@@ -1,6 +1,6 @@
 name: "💡 Feat"
 description: "새로운 기능 추가 템플릿"
-title: "[Feat] "
+title: "feat: "
 labels: "feat"
 body:
   - type: textarea
