@@ -1,12 +1,12 @@
 export default defineConfig([
   {
-    files: ["**/*.{js,mjs,cjs,ts,mts,cts,jsx,tsx}"],
+    files: ['**/*.{js,mjs,cjs,ts,mts,cts,jsx,tsx}'],
     plugins: { js },
-    extends: ["js/recommended"],
+    extends: ['js/recommended']
   },
   {
-    files: ["**/*.{js,mjs,cjs,ts,mts,cts,jsx,tsx}"],
-    languageOptions: { globals: globals.browser },
+    files: ['**/*.{js,mjs,cjs,ts,mts,cts,jsx,tsx}'],
+    languageOptions: { globals: globals.browser }
   },
   tseslint.configs.recommended,
   pluginReact.configs.flat.recommended,
@@ -14,18 +14,18 @@ export default defineConfig([
     // 🚨 react version 명시
     settings: {
       react: {
-        version: "detect",
-      },
-    },
+        version: 'detect'
+      }
+    }
   },
   {
     // 🚨 'react/react-in-jsx-scope' 규칙을 'off'로 설정
     rules: {
-      "react/react-in-jsx-scope": "off",
-      "react/jsx-uses-react": "off",
-      indent: ["error", 2],
+      'react/react-in-jsx-scope': 'off',
+      'react/jsx-uses-react': 'off',
+      indent: ['error', 2]
     },
     // 🚨 ignore 설정
-    ignores: ["**/node_modules/**", "**/dist/**", "**/build/**"],
-  },
+    ignores: ['**/node_modules/**', '**/dist/**', '**/build/**']
+  }
 ]);
