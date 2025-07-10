@@ -1,0 +1,19 @@
+name: "💡 Feat"
+description: "새로운 기능 추가 템플릿"
+title: "[Feat] "
+labels: "feat"
+body:
+  - type: textarea
+    attributes:
+      label: 📝 설명
+      description: 새로운 기능에 대해 설명해주세요.
+      placeholder: 기능에 대해서 적어주세요.
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: ✅ 체크사항
+      description: 주어진 기능에 대해서 체크박스를 만들어주세요.
+      placeholder: 기능에 대해서 나열해주세요.
+    validations:
+      required: true
