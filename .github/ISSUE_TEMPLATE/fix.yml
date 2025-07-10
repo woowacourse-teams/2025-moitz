@@ -1,6 +1,6 @@
 name: "🛠️ Fix"
 description: "Fix 템플릿"
-title: "[Fix] "
+title: "fix: "
 labels: "fix"
 body:
   - type: textarea
