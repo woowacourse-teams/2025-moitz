@@ -1,6 +1,6 @@
 name: "♻️ Refactor"
 description: "리팩토링 템플릿"
-title: "[Refactor] "
+title: "refactor: "
 labels: "refactor"
 body:
   - type: textarea
