@@ -1,0 +1,7 @@
+{
+  "editor.rulers": [80],
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "always" // S/TS 파일을 저장할 때마다 ESLint를 실행하고 문제점을 고치게 설정
+  },
+  "trailing-spaces.trimOnSave": true
+}
