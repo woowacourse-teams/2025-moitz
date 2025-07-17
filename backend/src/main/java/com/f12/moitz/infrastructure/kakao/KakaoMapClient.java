@@ -1,6 +1,6 @@
-package com.f12.moitz.infrastructure;
+package com.f12.moitz.infrastructure.kakao;
 
-import com.f12.moitz.infrastructure.dto.KakaoApiResponse;
+import com.f12.moitz.infrastructure.kakao.dto.KakaoApiResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;

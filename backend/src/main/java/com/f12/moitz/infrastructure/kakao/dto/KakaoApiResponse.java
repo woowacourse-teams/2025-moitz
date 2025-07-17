@@ -1,4 +1,4 @@
-package com.f12.moitz.infrastructure.dto;
+package com.f12.moitz.infrastructure.kakao.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.List;
