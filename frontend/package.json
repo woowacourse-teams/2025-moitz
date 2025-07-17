@@ -3,7 +3,7 @@
   "description": "My webpack project",
   "name": "webpack-project",
   "scripts": {
-    "start": "webpack serve --mode=development",
+    "start": "webpack serve --mode=development --host 0.0.0.0",
     "build": "webpack --mode=production --node-env=production",
     "build:dev": "webpack --mode=development",
     "serve": "webpack serve",
