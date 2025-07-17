@@ -1,17 +1,12 @@
+import { ThemeProvider } from '@emotion/react';
 import { css } from '@emotion/react';
+
+import defaultTheme from './shared/styles/defaultTheme';
 
 export default function App() {
   return (
-    <div
-      css={css`
-        padding: 32px;
-        background-color: hotpink;
-        font-size: 24px;
-        border-radius: 4px;
-        &:hover {
-          color: red;
-        }
-      `}
-    ></div>
+    <ThemeProvider theme={defaultTheme}>
+      <div css={(theme) => ({ color: theme.colors.primary })}>some other text</div>
+    </ThemeProvider>
   );
 }
