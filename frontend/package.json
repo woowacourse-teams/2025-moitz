@@ -3,7 +3,7 @@
   "description": "My webpack project",
   "name": "webpack-project",
   "scripts": {
-    "start": "webpack serve --mode=development",
+    "start": "webpack serve --mode=development --host 0.0.0.0",
     "build": "webpack --mode=production --node-env=production",
     "build:dev": "webpack --mode=development",
     "serve": "webpack serve",
@@ -17,6 +17,7 @@
     "@types/react-dom": "^19.1.6",
     "@types/webpack": "^5.28.5",
     "eslint": "^9.30.1",
+    "eslint-plugin-import": "^2.32.0",
     "eslint-plugin-react": "^7.37.5",
     "globals": "^16.3.0",
     "html-loader": "^5.1.0",
