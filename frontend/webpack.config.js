@@ -1,6 +1,7 @@
 // Generated using webpack-cli https://github.com/webpack/webpack-cli
 
 const path = require('path');
+
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 const isProduction = process.env.NODE_ENV === 'production';
@@ -47,12 +48,16 @@ const config = {
     extensions: ['.tsx', '.ts', '.jsx', '.js', '...']
   }
 };
+if (isProduction) {
+  config.mode = 'production';
+} else {
+  config.mode = 'development';
+}
 
-module.exports = () => {
-  if (isProduction) {
-    config.mode = 'production';
-  } else {
-    config.mode = 'development';
-  }
-  return config;
-};
+// Add CSS loader rule
+config.module.rules.push({
+  test: /\.css$/i,
+  use: ['style-loader', 'css-loader'],
+});
+
+module.exports = config;
