@@ -1,3 +1,4 @@
+/** @jsxImportSource @emotion/react */
 import * as button from './markerIndex.styled';
 
 interface MarkerIndexProps {
