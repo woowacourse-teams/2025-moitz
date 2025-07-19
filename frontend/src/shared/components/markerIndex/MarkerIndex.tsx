@@ -1,5 +1,5 @@
 /** @jsxImportSource @emotion/react */
-import * as button from './markerIndex.styled';
+import * as marker from './markerIndex.styled';
 
 interface MarkerIndexProps {
   index: number;
@@ -7,8 +7,8 @@ interface MarkerIndexProps {
 
 function MarkerIndex({ index }: MarkerIndexProps) {
   return (
-    <div css={button.base()}>
-      <div>{index}</div>
+    <div css={marker.base()}>
+      <span>{index}</span>
     </div>
   );
 }
