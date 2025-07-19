@@ -1,6 +1,6 @@
 import { css } from '@emotion/react';
 
-import { colors, borderRadius } from '../../styles/tokens';
+import { colorToken, borderRadiusToken } from '../../styles/tokens';
 
 export const base = () => css`
   display: flex;
@@ -8,7 +8,7 @@ export const base = () => css`
   align-items: center;
   width: 40px;
   height: 40px;
-  border-radius: ${borderRadius.round};
-  color: ${colors.gray[7]};
-  background-color: ${colors.main[1]};
+  border-radius: ${borderRadiusToken.round};
+  color: ${colorToken.gray[7]};
+  background-color: ${colorToken.main[1]};
 `;

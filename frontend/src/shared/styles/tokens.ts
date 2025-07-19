@@ -1,6 +1,6 @@
-import './index.css';
+import './tokens.css';
 
-const colors = {
+const colorToken = {
   gray: {
     0: 'var(--color-gray-0)',
     1: 'var(--color-gray-1)',
@@ -30,7 +30,7 @@ const colors = {
   },
 };
 
-const typography = {
+const typoToken = {
   headers: {
     h1: 'var(--font-header-h1)',
     h2: 'var(--font-header-h2)',
@@ -47,13 +47,18 @@ const typography = {
   captions: {
     c1: 'var(--font-caption-c1)',
   },
+  weight: {
+    bold: 'var(--font-weight-bold)',
+    semiBold: 'var(--font-weight-semi-bold)',
+    regular: 'var(--font-weight-regular)',
+  },
 };
 
-const borderRadius = {
+const borderRadiusToken = {
   input: 'var(--radius-input)',
   button: 'var(--radius-button)',
   global: 'var(--radius-global)',
   round: 'var(--radius-round)',
 };
 
-export { colors, typography, borderRadius };
+export { colorToken, typoToken, borderRadiusToken };
