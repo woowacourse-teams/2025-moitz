@@ -27,14 +27,18 @@
   --color-bg-2: #f7f7f7;
 
   /* Typography */
-  --font-header-h1: 20pt Pretendard;
-  --font-header-h2: 18pt Pretendard;
-  --font-header-h3: 16pt Pretendard;
-  --font-subheader-sh1: 14pt Pretendard;
-  --font-subheader-sh2: 12pt Pretendard;
-  --font-body-b1: 16pt Pretendard;
-  --font-body-b2: 14pt Pretendard;
-  --font-caption-c1: 12pt Pretendard;
+  --font-header-h1: 20px;
+  --font-header-h2: 18px;
+  --font-header-h3: 16px;
+  --font-subheader-sh1: 14px;
+  --font-subheader-sh2: 12px;
+  --font-body-b1: 16px;
+  --font-body-b2: 14px;
+  --font-caption-c1: 12px;
+
+  --font-weight-bold: 700;
+  --font-weight-semi-bold: 600;
+  --font-weight-regular: 400;
 
   /* Border Radius */
   --radius-input: 10px;
