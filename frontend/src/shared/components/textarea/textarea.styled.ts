@@ -10,6 +10,7 @@ export const base = () => css`
   color: ${colorToken.gray[1]};
   background-color: ${colorToken.gray[7]};
   border: none;
+  resize: none;
 
   &:focus {
     box-shadow: 0 0 0 2px ${colorToken.main[1]};
