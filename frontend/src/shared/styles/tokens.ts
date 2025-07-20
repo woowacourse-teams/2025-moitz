@@ -15,6 +15,7 @@ const colorToken = {
     1: 'var(--color-main-1)',
     2: 'var(--color-main-2)',
     3: 'var(--color-main-3)',
+    4: 'var(--color-main-4)',
   },
   sub: {
     1: 'var(--color-sub-1)',
