@@ -11,7 +11,7 @@ export const base = () => css`
   border: none;
   cursor: pointer;
   border-radius: ${borderRadiusToken.button};
-  color: ${colorToken.gray[7]};
+  color: ${colorToken.gray[8]};
   background-color: ${colorToken.main[3]};
 `;
 

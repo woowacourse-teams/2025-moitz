@@ -7,8 +7,8 @@ export const base = () => css`
   height: 100%;
   padding: 12px 10px;
   border-radius: ${borderRadiusToken.input};
-  color: ${colorToken.gray[1]};
-  background-color: ${colorToken.gray[7]};
+  color: ${colorToken.gray[3]};
+  background-color: ${colorToken.gray[8]};
   border: none;
 
   &:focus {
@@ -17,6 +17,6 @@ export const base = () => css`
   }
 
   &::placeholder {
-    color: ${colorToken.gray[4]};
+    color: ${colorToken.gray[5]};
   }
 `;

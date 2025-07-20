@@ -8,6 +8,6 @@ export const base = () => css`
   align-items: center;
   padding: 3px 10px;
   border-radius: ${borderRadiusToken.global};
-  color: ${colorToken.gray[7]};
+  color: ${colorToken.gray[8]};
   background-color: ${colorToken.orange[2]};
 `;
