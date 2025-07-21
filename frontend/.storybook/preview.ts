@@ -1,6 +1,4 @@
-import React from 'react';
-
-import GlobalStyle from '../src/shared/styles/GlobalStyle';
+import { colorToken } from '../src/shared/styles/tokens';
 
 import type { Preview } from '@storybook/react-webpack5';
 
@@ -12,17 +10,18 @@ const preview: Preview = {
         date: /Date$/i,
       },
     },
-  },
-  decorators: [
-    (Story) => {
-      return React.createElement(
-        React.Fragment,
-        null,
-        React.createElement(GlobalStyle),
-        React.createElement(Story),
-      );
+    backgrounds: {
+      options: {
+        bg1: { name: 'bg1', value: colorToken.bg[1] },
+        bg2: { name: 'bg2', value: colorToken.bg[2] },
+        dark: { name: 'Dark', value: '#333333' },
+        light: { name: 'Light', value: '#FFFFFF' },
+      },
     },
-  ],
+  },
+  initialGlobals: {
+    backgrounds: { value: 'bg1' },
+  },
 };
 
 export default preview;
