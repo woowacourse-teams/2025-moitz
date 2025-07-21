@@ -14,6 +14,10 @@ const meta = {
       control: { type: 'number', min: 1, max: 5 },
       description: '마커에 표시될 인덱스 번호',
     },
+    hasStroke: {
+      control: { type: 'boolean' },
+      description: '마커 stroke 여부',
+    },
   },
 } satisfies Meta<typeof MarkerIndex>;
 
@@ -23,5 +27,13 @@ type Story = StoryObj<typeof meta>;
 export const Default: Story = {
   args: {
     index: 1,
+    hasStroke: false,
+  },
+};
+
+export const Stroke: Story = {
+  args: {
+    index: 1,
+    hasStroke: true,
   },
 };
