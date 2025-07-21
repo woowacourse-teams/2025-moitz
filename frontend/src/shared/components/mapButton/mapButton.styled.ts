@@ -8,11 +8,7 @@ export const base = () => css`
   align-items: center;
   width: 40px;
   height: 40px;
+  cursor: pointer;
   border-radius: ${borderRadiusToken.round};
-  color: ${colorToken.gray[8]};
-  background-color: ${colorToken.main[1]};
-`;
-
-export const stroke = () => css`
-  border: 4px solid ${colorToken.gray[8]};
+  background-color: ${colorToken.gray[8]};
 `;
