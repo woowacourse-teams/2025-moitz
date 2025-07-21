@@ -7,7 +7,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.genai.types.GenerateContentConfig;
 import java.util.List;
 import java.util.Map;
-import lombok.extern.log4j.Log4j2;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -15,7 +15,7 @@ import com.google.genai.Client;
 import com.google.genai.types.GenerateContentResponse;
 
 @Component
-@Log4j2
+@Slf4j
 public class GoogleGeminiClient {
 
     private static final int RECOMMENDATION_COUNT = 5;
@@ -27,6 +27,39 @@ public class GoogleGeminiClient {
                     The recommendation must include the following format for each starting point: travel method, travel route, travel time, travel cost, and number of transfers. Must satisfy additional conditions provided by the user.
                     Starting Points:%s
                     Additional User Condition:%s
+            """;
+    private static final String ADDITIONAL_PROMPT = """
+                    You're an AI assistant recommending optimal meeting locations in Seoul. Your main goal is to suggest places where subway travel times from all starting points are similar and distances aren't too far.
+
+                    Core Conditions:
+                    Subway Travel Only: Travel time calculations must be limited to public transportation (subway).
+                    Subway Station Scope: Starting and destination points must be limited to Seoul Metro subway stations.
+                    Similar Travel Times: The travel time from each starting point to the recommended destination must be within a 15-minute margin of error (max_time - min_time <= 15 minutes) across all starting points.
+                    Facility Sufficiency: Recommended areas must be near subway stations, have ample dining/cafes/convenience facilities, and specifically meet any additional user conditions.
+
+                    Recommendation Requirements:
+                    Recommend a total of %d locations.
+                    For each recommended location, provide the following detailed format per starting point: travelMethod, travelRoute, totalTimeInMinutes, travelCost, and numberOfTransfers.
+                    Do NOT recommend locations that fail to meet the Additional User Condition.
+
+                    Input:
+                    Starting Points: %s (List of subway station names)
+                    Additional User Condition: %s (e.g., "PC방, 코인노래방")
+
+                    Kakao Category Extraction:
+                    Analyze the Additional User Condition to extract relevant Kakao Local API Category Group Codes. Include all clearly mapping codes. If a condition doesn't clearly map, return ALL available Kakao Category Group Codes from the reference list.
+
+                    Kakao Local API Category Group Codes (you must use these):
+                    CT1: Cultural Facility
+                    AT4: Tourist Attraction
+                    AD5: Accommodation
+                    FD6: Restaurant
+                    CE7: Cafe
+
+                    Based on analysis, you must explicitly include a list of relevant Kakao Category Group Codes in your response for the additionalConditionsCategoryCodes field.
+
+                    Output:
+                    Provide the response in the structured JSON format defined by the provided schemas.
             """;
 
     private final Client geminiClient;
@@ -41,10 +74,10 @@ public class GoogleGeminiClient {
         this.objectMapper = objectMapper;
     }
 
-    public RecommendationsResponse generateDetailResponse(final String stations, final String additionalCondition) {
+    public RecommendationsResponse generateDetailResponse(final List<String> stationNames, final String additionalCondition) {
         try {
             return objectMapper.readValue(
-                    generateContent(stations, additionalCondition, generateDetailData()).text(),
+                    generateContent(stationNames, additionalCondition, generateDetailData()).text(),
                     RecommendationsResponse.class
             );
         } catch (JsonProcessingException e) {
@@ -52,10 +85,10 @@ public class GoogleGeminiClient {
         }
     }
 
-    public RecommendedLocationPreview generateBriefResponse(final String stations, final String additionalCondition) {
+    public RecommendedLocationPreview generateBriefResponse(final List<String> stationNames, final String additionalCondition) {
         try {
             return objectMapper.readValue(
-                    generateContent(stations, additionalCondition, generateBriefData()).text(),
+                    generateContent(stationNames, additionalCondition, generateBriefData()).text(),
                     RecommendedLocationPreview.class
             );
         } catch (JsonProcessingException e) {
@@ -65,11 +98,12 @@ public class GoogleGeminiClient {
     }
 
     private GenerateContentResponse generateContent(
-            final String stations,
+            final List<String> stationNames,
             final String additionalCondition,
             final Map<String, Object> inputData
     ) {
-        String prompt = String.format(BASIC_PROMPT, RECOMMENDATION_COUNT, stations, additionalCondition);
+        final String stations = String.join(", ", stationNames);
+        final String prompt = String.format(ADDITIONAL_PROMPT, RECOMMENDATION_COUNT, stations, additionalCondition);
         final GenerateContentResponse generateContentResponse = generateBasicContent(
                 "gemini-1.5-flash",
                 prompt,
@@ -80,7 +114,7 @@ public class GoogleGeminiClient {
     }
 
     private GenerateContentResponse generateBasicContent(String model, String prompt, Map<String, Object> inputData) {
-        GenerateContentConfig config = GenerateContentConfig.builder()
+        final GenerateContentConfig config = GenerateContentConfig.builder()
                 .temperature(0.5F)
                 .maxOutputTokens(2000)
                 .responseMimeType("application/json")
@@ -145,9 +179,15 @@ public class GoogleGeminiClient {
                                 "items", recommendedLocationSchema,
                                 "minItems", 3,
                                 "maxItems", 5
+                        ),
+                        "additionalConditionsCategoryCodes", Map.of(
+                                "type", "array",
+                                "description", "사용자의 추가 요구사항에 매핑되는 카카오 로컬 API 카테고리 그룹 코드 리스트 (예: ['CT1', 'FD6']). 매핑되지 않으면 모두 포함.",
+                                "items", Map.of("type", "string"),
+                                "minItems", 0 // 최소 0개, 즉 비어있을 수도 있음
                         )
                 ),
-                "required", List.of("recommendations")
+                "required", List.of("recommendations", "additionalConditionsCategoryCodes")
         );
     }
 
@@ -162,9 +202,16 @@ public class GoogleGeminiClient {
                                 "items", Map.of("type", "string"),
                                 "minItems", 3,
                                 "maxItems", 5
+                        ),
+                        "additionalConditionsCategoryCodes", Map.of(
+                                "type", "array",
+                                "description", "사용자의 추가 요구사항에 매핑되는 카카오 로컬 API 카테고리 그룹 코드 리스트 (예: ['CT1', 'FD6']). 매핑되지 않으면 모두 포함.",
+                                "items", Map.of("type", "string"),
+                                "minItems", 0,
+                                "maxItems", 5
                         )
                 ),
-                "required", List.of("recommendations")
+                "required", List.of("recommendations", "additionalConditionsCategoryCodes")
         );
     }
 
