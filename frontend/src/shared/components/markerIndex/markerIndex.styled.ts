@@ -12,3 +12,7 @@ export const base = () => css`
   color: ${colorToken.gray[8]};
   background-color: ${colorToken.main[1]};
 `;
+
+export const stroke = () => css`
+  border: 4px solid ${colorToken.gray[8]};
+`;
