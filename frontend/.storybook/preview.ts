@@ -1,3 +1,5 @@
+import { colorToken } from '../src/shared/styles/tokens';
+
 import type { Preview } from '@storybook/react-webpack5';
 
 const preview: Preview = {
@@ -8,6 +10,17 @@ const preview: Preview = {
         date: /Date$/i,
       },
     },
+    backgrounds: {
+      options: {
+        bg1: { name: 'bg1', value: colorToken.bg[1] },
+        bg2: { name: 'bg2', value: colorToken.bg[2] },
+        dark: { name: 'Dark', value: '#333333' },
+        light: { name: 'Light', value: '#FFFFFF' },
+      },
+    },
+  },
+  initialGlobals: {
+    backgrounds: { value: 'bg1' },
   },
 };
 
