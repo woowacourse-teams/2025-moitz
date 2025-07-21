@@ -2,7 +2,6 @@ import './tokens.css';
 
 const colorToken = {
   gray: {
-    0: 'var(--color-gray-0)',
     1: 'var(--color-gray-1)',
     2: 'var(--color-gray-2)',
     3: 'var(--color-gray-3)',
@@ -10,11 +9,13 @@ const colorToken = {
     5: 'var(--color-gray-5)',
     6: 'var(--color-gray-6)',
     7: 'var(--color-gray-7)',
+    8: 'var(--color-gray-8)',
   },
   main: {
     1: 'var(--color-main-1)',
     2: 'var(--color-main-2)',
     3: 'var(--color-main-3)',
+    4: 'var(--color-main-4)',
   },
   sub: {
     1: 'var(--color-sub-1)',

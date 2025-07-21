@@ -1,18 +1,19 @@
 :root {
   /* Gray Colors */
-  --color-gray-0: #000000;
-  --color-gray-1: #242424;
-  --color-gray-2: #434343;
-  --color-gray-3: #656565;
-  --color-gray-4: #898989;
-  --color-gray-5: #afafaf;
-  --color-gray-6: #d6d6d6;
-  --color-gray-7: #ffffff;
+  --color-gray-1: #000000;
+  --color-gray-2: #242424;
+  --color-gray-3: #434343;
+  --color-gray-4: #656565;
+  --color-gray-5: #898989;
+  --color-gray-6: #afafaf;
+  --color-gray-7: #d6d6d6;
+  --color-gray-8: #ffffff;
 
   /* Main Colors */
   --color-main-1: #1dcfc1;
-  --color-main-2: #8ee7e0;
-  --color-main-3: #e8faf9;
+  --color-main-2: #2cdbcd;
+  --color-main-3: #8ee7e0;
+  --color-main-4: #e8faf9;
 
   /* Sub Colors */
   --color-sub-1: #3a3d4e;
