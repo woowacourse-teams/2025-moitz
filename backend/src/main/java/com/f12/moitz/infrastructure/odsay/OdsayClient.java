@@ -49,7 +49,7 @@ public class OdsayClient {
                 .uri(url)
                 .retrieve()
                 .body(SubwayRouteSearchResponse.class);
-        log.info("Odsay 응답 성공, url : {}, response : {}", url, response);
+        log.info("Odsay 응답 성공, url : {}", url);
         return response;
     }
 
