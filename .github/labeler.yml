@@ -1,0 +1,4 @@
+FE:
+  - frontend/**/*
+BE:
+  - backend/**/*
