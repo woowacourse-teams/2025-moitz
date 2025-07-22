@@ -40,3 +40,32 @@ export const typography = {
     font-weight: ${typoToken.weight.regular};
   `,
 };
+
+// Flex
+type flexOptions = {
+  direction?: 'row' | 'column';
+  justify?:
+    | 'flex-start'
+    | 'center'
+    | 'flex-end'
+    | 'space-between'
+    | 'space-around';
+  align?: 'flex-start' | 'center' | 'flex-end' | 'stretch';
+  gap?: number;
+};
+
+export const flex = (options: flexOptions = {}) => css`
+  display: flex;
+  ${options.direction && `flex-direction: ${options.direction};`}
+  ${options.justify && `justify-content: ${options.justify};`}
+  ${options.align && `align-items: ${options.align};`}
+  ${options.gap && `gap: ${options.gap}px;`}
+`;
+
+export const inline_flex = (options: flexOptions = {}) => css`
+  display: inline-flex;
+  ${options.direction && `flex-direction: ${options.direction};`}
+  ${options.justify && `justify-content: ${options.justify};`}
+  ${options.align && `align-items: ${options.align};`}
+  ${options.gap && `gap: ${options.gap}px;`}
+`;
