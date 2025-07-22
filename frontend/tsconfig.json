@@ -8,7 +8,8 @@
     "allowSyntheticDefaultImports": true,
     "resolveJsonModule": true,
     "jsxImportSource": "@emotion/react",
-    "typeRoots": ["./node_modules/@types", "./src/types"]
+    "typeRoots": ["./node_modules/@types", "./src/types"],
+    "skipLibCheck": true, // 외부 라이브러리 타입 검사를 무시하도록 설정
   },
   "include": ["src", "main.tsx", "src/shared/styles/styled.d.ts", "src/types/*.d.ts"]
 }
