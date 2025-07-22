@@ -13,7 +13,7 @@ public class LocationCalculator {
         List<Coordinate> points = new ArrayList<>();
 
         for (PlaceRequest place : places) {
-            points.add(new Coordinate(place.longitude(), place.latitude()));
+            points.add(new Coordinate(place.x(), place.y()));
         }
 
         Coordinate[] pointArray = points.toArray(new Coordinate[0]);

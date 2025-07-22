@@ -1,8 +1,8 @@
 package com.f12.moitz.application.dto;
 
 public record PlaceResponse(
-        double latitude,
-        double longitude,
+        double y,
+        double x,
         String placeName
 ) {
 
