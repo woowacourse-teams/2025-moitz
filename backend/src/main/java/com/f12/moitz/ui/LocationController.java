@@ -1,8 +1,8 @@
 package com.f12.moitz.ui;
 
 import com.f12.moitz.application.LocationService;
-import com.f12.moitz.ui.dto.LocationRecommendRequest;
-import com.f12.moitz.ui.dto.PlaceResponse;
+import com.f12.moitz.application.dto.LocationRecommendRequest;
+import com.f12.moitz.application.dto.PlaceResponse;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

@@ -1,13 +1,13 @@
 package com.f12.moitz.application;
 
+import com.f12.moitz.application.dto.LocationRecommendRequest;
+import com.f12.moitz.application.dto.PlaceResponse;
 import com.f12.moitz.domain.Place;
 import com.f12.moitz.infrastructure.gemini.GoogleGeminiClient;
 import com.f12.moitz.infrastructure.gemini.dto.RecommendedLocationPreview;
 import com.f12.moitz.infrastructure.kakao.KakaoMapClient;
 import com.f12.moitz.infrastructure.odsay.OdsayClient;
 import com.f12.moitz.infrastructure.odsay.dto.SubwayRouteSearchResponse;
-import com.f12.moitz.ui.dto.LocationRecommendRequest;
-import com.f12.moitz.ui.dto.PlaceResponse;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;

@@ -1,4 +1,4 @@
-package com.f12.moitz.ui.dto;
+package com.f12.moitz.application.dto;
 
 import java.util.List;
 

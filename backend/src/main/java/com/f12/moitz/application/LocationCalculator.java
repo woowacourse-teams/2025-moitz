@@ -1,6 +1,6 @@
 package com.f12.moitz.application;
 
-import com.f12.moitz.ui.dto.PlaceRequest;
+import com.f12.moitz.application.dto.PlaceRequest;
 import java.util.ArrayList;
 import java.util.List;
 import org.locationtech.jts.geom.Coordinate;
