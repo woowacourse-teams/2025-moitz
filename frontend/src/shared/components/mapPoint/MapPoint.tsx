@@ -1,5 +1,5 @@
 /** @jsxImportSource @emotion/react */
-import { typography } from '../../styles/default.styled';
+import { inline_flex, typography } from '../../styles/default.styled';
 
 import * as mapPoint from './mapPoint.styled';
 
@@ -9,7 +9,12 @@ interface MapPointProps {
 
 function MapPoint({ text }: MapPointProps) {
   return (
-    <div css={mapPoint.base()}>
+    <div
+      css={[
+        inline_flex({ justify: 'center', align: 'center', gap: 10 }),
+        mapPoint.base(),
+      ]}
+    >
       <div css={mapPoint.dot()}></div>
       <span css={typography.sh2}>{text}</span>
     </div>

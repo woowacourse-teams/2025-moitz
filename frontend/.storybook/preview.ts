@@ -1,6 +1,19 @@
+import { createElement } from 'react';
+
+import GlobalStyle from '../src/shared/styles/GlobalStyle';
 import { colorToken } from '../src/shared/styles/tokens';
 
+import type { Decorator } from '@storybook/react';
 import type { Preview } from '@storybook/react-webpack5';
+
+const withGlobalStyle: Decorator = (Story) => {
+  return createElement(
+    'div',
+    null,
+    createElement(GlobalStyle),
+    createElement(Story),
+  );
+};
 
 const preview: Preview = {
   parameters: {
@@ -22,6 +35,7 @@ const preview: Preview = {
   initialGlobals: {
     backgrounds: { value: 'bg1' },
   },
+  decorators: [withGlobalStyle],
 };
 
 export default preview;
