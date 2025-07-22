@@ -2,7 +2,7 @@ package com.f12.moitz.ui;
 
 import com.f12.moitz.application.LocationService;
 import com.f12.moitz.application.dto.LocationRecommendRequest;
-import com.f12.moitz.application.dto.PlaceResponse;
+import com.f12.moitz.application.dto.LocationRecommendResponse;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -19,7 +19,7 @@ public class LocationController {
     private final LocationService locationService;
 
     @PostMapping
-    public ResponseEntity<List<PlaceResponse>> recommendLocations(@RequestBody LocationRecommendRequest request) {
+    public ResponseEntity<List<LocationRecommendResponse>> recommendLocations(@RequestBody LocationRecommendRequest request) {
         return ResponseEntity.ok(locationService.recommendLocation(request));
     }
 

@@ -1,6 +1,6 @@
 package com.f12.moitz.application;
 
-import com.f12.moitz.application.dto.PlaceRequest;
+import com.f12.moitz.domain.Point;
 import java.util.ArrayList;
 import java.util.List;
 import org.locationtech.jts.geom.Coordinate;
@@ -9,17 +9,17 @@ import org.springframework.stereotype.Component;
 @Component
 public class LocationCalculator {
 
-    public PlaceRequest calculateCenterPoint(List<PlaceRequest> places) {
-        List<Coordinate> points = new ArrayList<>();
+    public Point calculateCenterPoint(List<Point> places) {
+        List<Coordinate> coordinates = new ArrayList<>();
 
-        for (PlaceRequest place : places) {
-            points.add(new Coordinate(place.x(), place.y()));
+        for (Point place : places) {
+            coordinates.add(new Coordinate(place.getX(), place.getY()));
         }
 
-        Coordinate[] pointArray = points.toArray(new Coordinate[0]);
+        Coordinate[] pointArray = coordinates.toArray(new Coordinate[0]);
         Coordinate midpoint = calculateMidpoint(pointArray);
 
-        return new PlaceRequest(midpoint.y, midpoint.x);
+        return new Point(midpoint.x, midpoint.y);
     }
 
     private Coordinate calculateMidpoint(Coordinate[] geoPoints) {

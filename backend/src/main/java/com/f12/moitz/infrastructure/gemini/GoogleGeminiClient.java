@@ -1,7 +1,7 @@
 package com.f12.moitz.infrastructure.gemini;
 
 import com.f12.moitz.infrastructure.gemini.dto.RecommendationsResponse;
-import com.f12.moitz.infrastructure.gemini.dto.RecommendedLocationPreview;
+import com.f12.moitz.infrastructure.gemini.dto.BriefRecommendedLocationResponse;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.genai.types.GenerateContentConfig;
@@ -18,6 +18,7 @@ import com.google.genai.types.GenerateContentResponse;
 @Slf4j
 public class GoogleGeminiClient {
 
+    private static final String GEMINI_MODEL = "gemini-1.5-flash";
     private static final int RECOMMENDATION_COUNT = 5;
     private static final String BASIC_PROMPT = """
                     Purpose: Recommend meeting locations where subway travel times from all starting points are similar and distances are not too far.
@@ -40,6 +41,8 @@ public class GoogleGeminiClient {
                     Recommendation Requirements:
                     Recommend a total of %d locations.
                     For each recommended location, provide the following detailed format per starting point: travelMethod, travelRoute, totalTimeInMinutes, travelCost, and numberOfTransfers.
+                    Additionally, for each recommended location, you must provide a concise, one-line summary reason (e.g., '접근성 좋고 맛집이 많아요! 😋') explaining why this specific location is recommended, highlighting its key advantages based on the user's conditions and travel similarities.
+                    This reason must be within 50 characters, and you may use relevant emojis to enhance expressiveness.
                     Do NOT recommend locations that fail to meet the Additional User Condition.
 
                     Input:
@@ -77,7 +80,7 @@ public class GoogleGeminiClient {
     public RecommendationsResponse generateDetailResponse(final List<String> stationNames, final String additionalCondition) {
         try {
             return objectMapper.readValue(
-                    generateContent(stationNames, additionalCondition, generateDetailData()).text(),
+                    generateContent(stationNames, additionalCondition, getDetailSchema()).text(),
                     RecommendationsResponse.class
             );
         } catch (JsonProcessingException e) {
@@ -85,11 +88,11 @@ public class GoogleGeminiClient {
         }
     }
 
-    public RecommendedLocationPreview generateBriefResponse(final List<String> stationNames, final String additionalCondition) {
+    public BriefRecommendedLocationResponse generateBriefResponse(final List<String> stationNames, final String additionalCondition) {
         try {
             return objectMapper.readValue(
-                    generateContent(stationNames, additionalCondition, generateBriefData()).text(),
-                    RecommendedLocationPreview.class
+                    generateContent(stationNames, additionalCondition, getBriefSchema()).text(),
+                    BriefRecommendedLocationResponse.class
             );
         } catch (JsonProcessingException e) {
             throw new RuntimeException("Gemini 응답 파싱 실패", e);
@@ -105,7 +108,7 @@ public class GoogleGeminiClient {
         final String stations = String.join(", ", stationNames);
         final String prompt = String.format(ADDITIONAL_PROMPT, RECOMMENDATION_COUNT, stations, additionalCondition);
         final GenerateContentResponse generateContentResponse = generateBasicContent(
-                "gemini-1.5-flash",
+                GEMINI_MODEL,
                 prompt,
                 inputData
         );
@@ -116,7 +119,7 @@ public class GoogleGeminiClient {
     private GenerateContentResponse generateBasicContent(String model, String prompt, Map<String, Object> inputData) {
         final GenerateContentConfig config = GenerateContentConfig.builder()
                 .temperature(0.5F)
-                .maxOutputTokens(2000)
+                .maxOutputTokens(2500)
                 .responseMimeType("application/json")
                 .responseJsonSchema(inputData)
                 .build();
@@ -128,7 +131,7 @@ public class GoogleGeminiClient {
         );
     }
 
-    private Map<String, Object> generateDetailData() {
+    private Map<String, Object> getDetailSchema() {
         Map<String, Object> movingInfoSchema = Map.of(
                 "type", "object",
                 "properties", Map.of(
@@ -184,14 +187,14 @@ public class GoogleGeminiClient {
                                 "type", "array",
                                 "description", "사용자의 추가 요구사항에 매핑되는 카카오 로컬 API 카테고리 그룹 코드 리스트 (예: ['CT1', 'FD6']). 매핑되지 않으면 모두 포함.",
                                 "items", Map.of("type", "string"),
-                                "minItems", 0 // 최소 0개, 즉 비어있을 수도 있음
+                                "minItems", 0
                         )
                 ),
                 "required", List.of("recommendations", "additionalConditionsCategoryCodes")
         );
     }
 
-    private Map<String, Object> generateBriefData() {
+    private Map<String, Object> getBriefSchema() {
         return Map.of(
                 "type", "object",
                 "properties", Map.of(
@@ -199,7 +202,18 @@ public class GoogleGeminiClient {
                                 "type", "array",
                                 "description",
                                 "추천된 장소들의 이름 리스트. 총 N개의 지하철역 이름(문자열)을 포함합니다.",
-                                "items", Map.of("type", "string"),
+                                "items", Map.of(
+                                        "type", "object",
+                                        "properties", Map.of(
+                                                "locationName", Map.of("type", "string", "description", "추천 장소의 이름"),
+                                                "reason", Map.of(
+                                                        "type", "string",
+                                                        "description", "해당 장소를 추천하는 간결한 한 줄 요약 이유 50자 이내 (예: '접근성 좋고 맛집이 많아요!')",
+                                                        "maxLength", 50
+                                                )
+                                        ),
+                                        "required", List.of("locationName", "reason")
+                                ),
                                 "minItems", 3,
                                 "maxItems", 5
                         ),
