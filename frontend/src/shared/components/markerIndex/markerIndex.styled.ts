@@ -4,6 +4,7 @@ import { colorToken, borderRadiusToken } from '../../styles/tokens';
 
 export const base = () => css`
   width: 40px;
+  min-width: 40px;
   height: 40px;
   border-radius: ${borderRadiusToken.round};
   color: ${colorToken.gray[8]};

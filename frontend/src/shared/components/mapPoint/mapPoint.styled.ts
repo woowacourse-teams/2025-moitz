@@ -11,6 +11,7 @@ export const base = () => css`
 
 export const dot = () => css`
   width: 8px;
+  min-width: 8px;
   height: 8px;
   border-radius: ${borderRadiusToken.round};
   background-color: ${colorToken.main[1]};
