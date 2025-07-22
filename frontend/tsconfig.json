@@ -8,7 +8,45 @@
     "allowSyntheticDefaultImports": true,
     "resolveJsonModule": true,
     "jsxImportSource": "@emotion/react",
-    "typeRoots": ["./node_modules/@types", "./src/types"]
+    "typeRoots": [
+      "./node_modules/@types",
+      "./src/types"
+    ],
+    "baseUrl": ".",
+    "paths": {
+      "@app/*": [
+        "src/app/*"
+      ],
+      "@pages/*": [
+        "src/pages/*"
+      ],
+      "@widgets/*": [
+        "src/widgets/*"
+      ],
+      "@features/*": [
+        "src/features/*"
+      ],
+      "@shared/*": [
+        "src/shared/*"
+      ],
+      "@shared/components/*": [
+        "src/shared/components/*"
+      ],
+      "@shared/styles/*": [
+        "src/shared/styles/*"
+      ],
+      "@shared/types/*": [
+        "src/shared/types/*"
+      ],
+      "@icons/*": [
+        "assets/icon/*"
+      ]
+    }
   },
-  "include": ["src", "main.tsx", "src/shared/styles/styled.d.ts", "src/types/*.d.ts"]
+  "include": [
+    "src",
+    "main.tsx",
+    "src/shared/styles/styled.d.ts",
+    "src/types/*.d.ts"
+  ]
 }
