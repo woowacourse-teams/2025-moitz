@@ -1,5 +1,5 @@
 /** @jsxImportSource @emotion/react */
-import { flex } from '../../styles/default.styled';
+import { flex } from '@shared/styles/default.styled';
 
 import * as mapButton from './mapButton.styled';
 

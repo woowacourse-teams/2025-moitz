@@ -1,6 +1,8 @@
 /** @jsxImportSource @emotion/react */
-import IconCancel from '../../../../assets/icon/icon-cancel.svg';
-import { inline_flex, flex, typography } from '../../styles/default.styled';
+
+import { flex, inline_flex, typography } from '@shared/styles/default.styled';
+
+import IconCancel from '@icons/icon-cancel.svg';
 
 import * as tag from './tag.styled';
 
