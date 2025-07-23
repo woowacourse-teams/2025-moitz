@@ -8,6 +8,7 @@
     "allowSyntheticDefaultImports": true,
     "resolveJsonModule": true,
     "jsxImportSource": "@emotion/react",
+    "skipLibCheck": true,
     "typeRoots": [
       "./node_modules/@types",
       "./src/types"
