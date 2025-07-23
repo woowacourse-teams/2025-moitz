@@ -1,7 +1,9 @@
+import { ReactNode } from 'react';
+
 import * as layout from './layout.styled';
 
 interface LayoutProps {
-  children: React.ReactNode;
+  children: ReactNode;
 }
 
 function Layout({ children }: LayoutProps) {
