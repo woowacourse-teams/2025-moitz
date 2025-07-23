@@ -1,6 +1,6 @@
 import { css } from '@emotion/react';
 
-import { borderRadiusToken, colorToken } from '../../styles/tokens';
+import { borderRadiusToken, colorToken } from '@shared/styles/tokens';
 
 export const base = () => css`
   width: 100%;

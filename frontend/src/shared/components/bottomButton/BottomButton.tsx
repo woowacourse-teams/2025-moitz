@@ -1,5 +1,5 @@
 /** @jsxImportSource @emotion/react */
-import { flex, typography } from '../../styles/default.styled';
+import { flex, typography } from '@shared/styles/default.styled';
 
 import * as bottomButton from './bottomButton.styled';
 

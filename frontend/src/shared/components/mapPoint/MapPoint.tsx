@@ -1,5 +1,5 @@
 /** @jsxImportSource @emotion/react */
-import { inline_flex, typography } from '../../styles/default.styled';
+import { inline_flex, typography } from '@shared/styles/default.styled';
 
 import * as mapPoint from './mapPoint.styled';
 
