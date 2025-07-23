@@ -1,0 +1,49 @@
+name: Backend 개발 환경 CI/CD
+
+on:
+  pull_request_target:
+    branches:
+      - dev
+    types:
+      - closed
+    paths:
+      - "backend/**"
+
+  push:
+    paths:
+      - "backend/**"
+
+jobs:
+  deploy_wip_branch:
+    if: github.event_name == 'push' && !endsWith(github.ref, 'dev')
+    runs-on: [ self-hosted ]
+    steps:
+      - name: 마지막 커밋 내역으로 checkout 한다
+        uses: actions/checkout@v4
+
+      - name: 개별 WIP 브랜치의 배포를 진행한다
+        env:
+          APPLICATION_PROPERTIES: ${{ secrets.APPLICATION_PROPERTIES }}
+        run: |
+          cd 2025-moitz/backend
+          rm -rf src/main/resources/application.properties
+          echo "$APPLICATION_PROPERTIES" > src/main/resources/application.properties
+          ./gradlew clean build
+          sudo fuser -k -n tcp 8080 || true
+          nohup java -jar build/libs/*SNAPSHOT.jar > ./output.log 2>&1 &
+
+  deploy_dev_branch:
+    if: github.event_name == 'pull_request_target' && github.event.pull_request.merged == true
+    runs-on: [ self-hosted ]
+    steps:
+      - name: 마지막 커밋 내역으로 checkout 한다
+        uses: actions/checkout@v4
+
+      - name: 머지된 dev 브랜치의 배포를 진행한다
+        run: |
+          cd 2025-moitz/backend
+          rm -rf src/main/resources/application.properties
+          echo "$APPLICATION_PROPERTIES" > src/main/resources/application.properties
+          ./gradlew clean build
+          sudo fuser -k -n tcp 8080 || true
+          nohup java -jar build/libs/*SNAPSHOT.jar > ./output.log 2>&1 &
