@@ -29,44 +29,44 @@ public class LocationService {
     private final KakaoMapClient kakaoMapClient;
 
     public List<LocationRecommendResponse> recommendLocation(final LocationRecommendRequest request) {
-        final List<LocationNameAndReason> generatedLocations = generateLocations(request);
-        final List<Place> startingPlace = getPlacesByName(request.startingPoint());
-        final List<String> placeNames = generatedLocations.stream()
+        final List<LocationNameAndReason> aiGeneratedResponse = generateAiRecommendedLocations(request);
+        final List<Place> startingPlace = getPlacesByName(request.startingPlaceNames());
+        final List<String> placeNames = aiGeneratedResponse.stream()
                 .map(LocationNameAndReason::locationName)
                 .toList();
-        final List<Place> recommendedPlaceByAi = getPlacesByName(placeNames);
-        return verifyRecommendLocationsByTravelTime(startingPlace, recommendedPlaceByAi, generatedLocations);
+        final List<Place> aiGeneratedPlaces = getPlacesByName(placeNames);
+        return verifyRecommendLocationsByTravelTime(startingPlace, aiGeneratedPlaces, aiGeneratedResponse);
     }
 
-    private List<LocationNameAndReason> generateLocations(final LocationRecommendRequest request) {
+    private List<LocationNameAndReason> generateAiRecommendedLocations(final LocationRecommendRequest request) {
         final BriefRecommendedLocationResponse briefRecommendedLocationResponse = googleGeminiClient.generateBriefResponse(
-                request.startingPoint(),
+                request.startingPlaceNames(),
                 request.requirement()
         );
         log.info("카테고리: {}", briefRecommendedLocationResponse.additionalConditionsCategoryCodes());
         return briefRecommendedLocationResponse.recommendations();
     }
 
-    private List<Place> getPlacesByName(final List<String> locationNames) {
-        return locationNames.stream()
-                .map(locationName -> new Place(
-                        locationName,
-                        kakaoMapClient.searchPointBy(locationName)
+    private List<Place> getPlacesByName(final List<String> startingPlaceNames) {
+        return startingPlaceNames.stream()
+                .map(placeName -> new Place(
+                        placeName,
+                        kakaoMapClient.searchPointBy(placeName)
                 ))
                 .toList();
     }
 
     private List<LocationRecommendResponse> verifyRecommendLocationsByTravelTime(
-            List<Place> startingLocations,
-            List<Place> locations,
+            List<Place> startingPlaces,
+            List<Place> aiGeneratedPlaces,
             List<LocationNameAndReason> generatedLocations
     ) {
-        Map<Place, Integer> verifiedLocations = new HashMap<>();
+        Map<Place, Integer> arrivalPlaces = new HashMap<>();
 
-        for (Place location : locations) {
+        for (Place aiGeneratedPlace : aiGeneratedPlaces) {
             List<Integer> durations = new ArrayList<>();
-            for (Place startingLocation : startingLocations) {
-                final SubwayRouteSearchResponse route = getSubwayRouteSearchResponse(location, startingLocation);
+            for (Place startingPlace : startingPlaces) {
+                final SubwayRouteSearchResponse route = getSubwayRouteSearchResponse(aiGeneratedPlace, startingPlace);
                 final int durationTime = route.getLeastTime();
                 durations.add(durationTime);
             }
@@ -80,10 +80,10 @@ public class LocationService {
                     .average()
                     .orElseThrow(() -> new IllegalStateException("Average duration not found"));
 
-            verifiedLocations.put(location, averageTime);
+            arrivalPlaces.put(aiGeneratedPlace, averageTime);
         }
 
-        return sortAndParseResponse(generatedLocations, verifiedLocations);
+        return sortAndParseResponse(generatedLocations, arrivalPlaces);
     }
 
     private SubwayRouteSearchResponse getSubwayRouteSearchResponse(final Place location, final Place startingLocation) {
@@ -116,13 +116,13 @@ public class LocationService {
 
     private List<LocationRecommendResponse> sortAndParseResponse(
             final List<LocationNameAndReason> generatedLocations,
-            final Map<Place, Integer> verifiedLocations
+            final Map<Place, Integer> arrivalPlaces
     ) {
-        int minTime = verifiedLocations.values().stream()
+        int minTime = arrivalPlaces.values().stream()
                 .min(Integer::compareTo)
                 .orElseThrow(() -> new IllegalStateException("No minimum time found"));
 
-        List<Map.Entry<Place, Integer>> entryList = new ArrayList<>(verifiedLocations.entrySet());
+        List<Map.Entry<Place, Integer>> entryList = new ArrayList<>(arrivalPlaces.entrySet());
         entryList.sort(Entry.comparingByValue());
 
         return IntStream.range(0, entryList.size())
