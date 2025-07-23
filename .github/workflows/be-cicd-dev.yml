@@ -29,7 +29,7 @@ jobs:
           echo "$APPLICATION_CLIENT_PROPERTIES" > src/main/resources/application-client.properties
           ./gradlew clean build
 
-          echo "hello"
+          echo github.ref
 
           if [ $? -ne 0 ]; then
             echo "빌드 실패"
