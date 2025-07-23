@@ -18,7 +18,7 @@ function BottomButton({ text, active }: BottomButtonProps) {
         active && bottomButton.active(),
       ]}
     >
-      <span css={typography.sh2}>{text}</span>
+      <span css={typography.h1}>{text}</span>
     </button>
   );
 }
