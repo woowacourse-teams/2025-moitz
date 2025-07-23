@@ -25,6 +25,8 @@ jobs:
           git pull origin $BRANCH_NAME
           git checkout $BRANCH_NAME
           
+          sleep 2
+          
           echo "=== JAR 빌드 ==="
           cd ~/2025-moitz/backend
           rm -rf src/main/resources/application-client.properties
