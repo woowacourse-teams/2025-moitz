@@ -14,4 +14,18 @@ public record LocationRecommendRequest(
         String requirement
 ) {
 
+        public LocationRecommendRequest {
+                validate(startingPoint, requirement);
+        }
+
+        public void validate(final List<String> startingPoint, final String requirement) {
+                if (startingPoint == null || startingPoint.isEmpty()) {
+                        throw new IllegalArgumentException("출발지 이름 목록은 필수입니다.");
+                }
+                if (requirement == null || requirement.isBlank()) {
+                        throw new IllegalArgumentException("추가 요청사항은 필수입니다.");
+                }
+
+        }
+
 }
