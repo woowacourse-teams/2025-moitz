@@ -18,19 +18,15 @@ jobs:
     steps:
       - name: 마지막 커밋 내역으로 checkout 한다
         run: |
-          ls
-          cd ~/2025-moitz/backend
           BRANCH_NAME="${{ github.head_ref || github.ref_name }}"
           echo "Branch is $BRANCH_NAME"
-          git fetch origin $BRANCH_NAME
+          git pull origin $BRANCH_NAME
           git checkout $BRANCH_NAME
 
       - name: EC2 환경에서 배포를 진행한다
         env:
           APPLICATION_CLIENT_PROPERTIES: ${{ secrets.APPLICATION_CLIENT_PROPERTIES }}
         run: |
-          ls
-          
           echo "=== JAR 빌드 ==="
           cd ~/2025-moitz/backend
           rm -rf src/main/resources/application-client.properties
