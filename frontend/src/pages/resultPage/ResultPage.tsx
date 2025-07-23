@@ -1,5 +1,9 @@
+import SpotItemList from '@features/spotItemList/SpotItemList';
+
+import spotItemListMock from '../../mocks/spotItemListMock';
+
 function ResultPage() {
-  return <div>ResultPage</div>;
+  return <SpotItemList itemList={spotItemListMock} />;
 }
 
 export default ResultPage;

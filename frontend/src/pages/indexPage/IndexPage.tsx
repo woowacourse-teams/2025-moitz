@@ -1,11 +1,5 @@
-import SpotItemList from '@features/spotItemList/SpotItemList';
-
 function IndexPage() {
-  return (
-    <div>
-      <SpotItemList />
-    </div>
-  );
+  return <div></div>;
 }
 
 export default IndexPage;

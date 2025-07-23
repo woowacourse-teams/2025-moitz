@@ -1,21 +1,28 @@
 import SpotItem from '@shared/components/spotItem/SpotItem';
 import { flex } from '@shared/styles/default.styled';
 
-import spotItemsMock from './spotItemListMock';
+import { spotItem } from '@shared/types/spotItem';
 
-function SpotItemList() {
+interface SpotItemListProps {
+  itemList: spotItem[];
+}
+
+function SpotItemList({ itemList }: SpotItemListProps) {
   return (
     <div css={flex({ direction: 'column', gap: 20 })}>
-      {spotItemsMock.map((item) => (
-        <SpotItem
-          key={item.index}
-          index={item.index}
-          name={item.name}
-          description={item.description}
-          avgMinutes={item.avgMinutes}
-          isBest={item.isBest}
-        />
-      ))}
+      {itemList.map((item) => {
+        const { index, name, description, avgMinutes, isBest } = item;
+        return (
+          <SpotItem
+            key={index}
+            index={index}
+            name={name}
+            description={description}
+            avgMinutes={avgMinutes}
+            isBest={isBest}
+          />
+        );
+      })}
     </div>
   );
 }

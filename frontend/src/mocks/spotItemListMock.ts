@@ -1,6 +1,6 @@
 import { spotItem } from '@shared/types/spotItem';
 
-const spotItemsMock: spotItem[] = [
+const spotItemListMock: spotItem[] = [
   {
     index: 1,
     name: '가오리',
@@ -31,4 +31,4 @@ const spotItemsMock: spotItem[] = [
   },
 ];
 
-export default spotItemsMock;
+export default spotItemListMock;
