@@ -17,7 +17,7 @@ jobs:
     runs-on: [ self-hosted ]
     steps:
       - name: 마지막 커밋 내역으로 checkout 한다
-        uses: actions/checkout@v4
+        uses: actions/checkout@v3
 
       - name: EC2 환경에서 배포를 진행한다
         env:
@@ -28,6 +28,8 @@ jobs:
           rm -rf src/main/resources/application-client.properties
           echo "$APPLICATION_CLIENT_PROPERTIES" > src/main/resources/application-client.properties
           ./gradlew clean build
+
+          echo "hello"
 
           if [ $? -ne 0 ]; then
             echo "빌드 실패"
