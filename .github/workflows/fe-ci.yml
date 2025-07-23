@@ -1,4 +1,4 @@
-name: CI
+name: FE CI
 
 on:
   push:
