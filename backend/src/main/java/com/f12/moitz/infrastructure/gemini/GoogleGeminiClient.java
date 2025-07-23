@@ -18,7 +18,7 @@ import com.google.genai.types.GenerateContentResponse;
 @Slf4j
 public class GoogleGeminiClient {
 
-    private static final String GEMINI_MODEL = "gemini-1.5-flash";
+    private static final String GEMINI_MODEL = "gemini-1.5-flash-latest";
     private static final int RECOMMENDATION_COUNT = 5;
     private static final String BASIC_PROMPT = """
                     Purpose: Recommend meeting locations where subway travel times from all starting points are similar and distances are not too far.
@@ -59,7 +59,7 @@ public class GoogleGeminiClient {
                     FD6: Restaurant
                     CE7: Cafe
 
-                    Based on analysis, you must explicitly include a list of relevant Kakao Category Group Codes in your response for the additionalConditionsCategoryCodes field.
+                    Based on analysis, you must explicitly include a list of relevant Kakao Category Group Codes in your response for the requirementsCategoryCodes field.
 
                     Output:
                     Provide the response in the structured JSON format defined by the provided schemas.
@@ -77,10 +77,10 @@ public class GoogleGeminiClient {
         this.objectMapper = objectMapper;
     }
 
-    public RecommendationsResponse generateDetailResponse(final List<String> stationNames, final String additionalCondition) {
+    public RecommendationsResponse generateDetailResponse(final List<String> stationNames, final String requirement) {
         try {
             return objectMapper.readValue(
-                    generateContent(stationNames, additionalCondition, getDetailSchema()).text(),
+                    generateContent(stationNames, requirement, getDetailSchema()).text(),
                     RecommendationsResponse.class
             );
         } catch (JsonProcessingException e) {
@@ -88,10 +88,10 @@ public class GoogleGeminiClient {
         }
     }
 
-    public BriefRecommendedLocationResponse generateBriefResponse(final List<String> stationNames, final String additionalCondition) {
+    public BriefRecommendedLocationResponse generateBriefResponse(final List<String> stationNames, final String requirement) {
         try {
             return objectMapper.readValue(
-                    generateContent(stationNames, additionalCondition, getBriefSchema()).text(),
+                    generateContent(stationNames, requirement, getBriefSchema()).text(),
                     BriefRecommendedLocationResponse.class
             );
         } catch (JsonProcessingException e) {
@@ -102,11 +102,11 @@ public class GoogleGeminiClient {
 
     private GenerateContentResponse generateContent(
             final List<String> stationNames,
-            final String additionalCondition,
+            final String requirement,
             final Map<String, Object> inputData
     ) {
         final String stations = String.join(", ", stationNames);
-        final String prompt = String.format(ADDITIONAL_PROMPT, RECOMMENDATION_COUNT, stations, additionalCondition);
+        final String prompt = String.format(ADDITIONAL_PROMPT, RECOMMENDATION_COUNT, stations, requirement);
         final GenerateContentResponse generateContentResponse = generateBasicContent(
                 GEMINI_MODEL,
                 prompt,
@@ -118,8 +118,8 @@ public class GoogleGeminiClient {
 
     private GenerateContentResponse generateBasicContent(String model, String prompt, Map<String, Object> inputData) {
         final GenerateContentConfig config = GenerateContentConfig.builder()
-                .temperature(0.5F)
-                .maxOutputTokens(2500)
+                .temperature(0.2F)
+//                .maxOutputTokens(5000)
                 .responseMimeType("application/json")
                 .responseJsonSchema(inputData)
                 .build();
@@ -164,13 +164,13 @@ public class GoogleGeminiClient {
                                 "description", "각 출발점에서 해당 장소까지의 이동 정보 리스트. 각 출발점에 대한 하나의 MovingInfo 객체 포함",
                                 "items", movingInfoSchema
                         ),
-                        "additionalConditionsMet", Map.of(
+                        "requirementsMet", Map.of(
                                 "type", "string",
                                 "description",
                                 "사용자의 추가 요구사항(PC방, 코인노래방 등) 충족 여부 및 확인 출처 (예: 'PC방 3곳, 코인노래방 2곳 확인됨 (네이버 블로그, 인스타그램 기준)'). 충족되지 않으면 추천하지 않을 것."
                         )
                 ),
-                "required", List.of("locationName", "movingInfos", "additionalConditionsMet")
+                "required", List.of("locationName", "movingInfos", "requirementsMet")
         );
 
         return Map.of(
@@ -183,14 +183,14 @@ public class GoogleGeminiClient {
                                 "minItems", 3,
                                 "maxItems", 5
                         ),
-                        "additionalConditionsCategoryCodes", Map.of(
+                        "requirementsCategoryCodes", Map.of(
                                 "type", "array",
                                 "description", "사용자의 추가 요구사항에 매핑되는 카카오 로컬 API 카테고리 그룹 코드 리스트 (예: ['CT1', 'FD6']). 매핑되지 않으면 모두 포함.",
                                 "items", Map.of("type", "string"),
                                 "minItems", 0
                         )
                 ),
-                "required", List.of("recommendations", "additionalConditionsCategoryCodes")
+                "required", List.of("recommendations", "requirementsCategoryCodes")
         );
     }
 
@@ -217,7 +217,7 @@ public class GoogleGeminiClient {
                                 "minItems", 3,
                                 "maxItems", 5
                         ),
-                        "additionalConditionsCategoryCodes", Map.of(
+                        "requirementsCategoryCodes", Map.of(
                                 "type", "array",
                                 "description", "사용자의 추가 요구사항에 매핑되는 카카오 로컬 API 카테고리 그룹 코드 리스트 (예: ['CT1', 'FD6']). 매핑되지 않으면 모두 포함.",
                                 "items", Map.of("type", "string"),
@@ -225,7 +225,7 @@ public class GoogleGeminiClient {
                                 "maxItems", 5
                         )
                 ),
-                "required", List.of("recommendations", "additionalConditionsCategoryCodes")
+                "required", List.of("recommendations", "requirementsCategoryCodes")
         );
     }
 
