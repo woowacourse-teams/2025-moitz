@@ -25,8 +25,8 @@ jobs:
         run: |
           echo "=== JAR 빌드 ==="
           cd ~/2025-moitz/backend
-          rm -rf src/main/resources/application.properties
-          echo "$APPLICATION_PROPERTIES" > src/main/resources/application.properties
+          rm -rf src/main/resources/application-client.properties
+          echo "$APPLICATION_PROPERTIES" > src/main/resources/application-client.properties
           ./gradlew clean build
 
           if [ $? -ne 0 ]; then
