@@ -18,6 +18,8 @@ jobs:
     steps:
       - name: 마지막 커밋 내역으로 checkout 한다
         run: |
+          ls
+          cd ~/2025-moitz/backend
           BRANCH_NAME="${{ github.head_ref || github.ref_name }}"
           echo "Branch is $BRANCH_NAME"
           git fetch origin $BRANCH_NAME
@@ -27,7 +29,7 @@ jobs:
         env:
           APPLICATION_CLIENT_PROPERTIES: ${{ secrets.APPLICATION_CLIENT_PROPERTIES }}
         run: |
-          echo "$GITHUB_REF"
+          ls
           
           echo "=== JAR 빌드 ==="
           cd ~/2025-moitz/backend
@@ -45,6 +47,8 @@ jobs:
             echo "JAR 파일이 없습니다: $JAR_PATH"
             exit 1
           fi
+          
+          jar tf $JAR_PATH
 
           echo "=== 실행 중인 앱 종료 ==="
           PID=$(pgrep -f "$JAR_PATH" || true)
