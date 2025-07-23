@@ -47,10 +47,10 @@ record Document(
 }
 
 record Meta(
-    @JsonProperty("is_end") boolean isEnd,
-    @JsonProperty("pageable_count") int pageableCount,
-    @JsonProperty("total_count") int totalCount,
-    @JsonProperty("same_name") Object sameName
+        @JsonProperty("is_end") boolean isEnd,
+        @JsonProperty("pageable_count") int pageableCount,
+        @JsonProperty("total_count") int totalCount,
+        @JsonProperty("same_name") Object sameName
 ) {
 
 }
