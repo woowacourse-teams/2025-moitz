@@ -8,6 +8,7 @@
     "build:dev": "webpack --mode=development",
     "lint": "eslint \"src/**/*.{js,jsx,ts,tsx}\"",
     "lint:fix": "eslint \"src/**/*.{js,jsx,ts,tsx}\" --fix",
+    "type": "tsc --noEmit",
     "serve": "webpack serve",
     "watch": "webpack --watch",
     "prepare": "husky"
