@@ -1,13 +1,13 @@
-import { ThemeProvider } from '@emotion/react';
+import { Route, Routes } from 'react-router';
 
-import defaultTheme from '../shared/styles/defaultTheme';
-import GlobalStyle from '../shared/styles/GlobalStyle';
+import IndexPage from '@pages/indexPage/IndexPage';
+import ResultPage from '@pages/resultPage/ResultPage';
 
 export default function App() {
   return (
-    <ThemeProvider theme={defaultTheme}>
-      <GlobalStyle />
-      <div css={(theme) => ({ color: theme.colors.gray[0] })}>some other text</div>
-    </ThemeProvider>
+    <Routes>
+      <Route path="/" element={<IndexPage />} />
+      <Route path="/result" element={<ResultPage />} />
+    </Routes>
   );
 }
