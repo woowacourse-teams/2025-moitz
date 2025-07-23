@@ -1,11 +1,13 @@
-import Tag from '../shared/components/tag/Tag';
-import GlobalStyle from '../shared/styles/GlobalStyle';
+import { Route, Routes } from 'react-router';
+
+import IndexPage from '../pages/indexPage/IndexPage';
+import ResultPage from '../pages/resultPage/ResultPage';
 
 export default function App() {
   return (
-    <>
-      <Tag text="Hello" />
-      <GlobalStyle />
-    </>
+    <Routes>
+      <Route path="/" element={<IndexPage />} />
+      <Route path="/result" element={<ResultPage />} />
+    </Routes>
   );
 }
