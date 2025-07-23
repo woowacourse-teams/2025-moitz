@@ -1,11 +1,14 @@
 package com.f12.moitz.infrastructure.odsay;
 
 import com.f12.moitz.domain.Point;
+import com.f12.moitz.infrastructure.odsay.dto.OdsayErrorResponse;
 import com.f12.moitz.infrastructure.odsay.dto.SubwayRouteSearchResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.io.IOException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 
@@ -37,7 +40,6 @@ public class OdsayClient {
                 SEARCH_PATH_TYPE
         );
 
-        // TODO: 임시 요청 지연 처리
         try {
             Thread.sleep(300);
         } catch (InterruptedException e) {
@@ -48,9 +50,24 @@ public class OdsayClient {
         final SubwayRouteSearchResponse response = restClient.get()
                 .uri(url)
                 .retrieve()
+                .onStatus(
+                        status -> status.is4xxClientError() || status.is5xxServerError(),
+                        (req, res) -> handleError(res)
+                )
                 .body(SubwayRouteSearchResponse.class);
         log.info("Odsay 응답 성공, url : {}", url);
         return response;
+    }
+
+    private void handleError(ClientHttpResponse res) {
+        try {
+            byte[] body = res.getBody().readAllBytes();
+            OdsayErrorResponse error = objectMapper.readValue(body,
+                    OdsayErrorResponse.class);
+            throw new RuntimeException(error.msg());
+        } catch (IOException e) {
+            throw new RuntimeException("응답 바디 파싱에 실패하였습니다.", e);
+        }
     }
 
 }

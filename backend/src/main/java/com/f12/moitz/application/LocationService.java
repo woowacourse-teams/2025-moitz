@@ -30,7 +30,7 @@ public class LocationService {
 
     public List<LocationRecommendResponse> recommendLocation(final LocationRecommendRequest request) {
         final List<LocationNameAndReason> generatedLocations = generateLocations(request);
-        final List<Place> startingPlace = getPlacesByName(request.stations());
+        final List<Place> startingPlace = getPlacesByName(request.startingPoint());
         final List<String> placeNames = generatedLocations.stream()
                 .map(LocationNameAndReason::locationName)
                 .toList();
@@ -40,8 +40,8 @@ public class LocationService {
 
     private List<LocationNameAndReason> generateLocations(final LocationRecommendRequest request) {
         final BriefRecommendedLocationResponse briefRecommendedLocationResponse = googleGeminiClient.generateBriefResponse(
-                request.stations(),
-                request.additionalCondition()
+                request.startingPoint(),
+                request.requirement()
         );
         log.info("카테고리: {}", briefRecommendedLocationResponse.additionalConditionsCategoryCodes());
         return briefRecommendedLocationResponse.recommendations();
@@ -91,7 +91,7 @@ public class LocationService {
                 startingLocation.getPoint(),
                 location.getPoint()
         );
-        if (route.result() == null && route.error().isEmpty()) {
+        if (route.result() == null) {
             throw new RuntimeException("이동 경로를 찾을 수 없습니다. " +
                     "출발지: " + startingLocation.getName() + ", 목적지: " + location.getName());
         }

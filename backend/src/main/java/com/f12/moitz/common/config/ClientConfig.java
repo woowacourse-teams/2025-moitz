@@ -1,4 +1,4 @@
-package com.f12.moitz.common;
+package com.f12.moitz.common.config;
 
 import com.google.genai.Client;
 import java.time.Duration;

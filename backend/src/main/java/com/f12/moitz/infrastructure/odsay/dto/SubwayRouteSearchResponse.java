@@ -2,11 +2,9 @@ package com.f12.moitz.infrastructure.odsay.dto;
 
 import java.util.Comparator;
 import java.util.List;
-import java.util.Optional;
 
 public record SubwayRouteSearchResponse(
-        ResultResponse result,
-        Optional<ErrorResponse> error
+        ResultResponse result
 ) {
 
     public int getLeastTime() {
@@ -83,9 +81,3 @@ record LaneResponse(
 
 }
 
-record ErrorResponse(
-        String code,
-        String msg
-) {
-
-}

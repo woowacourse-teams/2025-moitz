@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/locations")
-public class LocationController {
+public class LocationController implements SwaggerLocationController {
 
     private final LocationService locationService;
 
