@@ -4,5 +4,5 @@ import defaultTheme from './defaultTheme';
 type ThemeType = typeof defaultTheme;
 
 declare module '@emotion/react' {
-  export interface Theme extends ThemeType {}
+  export type Theme = ThemeType;
 }
