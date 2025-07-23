@@ -1,0 +1,29 @@
+name: Backend 개발 환경 CI/CD
+
+on:
+  pull_request_target:
+    branches:
+      - dev
+    types:
+      - closed
+    paths:
+      - "backend/**"
+
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    if: github.event.pull_request.merged == true || !endsWith(github.ref, 'dev')
+    runs-on: [ self-hosted ]
+    steps:
+      - name: 마지막 커밋 내역으로 checkout 한다
+        uses: actions/checkout@v4
+
+      - name: EC2 환경에서 배포를 진행한다
+        run: |
+          cd 2025-moitz/backend
+          rm -rf src/main/resources/application.properties
+          echo "$APPLICATION_PROPERTIES" > src/main/resources/application.properties
+          ./gradlew clean build
+          sudo fuser -k -n tcp 8080 || true
+          nohup java -jar build/libs/*SNAPSHOT.jar > ./output.log 2>&1 &
