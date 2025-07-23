@@ -1,6 +1,6 @@
 import { css } from '@emotion/react';
 
-import { colorToken } from '../../styles/tokens';
+import { colorToken } from '@shared/styles/tokens';
 
 export const container = () => css`
   display: flex;
