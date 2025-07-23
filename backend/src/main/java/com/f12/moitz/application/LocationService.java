@@ -83,44 +83,7 @@ public class LocationService {
             verifiedLocations.put(location, averageTime);
         }
 
-        int minTime = verifiedLocations.values().stream()
-                .min(Integer::compareTo)
-                .orElseThrow(() -> new IllegalStateException("No minimum time found"));
-
-
-        return convert(generatedLocations, verifiedLocations, minTime);
-    }
-
-    private List<LocationRecommendResponse> convert(
-            final List<LocationNameAndReason> generatedLocations,
-            final Map<Place, Integer> verifiedLocations,
-            final int minTime
-    ) {
-        List<Map.Entry<Place, Integer>> entryList = new ArrayList<>(verifiedLocations.entrySet());
-        entryList.sort(Entry.comparingByValue());
-
-        return IntStream.range(0, entryList.size())
-                .mapToObj(index -> {
-                    Map.Entry<Place, Integer> placeIntegerEntry = entryList.get(index);
-                    String locationName = placeIntegerEntry.getKey().getName();
-
-                    String reason = generatedLocations.stream()
-                            .filter(generatedLocation -> generatedLocation.locationName().equals(locationName))
-                            .findFirst()
-                            .map(LocationNameAndReason::reason)
-                            .orElse(null);
-
-                    return new LocationRecommendResponse(
-                            index + 1,
-                            placeIntegerEntry.getKey().getPoint().getY(),
-                            placeIntegerEntry.getKey().getPoint().getX(),
-                            locationName,
-                            placeIntegerEntry.getValue(),
-                            minTime == placeIntegerEntry.getValue(),
-                            reason
-                    );
-                })
-                .toList();
+        return sortAndParseResponse(generatedLocations, verifiedLocations);
     }
 
     private SubwayRouteSearchResponse getSubwayRouteSearchResponse(final Place location, final Place startingLocation) {
@@ -149,6 +112,42 @@ public class LocationService {
                 .orElseThrow(() -> new IllegalStateException("Average duration not found"));
 
         return max - min > avg * 1.5;
+    }
+
+    private List<LocationRecommendResponse> sortAndParseResponse(
+            final List<LocationNameAndReason> generatedLocations,
+            final Map<Place, Integer> verifiedLocations
+    ) {
+        int minTime = verifiedLocations.values().stream()
+                .min(Integer::compareTo)
+                .orElseThrow(() -> new IllegalStateException("No minimum time found"));
+
+        List<Map.Entry<Place, Integer>> entryList = new ArrayList<>(verifiedLocations.entrySet());
+        entryList.sort(Entry.comparingByValue());
+
+        return IntStream.range(0, entryList.size())
+                .mapToObj(index -> {
+                    Map.Entry<Place, Integer> placeIntegerEntry = entryList.get(index);
+                    String locationName = placeIntegerEntry.getKey().getName();
+
+                    String reason = generatedLocations.stream()
+                            .filter(generatedLocation -> generatedLocation.locationName().equals(locationName))
+                            .findFirst()
+                            .map(LocationNameAndReason::reason)
+                            .orElse(null);
+
+                    return new LocationRecommendResponse(
+                            index + 1,
+                            placeIntegerEntry.getKey().getPoint().getY(),
+                            placeIntegerEntry.getKey().getPoint().getX(),
+                            locationName,
+                            placeIntegerEntry.getValue(),
+                            // 만약 최소 시간이 같은 경우가 있다면?
+                            minTime == placeIntegerEntry.getValue(),
+                            reason
+                    );
+                })
+                .toList();
     }
 
 }
