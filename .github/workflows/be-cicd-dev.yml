@@ -36,6 +36,8 @@ jobs:
           rm -rf src/main/resources/application-client.properties
           echo "$APPLICATION_CLIENT_PROPERTIES" > src/main/resources/application-client.properties
           ./gradlew clean build
+          
+          sleep 3
 
           if [ $? -ne 0 ]; then
             echo "빌드 실패"
