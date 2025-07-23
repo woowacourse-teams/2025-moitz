@@ -20,10 +20,45 @@ jobs:
         uses: actions/checkout@v4
 
       - name: EC2 환경에서 배포를 진행한다
+        env:
+          APPLICATION_PROPERTIES: ${{ secrets.APPLICATION_PROPERTIES }}
         run: |
-          cd 2025-moitz/backend
+          echo "=== JAR 빌드 ==="
+          cd ~/2025-moitz/backend
           rm -rf src/main/resources/application.properties
           echo "$APPLICATION_PROPERTIES" > src/main/resources/application.properties
           ./gradlew clean build
-          sudo fuser -k -n tcp 8080 || true
-          nohup java -jar build/libs/*SNAPSHOT.jar > ./output.log 2>&1 &
+
+          if [ $? -ne 0 ]; then
+            echo "빌드 실패"
+            exit 1
+          fi
+
+          JAR_PATH=$(ls ./build/libs/*SNAPSHOT.jar | head -n 1)
+          if [ ! -f "$JAR_PATH" ]; then
+            echo "JAR 파일이 없습니다: $JAR_PATH"
+            exit 1
+          fi
+
+          echo "=== 실행 중인 앱 종료 ==="
+          PID=$(pgrep -f "$JAR_PATH" || true)
+
+          if [ -n "$PID" ]; then
+            kill -15 $PID
+            echo "→ 종료 완료 (PID: $PID)"
+            sleep 5
+          fi
+
+          echo "=== 앱 실행 ==="
+          mkdir -p ./logs
+          RUNNER_TRACKING_ID="" && nohup java -jar "$JAR_PATH" > ./logs/error.log 2>&1 &
+          sleep 3
+
+          NEW_PID=$(pgrep -f "$JAR_PATH" || true)
+
+          if [ -n "$NEW_PID" ]; then
+            echo "앱 실행 성공 (PID: $NEW_PID)"
+          else
+            echo "앱 실행 실패 ./logs/error.log"
+            exit 1
+          fi
