@@ -21,12 +21,12 @@ jobs:
 
       - name: EC2 환경에서 배포를 진행한다
         env:
-          APPLICATION_PROPERTIES: ${{ secrets.APPLICATION_PROPERTIES }}
+          APPLICATION_CLIENT_PROPERTIES: ${{ secrets.APPLICATION_CLIENT_PROPERTIES }}
         run: |
           echo "=== JAR 빌드 ==="
           cd ~/2025-moitz/backend
           rm -rf src/main/resources/application-client.properties
-          echo "$APPLICATION_PROPERTIES" > src/main/resources/application-client.properties
+          echo "$APPLICATION_CLIENT_PROPERTIES" > src/main/resources/application-client.properties
           ./gradlew clean build
 
           if [ $? -ne 0 ]; then
