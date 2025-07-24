@@ -28,7 +28,7 @@ jobs:
             exit 1
           fi
 
-          JAR_PATH=$(ls build/libs/*SNAPSHOT.jar | head -n 1)
+          JAR_PATH=$(ls ./build/libs/*SNAPSHOT.jar | head -n 1)
           if [ ! -f "$JAR_PATH" ]; then
             echo "JAR 파일이 없습니다: $JAR_PATH"
             exit 1
@@ -36,7 +36,7 @@ jobs:
 
           # 기존에 실행 중인 애플리케이션을 먼저 종료한다
           echo "=== 실행 중인 앱 종료 ==="
-          PID=$(pgrep -f "$JAR_PATH" || true)
+          PID=$(pgrep -f SNAPSHOT.jar || true)
 
           if [ -n "$PID" ]; then
             kill -15 $PID
