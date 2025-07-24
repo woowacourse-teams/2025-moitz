@@ -42,6 +42,8 @@ jobs:
             echo "JAR 파일이 없습니다: $JAR_PATH"
             exit 1
           fi
+          
+          jar tf $JAR_PATH
 
           echo "=== 실행 중인 앱 종료 ==="
           PID=$(pgrep -f "$JAR_PATH" || true)
