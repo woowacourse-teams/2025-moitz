@@ -1,4 +1,4 @@
-import startSpotNameListMock from 'src/mocks/startSpotNameListMock';
+import startSpotNameListMock from '../../../mocks/startSpotNameListMock';
 
 import StartSpotName from './startSpotName';
 
