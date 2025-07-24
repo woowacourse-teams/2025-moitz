@@ -1,4 +1,5 @@
 import BottomSheet from '@features/bottomSheet/BottomSheet';
+import Map from '@features/map/Map';
 
 import { flex } from '@shared/styles/default.styled';
 
@@ -14,6 +15,7 @@ function ResultPage() {
         resultPage.base(),
       ]}
     >
+      <Map />
       <BottomSheet itemList={spotItemListMock} />
     </div>
   );
