@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/lauren")
-public class LaurenController {
+public class LemonController {
 
     @GetMapping
     public ResponseEntity<Gumball> get() {
