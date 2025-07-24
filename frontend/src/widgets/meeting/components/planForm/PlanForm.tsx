@@ -93,6 +93,8 @@ function PlanForm() {
       name: place,
     }));
 
+    console.log(meetingTime);
+
     navigate('/result', {
       state: {
         startingPlaces: formattedStartingPlaces,
