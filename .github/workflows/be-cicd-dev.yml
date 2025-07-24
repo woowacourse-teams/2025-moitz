@@ -23,10 +23,8 @@ jobs:
         env:
           APPLICATION_CLIENT_PROPERTIES: ${{ secrets.APPLICATION_CLIENT_PROPERTIES }}
         run: |
-          pwd
-          
           echo "=== JAR 빌드 ==="
-          cd ~/2025-moitz/backend
+          cd backend
           
           pwd
           
