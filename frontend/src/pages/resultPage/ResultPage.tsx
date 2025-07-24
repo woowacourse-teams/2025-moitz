@@ -13,7 +13,12 @@ import * as resultPage from './resultPage.styled';
 
 function ResultPage() {
   const location = useLocation();
-  const state = location.state as { startingPlaces: nameInfo[] };
+  const state = location.state as {
+    startingPlaces: nameInfo[];
+    recommendedLocations: any[];
+  } | null;
+
+  console.log(state);
 
   return (
     <div
@@ -25,7 +30,7 @@ function ResultPage() {
       <Map />
       <BottomSheet
         nameList={state?.startingPlaces}
-        itemList={spotItemListMock}
+        itemList={state?.recommendedLocations}
       />
     </div>
   );

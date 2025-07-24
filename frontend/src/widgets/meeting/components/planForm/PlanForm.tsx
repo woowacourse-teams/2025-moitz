@@ -1,3 +1,4 @@
+/** @jsxImportSource @emotion/react */
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router';
 
@@ -64,9 +65,7 @@ function PlanForm() {
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
       e.preventDefault();
-      if (e.nativeEvent.isComposing) {
-        return;
-      }
+      if (e.nativeEvent.isComposing) return;
       if (placeInputValue.trim() !== '') {
         setStartingPlaces([...startingPlaces, placeInputValue.trim()]);
         setPlaceInputValue('');
@@ -80,26 +79,50 @@ function PlanForm() {
     );
   };
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  // ✅ 수정된 handleSubmit 함수
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+
     if (startingPlaces.length < 2) {
       alert('최소 2개 이상의 출발지를 입력해주세요');
       return;
     }
 
-    // startingPlaces를 원하는 형태로 변환
     const formattedStartingPlaces = startingPlaces.map((place, index) => ({
       index,
       name: place,
     }));
 
-    console.log(meetingTime);
+    try {
+      const response = await fetch(`http://moitz.kr/locations`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          startingPlaceNames: startingPlaces,
+          meetingTime,
+          requirement,
+        }),
+      });
 
-    navigate('/result', {
-      state: {
-        startingPlaces: formattedStartingPlaces,
-      },
-    });
+      if (!response.ok) {
+        throw new Error('추천 장소 요청 실패');
+      }
+
+      const result = await response.json();
+      console.log(result); // ✅ 응답 확인
+
+      navigate('/result', {
+        state: {
+          startingPlaces: formattedStartingPlaces, // ✅ 요청한 포맷 유지
+          recommendedLocations: result.recommendedLocations, // ✅ 추천 장소 정보
+        },
+      });
+    } catch (error) {
+      console.error(error);
+      alert('추천 장소를 불러오는 데 실패했습니다.');
+    }
   };
 
   return (
