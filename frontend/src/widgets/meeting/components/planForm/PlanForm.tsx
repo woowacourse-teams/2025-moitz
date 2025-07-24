@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router';
 
 import TimePickBottomModal from '@widgets/meeting/components/timePickBottomModal/TimePickBottomModal';
 
@@ -18,6 +19,7 @@ import * as planForm from './planForm.styled';
 import PlanFormTitle from './planFormTitle/PlanFormTitle';
 
 function PlanForm() {
+  const navigate = useNavigate();
   const {
     startingPlaces,
     meetingTime,
@@ -84,7 +86,18 @@ function PlanForm() {
       alert('최소 2개 이상의 출발지를 입력해주세요');
       return;
     }
-    console.log(startingPlaces, meetingTime, requirement);
+
+    // startingPlaces를 원하는 형태로 변환
+    const formattedStartingPlaces = startingPlaces.map((place, index) => ({
+      index,
+      name: place,
+    }));
+
+    navigate('/result', {
+      state: {
+        startingPlaces: formattedStartingPlaces,
+      },
+    });
   };
 
   return (
