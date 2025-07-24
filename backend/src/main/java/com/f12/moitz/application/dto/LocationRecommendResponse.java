@@ -4,6 +4,8 @@ import io.swagger.v3.oas.annotations.media.Schema;
 
 @Schema(description = "지역 추천 응답")
 public record LocationRecommendResponse(
+        @Schema(description = "ID", example = "1", requiredMode = Schema.RequiredMode.REQUIRED)
+        Long id,
         @Schema(description = "순번", example = "1", requiredMode = Schema.RequiredMode.REQUIRED)
         int index,
         @Schema(description = "위도", example = "37.49808633653005", requiredMode = Schema.RequiredMode.REQUIRED)
