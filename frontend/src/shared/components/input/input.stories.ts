@@ -21,5 +21,5 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {
-  args: { placeholder: '아무 값도 없어요' },
+  args: { placeholder: '아무 값도 없어요', value: '' },
 };
