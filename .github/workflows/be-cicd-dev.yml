@@ -37,7 +37,7 @@ jobs:
             exit 1
           fi
 
-          JAR_PATH=$(ls build/libs/*SNAPSHOT.jar | head -n 1)
+          JAR_PATH=$(ls ./build/libs/*SNAPSHOT.jar | head -n 1)
           if [ ! -f "$JAR_PATH" ]; then
             echo "JAR 파일이 없습니다: $JAR_PATH"
             exit 1

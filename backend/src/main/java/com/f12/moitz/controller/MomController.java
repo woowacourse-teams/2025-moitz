@@ -7,12 +7,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/julie2")
-public class JulieController {
+@RequestMapping("/hi")
+public class MomController {
 
     @GetMapping
     public ResponseEntity<Gumball> get() {
-        return ResponseEntity.ok(new Gumball("Buwal", 30));
+        return ResponseEntity.ok(new Gumball("Jenson", 30));
     }
 
 }
