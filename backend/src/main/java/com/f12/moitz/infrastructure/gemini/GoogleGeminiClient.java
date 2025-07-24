@@ -18,7 +18,7 @@ import com.google.genai.types.GenerateContentResponse;
 @Slf4j
 public class GoogleGeminiClient {
 
-    private static final String GEMINI_MODEL = "gemini-1.5-flash-latest";
+    private static final String GEMINI_MODEL = "gemini-2.0-flash";
     private static final int RECOMMENDATION_COUNT = 5;
     private static final String BASIC_PROMPT = """
                     Purpose: Recommend meeting locations where subway travel times from all starting points are similar and distances are not too far.
@@ -119,7 +119,7 @@ public class GoogleGeminiClient {
     private GenerateContentResponse generateBasicContent(String model, String prompt, Map<String, Object> inputData) {
         final GenerateContentConfig config = GenerateContentConfig.builder()
                 .temperature(0.2F)
-//                .maxOutputTokens(5000)
+                .maxOutputTokens(5000)
                 .responseMimeType("application/json")
                 .responseJsonSchema(inputData)
                 .build();
