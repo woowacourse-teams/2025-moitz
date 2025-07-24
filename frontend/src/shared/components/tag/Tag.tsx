@@ -8,9 +8,10 @@ import * as tag from './tag.styled';
 
 interface TagProps {
   text: string;
+  onClick?: () => void;
 }
 
-function Tag({ text }: TagProps) {
+function Tag({ text, onClick }: TagProps) {
   return (
     <div
       css={[
@@ -21,6 +22,8 @@ function Tag({ text }: TagProps) {
       <span css={typography.b2}>{text}</span>
       <button
         css={[flex({ justify: 'center', align: 'center' }), tag.button()]}
+        onClick={onClick}
+        type="button"
       >
         <img src={IconCancel} alt="icon-cancel"></img>
       </button>
