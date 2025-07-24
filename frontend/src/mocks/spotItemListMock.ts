@@ -20,7 +20,7 @@ const spotItemListMock: spotItem[] = [
     name: '잠실역',
     description: '롯데월드와 석촌호수 인근',
     avgMinutes: 25,
-    isBest: true,
+    isBest: false,
   },
   {
     index: 4,
@@ -34,7 +34,7 @@ const spotItemListMock: spotItem[] = [
     name: '신촌역',
     description: '대학교 인근, 맛집 거리',
     avgMinutes: 30,
-    isBest: true,
+    isBest: false,
   },
   {
     index: 6,
@@ -55,7 +55,7 @@ const spotItemListMock: spotItem[] = [
     name: '을지로입구역',
     description: '도심의 직장인 밀집 지역',
     avgMinutes: 18,
-    isBest: true,
+    isBest: false,
   },
   {
     index: 9,
@@ -69,7 +69,7 @@ const spotItemListMock: spotItem[] = [
     name: '건대입구역',
     description: '맛집과 쇼핑의 거리',
     avgMinutes: 22,
-    isBest: true,
+    isBest: false,
   },
 ];
 
