@@ -72,3 +72,7 @@ export const inline_flex = (options: flexOptions = {}) => css`
   ${options.wrap && `flex-wrap: ${options.wrap};`}
   ${options.gap && `gap: ${options.gap}px;`}
 `;
+
+export const gridPadding = css`
+  padding: 0 20px;
+`;
