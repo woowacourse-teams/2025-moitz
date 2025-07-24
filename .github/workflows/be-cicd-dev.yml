@@ -28,7 +28,6 @@ jobs:
           echo "=== JAR 빌드 ==="
           rm -rf src/main/resources/application-client.properties
           echo "$APPLICATION_CLIENT_PROPERTIES" > src/main/resources/application-client.properties
-          rm -rf build
           sleep 1
 
           ./gradlew --no-build-cache clean build --refresh-dependencies
