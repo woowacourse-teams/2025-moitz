@@ -137,7 +137,7 @@ public class LocationService {
                             .orElse(null);
 
                     return new LocationRecommendResponse(
-                            index + 1,
+                            (long) index + 1,
                             index + 1,
                             placeIntegerEntry.getKey().getPoint().getY(),
                             placeIntegerEntry.getKey().getPoint().getX(),
