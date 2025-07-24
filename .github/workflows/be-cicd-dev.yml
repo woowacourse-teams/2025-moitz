@@ -23,12 +23,17 @@ jobs:
         env:
           APPLICATION_CLIENT_PROPERTIES: ${{ secrets.APPLICATION_CLIENT_PROPERTIES }}
         run: |
-          cd backend/src/main/java/com/f12/moitz/controller
+          cd backend
+          
+          pwd
+          ls -al
+          cat src/main/java/com/f12/moitz/controller/JulieController.java
+          
+          cd src/main/java/com/f12/moitz/controller
           ls
           sleep 1
           
           echo "=== JAR 빌드 ==="
-          cd ~/2025-moitz/backend
           
           sleep 1
           
@@ -37,16 +42,16 @@ jobs:
           
           sleep 1
           
+          rm -rf build
+
           ./gradlew --no-build-cache clean build --refresh-dependencies
-          
-          sleep 3
 
           if [ $? -ne 0 ]; then
             echo "빌드 실패"
             exit 1
           fi
 
-          JAR_PATH=$(ls ./build/libs/*SNAPSHOT.jar | head -n 1)
+          JAR_PATH=$(ls build/libs/*SNAPSHOT.jar | head -n 1)
           if [ ! -f "$JAR_PATH" ]; then
             echo "JAR 파일이 없습니다: $JAR_PATH"
             exit 1
