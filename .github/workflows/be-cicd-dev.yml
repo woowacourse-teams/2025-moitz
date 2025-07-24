@@ -24,7 +24,7 @@ jobs:
           APPLICATION_CLIENT_PROPERTIES: ${{ secrets.APPLICATION_CLIENT_PROPERTIES }}
         run: |
           echo "=== JAR 빌드 ==="
-          cd ~/2025-moitz/backend
+          cd backend
           rm -rf build
           rm -rf src/main/resources/application-client.properties
           echo "$APPLICATION_CLIENT_PROPERTIES" > src/main/resources/application-client.properties
