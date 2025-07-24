@@ -1,9 +1,11 @@
+import spotItemListMock from '../../mocks/spotItemListMock';
+
 import SpotItemList from './SpotItemList';
 
 import type { Meta, StoryObj } from '@storybook/react-webpack5';
 
 const meta = {
-  title: 'shared/SpotItemList',
+  title: 'features/SpotItemList',
   component: SpotItemList,
   parameters: {
     layout: 'centered',
@@ -16,5 +18,5 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {
-  args: { itemList: [] },
+  args: { itemList: spotItemListMock },
 };
