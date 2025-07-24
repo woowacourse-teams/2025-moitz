@@ -23,12 +23,12 @@ jobs:
         env:
           APPLICATION_CLIENT_PROPERTIES: ${{ secrets.APPLICATION_CLIENT_PROPERTIES }}
         run: |
-          echo "=== JAR 빌드 ==="
           cd backend
 
-          rm -rf build
+          echo "=== JAR 빌드 ==="
           rm -rf src/main/resources/application-client.properties
           echo "$APPLICATION_CLIENT_PROPERTIES" > src/main/resources/application-client.properties
+          rm -rf build
           sleep 1
 
           ./gradlew --no-build-cache clean build --refresh-dependencies
@@ -38,7 +38,7 @@ jobs:
             exit 1
           fi
 
-          JAR_PATH=$(ls ./build/libs/*SNAPSHOT.jar | head -n 1)
+          JAR_PATH=$(ls build/libs/*SNAPSHOT.jar | head -n 1)
           if [ ! -f "$JAR_PATH" ]; then
             echo "JAR 파일이 없습니다: $JAR_PATH"
             exit 1
@@ -46,8 +46,6 @@ jobs:
 
           echo $JAR_PATH
           jar tf $JAR_PATH
-          
-          cd ~/2025-moitz
 
           echo "=== 실행 중인 앱 종료 ==="
           PID=$(pgrep -f "$JAR_PATH" || true)
