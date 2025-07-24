@@ -25,9 +25,7 @@ jobs:
         run: |
           echo "=== JAR 빌드 ==="
           cd backend
-          
-          pwd
-          
+
           rm -rf build
           rm -rf src/main/resources/application-client.properties
           echo "$APPLICATION_CLIENT_PROPERTIES" > src/main/resources/application-client.properties
@@ -45,8 +43,11 @@ jobs:
             echo "JAR 파일이 없습니다: $JAR_PATH"
             exit 1
           fi
-          
+
+          echo $JAR_PATH
           jar tf $JAR_PATH
+          
+          cd ~/2025-moitz
 
           echo "=== 실행 중인 앱 종료 ==="
           PID=$(pgrep -f "$JAR_PATH" || true)
