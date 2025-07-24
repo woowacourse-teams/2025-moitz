@@ -1,22 +1,34 @@
 import { useLocation } from 'react-router';
 
-interface StartingPlace {
-  index: number;
-  name: string;
-}
+import BottomSheet from '@features/bottomSheet/BottomSheet';
+import Map from '@features/map/Map';
 
-interface LocationState {
-  startingPlaces: StartingPlace[];
-}
+import { flex } from '@shared/styles/default.styled';
+
+import { nameInfo } from '@shared/types/nameInfo';
+
+import spotItemListMock from '../../mocks/spotItemListMock';
+
+import * as resultPage from './resultPage.styled';
 
 function ResultPage() {
   const location = useLocation();
-  const state = location.state as LocationState;
+  const state = location.state as { startingPlaces: nameInfo[] };
 
-  // 전달받은 데이터 확인
-  console.log('전달받은 startingPlaces:', state?.startingPlaces);
-
-  return <div></div>;
+  return (
+    <div
+      css={[
+        flex({ direction: 'column', justify: 'flex-end' }),
+        resultPage.base(),
+      ]}
+    >
+      <Map />
+      <BottomSheet
+        nameList={state?.startingPlaces}
+        itemList={spotItemListMock}
+      />
+    </div>
+  );
 }
 
 export default ResultPage;

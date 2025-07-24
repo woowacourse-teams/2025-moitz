@@ -1,10 +1,17 @@
-name: Backend 개발 서버 CI/CD
+name: Backend 개발 서버 CI/CD (Auto-trigger)
 
 on:
-  workflow_dispatch:
+  pull_request:
+    branches:
+      - dev
+    types:
+      - closed
+    paths:
+      - "backend/**"
 
 jobs:
   deploy:
+    if: github.event.pull_request.merged == true
     runs-on: [ self-hosted ]
     steps:
       - name: 최신 커밋 내역으로 checkout 한다
