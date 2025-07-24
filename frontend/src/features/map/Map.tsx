@@ -12,16 +12,24 @@ function Map() {
 
     if (!naver || !mapRef.current) return;
 
-    const location = new naver.maps.LatLng(37.3595704, 127.105399);
+    const locations = [
+      new naver.maps.LatLng(37.554722, 126.970833),
+      new naver.maps.LatLng(37.497942, 127.027621),
+      new naver.maps.LatLng(37.513342, 127.100095),
+      new naver.maps.LatLng(37.556201, 126.923734),
+      new naver.maps.LatLng(37.555134, 126.936893),
+    ];
 
     const map = new naver.maps.Map(mapRef.current, {
-      center: location,
-      zoom: 17,
+      center: locations[0],
+      zoom: 11,
     });
 
-    new naver.maps.Marker({
-      map,
-      position: location,
+    locations.forEach((location) => {
+      new naver.maps.Marker({
+        map,
+        position: location,
+      });
     });
   }, []);
 
