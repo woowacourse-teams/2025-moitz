@@ -2,14 +2,14 @@
 
 import { flex, typography } from '@shared/styles/default.styled';
 
-import { nameInfo } from '@shared/types/nameInfo';
+import { startingSpotName } from '@shared/types/startingSpotName';
 
 import StartSpotName from '../startSpotName/startSpotName';
 
 import * as startSpotWrapper from './startSpotWrapper.styled';
 
 interface StartSpotWrapperProps {
-  nameList: nameInfo[];
+  nameList: startingSpotName[];
 }
 
 function StartSpotWrapper({ nameList }: StartSpotWrapperProps) {

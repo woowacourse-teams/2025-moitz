@@ -2,12 +2,12 @@
 
 import { flex, typography } from '@shared/styles/default.styled';
 
-import { nameInfo } from '@shared/types/nameInfo';
+import { startingSpotName } from '@shared/types/startingSpotName';
 
 import * as startSpotName from './startSpotName.styled';
 
 interface StartSpotNameProps {
-  nameInfo: nameInfo;
+  nameInfo: startingSpotName;
 }
 
 function StartSpotName({ nameInfo }: StartSpotNameProps) {

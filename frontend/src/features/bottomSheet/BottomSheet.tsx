@@ -4,7 +4,7 @@ import SpotItemList from '@features/spotItemList/SpotItemList';
 
 import StartSpotWrapper from '@shared/components/startSpotWrapper/StartSpotWrapper';
 
-import { spotItem } from '@shared/types/spotItem';
+import { recommendedSpotItem } from '@shared/types/recommendedSpotItem';
 
 import spotItemListMock from '../../mocks/spotItemListMock';
 import startSpotNameListMock from '../../mocks/startSpotNameListMock';
@@ -13,7 +13,7 @@ import { flex } from '../../shared/styles/default.styled';
 import * as bottomSheet from './bottomSheet.styled';
 
 interface BottomSheetProps {
-  itemList: spotItem[];
+  itemList: recommendedSpotItem[];
 }
 
 function BottomSheet({ itemList = spotItemListMock }: BottomSheetProps) {
