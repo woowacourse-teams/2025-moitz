@@ -12,7 +12,7 @@ public class JulieController {
 
     @GetMapping
     public ResponseEntity<Gumball> get() {
-        return ResponseEntity.ok(new Gumball("Tuda", 30));
+        return ResponseEntity.ok(new Gumball("Siso", 30));
     }
 
 }
