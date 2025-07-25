@@ -20,7 +20,7 @@ function Map({ itemList }: { itemList?: spotItem[] }) {
 
     const map = new naver.maps.Map(mapRef.current, {
       center: locations[0],
-      zoom: 11,
+      zoom: 14,
     });
 
     locations.forEach((location) => {
