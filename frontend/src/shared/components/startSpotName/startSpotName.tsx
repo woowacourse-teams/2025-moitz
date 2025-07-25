@@ -8,9 +8,10 @@ import * as startSpotName from './startSpotName.styled';
 
 interface StartSpotNameProps {
   nameInfo: nameInfo;
+  isLast?: boolean;
 }
 
-function StartSpotName({ nameInfo }: StartSpotNameProps) {
+function StartSpotName({ nameInfo, isLast = false }: StartSpotNameProps) {
   return (
     <div
       key={nameInfo.index}
@@ -23,7 +24,7 @@ function StartSpotName({ nameInfo }: StartSpotNameProps) {
       <span css={[typography.b2, startSpotName.nameList()]}>
         {nameInfo.name}
       </span>
-      <div css={startSpotName.dot()}></div>
+      {!isLast && <div css={startSpotName.dot()}></div>}
     </div>
   );
 }

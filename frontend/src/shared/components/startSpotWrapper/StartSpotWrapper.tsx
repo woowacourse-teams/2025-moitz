@@ -17,8 +17,12 @@ function StartSpotWrapper({ nameList }: StartSpotWrapperProps) {
     <div css={[flex({ align: 'center', gap: 10 }), startSpotWrapper.base()]}>
       <span css={[typography.sh1, startSpotWrapper.title()]}>출발지</span>
       <div css={[flex({ wrap: 'wrap', gap: 5 })]}>
-        {nameList.map((nameInfo) => (
-          <StartSpotName key={nameInfo.index} nameInfo={nameInfo} />
+        {nameList.map((nameInfo, index) => (
+          <StartSpotName
+            key={nameInfo.index}
+            nameInfo={nameInfo}
+            isLast={index === nameList.length - 1}
+          />
         ))}
       </div>
     </div>
