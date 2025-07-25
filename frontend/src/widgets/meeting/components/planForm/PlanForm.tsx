@@ -12,6 +12,7 @@ import {
 
 import BottomButton from '@shared/components/bottomButton/BottomButton';
 import Input from '@shared/components/input/Input';
+import Loading from '@shared/components/loading/Loading';
 import Textarea from '@shared/components/textarea/Textarea';
 import Toast from '@shared/components/toast/Toast';
 import { useToast } from '@shared/hooks/useToast';
@@ -33,6 +34,7 @@ function PlanForm() {
 
   const [timeInputValue, setTimeInputValue] = useState<string>('');
   const [isTimeModalOpen, setIsTimeModalOpen] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const { isVisible, message, showToast, hideToast } = useToast();
 
   const handleTimeSelect = () => {
@@ -73,6 +75,8 @@ function PlanForm() {
       name: place,
     }));
 
+    setIsLoading(true);
+
     try {
       const response = await fetch(`https://dev.api.moitz.kr/locations`, {
         method: 'POST',
@@ -102,6 +106,8 @@ function PlanForm() {
     } catch (error) {
       console.error(error);
       showToast('추천 장소를 불러오는 데 실패했습니다.');
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -147,6 +153,7 @@ function PlanForm() {
         initialTime={timeInputValue}
       />
       <Toast isVisible={isVisible} message={message} onClose={hideToast} />
+      {isLoading && <Loading />}
     </form>
   );
 }
