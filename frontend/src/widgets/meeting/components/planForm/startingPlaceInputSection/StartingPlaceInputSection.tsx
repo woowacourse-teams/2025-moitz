@@ -5,6 +5,8 @@ import { stationList } from '@features/meeting/config/stationList';
 
 import Input from '@shared/components/input/Input';
 import Tag from '@shared/components/tag/Tag';
+import Toast from '@shared/components/toast/Toast';
+import { useToast } from '@shared/hooks/useToast';
 import { flex, typography } from '@shared/styles/default.styled';
 
 import * as planForm from '../planForm.styled';
@@ -24,6 +26,7 @@ function StartingPlaceInputSection({
   const [placeInputValue, setPlaceInputValue] = useState<string>('');
   const [filteredStations, setFilteredStations] = useState<string[]>([]);
   const [showDropdown, setShowDropdown] = useState<boolean>(false);
+  const { isVisible, message, showToast, hideToast } = useToast();
   const inputRef = useRef<HTMLInputElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -69,13 +72,13 @@ function StartingPlaceInputSection({
 
     // 중복 체크
     if (startingPlaces.includes(station)) {
-      alert('이미 출발지에 존재하는 역입니다.');
+      showToast('이미 출발지에 존재하는 역입니다.');
       return false;
     }
 
     // 최대 개수 체크
     if (startingPlaces.length >= 6) {
-      alert('최대 6개의 출발지를 입력할 수 있습니다.');
+      showToast('최대 6개의 출발지를 입력할 수 있습니다.');
       return false;
     }
 
@@ -94,7 +97,7 @@ function StartingPlaceInputSection({
         const isValidStation = stationList.includes(trimmedValue);
 
         if (!isValidStation) {
-          alert('서울내에 존재하는 역이름을 작성해주세요');
+          showToast('서울내에 존재하는 역이름을 작성해주세요');
           return;
         }
 
@@ -158,6 +161,7 @@ function StartingPlaceInputSection({
           최소 2개 이상의 출발지를 입력해주세요
         </p>
       )}
+      <Toast isVisible={isVisible} message={message} onClose={hideToast} />
     </div>
   );
 }

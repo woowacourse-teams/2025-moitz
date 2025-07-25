@@ -13,6 +13,8 @@ import {
 import BottomButton from '@shared/components/bottomButton/BottomButton';
 import Input from '@shared/components/input/Input';
 import Textarea from '@shared/components/textarea/Textarea';
+import Toast from '@shared/components/toast/Toast';
+import { useToast } from '@shared/hooks/useToast';
 import { flex } from '@shared/styles/default.styled';
 
 import PlanFormTitle from './planFormTitle/PlanFormTitle';
@@ -31,6 +33,7 @@ function PlanForm() {
 
   const [timeInputValue, setTimeInputValue] = useState<string>('');
   const [isTimeModalOpen, setIsTimeModalOpen] = useState<boolean>(false);
+  const { isVisible, message, showToast, hideToast } = useToast();
 
   const handleTimeSelect = () => {
     setIsTimeModalOpen(true);
@@ -61,7 +64,7 @@ function PlanForm() {
     e.preventDefault();
 
     if (startingPlaces.length < 2) {
-      alert('최소 2개 이상의 출발지를 입력해주세요');
+      showToast('최소 2개 이상의 출발지를 입력해주세요');
       return;
     }
 
@@ -71,7 +74,7 @@ function PlanForm() {
     }));
 
     try {
-      const response = await fetch(`https://moitz.kr/locations`, {
+      const response = await fetch(`https://dev.api.moitz.kr/locations`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -98,7 +101,7 @@ function PlanForm() {
       });
     } catch (error) {
       console.error(error);
-      alert('추천 장소를 불러오는 데 실패했습니다.');
+      showToast('추천 장소를 불러오는 데 실패했습니다.');
     }
   };
 
@@ -143,6 +146,7 @@ function PlanForm() {
         onConfirm={handleTimeConfirm}
         initialTime={timeInputValue}
       />
+      <Toast isVisible={isVisible} message={message} onClose={hideToast} />
     </form>
   );
 }
