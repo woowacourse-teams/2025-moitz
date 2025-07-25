@@ -4,6 +4,7 @@ import { useEffect, useRef } from 'react';
 import { Link } from 'react-router';
 
 import MapButton from '@shared/components/mapButton/MapButton';
+import MapPoint from '@shared/components/mapPoint/MapPoint';
 import { flex } from '@shared/styles/default.styled';
 
 import IconBack from '@icons/icon-back.svg';
@@ -43,13 +44,16 @@ function Map() {
   return (
     <div css={map.container()}>
       <div ref={mapRef} css={map.base()} />
-      <div css={[flex({ justify: 'space-between' }), map.overlay()]}>
+      <div css={[flex({ justify: 'space-between' }), map.top_overlay()]}>
         <Link to="/">
           <MapButton src={IconBack} alt="back" />
         </Link>
         <Link to="/">
           <MapButton src={IconShare} alt="share" />
         </Link>
+      </div>
+      <div css={[flex({ justify: 'space-between' }), map.bottom_overlay()]}>
+        <MapPoint text="전체 추첨 지점" />
       </div>
     </div>
   );

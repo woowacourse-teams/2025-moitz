@@ -12,10 +12,18 @@ export const base = () => css`
   height: 100%;
 `;
 
-export const overlay = () => css`
+export const top_overlay = () => css`
   position: absolute;
   width: 100%;
-  top: 16px;
-  padding: 0px 16px;
+  top: 20px;
+  padding: 0px 20px;
+  z-index: 10;
+`;
+
+export const bottom_overlay = () => css`
+  position: absolute;
+  width: 100%;
+  bottom: 15px;
+  padding: 0px 20px;
   z-index: 10;
 `;
