@@ -2,9 +2,11 @@
 
 import { useEffect, useRef } from 'react';
 
+import { spotItem } from '@shared/types/spotItem';
+
 import * as map from './map.styled';
 
-function Map() {
+function Map({ itemList }: { itemList?: spotItem[] }) {
   const mapRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
@@ -12,16 +14,20 @@ function Map() {
 
     if (!naver || !mapRef.current) return;
 
-    const location = new naver.maps.LatLng(37.3595704, 127.105399);
+    const locations =
+      itemList?.map((item) => new naver.maps.LatLng(item.y, item.x)) ?? [];
+    if (locations.length === 0) return;
 
     const map = new naver.maps.Map(mapRef.current, {
-      center: location,
-      zoom: 17,
+      center: locations[0],
+      zoom: 11,
     });
 
-    new naver.maps.Marker({
-      map,
-      position: location,
+    locations.forEach((location) => {
+      new naver.maps.Marker({
+        map,
+        position: location,
+      });
     });
   }, []);
 

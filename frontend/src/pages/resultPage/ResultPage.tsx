@@ -26,7 +26,7 @@ function ResultPage() {
         resultPage.base(),
       ]}
     >
-      <Map />
+      <Map itemList={state?.recommendedLocations} />
       <BottomSheet
         nameList={state?.startingPlaces}
         itemList={state?.recommendedLocations}
