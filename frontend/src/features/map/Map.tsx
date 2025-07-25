@@ -1,6 +1,13 @@
 /** @jsxImportSource @emotion/react */
 
 import { useEffect, useRef } from 'react';
+import { Link } from 'react-router';
+
+import MapButton from '@shared/components/mapButton/MapButton';
+import { flex } from '@shared/styles/default.styled';
+
+import IconBack from '@icons/icon-back.svg';
+import IconShare from '@icons/icon-share.svg';
 
 import * as map from './map.styled';
 
@@ -33,7 +40,19 @@ function Map() {
     });
   }, []);
 
-  return <div ref={mapRef} css={map.base()} />;
+  return (
+    <div css={map.container()}>
+      <div ref={mapRef} css={map.base()} />
+      <div css={[flex({ justify: 'space-between' }), map.overlay()]}>
+        <Link to="/">
+          <MapButton src={IconBack} alt="back" />
+        </Link>
+        <Link to="/">
+          <MapButton src={IconShare} alt="share" />
+        </Link>
+      </div>
+    </div>
+  );
 }
 
 export default Map;
