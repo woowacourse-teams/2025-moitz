@@ -1,5 +1,5 @@
 /** @jsxImportSource @emotion/react */
-import React from 'react';
+import React, { forwardRef } from 'react';
 
 import { typography } from '@shared/styles/default.styled';
 
@@ -11,28 +11,39 @@ interface InputProps {
   onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onKeyDown?: (e: React.KeyboardEvent<HTMLInputElement>) => void;
   onClick?: () => void;
+  onFocus?: () => void;
   readOnly?: boolean;
 }
 
-function Input({
-  placeholder,
-  value,
-  onChange,
-  onKeyDown,
-  onClick,
-  readOnly = false,
-}: InputProps) {
-  return (
-    <input
-      css={[input.base(), typography.b1]}
-      placeholder={placeholder}
-      value={value}
-      onChange={onChange}
-      onKeyDown={onKeyDown}
-      onClick={onClick}
-      readOnly={readOnly}
-    />
-  );
-}
+const Input = forwardRef<HTMLInputElement, InputProps>(
+  (
+    {
+      placeholder,
+      value,
+      onChange,
+      onKeyDown,
+      onClick,
+      onFocus,
+      readOnly = false,
+    },
+    ref,
+  ) => {
+    return (
+      <input
+        ref={ref}
+        css={[input.base(), typography.b1]}
+        placeholder={placeholder}
+        value={value}
+        onChange={onChange}
+        onKeyDown={onKeyDown}
+        onClick={onClick}
+        onFocus={onFocus}
+        readOnly={readOnly}
+      />
+    );
+  },
+);
+
+Input.displayName = 'Input';
 
 export default Input;

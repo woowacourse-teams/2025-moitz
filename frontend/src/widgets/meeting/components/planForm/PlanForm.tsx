@@ -12,12 +12,11 @@ import {
 
 import BottomButton from '@shared/components/bottomButton/BottomButton';
 import Input from '@shared/components/input/Input';
-import Tag from '@shared/components/tag/Tag';
 import Textarea from '@shared/components/textarea/Textarea';
-import { flex, typography } from '@shared/styles/default.styled';
+import { flex } from '@shared/styles/default.styled';
 
-import * as planForm from './planForm.styled';
 import PlanFormTitle from './planFormTitle/PlanFormTitle';
+import StartingPlaceInputSection from './startingPlaceInputSection/StartingPlaceInputSection';
 
 function PlanForm() {
   const navigate = useNavigate();
@@ -30,13 +29,8 @@ function PlanForm() {
     setRequirement,
   } = useMeetingInfo();
 
-  const [placeInputValue, setPlaceInputValue] = useState<string>('');
   const [timeInputValue, setTimeInputValue] = useState<string>('');
   const [isTimeModalOpen, setIsTimeModalOpen] = useState<boolean>(false);
-
-  const handlePlaceInputValue = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setPlaceInputValue(e.target.value);
-  };
 
   const handleTimeSelect = () => {
     setIsTimeModalOpen(true);
@@ -62,23 +56,6 @@ function PlanForm() {
     setRequirement(e.target.value);
   };
 
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter') {
-      e.preventDefault();
-      if (e.nativeEvent.isComposing) return;
-      if (placeInputValue.trim() !== '') {
-        setStartingPlaces([...startingPlaces, placeInputValue.trim()]);
-        setPlaceInputValue('');
-      }
-    }
-  };
-
-  const removeTag = (indexToRemove: number) => {
-    setStartingPlaces(
-      startingPlaces.filter((_, index) => index !== indexToRemove),
-    );
-  };
-
   // ✅ 수정된 handleSubmit 함수
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -94,7 +71,7 @@ function PlanForm() {
     }));
 
     try {
-      const response = await fetch(`http://moitz.kr/locations`, {
+      const response = await fetch(`https://moitz.kr/locations`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -128,27 +105,10 @@ function PlanForm() {
   return (
     <form css={flex({ direction: 'column', gap: 50 })} onSubmit={handleSubmit}>
       {/* 출발지 입력 */}
-      <div css={flex({ direction: 'column', gap: 5 })}>
-        <PlanFormTitle text="출발지" isRequired={true} />
-        <Input
-          placeholder="출발하는 역 이름을 입력해주세요."
-          value={placeInputValue}
-          onChange={handlePlaceInputValue}
-          onKeyDown={handleKeyDown}
-        />
-        {startingPlaces.length > 0 && (
-          <div css={[flex({ gap: 5 }), { flexWrap: 'wrap' }]}>
-            {startingPlaces.map((tag, index) => (
-              <Tag key={index} text={tag} onClick={() => removeTag(index)} />
-            ))}
-          </div>
-        )}
-        {startingPlaces.length === 0 && (
-          <p css={[typography.b2, planForm.description()]}>
-            최소 2개 이상의 출발지를 입력해주세요
-          </p>
-        )}
-      </div>
+      <StartingPlaceInputSection
+        startingPlaces={startingPlaces}
+        setStartingPlaces={setStartingPlaces}
+      />
 
       {/* 도착 시간 입력 */}
       <div css={flex({ direction: 'column', gap: 5 })}>
