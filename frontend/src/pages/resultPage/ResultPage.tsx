@@ -6,8 +6,7 @@ import Map from '@features/map/Map';
 import { flex } from '@shared/styles/default.styled';
 
 import { nameInfo } from '@shared/types/nameInfo';
-
-import spotItemListMock from '../../mocks/spotItemListMock';
+import { spotItem } from '@shared/types/spotItem';
 
 import * as resultPage from './resultPage.styled';
 
@@ -15,10 +14,10 @@ function ResultPage() {
   const location = useLocation();
   const state = location.state as {
     startingPlaces: nameInfo[];
-    recommendedLocations: any[];
+    recommendedLocations: spotItem[];
   } | null;
 
-  console.log(state);
+  console.log(state.startingPlaces, state.recommendedLocations, '!!!');
 
   return (
     <div

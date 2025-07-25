@@ -111,12 +111,12 @@ function PlanForm() {
       }
 
       const result = await response.json();
-      console.log(result); // ✅ 응답 확인
+      console.log(result, '응답확인'); // ✅ 응답 확인
 
       navigate('/result', {
         state: {
           startingPlaces: formattedStartingPlaces, // ✅ 요청한 포맷 유지
-          recommendedLocations: result.recommendedLocations, // ✅ 추천 장소 정보
+          recommendedLocations: result, // ✅ 추천 장소 정보
         },
       });
     } catch (error) {
