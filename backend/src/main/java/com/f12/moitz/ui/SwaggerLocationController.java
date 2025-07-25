@@ -30,6 +30,13 @@ public interface SwaggerLocationController {
                     content = @Content(
                             schema = @Schema(implementation = ErrorResponse.class)
                     )
+            ),
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "서버 에러",
+                    content = @Content(
+                            schema = @Schema(implementation = ErrorResponse.class)
+                    )
             )
     })
     ResponseEntity<List<LocationRecommendResponse>> recommendLocations(@RequestBody LocationRecommendRequest request);
