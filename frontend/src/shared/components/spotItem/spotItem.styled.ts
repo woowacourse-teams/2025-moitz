@@ -8,6 +8,7 @@ export const base = () => css`
   color: ${colorToken.gray[1]};
   background-color: ${colorToken.gray[8]};
   border-radius: ${borderRadiusToken.input};
+  cursor: pointer;
 
   &:hover {
     background-color: ${colorToken.main[4]};
