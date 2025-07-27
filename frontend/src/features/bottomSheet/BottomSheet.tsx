@@ -3,11 +3,10 @@
 import SpotItemList from '@features/spotItemList/SpotItemList';
 
 import StartingSpotWrapper from '@shared/components/startingSpotWrapper/StartingSpotWrapper';
+import { flex } from '@shared/styles/default.styled';
 
-import { startingSpotName } from '@shared/types/startingSpotName';
 import { recommendedSpotItem } from '@shared/types/recommendedSpotItem';
-``;
-import { flex } from '../../shared/styles/default.styled';
+import { startingSpotName } from '@shared/types/startingSpotName';
 
 import * as bottomSheet from './bottomSheet.styled';
 
