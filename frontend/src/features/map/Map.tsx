@@ -7,12 +7,20 @@ import MapButton from '@shared/components/mapButton/MapButton';
 import MapPoint from '@shared/components/mapPoint/MapPoint';
 import { flex } from '@shared/styles/default.styled';
 
+import { recommendedSpotItem } from '@shared/types/recommendedSpotItem';
+import { startingSpotName } from '@shared/types/startingSpotName';
+
 import IconBack from '@icons/icon-back.svg';
 import IconShare from '@icons/icon-share.svg';
 
 import * as map from './map.styled';
 
-function Map() {
+interface MapProps {
+  startingSpotNameList: startingSpotName[];
+  recommendedSpotItemList?: recommendedSpotItem[];
+}
+
+function Map({ startingSpotNameList }: MapProps) {
   const mapRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
@@ -20,13 +28,9 @@ function Map() {
 
     if (!naver || !mapRef.current) return;
 
-    const locations = [
-      new naver.maps.LatLng(37.554722, 126.970833),
-      new naver.maps.LatLng(37.497942, 127.027621),
-      new naver.maps.LatLng(37.513342, 127.100095),
-      new naver.maps.LatLng(37.556201, 126.923734),
-      new naver.maps.LatLng(37.555134, 126.936893),
-    ];
+    const locations = startingSpotNameList.map(
+      (name) => new naver.maps.LatLng(name.y, name.x),
+    );
 
     const map = new naver.maps.Map(mapRef.current, {
       center: locations[0],

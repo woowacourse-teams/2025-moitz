@@ -16,7 +16,10 @@ function ResultPage() {
         resultPage.base(),
       ]}
     >
-      <Map />
+      <Map
+        startingSpotNameList={startingSpotNameListMock}
+        recommendedSpotItemList={recommendedSpotItemListMock}
+      />
       <BottomSheet
         startingSpotNameList={startingSpotNameListMock}
         recommendedSpotItemList={recommendedSpotItemListMock}

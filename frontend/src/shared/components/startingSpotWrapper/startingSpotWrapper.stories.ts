@@ -12,7 +12,7 @@ const meta = {
   },
   tags: ['autodocs'],
   argTypes: {
-    nameList: {
+    startingSpotNameList: {
       control: { type: 'object' },
       description: '출발지 이름 목록',
     },
@@ -24,13 +24,13 @@ type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {
   args: {
-    nameList: startSpotNameListMock,
+    startingSpotNameList: startSpotNameListMock,
   },
 };
 
 export const Long: Story = {
   args: {
-    nameList: [
+    startingSpotNameList: [
       { index: 0, name: '서울역' },
       { index: 1, name: '강남역' },
       { index: 2, name: '역삼역' },

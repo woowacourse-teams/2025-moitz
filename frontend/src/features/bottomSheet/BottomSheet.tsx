@@ -22,7 +22,7 @@ function BottomSheet({
   return (
     <div css={[flex({ direction: 'column', gap: 20 }), bottomSheet.base()]}>
       <StartingSpotWrapper
-        nameList={startingSpotNameList}
+        startingSpotNameList={startingSpotNameList}
       ></StartingSpotWrapper>
       <SpotItemList recommendedSpotItemList={recommendedSpotItemList} />
     </div>
