@@ -6,13 +6,13 @@ import { recommendedSpotItem } from '@shared/types/recommendedSpotItem';
 import * as spotItemList from './spotItemList.styled';
 
 interface SpotItemListProps {
-  itemList: recommendedSpotItem[];
+  recommendedSpotItemList: recommendedSpotItem[];
 }
 
-function SpotItemList({ itemList }: SpotItemListProps) {
+function SpotItemList({ recommendedSpotItemList }: SpotItemListProps) {
   return (
     <div css={[flex({ direction: 'column', gap: 20 }), spotItemList.base()]}>
-      {itemList.map((item) => {
+      {recommendedSpotItemList.map((item) => {
         const { index, name, description, avgMinutes, isBest } = item;
         return (
           <SpotItem

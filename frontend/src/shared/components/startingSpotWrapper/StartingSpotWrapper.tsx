@@ -4,15 +4,15 @@ import { flex, typography } from '@shared/styles/default.styled';
 
 import { startingSpotName } from '@shared/types/startingSpotName';
 
-import StartSpotName from '../startSpotName/startSpotName';
+import StartSpotName from '../startingSpotName/StartingSpotName';
 
-import * as startSpotWrapper from './startSpotWrapper.styled';
+import * as startSpotWrapper from './startingSpotWrapper.styled';
 
-interface StartSpotWrapperProps {
+interface StaringSpotWrapperProps {
   nameList: startingSpotName[];
 }
 
-function StartSpotWrapper({ nameList }: StartSpotWrapperProps) {
+function StartingSpotWrapper({ nameList }: StaringSpotWrapperProps) {
   return (
     <div css={[flex({ align: 'center', gap: 10 }), startSpotWrapper.base()]}>
       <span css={[typography.sh1, startSpotWrapper.title()]}>출발지</span>
@@ -25,4 +25,4 @@ function StartSpotWrapper({ nameList }: StartSpotWrapperProps) {
   );
 }
 
-export default StartSpotWrapper;
+export default StartingSpotWrapper;

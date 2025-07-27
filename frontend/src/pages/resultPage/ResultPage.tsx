@@ -3,7 +3,8 @@ import Map from '@features/map/Map';
 
 import { flex } from '@shared/styles/default.styled';
 
-import spotItemListMock from '../../mocks/spotItemListMock';
+import recommendedSpotItemListMock from '../../mocks/recommendedSpotItemListMock';
+import startingSpotNameListMock from '../../mocks/startingSpotNameListMock';
 
 import * as resultPage from './resultPage.styled';
 
@@ -16,7 +17,10 @@ function ResultPage() {
       ]}
     >
       <Map />
-      <BottomSheet itemList={spotItemListMock} />
+      <BottomSheet
+        startingSpotNameList={startingSpotNameListMock}
+        recommendedSpotItemList={recommendedSpotItemListMock}
+      />
     </div>
   );
 }

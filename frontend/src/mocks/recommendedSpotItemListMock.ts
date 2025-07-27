@@ -1,6 +1,6 @@
 import { recommendedSpotItem } from '@shared/types/recommendedSpotItem';
 
-const spotItemListMock: recommendedSpotItem[] = [
+const recommendedSpotItemListMock: recommendedSpotItem[] = [
   {
     id: 1,
     index: 1,
@@ -43,4 +43,4 @@ const spotItemListMock: recommendedSpotItem[] = [
   },
 ];
 
-export default spotItemListMock;
+export default recommendedSpotItemListMock;

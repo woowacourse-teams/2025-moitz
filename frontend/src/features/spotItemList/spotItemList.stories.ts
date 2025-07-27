@@ -1,4 +1,4 @@
-import spotItemListMock from '../../mocks/spotItemListMock';
+import recommendedSpotItemListMock from '../../mocks/recommendedSpotItemListMock';
 
 import SpotItemList from './SpotItemList';
 
@@ -18,5 +18,5 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {
-  args: { itemList: spotItemListMock },
+  args: { recommendedSpotItemList: recommendedSpotItemListMock },
 };

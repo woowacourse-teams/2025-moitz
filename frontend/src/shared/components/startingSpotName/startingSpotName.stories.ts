@@ -1,12 +1,12 @@
-import startSpotNameListMock from '../../../mocks/startSpotNameListMock';
+import startingSpotNameListMock from '../../../mocks/startingSpotNameListMock';
 
-import StartSpotName from './startSpotName';
+import StartingSpotName from './StartingSpotName';
 
 import type { Meta, StoryObj } from '@storybook/react-webpack5';
 
 const meta = {
-  title: 'shared/StartSpotName',
-  component: StartSpotName,
+  title: 'shared/StartingSpotName',
+  component: StartingSpotName,
   parameters: {
     layout: 'centered',
   },
@@ -17,13 +17,13 @@ const meta = {
       description: '출발지 이름 목록',
     },
   },
-} satisfies Meta<typeof StartSpotName>;
+} satisfies Meta<typeof StartingSpotName>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {
   args: {
-    nameInfo: startSpotNameListMock[0],
+    nameInfo: startingSpotNameListMock[0],
   },
 };

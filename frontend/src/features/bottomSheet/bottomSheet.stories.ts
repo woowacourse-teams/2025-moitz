@@ -1,4 +1,5 @@
-import spotItemListMock from '../../mocks/spotItemListMock';
+import startingSpotNameListMock from '../../mocks/startingSpotNameListMock';
+import recommendedSpotItemListMock from '../../mocks/recommendedSpotItemListMock';
 
 import BottomSheet from './BottomSheet';
 
@@ -12,7 +13,11 @@ const meta = {
   },
   tags: ['autodocs'],
   argTypes: {
-    itemList: {
+    startingSpotNameList: {
+      control: { type: 'object' },
+      description: '출발지 장소 리스트',
+    },
+    recommendedSpotItemList: {
       control: { type: 'object' },
       description: '추천 장소 리스트',
     },
@@ -24,12 +29,14 @@ type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {
   args: {
-    itemList: spotItemListMock,
+    startingSpotNameList: startingSpotNameListMock,
+    recommendedSpotItemList: recommendedSpotItemListMock,
   },
 };
 
 export const Short: Story = {
   args: {
-    itemList: spotItemListMock.slice(0, 2),
+    startingSpotNameList: startingSpotNameListMock,
+    recommendedSpotItemList: recommendedSpotItemListMock.slice(0, 2),
   },
 };

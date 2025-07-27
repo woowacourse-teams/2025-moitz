@@ -4,13 +4,13 @@ import { flex, typography } from '@shared/styles/default.styled';
 
 import { startingSpotName } from '@shared/types/startingSpotName';
 
-import * as startSpotName from './startSpotName.styled';
+import * as startingSpotNameStyled from './startingSpotName.styled';
 
 interface StartSpotNameProps {
   nameInfo: startingSpotName;
 }
 
-function StartSpotName({ nameInfo }: StartSpotNameProps) {
+function StartingSpotName({ nameInfo }: StartSpotNameProps) {
   return (
     <div
       key={nameInfo.index}
@@ -20,12 +20,12 @@ function StartSpotName({ nameInfo }: StartSpotNameProps) {
         gap: 5,
       })}
     >
-      <span css={[typography.b2, startSpotName.nameList()]}>
+      <span css={[typography.b2, startingSpotNameStyled.nameList()]}>
         {nameInfo.name}
       </span>
-      <div css={startSpotName.dot()}></div>
+      <div css={startingSpotNameStyled.dot()}></div>
     </div>
   );
 }
 
-export default StartSpotName;
+export default StartingSpotName;

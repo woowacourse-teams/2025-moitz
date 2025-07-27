@@ -7,10 +7,14 @@ import MapButton from '@shared/components/mapButton/MapButton';
 import MapPoint from '@shared/components/mapPoint/MapPoint';
 import { flex } from '@shared/styles/default.styled';
 
+import { startingSpotName } from '@shared/types/startingSpotName';
+
 import IconBack from '@icons/icon-back.svg';
 import IconShare from '@icons/icon-share.svg';
 
 import * as map from './map.styled';
+
+interface MapProps {}
 
 function Map() {
   const mapRef = useRef<HTMLDivElement | null>(null);
