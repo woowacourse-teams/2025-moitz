@@ -1,5 +1,5 @@
 export type recommendedSpotItem = {
-  id?: number;
+  id: number;
   index: number;
   name: string;
   description: string;

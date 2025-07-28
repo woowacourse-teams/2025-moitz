@@ -1,7 +1,7 @@
 export type startingSpotName = {
-  id?: number;
-  x?: number;
-  y?: number;
+  id: number;
+  x: number;
+  y: number;
   index: number;
   name: string;
 };
