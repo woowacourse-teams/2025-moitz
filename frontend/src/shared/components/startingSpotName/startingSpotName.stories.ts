@@ -25,5 +25,13 @@ type Story = StoryObj<typeof meta>;
 export const Default: Story = {
   args: {
     nameInfo: startingSpotNameListMock[0],
+    isLast: false,
+  },
+};
+
+export const NotLast: Story = {
+  args: {
+    nameInfo: startingSpotNameListMock[0],
+    isLast: true,
   },
 };
