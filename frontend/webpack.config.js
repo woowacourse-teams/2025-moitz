@@ -8,8 +8,6 @@ const webpack = require('webpack');
 // .env 파일 읽기
 const envVars = dotenv.config().parsed || {};
 
-console.log(envVars.NAVER_MAP_API_KEY);
-
 // DefinePlugin용 환경변수 정제
 const defineEnv = Object.entries(envVars).reduce((acc, [key, value]) => {
   acc[`process.env.${key}`] = JSON.stringify(value);
