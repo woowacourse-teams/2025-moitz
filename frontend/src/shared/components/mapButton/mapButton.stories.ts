@@ -1,5 +1,5 @@
-import IconBack from '../../../../assets/icon/icon-back.svg';
-import IconShare from '../../../../assets/icon/icon-share.svg';
+import IconBack from '@icons/icon-back.svg';
+import IconShare from '@icons/icon-share.svg';
 
 import MapButton from './MapButton';
 

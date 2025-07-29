@@ -1,0 +1,60 @@
+name: Backend 개발 서버 CI/CD
+
+on:
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: [ self-hosted ]
+    steps:
+      - name: 최신 커밋 내역으로 checkout 한다
+        uses: actions/checkout@v4
+
+      - name: EC2 환경에서 애플리케이션을 빌드 및 실행한다
+        env:
+          APPLICATION_CLIENT_PROPERTIES: ${{ secrets.APPLICATION_CLIENT_PROPERTIES }}
+        run: |
+          cd backend
+
+          # 이전 step에서 checkout한 코드로 JAR 파일을 새로 빌드한다
+          echo "=== JAR 빌드 ==="
+          rm -rf src/main/resources/application-client.properties
+          echo "$APPLICATION_CLIENT_PROPERTIES" > src/main/resources/application-client.properties
+
+          ./gradlew --no-build-cache clean build --refresh-dependencies
+
+          if [ $? -ne 0 ]; then
+            echo "빌드 실패"
+            exit 1
+          fi
+
+          JAR_PATH=$(ls build/libs/*SNAPSHOT.jar | head -n 1)
+          if [ ! -f "$JAR_PATH" ]; then
+            echo "JAR 파일이 없습니다: $JAR_PATH"
+            exit 1
+          fi
+
+          # 기존에 실행 중인 애플리케이션을 먼저 종료한다
+          echo "=== 실행 중인 앱 종료 ==="
+          PID=$(pgrep -f "$JAR_PATH" || true)
+
+          if [ -n "$PID" ]; then
+            kill -15 $PID
+            echo "→ 종료 완료 (PID: $PID)"
+            sleep 5
+          fi
+
+          # 빌드한 JAR 파일을 실행시킨다
+          echo "=== 앱 실행 ==="
+          mkdir -p ./logs
+          RUNNER_TRACKING_ID="" && nohup java -jar "$JAR_PATH" > ./logs/error.log 2>&1 &
+          sleep 3
+
+          NEW_PID=$(pgrep -f "$JAR_PATH" || true)
+
+          if [ -n "$NEW_PID" ]; then
+            echo "앱 실행 성공 (PID: $NEW_PID)"
+          else
+            echo "앱 실행 실패 ./logs/error.log"
+            exit 1
+          fi

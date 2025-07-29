@@ -1,4 +1,4 @@
-import { typography } from '../../styles/default.styled';
+import { typography } from '@shared/styles/default.styled';
 
 import * as textarea from './textarea.styled';
 

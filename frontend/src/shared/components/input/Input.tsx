@@ -1,4 +1,4 @@
-import { typography } from '../../styles/default.styled';
+import { typography } from '@shared/styles/default.styled';
 
 import * as input from './input.styled';
 
@@ -7,7 +7,9 @@ interface InputProps {
 }
 
 function Input({ placeholder }: InputProps) {
-  return <input css={[input.base, typography.b1]} placeholder={placeholder} />;
+  return (
+    <input css={[input.base(), typography.b1]} placeholder={placeholder} />
+  );
 }
 
 export default Input;

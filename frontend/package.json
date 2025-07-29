@@ -6,6 +6,9 @@
     "start": "webpack serve --mode=development --host 0.0.0.0",
     "build": "webpack --mode=production --node-env=production",
     "build:dev": "webpack --mode=development",
+    "lint": "eslint \"src/**/*.{js,jsx,ts,tsx}\"",
+    "lint:fix": "eslint \"src/**/*.{js,jsx,ts,tsx}\" --fix",
+    "type": "tsc --noEmit",
     "serve": "webpack serve",
     "watch": "webpack --watch",
     "prepare": "husky",
@@ -51,7 +54,8 @@
   "dependencies": {
     "@emotion/react": "^11.14.0",
     "react": "^19.1.0",
-    "react-dom": "^19.1.0"
+    "react-dom": "^19.1.0",
+    "react-router": "^7.7.0"
   },
   "lint-staged": {
     "**/*": "prettier --write --ignore-unknown"

@@ -1,4 +1,4 @@
-import { typography } from '../../styles/default.styled';
+import { flex, typography } from '@shared/styles/default.styled';
 
 import * as badge from './badge.styled';
 
@@ -8,7 +8,7 @@ interface BadgeProps {
 
 function Badge({ text }: BadgeProps) {
   return (
-    <div css={badge.base()}>
+    <div css={[flex({ justify: 'center', align: 'center' }), badge.base()]}>
       <span css={typography.sh2}>{text}</span>
     </div>
   );
