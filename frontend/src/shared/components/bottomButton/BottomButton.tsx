@@ -6,9 +6,10 @@ import * as bottomButton from './bottomButton.styled';
 interface BottomButtonProps {
   text: string;
   active: boolean;
+  onClick: () => void;
 }
 
-function BottomButton({ text, active }: BottomButtonProps) {
+function BottomButton({ text, active, onClick }: BottomButtonProps) {
   return (
     <button
       type="button"
@@ -17,6 +18,7 @@ function BottomButton({ text, active }: BottomButtonProps) {
         bottomButton.base(),
         active && bottomButton.active(),
       ]}
+      onClick={onClick}
     >
       <span css={typography.h1}>{text}</span>
     </button>
