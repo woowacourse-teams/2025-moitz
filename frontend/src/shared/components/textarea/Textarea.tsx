@@ -9,9 +9,10 @@ interface TextareaProps {
 
 function Textarea({ placeholder }: TextareaProps) {
   return (
-    <textarea css={[textarea.base(), typography.b1]} placeholder={placeholder}>
-      Textarea
-    </textarea>
+    <textarea
+      css={[textarea.base(), typography.b1]}
+      placeholder={placeholder}
+    />
   );
 }
 
