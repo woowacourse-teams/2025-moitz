@@ -29,7 +29,7 @@ export const Default: Story = {
   },
 };
 
-export const NotLast: Story = {
+export const Last: Story = {
   args: {
     nameInfo: startingSpotNameListMock[0],
     isLast: true,
