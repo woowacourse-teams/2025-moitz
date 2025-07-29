@@ -1,4 +1,3 @@
-/** @jsxImportSource @emotion/react */
 import { typography } from '../../styles/default.styled';
 
 import * as input from './input.styled';

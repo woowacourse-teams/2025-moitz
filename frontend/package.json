@@ -14,9 +14,13 @@
     "chromatic": "npx chromatic --project-token=chpt_ba09fe0f57a51ac"
   },
   "devDependencies": {
+    "@babel/preset-env": "^7.28.0",
+    "@babel/preset-react": "^7.27.1",
+    "@babel/preset-typescript": "^7.27.1",
+    "@emotion/babel-plugin": "^11.13.5",
     "@eslint/js": "^9.30.1",
     "@storybook/addon-docs": "^9.0.17",
-    "@storybook/addon-webpack5-compiler-swc": "^3.0.0",
+    "@storybook/addon-webpack5-compiler-babel": "^3.0.6",
     "@storybook/react-webpack5": "^9.0.17",
     "@types/node": "^24.0.12",
     "@types/react": "^19.1.8",

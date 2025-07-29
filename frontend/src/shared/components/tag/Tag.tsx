@@ -1,4 +1,3 @@
-/** @jsxImportSource @emotion/react */
 import IconCancel from '../../../../assets/icon/icon-cancel.svg';
 import { typography } from '../../styles/default.styled';
 
