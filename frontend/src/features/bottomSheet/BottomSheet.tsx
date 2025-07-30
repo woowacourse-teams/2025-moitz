@@ -1,6 +1,6 @@
 /** @jsxImportSource @emotion/react */
 
-import SpotItemList from '@features/recommandation/components/spotItemList/SpotItemList';
+import SpotItemList from '@features/spotItemList/SpotItemList';
 
 import StartingSpotWrapper from '@shared/components/startingSpotWrapper/StartingSpotWrapper';
 import { flex } from '@shared/styles/default.styled';
