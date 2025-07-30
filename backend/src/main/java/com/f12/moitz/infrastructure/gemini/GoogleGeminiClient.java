@@ -2,13 +2,30 @@ package com.f12.moitz.infrastructure.gemini;
 
 import com.f12.moitz.common.error.exception.ExternalApiErrorCode;
 import com.f12.moitz.common.error.exception.ExternalApiException;
+import com.f12.moitz.domain.Point;
 import com.f12.moitz.infrastructure.gemini.dto.RecommendationsResponse;
 import com.f12.moitz.infrastructure.gemini.dto.BriefRecommendedLocationResponse;
+import com.f12.moitz.infrastructure.kakao.KakaoMapClient;
+import com.f12.moitz.infrastructure.kakao.dto.KakaoApiResponse;
+import com.f12.moitz.infrastructure.kakao.dto.SearchPlacesRequest;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.ImmutableList;
+import com.google.genai.Client;
+import com.google.genai.types.Content;
+import com.google.genai.types.FunctionCall;
+import com.google.genai.types.FunctionDeclaration;
 import com.google.genai.types.GenerateContentConfig;
+import com.google.genai.types.GenerateContentResponse;
+import com.google.genai.types.Part;
+import com.google.genai.types.Schema;
+import com.google.genai.types.Tool;
+import com.google.genai.types.Type.Known;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -33,51 +50,151 @@ public class GoogleGeminiClient {
             """;
     private static final String ADDITIONAL_PROMPT = """
                     You're an AI assistant recommending optimal meeting locations in Seoul. Your main goal is to suggest places where subway travel times from all starting points are similar and distances aren't too far.
-
+            
                     Core Conditions:
                     Subway Travel Only: Travel time calculations must be limited to public transportation (subway).
                     Subway Station Scope: Starting and destination points must be limited to Seoul Metro subway stations.
                     Similar Travel Times: The travel time from each starting point to the recommended destination must be within a 15-minute margin of error (max_time - min_time <= 15 minutes) across all starting points.
                     Facility Sufficiency: Recommended areas must be near subway stations, have ample dining/cafes/convenience facilities, and specifically meet any additional user conditions.
                     **Exclusion: The recommended locations must NOT be any of the provided Starting Points.** // 이 줄을 추가합니다.
-
+            
                     Recommendation Requirements:
                     Recommend a total of %d locations.
                     For each recommended location, provide the following detailed format per starting point: travelMethod, travelRoute, totalTimeInMinutes, travelCost, and numberOfTransfers.
                     Additionally, for each recommended location, you must provide a concise, one-line summary reason (e.g., '접근성 좋고 맛집이 많아요! 😋') explaining why this specific location is recommended, highlighting its key advantages based on the user's conditions and travel similarities.
                     This reason MUST be very brief, strictly under 50 characters (including spaces and punctuation). Use emojis SPARINGLY, for example, 1-3 emojis at most, to enhance expressiveness, but do NOT include excessive or repetitive emojis.
                     Do NOT recommend locations that fail to meet the Additional User Condition.
-
+            
                     Input:
                     Starting Points: %s (List of subway station names)
                     Additional User Condition: %s (e.g., "PC방, 코인노래방")
-
+            
                     Kakao Category Extraction:
                     Analyze the Additional User Condition to extract relevant Kakao Local API Category Group Codes. Include all clearly mapping codes. If a condition doesn't clearly map, return ALL available Kakao Category Group Codes from the reference list.
-
+            
                     Kakao Local API Category Group Codes (you must use these):
                     CT1: Cultural Facility
                     AT4: Tourist Attraction
                     AD5: Accommodation
                     FD6: Restaurant
                     CE7: Cafe
-
+            
                     Based on analysis, you must explicitly include a list of relevant Kakao Category Group Codes in your response for the requirementsCategoryCodes field.
-
+            
                     Output:
                     Provide the response in the structured JSON format defined by the provided schemas.
             """;
 
     private final Client geminiClient;
+    private final KakaoMapClient kakaoMapClient;
     private final ObjectMapper objectMapper;
+
+    private final Map<String, Function<Object, Object>> functions = new HashMap<>();
 
     public GoogleGeminiClient(
             final @Autowired Client.Builder geminiClientBuilder,
+            final @Autowired KakaoMapClient kakaoMapClient,
             final @Value("${gemini.api.key}") String apiKey,
             final @Autowired ObjectMapper objectMapper
     ) {
         this.geminiClient = geminiClientBuilder.apiKey(apiKey).build();
+        this.kakaoMapClient = kakaoMapClient;
         this.objectMapper = objectMapper;
+
+        functions.put("getPointByPlaceName", arg -> kakaoMapClient.searchPointBy((String) arg));
+        functions.put("getPlacesByKeyword", arg -> kakaoMapClient.searchPlacesBy((SearchPlacesRequest) arg));
+    }
+
+    public void generateWithFunctionCalling(final String prompt) {
+        // Declare the getPlacesByKeword function
+        FunctionDeclaration getPlacesByKewordFunctionDeclaration = FunctionDeclaration.builder()
+                .name("getPlacesByKeyword")
+                .description("Get places by keyword within a specified radius (in meters) from the given coordinate")
+                .parameters(
+                        Schema.builder()
+                                .type(Known.OBJECT)
+                                .properties(Map.of(
+                                        "keyword", Schema.builder().type(Known.STRING)
+                                                .description("The keyword must be in Korean.").build(),
+                                        "longitude",
+                                        Schema.builder().type(Known.NUMBER).description("x좌표(경도)").minimum(124.0)
+                                                .maximum(132.0).build(),
+                                        "latitude",
+                                        Schema.builder().type(Known.NUMBER).description("y좌표(위도)").minimum(33.0)
+                                                .maximum(43.0).build(),
+                                        "radius",
+                                        Schema.builder().type(Known.INTEGER).description("반경").minimum(0.0).maximum(20000.0).build()
+                                )).required("keyword", "longitude", "latitude", "radius")
+                                .build()
+                ).build();
+
+        // Add the functions to a "tool"
+        Tool tools = Tool.builder()
+                .functionDeclarations(getPlacesByKewordFunctionDeclaration)
+                .build();
+
+        final GenerateContentConfig config = GenerateContentConfig.builder()
+                .temperature(0.0F)
+                .maxOutputTokens(5000)
+                .tools(tools)
+                .build();
+
+        GenerateContentResponse generateContentResponse = geminiClient.models.generateContent(
+                GEMINI_MODEL,
+                prompt,
+                config
+        );
+
+        log.info("Gemini 응답 성공, 토큰 사용 {}개", generateContentResponse.usageMetadata().get().totalTokenCount().get());
+        if (!generateContentResponse.functionCalls().isEmpty()) {
+            System.out.println("최초 응답: " + generateContentResponse.functionCalls().getFirst());
+        } else {
+            System.out.println("최초 응답: " + generateContentResponse.text());
+        }
+
+        boolean function_calling_in_process = true;
+        while (function_calling_in_process) {
+            // # Extract the first function call response
+            ImmutableList<FunctionCall> functionCalls = generateContentResponse.functionCalls();
+
+            FunctionCall functionCall = functionCalls.stream().findFirst().orElse(null);
+
+            if (functionCall == null) {
+                System.out.println("No more function calls found in response");
+                break;
+            }
+
+            String functionCallName = functionCall.name().get();
+            System.out.println("Need to invoke function: " + functionCallName);
+
+            Map<String, Object> functionCallParameters = functionCall.args().get();
+            String keword = functionCallParameters.get("keyword").toString();
+            Double longitude = (Double) functionCallParameters.get("longitude");
+            Double latitude = (Double) functionCallParameters.get("latitude");
+            Integer radius = (Integer) functionCallParameters.get("radius");
+            KakaoApiResponse kakaoApiResponse = kakaoMapClient.searchPlacesBy(
+                    new SearchPlacesRequest(keword, new Point(longitude, latitude), radius)
+            );
+
+            Content content = Content.fromParts(
+                    Part.fromFunctionResponse(functionCallName, Collections.singletonMap("content", kakaoApiResponse))
+            );
+
+            generateContentResponse = geminiClient.models.generateContent(
+                    GEMINI_MODEL,
+                    content,
+                    config
+            );
+
+            log.info("Gemini 응답 성공, 토큰 사용 {}개", generateContentResponse.usageMetadata().get().totalTokenCount().get());
+
+            if (!generateContentResponse.functionCalls().isEmpty()) {
+                System.out.println("응답: " + generateContentResponse.functionCalls().getFirst());
+            } else {
+
+                System.out.println("응답: " + generateContentResponse.text());
+            }
+        }
     }
 
     public RecommendationsResponse generateDetailResponse(final List<String> stationNames, final String requirement) {
