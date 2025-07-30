@@ -21,6 +21,10 @@ const meta = {
     onClick: {
       description: '클릭 시 실행될 함수',
     },
+    isSelected: {
+      control: { type: 'boolean' },
+      description: '선택 여부',
+    },
   },
 } satisfies Meta<typeof ConditionCard>;
 
@@ -32,5 +36,15 @@ export const Default: Story = {
     iconText: '💬',
     contentText: '떠들고 놀기 좋은',
     onClick: () => {},
+    isSelected: false,
+  },
+};
+
+export const Selected: Story = {
+  args: {
+    iconText: '💬',
+    contentText: '떠들고 놀기 좋은',
+    onClick: () => {},
+    isSelected: true,
   },
 };

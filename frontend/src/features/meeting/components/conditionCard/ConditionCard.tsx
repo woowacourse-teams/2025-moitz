@@ -7,14 +7,21 @@ interface ConditionCardProps {
   iconText: string;
   contentText: string;
   onClick: () => void;
+  isSelected?: boolean;
 }
 
-function ConditionCard({ iconText, contentText, onClick }: ConditionCardProps) {
+function ConditionCard({
+  iconText,
+  contentText,
+  onClick,
+  isSelected = false,
+}: ConditionCardProps) {
   return (
     <button
       css={[
         flex({ direction: 'column', align: 'center', gap: 5 }),
         conditionCard.base(),
+        isSelected && conditionCard.selected(),
       ]}
       type="button"
       onClick={onClick}

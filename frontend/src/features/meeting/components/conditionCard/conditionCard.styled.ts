@@ -11,10 +11,14 @@ export const base = () => css`
 
   &:hover {
     background-color: ${colorToken.main[4]};
-    box-shadow: 0 0 0 2px ${colorToken.main[1]};
   }
 `;
 
 export const text = () => css`
   color: ${colorToken.gray[2]};
+`;
+
+export const selected = () => css`
+  background-color: ${colorToken.main[4]};
+  box-shadow: 0 0 0 2px ${colorToken.main[1]};
 `;
