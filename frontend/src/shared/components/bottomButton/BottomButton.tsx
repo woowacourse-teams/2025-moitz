@@ -4,15 +4,16 @@ import { flex, typography } from '@shared/styles/default.styled';
 import * as bottomButton from './bottomButton.styled';
 
 interface BottomButtonProps {
+  type: 'button' | 'submit';
   text: string;
   active: boolean;
   onClick: () => void;
 }
 
-function BottomButton({ text, active, onClick }: BottomButtonProps) {
+function BottomButton({ type, text, active, onClick }: BottomButtonProps) {
   return (
     <button
-      type="button"
+      type={type}
       css={[
         flex({ justify: 'center', align: 'center' }),
         bottomButton.base(),
