@@ -35,17 +35,22 @@ public class KakaoMapClient {
     }
 
     public String searchPlaceBy(final double longitude, final double latitude) {
-        final String url = KAKAO_MAP_API_URL + "/category.json" + "?x=" + longitude + "&y=" + latitude + "&category_group_code=SW8";
+        final String url = KAKAO_MAP_API_URL + "/category.json" + "?x=" + longitude + "&y=" + latitude
+                           + "&category_group_code=SW8";
         final KakaoApiResponse response = getData(url);
         return response.findStationPlaceName();
     }
 
     public KakaoApiResponse searchPlacesBy(final SearchPlacesRequest request) {
-        return searchPlacesBy(request.query(), String.valueOf(request.point().getX()), String.valueOf(request.point().getY()), request.radius());
+        return searchPlacesBy(request.query(), String.valueOf(request.longitude()), String.valueOf(request.latitude()),
+                request.radius());
     }
 
-    private KakaoApiResponse searchPlacesBy(final String keyword, final String longitude, final String latitude, final int radius) {
-        final String url = KAKAO_MAP_API_URL + "/keyword.json" + "?query=" + keyword + "&x=" + longitude + "&y=" + latitude + "&radius=" + radius;
+    private KakaoApiResponse searchPlacesBy(final String keyword, final String longitude, final String latitude,
+                                            final int radius) {
+        final String url =
+                KAKAO_MAP_API_URL + "/keyword.json" + "?query=" + keyword + "&x=" + longitude + "&y=" + latitude
+                + "&radius=" + radius;
         final KakaoApiResponse response = getData(url);
         return response;
     }
