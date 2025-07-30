@@ -1,9 +1,10 @@
 package com.f12.moitz.infrastructure.kakao;
 
+import com.f12.moitz.common.error.exception.ExternalApiErrorCode;
+import com.f12.moitz.common.error.exception.ExternalApiException;
 import com.f12.moitz.domain.Point;
 import com.f12.moitz.infrastructure.kakao.dto.KakaoApiResponse;
 import com.f12.moitz.infrastructure.kakao.dto.KakaoMapErrorResponse;
-import com.f12.moitz.infrastructure.odsay.dto.OdsayErrorResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import lombok.RequiredArgsConstructor;
@@ -60,9 +61,10 @@ public class KakaoMapClient {
             byte[] body = res.getBody().readAllBytes();
             KakaoMapErrorResponse error = objectMapper.readValue(body,
                     KakaoMapErrorResponse.class);
-            throw new RuntimeException(error.msg());
+            log.error(error.msg());
+            throw new ExternalApiException(ExternalApiErrorCode.INVALID_KAKAO_MAP_API_RESPONSE);
         } catch (IOException e) {
-            throw new RuntimeException("응답 바디 파싱에 실패하였습니다.", e);
+            throw new ExternalApiException(ExternalApiErrorCode.INVALID_KAKAO_MAP_API_RESPONSE);
         }
     }
 

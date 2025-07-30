@@ -1,5 +1,7 @@
 package com.f12.moitz.infrastructure.gemini;
 
+import com.f12.moitz.common.error.exception.ExternalApiErrorCode;
+import com.f12.moitz.common.error.exception.ExternalApiException;
 import com.f12.moitz.infrastructure.gemini.dto.RecommendationsResponse;
 import com.f12.moitz.infrastructure.gemini.dto.BriefRecommendedLocationResponse;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -85,7 +87,7 @@ public class GoogleGeminiClient {
                     RecommendationsResponse.class
             );
         } catch (JsonProcessingException e) {
-            throw new RuntimeException("Gemini 응답 파싱 실패", e);
+            throw new ExternalApiException(ExternalApiErrorCode.INVALID_GEMINI_RESPONSE_FORMAT);
         }
     }
 
@@ -96,7 +98,7 @@ public class GoogleGeminiClient {
                     BriefRecommendedLocationResponse.class
             );
         } catch (JsonProcessingException e) {
-            throw new RuntimeException("Gemini 응답 파싱 실패", e);
+            throw new ExternalApiException(ExternalApiErrorCode.INVALID_GEMINI_RESPONSE_FORMAT);
         }
 
     }
