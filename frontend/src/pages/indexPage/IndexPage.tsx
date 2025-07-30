@@ -1,4 +1,4 @@
-import InputForm from '@features/meeting/components/inputForm/InputForm';
+import MeetingForm from '@features/meeting/components/meetingForm/MeetingForm';
 
 import HeaderLogo from '@shared/components/headerLogo/HeaderLogo';
 import { flex, gridPadding } from '@shared/styles/default.styled';
@@ -18,7 +18,7 @@ function IndexPage() {
       <div css={indexPage.headerLogo()}>
         <HeaderLogo />
       </div>
-      <InputForm />
+      <MeetingForm />
     </div>
   );
 }
