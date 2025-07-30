@@ -22,4 +22,17 @@ public class GoogleGeminiClientTest {
         geminiClient.generateWithFunctionCalling(prompt);
     }
 
+
+    @DisplayName("병렬 함수 호출 테스트")
+    @Test
+    void parallel() {
+        //given
+        String prompt = "Find all places for climbing within a 500m radius of Gangnam Station. Use multiple function calls to generate a response if necessary.";
+
+        //when
+        geminiClient.generateWithFunctionCalling(prompt);
+
+        //then
+
+    }
 }

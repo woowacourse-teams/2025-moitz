@@ -12,15 +12,20 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableList;
 import com.google.genai.Client;
+import com.google.genai.types.AutomaticFunctionCallingConfig;
 import com.google.genai.types.Content;
 import com.google.genai.types.FunctionCall;
+import com.google.genai.types.FunctionCallingConfig;
+import com.google.genai.types.FunctionCallingConfigMode;
 import com.google.genai.types.FunctionDeclaration;
 import com.google.genai.types.GenerateContentConfig;
 import com.google.genai.types.GenerateContentResponse;
 import com.google.genai.types.Part;
 import com.google.genai.types.Schema;
 import com.google.genai.types.Tool;
+import com.google.genai.types.ToolConfig;
 import com.google.genai.types.Type.Known;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -104,6 +109,23 @@ public class GoogleGeminiClient {
     }
 
     public void generateWithFunctionCalling(final String prompt) {
+        // Declare the getPointByPlaceName function
+        FunctionDeclaration getPointByPlaceNameFunctionDeclaration = FunctionDeclaration.builder()
+                .name("getPointByPlaceName")
+                .description("Get coordinate by the given place name")
+                .parameters(
+                        Schema.builder()
+                                .type(Known.OBJECT)
+                                .properties(Map.of(
+                                        "placeName", Schema.builder()
+                                                .type(Known.STRING)
+                                                .description(
+                                                        "The place name must be the Korean name of a subway station located in the Seoul Metropolitan Area of South Korea")
+                                                .build()
+                                )).required("placeName")
+                                .build()
+                ).build();
+
         // Declare the getPlacesByKeword function
         FunctionDeclaration getPlacesByKewordFunctionDeclaration = FunctionDeclaration.builder()
                 .name("getPlacesByKeyword")
@@ -129,7 +151,7 @@ public class GoogleGeminiClient {
 
         // Add the functions to a "tool"
         Tool tools = Tool.builder()
-                .functionDeclarations(getPlacesByKewordFunctionDeclaration)
+                .functionDeclarations(List.of(getPointByPlaceNameFunctionDeclaration,  getPlacesByKewordFunctionDeclaration))
                 .build();
 
         final GenerateContentConfig config = GenerateContentConfig.builder()
@@ -145,10 +167,12 @@ public class GoogleGeminiClient {
         );
 
         log.info("Gemini 응답 성공, 토큰 사용 {}개", generateContentResponse.usageMetadata().get().totalTokenCount().get());
+
         if (!generateContentResponse.functionCalls().isEmpty()) {
-            System.out.println("최초 응답: " + generateContentResponse.functionCalls().getFirst());
+            System.out.println("응답: " + generateContentResponse.functionCalls().getFirst());
         } else {
-            System.out.println("최초 응답: " + generateContentResponse.text());
+
+            System.out.println("응답: " + generateContentResponse.text());
         }
 
         boolean function_calling_in_process = true;
@@ -166,17 +190,20 @@ public class GoogleGeminiClient {
             String functionCallName = functionCall.name().get();
             System.out.println("Need to invoke function: " + functionCallName);
 
-            Map<String, Object> functionCallParameters = functionCall.args().get();
-            String keword = functionCallParameters.get("keyword").toString();
-            Double longitude = (Double) functionCallParameters.get("longitude");
-            Double latitude = (Double) functionCallParameters.get("latitude");
-            Integer radius = (Integer) functionCallParameters.get("radius");
-            KakaoApiResponse kakaoApiResponse = kakaoMapClient.searchPlacesBy(
-                    new SearchPlacesRequest(keword, new Point(longitude, latitude), radius)
-            );
+            Object result;
+
+            if ("getPointByPlaceName".equals(functionCallName)) {
+                result = functions.get(functionCallName)
+                        .apply(functionCall.args().get().values().stream().findFirst().orElse(null));
+            } else {
+                SearchPlacesRequest request = objectMapper.convertValue(functionCall.args().get(),
+                        SearchPlacesRequest.class);
+                result = functions.get(functionCallName).apply(request);
+            }
+
 
             Content content = Content.fromParts(
-                    Part.fromFunctionResponse(functionCallName, Collections.singletonMap("content", kakaoApiResponse))
+                    Part.fromFunctionResponse(functionCallName, Collections.singletonMap("content", result))
             );
 
             generateContentResponse = geminiClient.models.generateContent(
@@ -195,6 +222,114 @@ public class GoogleGeminiClient {
             }
         }
     }
+
+    public void generateWithParallelFunctionCalling(final String prompt) {
+        // Declare the getPointByPlaceName function
+        FunctionDeclaration getPointByPlaceNameFunctionDeclaration = FunctionDeclaration.builder()
+                .name("getPointByPlaceName")
+                .description("Get coordinate by the given place name")
+                .parameters(
+                        Schema.builder()
+                                .type(Known.OBJECT)
+                                .properties(Map.of(
+                                        "placeName", Schema.builder()
+                                                .type(Known.STRING)
+                                                .description(
+                                                        "The place name must be the Korean name of a subway station located in the Seoul Metropolitan Area of South Korea")
+                                                .build()
+                                )).required("placeName")
+                                .build()
+                ).build();
+
+        // Declare the getPlacesByKeword function
+        FunctionDeclaration getPlacesByKewordFunctionDeclaration = FunctionDeclaration.builder()
+                .name("getPlacesByKeyword")
+                .description("Get places by keyword within a specified radius (in meters) from the given coordinate")
+                .parameters(
+                        Schema.builder()
+                                .type(Known.OBJECT)
+                                .properties(Map.of(
+                                        "keyword", Schema.builder().type(Known.STRING)
+                                                .description("The keyword must be in Korean.").build(),
+                                        "longitude",
+                                        Schema.builder().type(Known.NUMBER).description("x좌표(경도)").minimum(124.0)
+                                                .maximum(132.0).build(),
+                                        "latitude",
+                                        Schema.builder().type(Known.NUMBER).description("y좌표(위도)").minimum(33.0)
+                                                .maximum(43.0).build(),
+                                        "radius",
+                                        Schema.builder().type(Known.INTEGER).description("반경").minimum(0.0)
+                                                .maximum(20000.0).build()
+                                )).required("keyword", "longitude", "latitude", "radius")
+                                .build()
+                ).build();
+
+        // Add the functions to a "tool"
+        Tool tools = Tool.builder()
+                .functionDeclarations(List.of(getPointByPlaceNameFunctionDeclaration, getPlacesByKewordFunctionDeclaration))
+                .build();
+
+        final GenerateContentConfig config = GenerateContentConfig.builder()
+                .temperature(0.0F)
+                .maxOutputTokens(5000)
+                .tools(tools)
+                .build();
+
+        GenerateContentResponse generateContentResponse = geminiClient.models.generateContent(
+                GEMINI_MODEL,
+                prompt,
+                config
+        );
+
+        log.info("Gemini 응답 성공, 토큰 사용 {}개", generateContentResponse.usageMetadata().get().totalTokenCount().get());
+        if (!generateContentResponse.functionCalls().isEmpty()) {
+            System.out.println("최초 응답: " + generateContentResponse.functionCalls());
+        } else {
+            System.out.println("최초 응답: " + generateContentResponse.text());
+        }
+
+        List<Content> kakaoResults = new ArrayList<>();
+
+        for (FunctionCall functionCall : generateContentResponse.functionCalls()) {
+            String functionCallName = functionCall.name().get();
+            System.out.println("Need to invoke function: " + functionCallName);
+
+            if (functions.containsKey(functionCallName)) {
+                Map<String, Object> functionCallParameter = functionCall.args().get();
+
+                Object result;
+
+                if ("getPointByPlaceName".equals(functionCallName)) {
+                    result = functions.get(functionCallName)
+                            .apply(functionCall.args().get().values().stream().findFirst().orElse(null));
+                } else {
+                    SearchPlacesRequest request = objectMapper.convertValue(functionCallParameter,
+                            SearchPlacesRequest.class);
+                    result = functions.get(functionCallName).apply(request);
+                }
+
+                kakaoResults.add(Content.fromParts(
+                        Part.fromFunctionResponse(functionCallName, Collections.singletonMap("content", result))
+                ));
+            }
+        }
+
+        generateContentResponse = geminiClient.models.generateContent(
+                GEMINI_MODEL,
+                kakaoResults,
+                config
+        );
+
+        log.info("Gemini 응답 성공, 토큰 사용 {}개", generateContentResponse.usageMetadata().get().totalTokenCount().get());
+
+        if (!generateContentResponse.functionCalls().isEmpty()) {
+            System.out.println("응답: " + generateContentResponse.functionCalls().getFirst());
+        } else {
+
+            System.out.println("응답: " + generateContentResponse.text());
+        }
+    }
+
 
     public RecommendationsResponse generateDetailResponse(final List<String> stationNames, final String requirement) {
         try {
