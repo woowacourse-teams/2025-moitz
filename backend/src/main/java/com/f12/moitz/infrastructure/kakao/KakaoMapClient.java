@@ -40,12 +40,6 @@ public class KakaoMapClient {
         return response.findStationPlaceName();
     }
 
-    public KakaoApiResponse searchBy(final String placeName) {
-        final String url = KAKAO_MAP_API_URL + "/keyword.json" + "?query=" + placeName;
-        final KakaoApiResponse response = getData(url);
-        return response;
-    }
-
     public KakaoApiResponse searchPlacesBy(final SearchPlacesRequest request) {
         return searchPlacesBy(request.query(), String.valueOf(request.point().getX()), String.valueOf(request.point().getY()), request.radius());
     }

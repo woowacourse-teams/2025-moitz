@@ -3,8 +3,8 @@ package com.f12.moitz.infrastructure.gemini;
 import com.f12.moitz.common.error.exception.ExternalApiErrorCode;
 import com.f12.moitz.common.error.exception.ExternalApiException;
 import com.f12.moitz.domain.Point;
-import com.f12.moitz.infrastructure.gemini.dto.RecommendationsResponse;
 import com.f12.moitz.infrastructure.gemini.dto.BriefRecommendedLocationResponse;
+import com.f12.moitz.infrastructure.gemini.dto.RecommendationsResponse;
 import com.f12.moitz.infrastructure.kakao.KakaoMapClient;
 import com.f12.moitz.infrastructure.kakao.dto.KakaoApiResponse;
 import com.f12.moitz.infrastructure.kakao.dto.SearchPlacesRequest;
@@ -30,8 +30,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import com.google.genai.Client;
-import com.google.genai.types.GenerateContentResponse;
 
 @Component
 @Slf4j
@@ -123,7 +121,8 @@ public class GoogleGeminiClient {
                                         Schema.builder().type(Known.NUMBER).description("y좌표(위도)").minimum(33.0)
                                                 .maximum(43.0).build(),
                                         "radius",
-                                        Schema.builder().type(Known.INTEGER).description("반경").minimum(0.0).maximum(20000.0).build()
+                                        Schema.builder().type(Known.INTEGER).description("반경").minimum(0.0)
+                                                .maximum(20000.0).build()
                                 )).required("keyword", "longitude", "latitude", "radius")
                                 .build()
                 ).build();
@@ -208,7 +207,8 @@ public class GoogleGeminiClient {
         }
     }
 
-    public BriefRecommendedLocationResponse generateBriefResponse(final List<String> stationNames, final String requirement) {
+    public BriefRecommendedLocationResponse generateBriefResponse(final List<String> stationNames,
+                                                                  final String requirement) {
         try {
             return objectMapper.readValue(
                     generateContent(stationNames, requirement, getBriefSchema()).text(),
@@ -305,7 +305,8 @@ public class GoogleGeminiClient {
                         ),
                         "requirementsCategoryCodes", Map.of(
                                 "type", "array",
-                                "description", "사용자의 추가 요구사항에 매핑되는 카카오 로컬 API 카테고리 그룹 코드 리스트 (예: ['CT1', 'FD6']). 매핑되지 않으면 모두 포함.",
+                                "description",
+                                "사용자의 추가 요구사항에 매핑되는 카카오 로컬 API 카테고리 그룹 코드 리스트 (예: ['CT1', 'FD6']). 매핑되지 않으면 모두 포함.",
                                 "items", Map.of("type", "string"),
                                 "minItems", 0
                         )
@@ -328,7 +329,8 @@ public class GoogleGeminiClient {
                                                 "locationName", Map.of("type", "string", "description", "추천 장소의 이름"),
                                                 "reason", Map.of(
                                                         "type", "string",
-                                                        "description", "해당 장소를 추천하는 간결한 한 줄 요약 이유 50자 이내 (예: '접근성 좋고 맛집이 많아요!')",
+                                                        "description",
+                                                        "해당 장소를 추천하는 간결한 한 줄 요약 이유 50자 이내 (예: '접근성 좋고 맛집이 많아요!')",
                                                         "maxLength", 50
                                                 )
                                         ),
@@ -339,7 +341,8 @@ public class GoogleGeminiClient {
                         ),
                         "requirementsCategoryCodes", Map.of(
                                 "type", "array",
-                                "description", "사용자의 추가 요구사항에 매핑되는 카카오 로컬 API 카테고리 그룹 코드 리스트 (예: ['CT1', 'FD6']). 매핑되지 않으면 모두 포함.",
+                                "description",
+                                "사용자의 추가 요구사항에 매핑되는 카카오 로컬 API 카테고리 그룹 코드 리스트 (예: ['CT1', 'FD6']). 매핑되지 않으면 모두 포함.",
                                 "items", Map.of("type", "string"),
                                 "minItems", 0,
                                 "maxItems", 5
