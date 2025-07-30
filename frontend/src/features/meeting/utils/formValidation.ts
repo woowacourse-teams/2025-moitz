@@ -51,7 +51,7 @@ export const validateDuplicateDeparture = (
   if (departureList.includes(newStation)) {
     return {
       isValid: false,
-      message: '이미 추가된 출발지입니다',
+      message: '이미 추가된 출발지예요',
     };
   }
   return { isValid: true, message: '' };
