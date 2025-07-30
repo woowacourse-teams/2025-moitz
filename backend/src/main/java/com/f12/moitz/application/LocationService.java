@@ -4,7 +4,7 @@ import com.f12.moitz.application.dto.LocationRecommendRequest;
 import com.f12.moitz.application.dto.LocationRecommendResponse;
 import com.f12.moitz.domain.Place;
 import com.f12.moitz.infrastructure.gemini.GoogleGeminiClient;
-import com.f12.moitz.infrastructure.gemini.dto.BriefRecommendedLocationResponse;
+import com.f12.moitz.infrastructure.gemini.dto.RecommendedLocationResponse;
 import com.f12.moitz.infrastructure.gemini.dto.LocationNameAndReason;
 import com.f12.moitz.infrastructure.kakao.KakaoMapClient;
 import com.f12.moitz.infrastructure.odsay.OdsayClient;
@@ -39,12 +39,12 @@ public class LocationService {
     }
 
     private List<LocationNameAndReason> generateAiRecommendedLocations(final LocationRecommendRequest request) {
-        final BriefRecommendedLocationResponse briefRecommendedLocationResponse = googleGeminiClient.generateBriefResponse(
+        final RecommendedLocationResponse recommendedLocationResponse = googleGeminiClient.generateResponse(
                 request.startingPlaceNames(),
                 request.requirement()
         );
-        log.info("카테고리: {}", briefRecommendedLocationResponse.additionalConditionsCategoryCodes());
-        return briefRecommendedLocationResponse.recommendations();
+        log.info("카테고리: {}", recommendedLocationResponse.additionalConditionsCategoryCodes());
+        return recommendedLocationResponse.recommendations();
     }
 
     private List<Place> getPlacesByName(final List<String> startingPlaceNames) {
