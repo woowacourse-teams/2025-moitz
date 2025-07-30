@@ -2,19 +2,19 @@
 
 import { flex, typography } from '@shared/styles/default.styled';
 
-import { startingSpotName } from '@shared/types/startingSpotName';
+import { startingLocation } from '@shared/types/startingLocation';
 
 import * as startingSpotNameStyled from './startingSpotName.styled';
 
 interface StartSpotNameProps {
-  nameInfo: startingSpotName;
+  location: startingLocation;
   isLast: boolean;
 }
 
-function StartingSpotName({ nameInfo, isLast }: StartSpotNameProps) {
+function StartingSpotName({ location, isLast }: StartSpotNameProps) {
   return (
     <div
-      key={nameInfo.index}
+      key={location.index}
       css={flex({
         justify: 'center',
         align: 'center',
@@ -22,7 +22,7 @@ function StartingSpotName({ nameInfo, isLast }: StartSpotNameProps) {
       })}
     >
       <span css={[typography.b2, startingSpotNameStyled.nameList()]}>
-        {nameInfo.name}
+        {location.name}
       </span>
       <div css={!isLast && startingSpotNameStyled.dot()}></div>
     </div>

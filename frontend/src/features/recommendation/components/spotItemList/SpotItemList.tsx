@@ -1,19 +1,19 @@
 import SpotItem from '@shared/components/spotItem/SpotItem';
 import { flex } from '@shared/styles/default.styled';
 
-import { recommendedSpotItem } from '@shared/types/recommendedSpotItem';
+import { recommendedLocation } from '@shared/types/recommendedLocation';
 
 import * as spotItemList from './spotItemList.styled';
 
 interface SpotItemListProps {
-  recommendedSpotItemList: recommendedSpotItem[];
+  recommendedLocations: recommendedLocation[];
 }
 
-function SpotItemList({ recommendedSpotItemList }: SpotItemListProps) {
+function SpotItemList({ recommendedLocations }: SpotItemListProps) {
   return (
     <div css={[flex({ direction: 'column', gap: 20 }), spotItemList.base()]}>
-      {recommendedSpotItemList.map((item) => {
-        const { index, name, description, avgMinutes, isBest } = item;
+      {recommendedLocations.map((location) => {
+        const { index, name, description, avgMinutes, isBest } = location;
         return (
           <SpotItem
             key={index}

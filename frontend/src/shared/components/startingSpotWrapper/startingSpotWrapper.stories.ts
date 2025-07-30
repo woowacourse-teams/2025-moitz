@@ -1,4 +1,4 @@
-import startSpotNameListMock from '../../../mocks/startingSpotNameListMock';
+import startSpotNameListMock from '../../../mocks/startingLocationsMock';
 
 import StartingSpotWrapper from './StartingSpotWrapper';
 
@@ -12,7 +12,7 @@ const meta = {
   },
   tags: ['autodocs'],
   argTypes: {
-    startingSpotNameList: {
+    startingLocations: {
       control: { type: 'object' },
       description: '출발지 이름 목록',
     },
@@ -24,13 +24,13 @@ type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {
   args: {
-    startingSpotNameList: startSpotNameListMock,
+    startingLocations: startSpotNameListMock,
   },
 };
 
 export const Long: Story = {
   args: {
-    startingSpotNameList: [
+    startingLocations: [
       { index: 0, name: '서울역', id: 0, x: 0, y: 0 },
       { index: 1, name: '강남역', id: 1, x: 1, y: 1 },
       { index: 2, name: '역삼역', id: 2, x: 2, y: 2 },

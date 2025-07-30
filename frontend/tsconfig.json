@@ -49,5 +49,5 @@
     "main.tsx",
     "src/shared/styles/styled.d.ts",
     "src/types/*.d.ts"
-  ]
+, "src/mocks/.ts"  ]
 }
