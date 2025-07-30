@@ -24,9 +24,6 @@ const meta = {
     onKeyDown: {
       description: '인풋 필드에 키 입력 시 실행될 함수',
     },
-    onClick: {
-      description: '인풋 필드 클릭 시 실행될 함수',
-    },
   },
 } satisfies Meta<typeof Input>;
 
@@ -39,6 +36,5 @@ export const Default: Story = {
     value: '',
     onChange: () => {},
     onKeyDown: () => {},
-    onClick: () => {},
   },
 };
