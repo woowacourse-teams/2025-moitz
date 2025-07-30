@@ -1,5 +1,5 @@
-import BottomSheet from '@features/bottomSheet/BottomSheet';
 import Map from '@features/map/Map';
+import BottomSheet from '@features/recommandation/components/bottomSheet/BottomSheet';
 
 import { flex } from '@shared/styles/default.styled';
 
