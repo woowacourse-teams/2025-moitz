@@ -1,5 +1,5 @@
-import recommendedSpotItemListMock from '../../mocks/recommendedSpotItemListMock';
-import startingSpotNameListMock from '../../mocks/startingSpotNameListMock';
+import recommendedSpotItemListMock from '../../../../mocks/recommendedSpotItemListMock';
+import startingSpotNameListMock from '../../../../mocks/startingSpotNameListMock';
 
 import BottomSheet from './BottomSheet';
 
