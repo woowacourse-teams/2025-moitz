@@ -14,7 +14,7 @@ function NotFoundPage() {
           align: 'center',
           gap: 40,
         }),
-        notFoundPage.base,
+        notFoundPage.base(),
       ]}
     >
       <p css={typography.h1}>죄송합니다. 페이지를 사용할 수 없습니다.</p>
