@@ -5,6 +5,7 @@ import com.f12.moitz.common.error.exception.ExternalApiException;
 import com.f12.moitz.infrastructure.gemini.dto.BriefRecommendedLocationResponse;
 import com.f12.moitz.infrastructure.gemini.dto.RecommendationsResponse;
 import com.f12.moitz.infrastructure.kakao.KakaoMapClient;
+import com.f12.moitz.infrastructure.kakao.dto.KakaoApiResponse;
 import com.f12.moitz.infrastructure.kakao.dto.SearchPlacesRequest;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -99,7 +100,7 @@ public class GoogleGeminiClient {
         this.objectMapper = objectMapper;
 
         functions.put("getPointByPlaceName", arg -> kakaoMapClient.searchPointBy((String) arg));
-        functions.put("getPlacesByKeyword", arg -> kakaoMapClient.searchPlacesBy((SearchPlacesRequest) arg));
+        functions.put("countPlacesByKeyword", arg -> kakaoMapClient.searchPlacesBy((SearchPlacesRequest) arg));
     }
 
     public void generateWithFunctionCalling(final String prompt) {
@@ -140,13 +141,18 @@ public class GoogleGeminiClient {
 
             Object result;
 
-            if ("getPointByPlaceName".equals(functionCallName)) {
-                result = functions.get(functionCallName)
-                        .apply(functionCall.args().get().values().stream().findFirst().orElse(null));
+            if (functions.containsKey(functionCallName)) {
+                if ("getPointByPlaceName".equals(functionCallName)) {
+                    result = functions.get(functionCallName)
+                            .apply(functionCall.args().get().values().stream().findFirst().orElse(null));
+                } else {
+                    SearchPlacesRequest request = objectMapper.convertValue(functionCall.args().get(),
+                            SearchPlacesRequest.class);
+                    result = functions.get(functionCallName).apply(request);
+                }
             } else {
-                SearchPlacesRequest request = objectMapper.convertValue(functionCall.args().get(),
-                        SearchPlacesRequest.class);
-                result = functions.get(functionCallName).apply(request);
+                result = null;
+                System.out.println("호출할 수 없는 함수: " + functionCallName);
             }
 
             Content content = Content.fromParts(
@@ -164,7 +170,6 @@ public class GoogleGeminiClient {
             if (!generateContentResponse.functionCalls().isEmpty()) {
                 System.out.println("응답: " + generateContentResponse.functionCalls());
             } else {
-
                 System.out.println("응답: " + generateContentResponse.text());
                 function_calling_in_process = false;
             }
@@ -172,6 +177,8 @@ public class GoogleGeminiClient {
     }
 
     public void generateWithParallelFunctionCalling(final String prompt) {
+        List<Content> history = new ArrayList<>();
+        history.add(Content.fromParts(Part.fromText(prompt)));
 
         GenerateContentConfig config = GenerateContentConfig.builder()
                 .temperature(0.0F)
@@ -181,57 +188,61 @@ public class GoogleGeminiClient {
 
         GenerateContentResponse generateContentResponse = geminiClient.models.generateContent(
                 GEMINI_MODEL,
-                prompt,
+                history,
                 config
         );
-
         log.info("Gemini 응답 성공, 토큰 사용 {}개", generateContentResponse.usageMetadata().get().totalTokenCount().get());
 
-        if (!generateContentResponse.functionCalls().isEmpty()) {
-            System.out.println("최초 응답: " + generateContentResponse.functionCalls());
-        } else {
-            System.out.println("최초 응답: " + generateContentResponse.text());
-        }
+        // 응답에 FunctionCall이 있으면 반복
+        while (!generateContentResponse.functionCalls().isEmpty()) {
+            // Gemini 응답을 재요청 시 보낼 history에 추가
+            history.add(generateContentResponse.candidates().get().getFirst().content().get());
+            System.out.println("함수 호출 요청하는 응답: " + generateContentResponse.functionCalls());
 
-        List<Content> kakaoResults = new ArrayList<>();
+            List<Part> kakaoResults = new ArrayList<>();
 
-        for (FunctionCall functionCall : generateContentResponse.functionCalls()) {
-            String functionCallName = functionCall.name().get();
-            System.out.println("Need to invoke function: " + functionCallName);
+            for (FunctionCall functionCall : generateContentResponse.functionCalls()) {
+                String functionCallName = functionCall.name().get();
+                System.out.println("Need to invoke function: " + functionCallName);
 
-            if (functions.containsKey(functionCallName)) {
-                Map<String, Object> functionCallParameter = functionCall.args().get();
+                if (functions.containsKey(functionCallName)) {
+                    Map<String, Object> functionCallParameter = functionCall.args().get();
 
-                Object result;
+                    Object result;
 
-                if ("getPointByPlaceName".equals(functionCallName)) {
-                    result = functions.get(functionCallName)
-                            .apply(functionCallParameter.values().stream().findFirst().orElse(null));
-                } else {
-                    SearchPlacesRequest request = objectMapper.convertValue(functionCallParameter,
-                            SearchPlacesRequest.class);
-                    result = functions.get(functionCallName).apply(request);
+                    if ("getPointByPlaceName".equals(functionCallName)) {
+                        result = functions.get(functionCallName)
+                                .apply(functionCallParameter.values().stream().findFirst().orElse(null));
+
+                        kakaoResults.add(Part.fromFunctionResponse(functionCallName, Map.of("point", result)));
+                    } else {
+                        SearchPlacesRequest request = objectMapper.convertValue(functionCallParameter,
+                                SearchPlacesRequest.class);
+
+                        result = functions.get(functionCallName).apply(request);
+
+                        int totalCount = ((KakaoApiResponse) result).totalCount();
+                        log.info("totalCount: " + totalCount);
+
+                        kakaoResults.add(Part.fromFunctionResponse(functionCallName, Map.of("count", totalCount)));
+                    }
                 }
-
-                kakaoResults.add(Content.fromParts(
-                        Part.fromFunctionResponse(functionCallName, Collections.singletonMap("content", result))
-                ));
             }
+
+            // FunctionResponse를 담은 Content 생성 및 history에 추가
+            Content content = Content.builder().parts(kakaoResults).build();
+            log.info("content 생성: {}", content.parts().get());
+            history.add(content);
+
+            generateContentResponse = geminiClient.models.generateContent(
+                    GEMINI_MODEL,
+                    history,
+                    config
+            );
+            log.info("Gemini 응답 성공, 토큰 사용 {}개", generateContentResponse.usageMetadata().get().totalTokenCount().get());
         }
-
-        generateContentResponse = geminiClient.models.generateContent(
-                GEMINI_MODEL,
-                kakaoResults,
-                config
-        );
-
-        log.info("Gemini 응답 성공, 토큰 사용 {}개", generateContentResponse.usageMetadata().get().totalTokenCount().get());
-
-        if (!generateContentResponse.functionCalls().isEmpty()) {
-            System.out.println("응답: " + generateContentResponse.functionCalls());
-        } else {
-            System.out.println("응답: " + generateContentResponse.text());
-        }
+        // 최종 응답 출력
+        System.out.println("응답: " + generateContentResponse.text());
     }
 
     private static Tool buildTool() {
@@ -244,8 +255,8 @@ public class GoogleGeminiClient {
     private static FunctionDeclaration declareGetPlacesByKewordFunction() {
         // Declare the getPlacesByKeword function
         FunctionDeclaration getPlacesByKewordFunctionDeclaration = FunctionDeclaration.builder()
-                .name("getPlacesByKeyword")
-                .description("Get places by keyword within a specified radius (in meters) from the given coordinate")
+                .name("countPlacesByKeyword")
+                .description("Count places by keyword within a specified radius (in meters) from the given coordinate")
                 .parameters(
                         Schema.builder()
                                 .type(Known.OBJECT)

@@ -27,6 +27,10 @@ public record KakaoApiResponse(
         return Double.parseDouble(findStation().y());
     }
 
+    public int totalCount() {
+        return meta().totalCount();
+    }
+
 }
 
 record Document(

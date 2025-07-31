@@ -22,17 +22,33 @@ public class GoogleGeminiClientTest {
         geminiClient.generateWithFunctionCalling(prompt);
     }
 
+    @DisplayName("제미나이 함수 연속 호출 테스트")
+    @Test
+    void multipleFunctionCalling() {
+        //given
+        String prompt = "Find all places for climbing within a 500m radius of Gangnam Station.";
+
+        //when & then
+        geminiClient.generateWithFunctionCalling(prompt);
+    }
 
     @DisplayName("병렬 함수 호출 테스트")
     @Test
     void parallel() {
         //given
-        String prompt = "Find all places for climbing within a 500m radius of Gangnam Station. Use multiple function calls to generate a response if necessary.";
+        String prompt = """
+                Please rank the following subway stations based on the total number of PC bangs (internet cafes) and conversation-friendly cafes around them:
+                - Samseong Station
+                - Jamsil Station
+                - Jamsil Saenae Station
+                - Jamsil Naru Station
+                
+                Use the countPlacesByKeyword function to count how many PC bangs and cafes are located near each station. The radius is 500m.
+                The station with more nearby places (combined count of PC bangs and cafes) should be ranked higher.
+                Return the stations in ranked order with a brief explanation.
+                """;
 
-        //when
-        geminiClient.generateWithFunctionCalling(prompt);
-
-        //then
-
+        //when & then
+        geminiClient.generateWithParallelFunctionCalling(prompt);
     }
 }
