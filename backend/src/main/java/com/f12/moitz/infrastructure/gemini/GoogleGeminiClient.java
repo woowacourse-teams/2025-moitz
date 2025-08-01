@@ -126,35 +126,7 @@ public class GoogleGeminiClient {
             history.add(generateContentResponse.candidates().get().getFirst().content().get());
             System.out.println("함수 호출 요청하는 응답: " + generateContentResponse.functionCalls());
 
-            List<Part> kakaoResults = new ArrayList<>();
-
-            for (FunctionCall functionCall : generateContentResponse.functionCalls()) {
-                String functionCallName = functionCall.name().get();
-                System.out.println("Need to invoke function: " + functionCallName);
-
-                if (functions.containsKey(functionCallName)) {
-                    Map<String, Object> functionCallParameter = functionCall.args().get();
-
-                    Object result;
-
-                    if ("getPointByPlaceName".equals(functionCallName)) {
-                        result = functions.get(functionCallName)
-                                .apply(functionCallParameter.values().stream().findFirst().orElse(null));
-
-                        kakaoResults.add(Part.fromFunctionResponse(functionCallName, Map.of("point", result)));
-                    } else {
-                        SearchPlacesRequest request = objectMapper.convertValue(functionCallParameter,
-                                SearchPlacesRequest.class);
-
-                        result = functions.get(functionCallName).apply(request);
-
-                        int totalCount = ((KakaoApiResponse) result).totalCount();
-                        log.info("totalCount: " + totalCount);
-
-                        kakaoResults.add(Part.fromFunctionResponse(functionCallName, Map.of("count", totalCount)));
-                    }
-                }
-            }
+            List<Part> kakaoResults = executeFunctionCalls(generateContentResponse);
 
             // FunctionResponse를 담은 Content 생성 및 history에 추가
             Content content = Content.builder().parts(kakaoResults).build();
@@ -170,6 +142,45 @@ public class GoogleGeminiClient {
         }
         // 최종 응답 출력
         System.out.println("응답: " + generateContentResponse.text());
+    }
+
+    @NotNull
+    private List<Part> executeFunctionCalls(final GenerateContentResponse generateContentResponse) {
+        List<Part> kakaoResults = new ArrayList<>();
+
+        for (FunctionCall functionCall : generateContentResponse.functionCalls()) {
+            String functionCallName = functionCall.name().get();
+            System.out.println("Need to invoke function: " + functionCallName);
+
+            if (functions.containsKey(functionCallName)) {
+                Map<String, Object> functionCallParameter = functionCall.args().get();
+
+                Object result;
+
+                if ("getPointByPlaceName".equals(functionCallName)) {
+                    result = functions.get(functionCallName)
+                            .apply(functionCallParameter.values().stream().findFirst().orElse(null));
+
+                    kakaoResults.add(Part.fromFunctionResponse(functionCallName, Map.of("point", result)));
+                } else {
+                    SearchPlacesRequest request = objectMapper.convertValue(functionCallParameter,
+                            SearchPlacesRequest.class);
+
+                    result = functions.get(functionCallName).apply(request);
+
+//                    int totalCount = getTotalCount((KakaoApiResponse) result);
+
+                    kakaoResults.add(Part.fromFunctionResponse(functionCallName, Map.of("content", result)));
+                }
+            }
+        }
+        return kakaoResults;
+    }
+
+    private static int getTotalCount(final KakaoApiResponse result) {
+        int totalCount = result.totalCount();
+        log.info("totalCount: " + totalCount);
+        return totalCount;
     }
 
     private static Tool buildTool() {
