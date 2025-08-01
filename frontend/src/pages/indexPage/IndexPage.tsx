@@ -1,7 +1,7 @@
 import MeetingForm from '@features/meeting/components/meetingForm/MeetingForm';
 
 import HeaderLogo from '@shared/components/headerLogo/HeaderLogo';
-import { flex, gridPadding } from '@shared/styles/default.styled';
+import { flex, grid_padding } from '@shared/styles/default.styled';
 
 import * as indexPage from './indexPage.styled';
 
@@ -9,7 +9,7 @@ function IndexPage() {
   return (
     <div
       css={[
-        gridPadding,
+        grid_padding,
         flex({ direction: 'column' }),
         indexPage.container(),
         indexPage.scroll(),

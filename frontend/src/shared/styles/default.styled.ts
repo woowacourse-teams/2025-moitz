@@ -70,6 +70,6 @@ export const inline_flex = (options: flexOptions = {}) => css`
   ${options.gap && `gap: ${options.gap}px;`}
 `;
 
-export const gridPadding = css`
+export const grid_padding = css`
   padding: 0 20px;
 `;
