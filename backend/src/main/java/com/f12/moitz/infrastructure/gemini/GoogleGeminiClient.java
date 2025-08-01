@@ -3,22 +3,17 @@ package com.f12.moitz.infrastructure.gemini;
 import com.f12.moitz.common.error.exception.ExternalApiErrorCode;
 import com.f12.moitz.common.error.exception.ExternalApiException;
 import com.f12.moitz.infrastructure.gemini.dto.RecommendedLocationResponse;
-import com.f12.moitz.infrastructure.kakao.KakaoMapClient;
-import com.f12.moitz.infrastructure.kakao.dto.SearchPlacesRequest;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.genai.Client;
 import com.google.genai.types.GenerateContentConfig;
-import com.google.genai.types.GenerateContentResponse;
+import java.util.List;
+import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.function.Function;
+import com.google.genai.Client;
+import com.google.genai.types.GenerateContentResponse;
 
 @Component
 @Slf4j
@@ -29,7 +24,7 @@ public class GoogleGeminiClient {
 
     private static final String ADDITIONAL_PROMPT = """
                     You're an AI assistant recommending optimal meeting locations in Seoul. Your main goal is to suggest places where subway travel times from all starting points are similar and distances aren't too far.
-            
+
                     Core Conditions:
                     Subway Travel Only: Travel time calculations must be limited to public transportation (subway).
                     Subway Station Scope: Starting and destination points must be limited to Seoul Metro subway stations.
@@ -43,7 +38,7 @@ public class GoogleGeminiClient {
                     Additionally, for each recommended location, you must provide a concise, one-line summary reason (e.g., '접근성 좋고 맛집이 많아요! 😋') explaining why this specific location is recommended, highlighting its key advantages based on the user's conditions and travel similarities.
                     This reason MUST be very brief, strictly under 50 characters (including spaces and punctuation). Use emojis SPARINGLY, for example, 1-3 emojis at most, to enhance expressiveness, but do NOT include excessive or repetitive emojis.
                     Do NOT recommend locations that fail to meet the Additional User Condition.
-            
+
                     Input:
                     Starting Points: %s (List of subway station names)
                     Additional User Condition: %s (e.g., "PC방, 코인노래방")
@@ -91,23 +86,15 @@ public class GoogleGeminiClient {
             """;
 
     private final Client geminiClient;
-    private final KakaoMapClient kakaoMapClient;
     private final ObjectMapper objectMapper;
-
-    private final Map<String, Function<Object, Object>> functions = new HashMap<>();
 
     public GoogleGeminiClient(
             final @Autowired Client.Builder geminiClientBuilder,
-            final @Autowired KakaoMapClient kakaoMapClient,
             final @Value("${gemini.api.key}") String apiKey,
             final @Autowired ObjectMapper objectMapper
     ) {
         this.geminiClient = geminiClientBuilder.apiKey(apiKey).build();
-        this.kakaoMapClient = kakaoMapClient;
         this.objectMapper = objectMapper;
-
-        functions.put("getPointByPlaceName", arg -> kakaoMapClient.searchPointBy((String) arg));
-        functions.put("getPlacesByKeyword", arg -> kakaoMapClient.searchPlacesBy((SearchPlacesRequest) arg));
     }
 
     public RecommendedLocationResponse generateResponse(final List<String> stationNames, final String requirement) {
@@ -167,8 +154,7 @@ public class GoogleGeminiClient {
                                                 "locationName", Map.of("type", "string", "description", "추천 장소의 이름"),
                                                 "reason", Map.of(
                                                         "type", "string",
-                                                        "description",
-                                                        "해당 장소를 추천하는 간결한 한 줄 요약 이유 50자 이내 (예: '접근성 좋고 맛집이 많아요!')",
+                                                        "description", "해당 장소를 추천하는 간결한 한 줄 요약 이유 50자 이내 (예: '접근성 좋고 맛집이 많아요!')",
                                                         "maxLength", 50
                                                 )
                                         ),
