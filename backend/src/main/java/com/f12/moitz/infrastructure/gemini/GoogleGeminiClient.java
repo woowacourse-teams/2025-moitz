@@ -9,7 +9,6 @@ import com.f12.moitz.infrastructure.kakao.dto.KakaoApiResponse;
 import com.f12.moitz.infrastructure.kakao.dto.SearchPlacesRequest;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.collect.ImmutableList;
 import com.google.genai.Client;
 import com.google.genai.types.Content;
 import com.google.genai.types.FunctionCall;
@@ -21,12 +20,12 @@ import com.google.genai.types.Schema;
 import com.google.genai.types.Tool;
 import com.google.genai.types.Type.Known;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -100,7 +99,7 @@ public class GoogleGeminiClient {
         this.objectMapper = objectMapper;
 
         functions.put("getPointByPlaceName", arg -> kakaoMapClient.searchPointBy((String) arg));
-        functions.put("countPlacesByKeyword", arg -> kakaoMapClient.searchPlacesBy((SearchPlacesRequest) arg));
+        functions.put("getPlacesByKeyword", arg -> kakaoMapClient.searchPlacesBy((SearchPlacesRequest) arg));
     }
 
     public void generateWithParallelFunctionCalling(final String prompt) {
@@ -186,15 +185,16 @@ public class GoogleGeminiClient {
     private static Tool buildTool() {
         // Add the functions to a "tool"
         return Tool.builder()
-                .functionDeclarations(List.of(declareGetPointByPlaceNameFunction(), declareGetPlacesByKewordFunction()))
+                .functionDeclarations(
+                        List.of(declareGetPointByPlaceNameFunction(), declareGetPlacesByKeywordFunction()))
                 .build();
     }
 
-    private static FunctionDeclaration declareGetPlacesByKewordFunction() {
+    private static FunctionDeclaration declareGetPlacesByKeywordFunction() {
         // Declare the getPlacesByKeword function
-        FunctionDeclaration getPlacesByKewordFunctionDeclaration = FunctionDeclaration.builder()
-                .name("countPlacesByKeyword")
-                .description("Count places by keyword within a specified radius (in meters) from the given coordinate")
+        return FunctionDeclaration.builder()
+                .name("getPlacesByKeyword")
+                .description("get places by keyword within a specified radius (in meters) from the given coordinate")
                 .parameters(
                         Schema.builder()
                                 .type(Known.OBJECT)
@@ -213,12 +213,11 @@ public class GoogleGeminiClient {
                                 )).required("query", "longitude", "latitude", "radius")
                                 .build()
                 ).build();
-        return getPlacesByKewordFunctionDeclaration;
     }
 
     private static FunctionDeclaration declareGetPointByPlaceNameFunction() {
         // Declare the getPointByPlaceName function
-        FunctionDeclaration getPointByPlaceNameFunctionDeclaration = FunctionDeclaration.builder()
+        return FunctionDeclaration.builder()
                 .name("getPointByPlaceName")
                 .description("Get coordinate by the given place name")
                 .parameters(
@@ -233,7 +232,6 @@ public class GoogleGeminiClient {
                                 )).required("placeName")
                                 .build()
                 ).build();
-        return getPointByPlaceNameFunctionDeclaration;
     }
 
 
