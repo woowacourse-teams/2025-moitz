@@ -3,6 +3,8 @@ package com.f12.moitz.infrastructure.gemini;
 import com.f12.moitz.common.error.exception.ExternalApiErrorCode;
 import com.f12.moitz.common.error.exception.ExternalApiException;
 import com.f12.moitz.infrastructure.gemini.dto.RecommendedLocationResponse;
+import com.f12.moitz.infrastructure.kakao.KakaoMapClient;
+import com.f12.moitz.infrastructure.kakao.dto.SearchPlacesRequest;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.genai.Client;

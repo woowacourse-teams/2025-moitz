@@ -11,19 +11,19 @@ public record RecommendedPlaceResponses(
 
 record RecommendedPlaceResponse(
         String stationName,
-        List<RecommendedPlace> places
+        List<RecommendedSpecificPlace> places
 ) {
 }
 
-record RecommendedPlace(
+record RecommendedSpecificPlace(
         int index,
         String name,
         String category,
         @JsonProperty("distance") int walkingTime,
         String url
 ) {
-    public RecommendedPlace(final int index, final String name, final String category, final int walkingTime,
-                            final String url) {
+    public RecommendedSpecificPlace(final int index, final String name, final String category, final int walkingTime,
+                                    final String url) {
         this.index = index;
         this.name = name;
         this.category = category;

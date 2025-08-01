@@ -10,7 +10,7 @@ public record RecommendationPlaceResponse(
 
 record StationRecommendation(
         String stationName,
-        List<RecommendedPlace> places
+        List<RecommendedSpecificPlace> places
 ) {
 
 }

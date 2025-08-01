@@ -1,16 +1,16 @@
 package com.f12.moitz;
 
-import com.f12.moitz.infrastructure.gemini.GoogleGeminiClient;
+import com.f12.moitz.infrastructure.gemini.GeminiRecommendPlaceClient;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class GoogleGeminiClientTest {
+public class GeminiRecommendPlaceClientTest {
 
     @Autowired
-    private GoogleGeminiClient geminiClient;
+    private GeminiRecommendPlaceClient geminiClient;
 
     @DisplayName("병렬 함수 호출 테스트")
     @Test
@@ -77,38 +77,34 @@ public class GoogleGeminiClientTest {
     void recommendPlaces() {
         //given
         String prompt = """
-                You're an AI assistant that recommends %d specific places within 500m of each given subway station.
-           
+            You're an AI assistant that recommends %d specific places within 500m of each given subway station.
             TASK OVERVIEW:
             You must complete this task in 2 phases:
             Phase 1: Data Collection (using function calls)
             Phase 2: Final Recommendation (generating JSON response)
-            
+  
             PHASE 1 - DATA COLLECTION:
             1. From the user requirements, extract search keywords that represent the types of places the user is looking for.
                - Each keyword must be in Korean and consist of only one word.
                - These keywords will be used with the getPlacesByKeyword function.
                - Among the search results, identify the top places based on their star ratings, as shown on the place URLs, and include their rankings using index values (e.g., 1 for the highest-rated place).
-           
+   
             2. For each station:
                - First, use getPointByPlaceName function to retrieve the station's coordinates.
                - Then, for each extracted keyword, use getPlacesByKeyword function to search for places within a 500m radius.
-            
+
             PHASE 2 - FINAL RECOMMENDATION:
             After collecting all the data from function calls, you MUST generate the final recommendation.
-            
             IMPORTANT: Even after receiving function call responses, you must continue to:
             1. Analyze all the collected place data
             2. For each station, select the top %d places based on:
-   - Highest Star ratings 
-   - Most Reviews 
+   - Highest Star ratings
+   - Most Reviews
                 -Relevance to user requirements
             3. Assign index rankings (1 = best, 2 = second best, etc.)
             4. Generate the final JSON response
-            
             CRITICAL OUTPUT FORMAT - READ CAREFULLY:
             Your FINAL response (after all function calls are complete) must be ONLY the JSON data with NO formatting whatsoever.
-            
             Each recommendation must be returned strictly as raw JSON, with no surrounding text, explanation, or formatting
             
             

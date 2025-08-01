@@ -24,8 +24,8 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 @Service
 public class LocationService {
+    private final GoogleGeminiClient geminiClient;
 
-    private final GoogleGeminiClient googleGeminiClient;
     private final OdsayClient odsayClient;
     private final KakaoMapClient kakaoMapClient;
     private final OdsayMapper odsayMapper;
@@ -41,7 +41,7 @@ public class LocationService {
     }
 
     private List<LocationNameAndReason> generateAiRecommendedLocations(final LocationRecommendRequest request) {
-        final RecommendedLocationResponse recommendedLocationResponse = googleGeminiClient.generateLocationResponse(
+        final RecommendedLocationResponse recommendedLocationResponse = geminiClient.generateResponse(
                 request.startingPlaceNames(),
                 request.requirement()
         );
