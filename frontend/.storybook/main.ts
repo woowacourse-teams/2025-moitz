@@ -1,14 +1,19 @@
-import path from 'path';
-import { fileURLToPath } from 'url';
+import { createRequire } from 'module';
+import path, { dirname, join } from 'path';
+
 import type { StorybookConfig } from '@storybook/react-webpack5';
 
-// __dirname 대체
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+function getAbsolutePath(value: string) {
+  const require = createRequire(import.meta.url);
+  return dirname(require.resolve(join(value, 'package.json')));
+}
 
 const config: StorybookConfig = {
   stories: ['../src/**/*.stories.@(ts|tsx)', '../src/**/*.mdx'],
-  addons: ['@storybook/addon-docs', '@storybook/addon-webpack5-compiler-babel'],
+  addons: [
+    getAbsolutePath('@storybook/addon-docs'),
+    getAbsolutePath('@storybook/addon-webpack5-compiler-babel'),
+  ],
   framework: {
     name: '@storybook/react-webpack5',
     options: {},
@@ -60,7 +65,7 @@ const config: StorybookConfig = {
         '@icons': path.resolve(__dirname, '../assets/icon'),
       };
     }
-    
+
     return config;
   },
 };
