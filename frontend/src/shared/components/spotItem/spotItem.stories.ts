@@ -1,3 +1,5 @@
+import { withLayout } from '../../../../.storybook/decorators/withLayout';
+
 import SpotItem from './SpotItem';
 
 import type { Meta, StoryObj } from '@storybook/react-webpack5';
@@ -5,6 +7,7 @@ import type { Meta, StoryObj } from '@storybook/react-webpack5';
 const meta = {
   title: 'shared/SpotItem',
   component: SpotItem,
+  decorators: [withLayout],
   parameters: {
     layout: 'centered',
   },
