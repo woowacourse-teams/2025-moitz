@@ -2,18 +2,19 @@ package com.f12.moitz.infrastructure.gemini;
 
 import com.f12.moitz.common.error.exception.ExternalApiErrorCode;
 import com.f12.moitz.common.error.exception.ExternalApiException;
+import com.f12.moitz.infrastructure.gemini.dto.RecommendationPlaceResponse;
 import com.f12.moitz.infrastructure.gemini.dto.RecommendedLocationResponse;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.genai.Client;
 import com.google.genai.types.GenerateContentConfig;
+import com.google.genai.types.GenerateContentResponse;
 import java.util.List;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import com.google.genai.Client;
-import com.google.genai.types.GenerateContentResponse;
 
 @Component
 @Slf4j
@@ -79,7 +80,7 @@ public class GoogleGeminiClient {
 
                     Input:
                     Starting Points: %s (List of subway station names)
-                    Additional User Condition: %s (e.g., "PC방, 코인노래방")
+                    Additional User Condition: %s
 
                     Output:
                     Provide the response in the structured JSON format defined by the provided schemas.
@@ -97,10 +98,10 @@ public class GoogleGeminiClient {
         this.objectMapper = objectMapper;
     }
 
-    public RecommendedLocationResponse generateResponse(final List<String> stationNames, final String requirement) {
+    public RecommendedLocationResponse generateLocationResponse(final List<String> stationNames, final String requirement) {
         try {
             return objectMapper.readValue(
-                    generateContent(stationNames, requirement, getSchema()).text(),
+                    generateContent(ADDITIONAL_PROMPT, stationNames, requirement, getLocationSchema()).text(),
                     RecommendedLocationResponse.class
             );
         } catch (JsonProcessingException e) {
@@ -109,16 +110,32 @@ public class GoogleGeminiClient {
 
     }
 
+    public RecommendationPlaceResponse generatePlaceResponse(
+            final List<String> stationNames,
+            final String requirement
+    ) {
+        try {
+            return objectMapper.readValue(
+                    generateContent(ADDITIONAL_PROMPT2, stationNames, requirement, getPlaceSchema()).text(),
+                    RecommendationPlaceResponse.class
+            );
+        } catch (JsonProcessingException e) {
+            throw new ExternalApiException(ExternalApiErrorCode.INVALID_GEMINI_RESPONSE_FORMAT);
+        }
+
+    }
+
     private GenerateContentResponse generateContent(
+            final String prompt,
             final List<String> stationNames,
             final String requirement,
             final Map<String, Object> inputData
     ) {
         final String stations = String.join(", ", stationNames);
-        final String prompt = String.format(ADDITIONAL_PROMPT, RECOMMENDATION_COUNT, stations, requirement);
+        final String formatedPrompt = String.format(prompt, RECOMMENDATION_COUNT, stations, requirement);
         final GenerateContentResponse generateContentResponse = generateBasicContent(
                 GEMINI_MODEL,
-                prompt,
+                formatedPrompt,
                 inputData
         );
         log.info("Gemini 응답 성공, 토큰 사용 {}개", generateContentResponse.usageMetadata().get().totalTokenCount().get());
@@ -140,7 +157,7 @@ public class GoogleGeminiClient {
         );
     }
 
-    private Map<String, Object> getSchema() {
+    private Map<String, Object> getLocationSchema() {
         return Map.of(
                 "type", "object",
                 "properties", Map.of(
@@ -154,7 +171,8 @@ public class GoogleGeminiClient {
                                                 "locationName", Map.of("type", "string", "description", "추천 장소의 이름"),
                                                 "reason", Map.of(
                                                         "type", "string",
-                                                        "description", "해당 장소를 추천하는 간결한 한 줄 요약 이유 50자 이내 (예: '접근성 좋고 맛집이 많아요!')",
+                                                        "description",
+                                                        "해당 장소를 추천하는 간결한 한 줄 요약 이유 50자 이내 (예: '접근성 좋고 맛집이 많아요!')",
                                                         "maxLength", 50
                                                 )
                                         ),
@@ -165,6 +183,69 @@ public class GoogleGeminiClient {
                         )
                 ),
                 "required", List.of("recommendations")
+        );
+    }
+
+    private Map<String, Object> getPlaceSchema() {
+        Map<String, Object> placeSchema = Map.of(
+                "type", "object",
+                "properties", Map.of(
+                        "name", Map.of(
+                                "type", "string",
+                                "description", "추천 장소의 이름 (예: 스타벅스 강남역점)"
+                        ),
+                        "category", Map.of(
+                                "type", "string",
+                                "description", "장소의 카테고리 (예: 카페, 음식점, 쇼핑몰)"
+                        ),
+                        "description", Map.of(
+                                "type", "string",
+                                "description", "해당 장소를 추천하는 이유나 간단한 설명"
+                        ),
+                        "address", Map.of(
+                                "type", "string",
+                                "description", "상세 주소"
+                        ),
+                        "latitude", Map.of(
+                                "type", "number",
+                                "description", "위도 좌표"
+                        ),
+                        "longitude", Map.of(
+                                "type", "number",
+                                "description", "경도 좌표"
+                        )
+                ),
+                "required", List.of("name", "category", "description", "address", "latitude", "longitude")
+        );
+
+        Map<String, Object> stationRecommendationSchema = Map.of(
+                "type", "object",
+                "properties", Map.of(
+                        "stationName", Map.of(
+                                "type", "string",
+                                "description", "지하철역 이름 (예: 강남역)"
+                        ),
+                        "places", Map.of(
+                                "type", "array",
+                                "description", "해당 지하철역에 대해 추천하는 3개의 장소 목록",
+                                "items", placeSchema,
+                                "minItems", 3,
+                                "maxItems", 3
+                        )
+                ),
+                "required", List.of("stationName", "places")
+        );
+
+        return Map.of(
+                "type", "object",
+                "properties", Map.of(
+                        "stationRecommendations", Map.of(
+                                "type", "array",
+                                "description", "입력된 각 지하철역에 대한 추천 장소 목록",
+                                "items", stationRecommendationSchema
+                        )
+                ),
+                "required", List.of("stationRecommendations")
         );
     }
 
