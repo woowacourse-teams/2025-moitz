@@ -7,7 +7,7 @@ export const base = () => css`
   height: 100%;
   padding: 12px 10px;
   border-radius: ${borderRadiusToken.input};
-  color: ${colorToken.gray[3]};
+  color: ${colorToken.gray[2]};
   background-color: ${colorToken.gray[8]};
   border: none;
 
