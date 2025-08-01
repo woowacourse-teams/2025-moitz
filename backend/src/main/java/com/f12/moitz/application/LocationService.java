@@ -2,8 +2,10 @@ package com.f12.moitz.application;
 
 import com.f12.moitz.application.dto.LocationRecommendRequest;
 import com.f12.moitz.application.dto.LocationRecommendResponse;
+import com.f12.moitz.application.dto.PlaceRecommendResponse;
 import com.f12.moitz.application.dto.RouteResponse;
 import com.f12.moitz.domain.Place;
+import com.f12.moitz.infrastructure.gemini.GeminiRecommendPlaceClient;
 import com.f12.moitz.infrastructure.gemini.GoogleGeminiClient;
 import com.f12.moitz.infrastructure.gemini.dto.RecommendedLocationResponse;
 import com.f12.moitz.infrastructure.gemini.dto.LocationNameAndReason;
@@ -11,10 +13,8 @@ import com.f12.moitz.infrastructure.kakao.KakaoMapClient;
 import com.f12.moitz.infrastructure.odsay.OdsayClient;
 import com.f12.moitz.infrastructure.odsay.OdsayMapper;
 import com.f12.moitz.infrastructure.odsay.dto.SubwayRouteSearchResponse;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+
+import java.util.*;
 import java.util.stream.IntStream;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -25,6 +25,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class LocationService {
     private final GoogleGeminiClient geminiClient;
+    private final GeminiRecommendPlaceClient recommendPlaceClient;
 
     private final OdsayClient odsayClient;
     private final KakaoMapClient kakaoMapClient;
@@ -37,7 +38,7 @@ public class LocationService {
                 .map(LocationNameAndReason::locationName)
                 .toList();
         final List<Place> aiGeneratedPlaces = getPlacesByName(placeNames);
-        return getAppropriateLocations(startingPlace, aiGeneratedPlaces, aiGeneratedResponse);
+        return getAppropriateLocations(startingPlace, aiGeneratedPlaces, aiGeneratedResponse,request.requirement());
     }
 
     private List<LocationNameAndReason> generateAiRecommendedLocations(final LocationRecommendRequest request) {
@@ -60,7 +61,8 @@ public class LocationService {
     private List<LocationRecommendResponse> getAppropriateLocations(
             List<Place> startingPlaces,
             List<Place> aiGeneratedPlaces,
-            List<LocationNameAndReason> generatedLocations
+            List<LocationNameAndReason> generatedLocations,
+            String requirement
     ) {
         Map<Place, List<RouteResponse>> arrivalPlaces = new HashMap<>();
 
@@ -76,8 +78,9 @@ public class LocationService {
 
             arrivalPlaces.put(aiGeneratedPlace, routes);
         }
-
-        return sortAndParseResponse(generatedLocations, arrivalPlaces);
+        Set<Place> targetPlaces = arrivalPlaces.keySet();
+        Map<Place,List<PlaceRecommendResponse>> places = recommendPlaceClient.generateWithParallelFunctionCalling(targetPlaces,requirement);
+        return sortAndParseResponse(generatedLocations, arrivalPlaces, places);
     }
 
     private List<RouteResponse> getRoutes(final List<Place> startingPlaces, final Place aiGeneratedPlace) {
@@ -120,7 +123,8 @@ public class LocationService {
 
     private List<LocationRecommendResponse> sortAndParseResponse(
             final List<LocationNameAndReason> generatedLocations,
-            final Map<Place, List<RouteResponse>> routes
+            final Map<Place, List<RouteResponse>> routes,
+            final Map<Place, List<PlaceRecommendResponse>> places
     ) {
         Map<Place, Integer> averageTimes = new HashMap<>();
 
@@ -161,7 +165,7 @@ public class LocationService {
                             totalTime == minTime,
                             reason,
                             reason,
-                            null,
+                            places.get(place),
                             routes.get(place)
                     );
                 })

@@ -8,24 +8,17 @@ import com.f12.moitz.infrastructure.kakao.dto.SearchPlacesRequest;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.genai.Client;
-import com.google.genai.types.Content;
-import com.google.genai.types.FunctionCall;
-import com.google.genai.types.FunctionDeclaration;
 import com.google.genai.types.GenerateContentConfig;
 import com.google.genai.types.GenerateContentResponse;
-import com.google.genai.types.Part;
-import com.google.genai.types.Schema;
-import com.google.genai.types.Tool;
-import com.google.genai.types.Type.Known;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.function.Function;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
 
 @Component
 @Slf4j

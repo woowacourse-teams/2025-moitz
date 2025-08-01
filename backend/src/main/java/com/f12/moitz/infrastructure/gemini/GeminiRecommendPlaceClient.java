@@ -1,7 +1,9 @@
 package com.f12.moitz.infrastructure.gemini;
 
+import com.f12.moitz.application.dto.PlaceRecommendResponse;
 import com.f12.moitz.common.error.exception.ExternalApiErrorCode;
 import com.f12.moitz.common.error.exception.ExternalApiException;
+import com.f12.moitz.domain.Place;
 import com.f12.moitz.infrastructure.gemini.dto.RecommendedPlaceResponses;
 import com.f12.moitz.infrastructure.kakao.KakaoMapClient;
 import com.f12.moitz.infrastructure.kakao.dto.SearchPlacesRequest;
@@ -15,11 +17,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Component
 @Slf4j
@@ -27,6 +27,68 @@ public class GeminiRecommendPlaceClient {
 
     private static final String GEMINI_MODEL = "gemini-2.0-flash";
     private static final int RECOMMENDATION_COUNT = 3;
+    private static final String PLACE_RECOMMEND_PROMPT = """
+            You're an AI assistant that recommends %d specific places within 800m of each given subway station.
+   
+            TASK OVERVIEW:
+            You must complete this task in 2 phases:
+            Phase 1: Data Collection (using function calls)
+            Phase 2: Final Recommendation (generating JSON response)
+
+            PHASE 1 - DATA COLLECTION:
+            1. From the user requirements, extract search keywords that represent the types of places the user is looking for.
+               - Each keyword must be in Korean and consist of only one word.
+               - These keywords will be used with the getPlacesByKeyword function.
+               - Among the search results, identify the top places based on their star ratings, as shown on the place URLs, and include their rankings using index values (e.g., 1 for the highest-rated place).
+
+            2. For each station:
+               - First, use getPointByPlaceName function to retrieve the station's coordinates.
+               - Then, for each extracted keyword, use getPlacesByKeyword function to search for places within a 800m radius.
+  
+            PHASE 2 - FINAL RECOMMENDATION:
+            After collecting all the data from function calls, you MUST generate the final recommendation.
+   
+            IMPORTANT: Even after receiving function call responses, you must continue to:
+            1. Analyze all the collected place data
+            2. For each station, select the top %d places based on:
+                - Highest Star ratings
+                - Most Reviews
+                -Relevance to user requirements
+            3. Assign index rankings (1 = best, 2 = second best, etc.)
+            4. Generate the final JSON response
+            
+            CRITICAL OUTPUT FORMAT - READ CAREFULLY:
+            Your FINAL response (after all function calls are complete) must be ONLY the JSON data with NO formatting whatsoever.
+            
+            Each recommendation must be returned strictly as raw JSON, with no surrounding text, explanation, or formatting
+            
+            
+            Structure for your final response:
+            {
+                "responses": [
+                    {
+                        "stationName": "",
+                        "places": [
+                            {
+                              "index": "",
+                              "name": "",
+                              "category": "",
+                              "distance": "",
+                              "url": ""
+                            }
+                        ]
+                    }
+                ]
+            }
+            
+            Stations (지하철역): %s
+            User Requirements (사용자 조건): %s
+            
+            EXECUTION INSTRUCTION:
+            1. Start by calling the necessary functions to collect data
+            2. After receiving all function responses, analyze the data and generate the final JSON recommendation
+            3. Do NOT stop after function calls - you must provide the final recommendation JSON
+            """;
 
     private final Client geminiClient;
     private final KakaoMapClient kakaoMapClient;
@@ -48,8 +110,10 @@ public class GeminiRecommendPlaceClient {
         functions.put("getPlacesByKeyword", arg -> kakaoMapClient.searchPlacesBy((SearchPlacesRequest) arg));
     }
 
-    public RecommendedPlaceResponses generateWithParallelFunctionCalling(final String prompt) {
+    public Map<Place,List<PlaceRecommendResponse>> generateWithParallelFunctionCalling(Set<Place> places, String requirement) {
         List<Content> history = new ArrayList<>();
+        String placeNames = places.stream().map(Place::getName).collect(Collectors.joining(", "));
+        String prompt = String.format(PLACE_RECOMMEND_PROMPT, RECOMMENDATION_COUNT,RECOMMENDATION_COUNT, placeNames,requirement);
         history.add(Content.fromParts(Part.fromText(prompt)));
 
         GenerateContentConfig config = GenerateContentConfig.builder()
@@ -96,12 +160,15 @@ public class GeminiRecommendPlaceClient {
                 .trim();
 
         System.out.println(originalText);
-
+        Map<Place, List<PlaceRecommendResponse>> recommendPlacesResult = new HashMap<>();
+        RecommendedPlaceResponses recommendedPlaceResponses;
         try {
-            return objectMapper.readValue(originalText, RecommendedPlaceResponses.class);
+            recommendedPlaceResponses = objectMapper.readValue(originalText, RecommendedPlaceResponses.class);
         } catch (JsonProcessingException e) {
             throw new ExternalApiException(ExternalApiErrorCode.INVALID_GEMINI_RESPONSE_FORMAT);
         }
+        places.forEach(place -> recommendPlacesResult.put(place, recommendedPlaceResponses.findPlacesByStationName(place.getName())));
+        return recommendPlacesResult;
     }
 
     private List<Part> executeFunctionCalls(final GenerateContentResponse generateContentResponse) {
