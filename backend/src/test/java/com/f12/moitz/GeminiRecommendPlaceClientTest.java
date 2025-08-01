@@ -3,6 +3,7 @@ package com.f12.moitz;
 import com.f12.moitz.domain.Place;
 import com.f12.moitz.domain.Point;
 import com.f12.moitz.infrastructure.gemini.GeminiRecommendPlaceClient;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +17,7 @@ public class GeminiRecommendPlaceClientTest {
     @Autowired
     private GeminiRecommendPlaceClient geminiClient;
 
+    @Disabled
     @DisplayName("장소 추천 테스트")
     @Test
     void recommendPlaces() {
