@@ -1,6 +1,7 @@
 package com.f12.moitz.application.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.util.List;
 
 @Schema(description = "지역 추천 응답")
 public record LocationRecommendResponse(
@@ -19,7 +20,13 @@ public record LocationRecommendResponse(
         @Schema(description = "최적의 추천 여부", example = "true", requiredMode = Schema.RequiredMode.REQUIRED)
         boolean isBest,
         @Schema(description = "AI 추천 한 마디", example = "역세권, 편의시설 풍부! \uD83D\uDC4D\uD83D\uDE0B", requiredMode = Schema.RequiredMode.REQUIRED)
-        String description
+        String description,
+        @Schema(description = "지역 추천 이유", example = "유명한 곱창집이 있고, 전체적으로 환승을 하지 않는 최적의 지역입니다!", requiredMode = Schema.RequiredMode.REQUIRED)
+        String reason,
+        @Schema(description = "추천 장소 목록", requiredMode = Schema.RequiredMode.REQUIRED)
+        List<PlaceRecommendResponse> places,
+        @Schema(description = "각 출발지로부터 이동 경로", requiredMode = Schema.RequiredMode.REQUIRED)
+        List<RouteResponse> routes
 ) {
 
 }
