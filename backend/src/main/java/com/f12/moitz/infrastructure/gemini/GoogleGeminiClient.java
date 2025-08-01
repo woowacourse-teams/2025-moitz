@@ -18,7 +18,7 @@ import com.google.genai.types.GenerateContentResponse;
 @Slf4j
 public class GoogleGeminiClient {
 
-    private static final String GEMINI_MODEL = "gemini-1.5-flash-latest";
+    private static final String GEMINI_MODEL = "gemini-2.0-flash";
     private static final int RECOMMENDATION_COUNT = 5;
     private static final String BASIC_PROMPT = """
                     Purpose: Recommend meeting locations where subway travel times from all starting points are similar and distances are not too far.
@@ -37,12 +37,13 @@ public class GoogleGeminiClient {
                     Subway Station Scope: Starting and destination points must be limited to Seoul Metro subway stations.
                     Similar Travel Times: The travel time from each starting point to the recommended destination must be within a 15-minute margin of error (max_time - min_time <= 15 minutes) across all starting points.
                     Facility Sufficiency: Recommended areas must be near subway stations, have ample dining/cafes/convenience facilities, and specifically meet any additional user conditions.
+                    **Exclusion: The recommended locations must NOT be any of the provided Starting Points.** // 이 줄을 추가합니다.
 
                     Recommendation Requirements:
                     Recommend a total of %d locations.
                     For each recommended location, provide the following detailed format per starting point: travelMethod, travelRoute, totalTimeInMinutes, travelCost, and numberOfTransfers.
                     Additionally, for each recommended location, you must provide a concise, one-line summary reason (e.g., '접근성 좋고 맛집이 많아요! 😋') explaining why this specific location is recommended, highlighting its key advantages based on the user's conditions and travel similarities.
-                    This reason must be within 50 characters, and you may use relevant emojis to enhance expressiveness.
+                    This reason MUST be very brief, strictly under 50 characters (including spaces and punctuation). Use emojis SPARINGLY, for example, 1-3 emojis at most, to enhance expressiveness, but do NOT include excessive or repetitive emojis.
                     Do NOT recommend locations that fail to meet the Additional User Condition.
 
                     Input:
@@ -118,8 +119,8 @@ public class GoogleGeminiClient {
 
     private GenerateContentResponse generateBasicContent(String model, String prompt, Map<String, Object> inputData) {
         final GenerateContentConfig config = GenerateContentConfig.builder()
-                .temperature(0.2F)
-//                .maxOutputTokens(5000)
+                .temperature(0.4F)
+                .maxOutputTokens(5000)
                 .responseMimeType("application/json")
                 .responseJsonSchema(inputData)
                 .build();
