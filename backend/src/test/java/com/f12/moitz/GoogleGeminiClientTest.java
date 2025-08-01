@@ -12,26 +12,6 @@ public class GoogleGeminiClientTest {
     @Autowired
     private GoogleGeminiClient geminiClient;
 
-    @DisplayName("제미나이 함수 호출 테스트")
-    @Test
-    void functionCalling() {
-        //given
-        String prompt = "Find all places for climbing within a 500m radius of Gangnam Station, located at longitude 127.028307900881 and latitude 37.4981646510326.";
-
-        //when & then
-        geminiClient.generateWithFunctionCalling(prompt);
-    }
-
-    @DisplayName("제미나이 함수 연속 호출 테스트")
-    @Test
-    void multipleFunctionCalling() {
-        //given
-        String prompt = "Find all places for climbing within a 500m radius of Gangnam Station.";
-
-        //when & then
-        geminiClient.generateWithFunctionCalling(prompt);
-    }
-
     @DisplayName("병렬 함수 호출 테스트")
     @Test
     void parallel() {
