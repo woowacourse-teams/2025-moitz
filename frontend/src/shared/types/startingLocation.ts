@@ -1,4 +1,4 @@
-export type startingSpotName = {
+export type startingLocation = {
   id: number;
   x: number;
   y: number;

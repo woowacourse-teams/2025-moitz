@@ -5,26 +5,26 @@ import SpotItemList from '@features/recommendation/components/spotItemList/SpotI
 import StartingSpotWrapper from '@shared/components/startingSpotWrapper/StartingSpotWrapper';
 import { flex } from '@shared/styles/default.styled';
 
-import { recommendedSpotItem } from '@shared/types/recommendedSpotItem';
-import { startingSpotName } from '@shared/types/startingSpotName';
+import { recommendedLocation } from '@shared/types/recommendedLocation';
+import { startingLocation } from '@shared/types/startingLocation';
 
 import * as bottomSheet from './bottomSheet.styled';
 
 interface BottomSheetProps {
-  startingSpotNameList: startingSpotName[];
-  recommendedSpotItemList: recommendedSpotItem[];
+  startingLocations: startingLocation[];
+  recommendedLocations: recommendedLocation[];
 }
 
 function BottomSheet({
-  startingSpotNameList,
-  recommendedSpotItemList,
+  startingLocations,
+  recommendedLocations,
 }: BottomSheetProps) {
   return (
     <div css={[flex({ direction: 'column', gap: 20 }), bottomSheet.base()]}>
       <StartingSpotWrapper
-        startingSpotNameList={startingSpotNameList}
+        startingLocations={startingLocations}
       ></StartingSpotWrapper>
-      <SpotItemList recommendedSpotItemList={recommendedSpotItemList} />
+      <SpotItemList recommendedLocations={recommendedLocations} />
     </div>
   );
 }

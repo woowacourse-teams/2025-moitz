@@ -1,4 +1,4 @@
-export type recommendedSpotItem = {
+export type recommendedLocation = {
   id: number;
   index: number;
   name: string;

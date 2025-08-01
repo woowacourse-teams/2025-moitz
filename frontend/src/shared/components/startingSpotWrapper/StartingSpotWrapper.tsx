@@ -3,27 +3,25 @@
 import StartingSpotName from '@shared/components/startingSpotName/StartingSpotName';
 import { flex, typography } from '@shared/styles/default.styled';
 
-import { startingSpotName } from '@shared/types/startingSpotName';
+import { startingLocation } from '@shared/types/startingLocation';
 
 import * as startSpotWrapper from './startingSpotWrapper.styled';
 
 interface StaringSpotWrapperProps {
-  startingSpotNameList: startingSpotName[];
+  startingLocations: startingLocation[];
 }
 
-function StartingSpotWrapper({
-  startingSpotNameList,
-}: StaringSpotWrapperProps) {
+function StartingSpotWrapper({ startingLocations }: StaringSpotWrapperProps) {
   return (
     <div css={[flex({ align: 'center', gap: 10 }), startSpotWrapper.base()]}>
       <span css={[typography.sh1, startSpotWrapper.title()]}>출발지</span>
       <div css={[flex({ wrap: 'wrap', gap: 5 })]}>
-        {startingSpotNameList.map((nameInfo, index) => {
-          const isLast = startingSpotNameList.length - 1 === index;
+        {startingLocations.map((location, index) => {
+          const isLast = startingLocations.length - 1 === index;
           return (
             <StartingSpotName
-              key={nameInfo.index}
-              nameInfo={nameInfo}
+              key={location.index}
+              location={location}
               isLast={isLast}
             />
           );
