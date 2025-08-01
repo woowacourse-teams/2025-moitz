@@ -142,12 +142,12 @@ public class GoogleGeminiClient {
         // 최종 응답 출력
         System.out.println("응답: " + generateContentResponse.text());
 
-        String originalText = generateContentResponse.text();
+        String requestText = generateContentResponse.text();
 
-        if (originalText.startsWith("```")) {
-            int index = originalText.indexOf("{");
-            originalText = originalText.substring(index, originalText.length() - 3);
-        }
+        String originalText = requestText.replaceAll("```json\\s*", "")
+                .replaceAll("```\\s*$", "")
+                .replaceAll("^```\\s*", "")
+                .trim();
 
         System.out.println(originalText);
 
