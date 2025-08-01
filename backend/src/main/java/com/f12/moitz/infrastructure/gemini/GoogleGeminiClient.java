@@ -4,6 +4,7 @@ import com.f12.moitz.common.error.exception.ExternalApiErrorCode;
 import com.f12.moitz.common.error.exception.ExternalApiException;
 import com.f12.moitz.infrastructure.gemini.dto.BriefRecommendedLocationResponse;
 import com.f12.moitz.infrastructure.gemini.dto.RecommendationsResponse;
+import com.f12.moitz.infrastructure.gemini.dto.RecommendedPlaceResponses;
 import com.f12.moitz.infrastructure.kakao.KakaoMapClient;
 import com.f12.moitz.infrastructure.kakao.dto.KakaoApiResponse;
 import com.f12.moitz.infrastructure.kakao.dto.SearchPlacesRequest;
@@ -25,7 +26,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import lombok.extern.slf4j.Slf4j;
-import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -102,7 +102,7 @@ public class GoogleGeminiClient {
         functions.put("getPlacesByKeyword", arg -> kakaoMapClient.searchPlacesBy((SearchPlacesRequest) arg));
     }
 
-    public void generateWithParallelFunctionCalling(final String prompt) {
+    public RecommendedPlaceResponses generateWithParallelFunctionCalling(final String prompt) {
         List<Content> history = new ArrayList<>();
         history.add(Content.fromParts(Part.fromText(prompt)));
 
@@ -141,9 +141,23 @@ public class GoogleGeminiClient {
         }
         // 최종 응답 출력
         System.out.println("응답: " + generateContentResponse.text());
+
+        String originalText = generateContentResponse.text();
+
+        if (originalText.startsWith("```")) {
+            int index = originalText.indexOf("{");
+            originalText = originalText.substring(index, originalText.length() - 3);
+        }
+
+        System.out.println(originalText);
+
+        try {
+            return objectMapper.readValue(originalText, RecommendedPlaceResponses.class);
+        } catch (JsonProcessingException e) {
+            throw new ExternalApiException(ExternalApiErrorCode.INVALID_GEMINI_RESPONSE_FORMAT);
+        }
     }
 
-    @NotNull
     private List<Part> executeFunctionCalls(final GenerateContentResponse generateContentResponse) {
         List<Part> kakaoResults = new ArrayList<>();
 

@@ -88,20 +88,30 @@ public class GoogleGeminiClientTest {
                 2. For each station:
                    - Retrieve its coordinates.
                    - For each extracted keyword, use the getPlacesByKeyword function to search for places within a 500m radius.
-                   - Among the search results, identify the top %d places based on their star ratings, as shown on the place URLs.
+                   - Among the search results, identify the top %d places based on their star ratings, as shown on the place URLs, and include their rankings using index values (e.g., 1 for the highest-rated place).
                    - Recommend these %d places per station.
                 
-                Each recommendation must include:
+                Each recommendation must be returned strictly as raw JSON, with no surrounding text, explanation, or formatting.
+                ⚠️ Do NOT use any Markdown syntax such as triple backticks (e.g., ```json) or comments.
+                The output must be only the JSON object, starting with { and ending with }, with no other characters before or after.
+                
+                Expected JSON structure:
                 {
-                    "stationName": "",
-                    "places": [
-                      {
-                        "placeName": "",
-                        "category": "",
-                        "kakaoMapUrl": "",
-                        "distance": ""
-                      },
-                      ...
+                    "responses": [
+                        {
+                            "stationName": "",
+                            "places": [
+                                {
+                                  "index": ""
+                                  "name": "",
+                                  "category": "",
+                                  "distance": "",
+                                  "url": ""
+                                },
+                              ...
+                            ]
+                        }
+                        ...
                     ]
                 }
                 
