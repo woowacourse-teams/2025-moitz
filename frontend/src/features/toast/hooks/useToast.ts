@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 
 export function useToast() {
   const [isVisible, setIsVisible] = useState(false);
@@ -13,10 +13,19 @@ export function useToast() {
     setIsVisible(false);
   }, []);
 
+  useEffect(() => {
+    if (isVisible) {
+      const timer = setTimeout(() => {
+        hideToast();
+      }, 3000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [isVisible, hideToast]);
+
   return {
     isVisible,
     message,
     showToast,
-    hideToast,
   };
 }

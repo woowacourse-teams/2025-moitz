@@ -1,6 +1,5 @@
 /** @jsxImportSource @emotion/react */
 
-import { useEffect } from 'react';
 import { createPortal } from 'react-dom';
 
 import { flex, typography } from '@shared/styles/default.styled';
@@ -12,20 +11,9 @@ import * as toast from './toast.styled';
 interface ToastProps {
   message: string;
   isVisible: boolean;
-  onClose: () => void;
 }
 
-function Toast({ message, isVisible, onClose }: ToastProps) {
-  useEffect(() => {
-    if (isVisible) {
-      const timer = setTimeout(() => {
-        onClose();
-      }, 3000);
-
-      return () => clearTimeout(timer);
-    }
-  }, [isVisible, onClose]);
-
+function Toast({ message, isVisible }: ToastProps) {
   if (!isVisible) return null;
 
   return createPortal(

@@ -28,7 +28,7 @@ function MeetingForm() {
     handleConditionID,
     validateFormSubmit,
   } = useFormInfo();
-  const { isVisible, message, showToast, hideToast } = useToast();
+  const { isVisible, message, showToast } = useToast();
 
   const [inputValue, setInputValue] = useState<string>('');
 
@@ -130,7 +130,7 @@ function MeetingForm() {
         active={validateActive()}
         onClick={() => {}}
       />
-      <Toast message={message} isVisible={isVisible} onClose={hideToast} />
+      <Toast message={message} isVisible={isVisible} />
     </form>
   );
 }
