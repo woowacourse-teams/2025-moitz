@@ -38,7 +38,7 @@ export default function useFormInfo() {
     return { isValid: true, message: '' };
   };
 
-  const deleteDepartureList = (index: number) => {
+  const removeDepartureAtIndex = (index: number) => {
     setDepartureList((prev) => prev.filter((_, i) => i !== index));
   };
 
@@ -54,7 +54,7 @@ export default function useFormInfo() {
     departureList,
     conditionID,
     addDepartureWithValidation,
-    deleteDepartureList,
+    removeDepartureAtIndex,
     handleConditionID,
     validateFormSubmit,
   };

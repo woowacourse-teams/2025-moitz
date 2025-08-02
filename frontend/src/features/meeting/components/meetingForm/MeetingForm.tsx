@@ -24,7 +24,7 @@ function MeetingForm() {
     departureList,
     conditionID,
     addDepartureWithValidation,
-    deleteDepartureList,
+    removeDepartureAtIndex,
     handleConditionID,
     validateFormSubmit,
   } = useFormInfo();
@@ -99,7 +99,7 @@ function MeetingForm() {
                 <Tag
                   key={index}
                   text={name}
-                  onClick={() => deleteDepartureList(index)}
+                  onClick={() => removeDepartureAtIndex(index)}
                 />
               ))}
             </div>
