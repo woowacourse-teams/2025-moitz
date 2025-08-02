@@ -5,17 +5,26 @@ import { colorToken } from '@shared/styles/tokens';
 export const container = () => css`
   display: flex;
   width: 100%;
-  height: 100vh;
+  min-height: 100vh;
   background-color: ${colorToken.main[4]};
 `;
 
 export const content = () => css`
-  flex: 0 0 400px;
-  height: 100%;
-  overflow-y: hidden;
+  width: 100%;
+  min-height: 100vh;
+  overflow-y: auto;
   background-color: ${colorToken.gray[8]};
+
+  @media (min-width: 400px) {
+    flex: 0 0 400px;
+  }
 `;
 
 export const side = () => css`
-  width: 100%;
+  display: none;
+
+  @media (min-width: 400px) {
+    display: initial;
+    width: 100%;
+  }
 `;
