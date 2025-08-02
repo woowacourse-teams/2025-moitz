@@ -1,6 +1,12 @@
 import { useState, useCallback, useEffect } from 'react';
 
-export function useToast() {
+interface UseToastReturn {
+  isVisible: boolean;
+  message: string;
+  showToast: (message: string) => void;
+}
+
+export function useToast(): UseToastReturn {
   const [isVisible, setIsVisible] = useState(false);
   const [message, setMessage] = useState('');
 
