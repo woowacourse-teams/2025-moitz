@@ -29,15 +29,15 @@ function Toast({ message, isVisible, onClose }: ToastProps) {
   if (!isVisible) return null;
 
   return createPortal(
-    <div css={toast.container}>
+    <div css={toast.container()}>
       <div
         css={[
-          toast.content,
+          toast.content(),
           flex({ justify: 'center', align: 'center', gap: 10 }),
         ]}
       >
         <img src={IconToast} alt="icon-toast" />
-        <div css={[toast.text, typography.b1]}>{message}</div>
+        <div css={[toast.text(), typography.b1]}>{message}</div>
       </div>
     </div>,
     document.body,
