@@ -1,5 +1,7 @@
 package com.f12.moitz.infrastructure.odsay;
 
+import com.f12.moitz.common.error.exception.ExternalApiErrorCode;
+import com.f12.moitz.common.error.exception.ExternalApiException;
 import com.f12.moitz.domain.Point;
 import com.f12.moitz.infrastructure.odsay.dto.OdsayErrorResponse;
 import com.f12.moitz.infrastructure.odsay.dto.SubwayRouteSearchResponse;
@@ -64,9 +66,10 @@ public class OdsayClient {
             byte[] body = res.getBody().readAllBytes();
             OdsayErrorResponse error = objectMapper.readValue(body,
                     OdsayErrorResponse.class);
-            throw new RuntimeException(error.msg());
+            log.error(error.msg());
+            throw new ExternalApiException(ExternalApiErrorCode.INVALID_ODSAY_API_RESPONSE);
         } catch (IOException e) {
-            throw new RuntimeException("응답 바디 파싱에 실패하였습니다.", e);
+            throw new ExternalApiException(ExternalApiErrorCode.INVALID_ODSAY_API_RESPONSE);
         }
     }
 

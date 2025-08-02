@@ -1,5 +1,6 @@
 package com.f12.moitz.common.error;
 
+import com.f12.moitz.common.error.exception.ErrorCode;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalDateTime;
 import lombok.Getter;
@@ -30,6 +31,15 @@ public class ErrorResponse {
         this.status = status;
         this.code = code;
         this.message = message;
+        this.method = method;
+        this.path = path;
+        this.timestamp = LocalDateTime.now();
+    }
+
+    public ErrorResponse(int status, ErrorCode errorCode, String method, String path) {
+        this.status = status;
+        this.code = errorCode.getCode();
+        this.message = errorCode.getClientMessage();
         this.method = method;
         this.path = path;
         this.timestamp = LocalDateTime.now();

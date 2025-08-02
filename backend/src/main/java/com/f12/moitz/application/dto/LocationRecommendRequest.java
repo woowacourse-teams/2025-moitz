@@ -1,5 +1,7 @@
 package com.f12.moitz.application.dto;
 
+import com.f12.moitz.common.error.exception.BadRequestException;
+import com.f12.moitz.common.error.exception.GeneralErrorCode;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalTime;
 import java.util.List;
@@ -20,7 +22,7 @@ public record LocationRecommendRequest(
 
         private void validate(final List<String> startingPlaceNames) {
                 if (startingPlaceNames == null || startingPlaceNames.isEmpty()) {
-                        throw new IllegalArgumentException("출발지 이름 목록은 필수입니다.");
+                        throw new BadRequestException(GeneralErrorCode.INPUT_INVALID_START_LOCATION);
                 }
         }
 
