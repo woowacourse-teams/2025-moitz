@@ -1,0 +1,9 @@
+{
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "module": "ESNext",
+    "moduleResolution": "Node",
+    "types": ["node"]
+  },
+  "include": ["./main.ts", "./preview.ts"]
+}

@@ -1,10 +1,23 @@
-import path from 'path';
+import { createRequire } from 'module';
+import path, { dirname, join } from 'path';
 
 import type { StorybookConfig } from '@storybook/react-webpack5';
 
+// 현재 파일이 존재하는 디렉토리의 절대 경로
+const require = createRequire(import.meta.url);
+const __dirname = path.dirname(require.resolve('./main.ts'));
+
+// 전달받은 패키지 이름(또는 모듈 이름)의 루트 디렉토리 절대 경로
+function getAbsolutePath(value: string) {
+  return dirname(require.resolve(join(value, 'package.json')));
+}
+
 const config: StorybookConfig = {
   stories: ['../src/**/*.stories.@(ts|tsx)', '../src/**/*.mdx'],
-  addons: ['@storybook/addon-docs', '@storybook/addon-webpack5-compiler-babel'],
+  addons: [
+    getAbsolutePath('@storybook/addon-docs'),
+    getAbsolutePath('@storybook/addon-webpack5-compiler-babel'),
+  ],
   framework: {
     name: '@storybook/react-webpack5',
     options: {},
@@ -56,7 +69,7 @@ const config: StorybookConfig = {
         '@icons': path.resolve(__dirname, '../assets/icon'),
       };
     }
-    
+
     return config;
   },
 };
