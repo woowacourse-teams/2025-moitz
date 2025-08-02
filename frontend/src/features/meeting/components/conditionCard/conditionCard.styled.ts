@@ -3,11 +3,11 @@ import { css } from '@emotion/react';
 import { borderRadiusToken, colorToken } from '@shared/styles/tokens';
 
 export const base = () => css`
-  background-color: ${colorToken.gray[8]};
-  border-radius: ${borderRadiusToken.input};
   padding: 12px;
   border: none;
   cursor: pointer;
+  background-color: ${colorToken.gray[8]};
+  border-radius: ${borderRadiusToken.input};
 
   &:hover {
     background-color: ${colorToken.main[4]};
