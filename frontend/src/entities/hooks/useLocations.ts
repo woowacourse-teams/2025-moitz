@@ -16,9 +16,9 @@ const useLocations = (
   loading: boolean;
   error: boolean;
 } => {
-  const [data, setData] = useState<Location[] | null>(null);
+  const [data, setData] = useState<Location[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(true);
+  const [error, setError] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
