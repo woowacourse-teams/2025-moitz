@@ -1,4 +1,4 @@
-import startSpotNameListMock from '../../../mocks/startingLocationsMock';
+import startSpotNameListMock from '@mocks/startingLocationsMock';
 
 import StartingSpotWrapper from './StartingSpotWrapper';
 

@@ -1,4 +1,4 @@
-import recommendedLocationMock from '../../../../mocks/recommendedLocationsMock';
+import recommendedLocationMock from '@mocks/recommendedLocationsMock';
 
 import SpotItemList from './SpotItemList';
 
