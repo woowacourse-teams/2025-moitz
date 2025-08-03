@@ -5,14 +5,14 @@ import SpotItemList from '@features/recommendation/components/spotItemList/SpotI
 import StartingSpotWrapper from '@shared/components/startingSpotWrapper/StartingSpotWrapper';
 import { flex } from '@shared/styles/default.styled';
 
-import { recommendedLocation } from '@shared/types/recommendedLocation';
+import { RecommendedLocation } from '../../../../entities/types/Location';
 import { startingLocation } from '@shared/types/startingLocation';
 
 import * as bottomSheet from './bottomSheet.styled';
 
 interface BottomSheetProps {
   startingLocations: startingLocation[];
-  recommendedLocations: recommendedLocation[];
+  recommendedLocations: RecommendedLocation[];
 }
 
 function BottomSheet({

@@ -7,17 +7,17 @@ import MapButton from '@shared/components/mapButton/MapButton';
 import MapPoint from '@shared/components/mapPoint/MapPoint';
 import { flex } from '@shared/styles/default.styled';
 
-import { recommendedLocation } from '@shared/types/recommendedLocation';
 import { startingLocation } from '@shared/types/startingLocation';
 
 import IconBack from '@icons/icon-back.svg';
 import IconShare from '@icons/icon-share.svg';
 
 import * as map from './map.styled';
+import { RecommendedLocation } from '../../../../entities/types/Location';
 
 interface MapProps {
   startingLocations: startingLocation[];
-  recommendedLocations: recommendedLocation[];
+  recommendedLocations: RecommendedLocation[];
 }
 
 function Map({ startingLocations }: MapProps) {
