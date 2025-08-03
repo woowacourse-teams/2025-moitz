@@ -25,7 +25,7 @@ function MeetingForm() {
     conditionID,
     addDepartureWithValidation,
     removeDepartureAtIndex,
-    handleConditionID,
+    updateConditionID,
     validateFormSubmit,
   } = useFormInfo();
   const { isVisible, message, showToast } = useToast();
@@ -60,7 +60,7 @@ function MeetingForm() {
   };
 
   const handleConditionCardClick = (condition: string) => {
-    handleConditionID(condition);
+    updateConditionID(condition);
   };
 
   const validateActive = () => {

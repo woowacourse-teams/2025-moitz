@@ -14,7 +14,7 @@ interface UseFormInfoReturn {
   conditionID: string;
   addDepartureWithValidation: (departure: string) => ValidationError;
   removeDepartureAtIndex: (index: number) => void;
-  handleConditionID: (condition: string) => void;
+  updateConditionID: (condition: string) => void;
   validateFormSubmit: () => ValidationError;
 }
 
@@ -51,7 +51,7 @@ export function useFormInfo(): UseFormInfoReturn {
     setDepartureList((prev) => prev.filter((_, i) => i !== index));
   };
 
-  const handleConditionID = (condition: string) => {
+  const updateConditionID = (condition: string) => {
     setConditionID(condition);
   };
 
@@ -64,7 +64,7 @@ export function useFormInfo(): UseFormInfoReturn {
     conditionID,
     addDepartureWithValidation,
     removeDepartureAtIndex,
-    handleConditionID,
+    updateConditionID,
     validateFormSubmit,
   };
 }
