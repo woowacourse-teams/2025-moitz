@@ -5,8 +5,9 @@ import SpotItemList from '@features/recommendation/components/spotItemList/SpotI
 import StartingSpotWrapper from '@shared/components/startingSpotWrapper/StartingSpotWrapper';
 import { flex } from '@shared/styles/default.styled';
 
-import { RecommendedLocation } from '../../../../entities/types/Location';
 import { startingLocation } from '@shared/types/startingLocation';
+
+import { RecommendedLocation } from '../../../../entities/types/Location';
 
 import * as bottomSheet from './bottomSheet.styled';
 

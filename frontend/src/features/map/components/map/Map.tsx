@@ -12,8 +12,9 @@ import { startingLocation } from '@shared/types/startingLocation';
 import IconBack from '@icons/icon-back.svg';
 import IconShare from '@icons/icon-share.svg';
 
-import * as map from './map.styled';
 import { RecommendedLocation } from '../../../../entities/types/Location';
+
+import * as map from './map.styled';
 
 interface MapProps {
   startingLocations: startingLocation[];

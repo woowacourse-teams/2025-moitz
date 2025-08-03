@@ -3,10 +3,10 @@ import BottomSheet from '@features/recommendation/components/bottomSheet/BottomS
 
 import { flex } from '@shared/styles/default.styled';
 
-import startingLocationsMock from '../../mocks/startingLocationsMock';
 
 import useLocations from '../../entities/hooks/useLocations';
 import { RecommendedLocation } from '../../entities/types/Location';
+import startingLocationsMock from '../../mocks/startingLocationsMock';
 
 import * as resultPage from './resultPage.styled';
 
