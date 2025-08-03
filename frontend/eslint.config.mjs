@@ -17,7 +17,7 @@ export default [
       react: pluginReact,
     },
     languageOptions: {
-      globals: globals.browser,
+      globals: [globals.browser, globals.node],
       parser: tsParser,
       parserOptions: {
         ecmaVersion: 'latest',
@@ -38,17 +38,20 @@ export default [
     rules: {
       // JavaScript 기본 권장 규칙들
       ...js.configs.recommended.rules,
-  
-      // TypeScript ESLint 권장 규칙들  
+
+      // TypeScript ESLint 권장 규칙들
       ...tseslint.configs.recommended.rules,
-  
+
       // React 권장 규칙들
       ...pluginReact.configs.recommended.rules,
-  
+
       // 커스텀 규칙들
       'react/react-in-jsx-scope': 'off',
       'react/jsx-uses-react': 'off',
-      '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
+      '@typescript-eslint/no-unused-vars': [
+        'error',
+        { argsIgnorePattern: '^_' },
+      ],
 
       // emotion css prop를 쓰기 위한 규칙
       'react/no-unknown-property': ['error', { ignore: ['css'] }],
