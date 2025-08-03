@@ -9,7 +9,16 @@ import {
 
 import { ValidationError } from '@shared/types/validationError';
 
-export default function useFormInfo() {
+interface UseFormInfoReturn {
+  departureList: string[];
+  conditionID: string;
+  addDepartureWithValidation: (departure: string) => ValidationError;
+  removeDepartureAtIndex: (index: number) => void;
+  handleConditionID: (condition: string) => void;
+  validateFormSubmit: () => ValidationError;
+}
+
+export function useFormInfo(): UseFormInfoReturn {
   const [departureList, setDepartureList] = useState<string[]>([]);
   const [conditionID, setConditionID] = useState<string>('');
 

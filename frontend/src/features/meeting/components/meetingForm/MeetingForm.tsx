@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import InputFormSection from '@features/meeting/components/meetingFormSection/MeetingFormSection';
 import { CONDITION_CARD_TEXT } from '@features/meeting/constant/conditionCard';
 import { INPUT_FORM_TEXT } from '@features/meeting/constant/inputForm';
-import useFormInfo from '@features/meeting/hooks/useFormInfo';
+import { useFormInfo } from '@features/meeting/hooks/useFormInfo';
 import Toast from '@features/toast/components/Toast';
 import { useToast } from '@features/toast/hooks/useToast';
 
