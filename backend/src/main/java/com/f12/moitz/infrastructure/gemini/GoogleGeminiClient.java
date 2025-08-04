@@ -114,7 +114,7 @@ public class GoogleGeminiClient {
                 prompt,
                 inputData
         );
-        log.info("Gemini 응답 성공, 토큰 사용 {}개", generateContentResponse.usageMetadata().get().totalTokenCount().get());
+        log.debug("Gemini 응답 성공, 토큰 사용 {}개", generateContentResponse.usageMetadata().get().totalTokenCount().get());
         return generateContentResponse;
     }
 
