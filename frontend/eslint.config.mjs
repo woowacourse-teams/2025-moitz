@@ -20,6 +20,7 @@ export default [
       globals: {
         ...globals.browser,
         ...globals.node,
+        ...globals.jest,
       },
       parser: tsParser,
       parserOptions: {
@@ -55,6 +56,10 @@ export default [
         'error',
         { argsIgnorePattern: '^_' },
       ],
+
+      // Jest 권장 규칙들
+      'no-unused-vars': 'warn',
+      'no-undef': 'warn',
 
       // emotion css prop를 쓰기 위한 규칙
       'react/no-unknown-property': ['error', { ignore: ['css'] }],
