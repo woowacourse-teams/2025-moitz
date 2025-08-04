@@ -41,6 +41,10 @@ public class Route {
                 .sum();
     }
 
+    public int calculateTransferCount() {
+        return paths.size() > 2 ? paths.size() - 2 : 0;
+    }
+
 }
 
 

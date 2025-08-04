@@ -1,27 +1,31 @@
 package com.f12.moitz.domain;
 
 import java.util.List;
-import java.util.OptionalInt;
 import lombok.Getter;
 
 @Getter
 public class Location {
 
-    private final Place recommendedPlace;
+    private final Place targetPlace;
     private final List<Route> routes;
+    private final List<RecommendedPlace> recommendedPlaces;
 
-    public Location(final Place recommendedPlace, final List<Route> routes) {
-        validate(recommendedPlace, routes);
-        this.recommendedPlace = recommendedPlace;
+    public Location(final Place targetPlace, final List<Route> routes, final List<RecommendedPlace> recommendedPlaces) {
+        validate(targetPlace, routes, recommendedPlaces);
+        this.targetPlace = targetPlace;
         this.routes = routes;
+        this.recommendedPlaces = recommendedPlaces;
     }
 
-    private void validate(final Place recommendedPlace, final List<Route> routes) {
-        if (recommendedPlace == null) {
-            throw new IllegalArgumentException("추천 장소는 필수입니다.");
+    private void validate(final Place targetPlace, final List<Route> routes, final List<RecommendedPlace> recommendedPlaces) {
+        if (targetPlace == null) {
+            throw new IllegalArgumentException("목표 장소는 필수입니다.");
         }
         if (routes == null || routes.isEmpty()) {
-            throw new IllegalArgumentException("경로 목록은 필수입니다.");
+            throw new IllegalArgumentException("경로 목록은 비어 있을 수 없습니다.");
+        }
+        if (recommendedPlaces == null || recommendedPlaces.isEmpty()) {
+            throw new IllegalArgumentException("추천 장소 목록은 비어 있을 수 없습니다.");
         }
     }
 
@@ -39,7 +43,7 @@ public class Location {
         return max - min > calculateAverageTravelTime() * 1.5;
     }
 
-    private int calculateAverageTravelTime() {
+    public int calculateAverageTravelTime() {
         return (int) routes.stream()
                 .mapToInt(Route::calculateTotalTravelTime)
                 .average()
