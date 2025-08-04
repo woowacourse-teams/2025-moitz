@@ -4,9 +4,9 @@ import java.util.List;
 
 public record RouteResponse(
         String startPlace,
-        String startingX,
-        String startingY,
-        String transferCount,
+        double startingX,
+        double startingY,
+        int transferCount,
         int totalTravelTime,
         List<PathResponse> paths
 ) {

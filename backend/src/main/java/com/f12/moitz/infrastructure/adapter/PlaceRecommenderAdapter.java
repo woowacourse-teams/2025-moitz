@@ -45,7 +45,7 @@ public class PlaceRecommenderAdapter implements PlaceRecommender {
                     Place place = entry.getKey();
                     List<RecommendedPlace> recommendedPlaces = entry.getValue().stream()
                             .map(recommendedPlace -> new RecommendedPlace(
-                                    findPlaceByName(recommendedPlace.name()),
+                                    recommendedPlace.name(),
                                     recommendedPlace.category(),
                                     recommendedPlace.walkingTime(),
                                     recommendedPlace.url()
