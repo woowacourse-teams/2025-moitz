@@ -1,6 +1,6 @@
 package com.f12.moitz.ui;
 
-import com.f12.moitz.application.LocationService;
+import com.f12.moitz.application.LocationApplicationService;
 import com.f12.moitz.application.dto.LocationRecommendRequest;
 import com.f12.moitz.application.dto.LocationRecommendResponse;
 import java.util.List;
@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/locations")
 public class LocationController implements SwaggerLocationController {
 
-    private final LocationService locationService;
+    private final LocationApplicationService locationService;
 
     @PostMapping
     public ResponseEntity<List<LocationRecommendResponse>> recommendLocations(@RequestBody LocationRecommendRequest request) {
