@@ -4,16 +4,13 @@
     <!-- 외부 프로퍼티 로딩 -->
     <property resource="logback-variable.properties" />
 
-    <!-- Spring 환경 변수 (application.yml 등에서 주입됨) -->
-    <springProperty scope="context" name="INFO_LOG_PATH" source="logging.file.path" defaultValue="${LOG_PATH}/${INFO_PATH}" />
-    <springProperty scope="context" name="ERROR_LOG_PATH" source="logging.file.path" defaultValue="${LOG_PATH}/${ERROR_PATH}" />
-
-    <timestamp key="TODAY" datePattern="yyyyMMdd" />
+    <!-- Spring 환경 변수 (application.properties 에서 주입됨) -->
+    <springProperty scope="context" name="INFO_LOG_PATH" source="logging.file.info.path"/>
+    <springProperty scope="context" name="ERROR_LOG_PATH" source="logging.file.error.path"/>
 
     <!-- 개발 환경용 설정 -->
     <springProfile name="dev">
         <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
-            <encoder class="net.logstash.logback.encoder.LogstashEncoder"/>
             <encoder>
                 <pattern>${CONSOLE_PATTERN}</pattern>
             </encoder>
@@ -52,10 +49,6 @@
             <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
                 <level>INFO</level>
             </filter>
-
-            <encoder>
-                <pattern>${ROLLING_PATTERN}</pattern>
-            </encoder>
         </appender>
 
         <!-- ERROR 전용 Appender -->
@@ -69,16 +62,11 @@
                 <maxHistory>${MAX_HISTORY}</maxHistory>
                 <maxFileSize>${MAX_FILE_SIZE}</maxFileSize>
                 <totalSizeCap>${TOTAL_SIZE}</totalSizeCap>
-
             </rollingPolicy>
 
             <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
                 <level>ERROR</level>
             </filter>
-
-            <encoder>
-                <pattern>${ROLLING_PATTERN}</pattern>
-            </encoder>
         </appender>
 
         <root level="INFO">

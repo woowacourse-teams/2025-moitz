@@ -16,7 +16,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class LoggingTest {
 
     @Test
-    @Disabled
     @DisplayName("로깅이 파일에 저장되는지 테스트")
     void LoggingTest() {
         // Given
