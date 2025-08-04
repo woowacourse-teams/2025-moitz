@@ -74,7 +74,6 @@ function MeetingForm() {
         type="submit"
         text="중간지점 찾기"
         active={validateActive()}
-        onClick={() => {}}
       />
       <Toast message={message} isVisible={isVisible} />
     </form>

@@ -3,12 +3,22 @@ import { flex, typography } from '@shared/styles/default.styled';
 
 import * as bottomButton from './bottomButton.styled';
 
-interface BottomButtonProps {
-  type: 'button' | 'submit';
+interface BaseBottomButtonProps {
   text: string;
   active: boolean;
+}
+
+interface SubmitBottomButtonProps extends BaseBottomButtonProps {
+  type: 'submit';
+  onClick?: () => void;
+}
+
+interface ButtonBottomButtonProps extends BaseBottomButtonProps {
+  type: 'button';
   onClick: () => void;
 }
+
+type BottomButtonProps = SubmitBottomButtonProps | ButtonBottomButtonProps;
 
 function BottomButton({ type, text, active, onClick }: BottomButtonProps) {
   return (
