@@ -1,0 +1,89 @@
+package com.f12.moitz.infrastructure.adapter;
+
+import com.f12.moitz.application.port.RouteFinder;
+import com.f12.moitz.domain.Path;
+import com.f12.moitz.domain.Place;
+import com.f12.moitz.domain.Point;
+import com.f12.moitz.domain.Route;
+import com.f12.moitz.domain.TravelMethod;
+import com.f12.moitz.infrastructure.odsay.OdsayClient;
+import com.f12.moitz.infrastructure.odsay.dto.SubPathResponse;
+import com.f12.moitz.infrastructure.odsay.dto.SubwayRouteSearchResponse;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Component;
+
+@Component
+@RequiredArgsConstructor
+public class RouteFinderAdapter implements RouteFinder {
+
+    private final OdsayClient odsayClient;
+
+    @Override
+    public Route findRoute(final Place startPlace, final Place endPlace) {
+        return new Route(
+                startPlace,
+                endPlace,
+                convertPaths(odsayClient.getRoute(startPlace.getPoint(), endPlace.getPoint()))
+        );
+    }
+
+    // 해당 로직은 OdsayClient로 옮기는 게 좋을까?
+    private List<Path> convertPaths(final SubwayRouteSearchResponse odsayResponse) {
+        var bestRoute = odsayResponse.result().path().stream()
+                .min(Comparator.comparingInt(path -> path.info().totalTime()))
+                .orElseThrow(() -> new IllegalStateException("경로 정보를 찾을 수 없습니다."));
+
+        // 시작과 끝에 도보로 걸어가는 응답 제거
+        List<SubPathResponse> subPaths = bestRoute.subPath();
+        if (!subPaths.isEmpty() && subPaths.getFirst().trafficType() == 1) {
+            subPaths.removeFirst();
+        }
+        if (!subPaths.isEmpty() && subPaths.getLast().trafficType() == 1) {
+            subPaths.removeLast();
+        }
+
+        List<Path> resultingPaths = new ArrayList<>();
+        // 환승이 존재할 경우 마지막 유효한 역 이름과 좌표로 대치하도록
+        String lastValidStationName = null;
+        Point lastValidPoint = null;
+
+        for (SubPathResponse subPath : subPaths) {
+            if (subPath.startName() == null || subPath.endName() == null) {
+                if (lastValidStationName != null) {
+                    Place transferPlace = new Place(lastValidStationName, lastValidPoint);
+                    resultingPaths.add(new Path(
+                            transferPlace,
+                            transferPlace,
+                            TravelMethod.TRANSFER,
+                            subPath.sectionTime()
+                    ));
+                }
+            }
+            else {
+                Place startPlace = new Place(
+                        subPath.startName(),
+                        new Point(subPath.startX(), subPath.startY())
+                );
+                Place endPlace = new Place(
+                        subPath.endName(),
+                        new Point(subPath.endX(), subPath.endY())
+                );
+                resultingPaths.add(new Path(
+                        startPlace,
+                        endPlace,
+                        TravelMethod.from(subPath.trafficType()),
+                        subPath.sectionTime()
+                ));
+
+                lastValidStationName = subPath.endName();
+                lastValidPoint = new Point(subPath.endX(), subPath.endY());
+            }
+        }
+
+        return resultingPaths;
+    }
+
+}
