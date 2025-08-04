@@ -27,8 +27,8 @@ public class Path {
         if (travelMethod == null) {
             throw new IllegalArgumentException("이동 수단은 필수입니다.");
         }
-        if (travelTime <= 0) {
-            throw new IllegalArgumentException("이동 시간은 양수이어야 합니다.");
+        if (travelTime < 0) {
+            throw new IllegalArgumentException("이동 시간은 음수일 수 없습니다.");
         }
     }
 
