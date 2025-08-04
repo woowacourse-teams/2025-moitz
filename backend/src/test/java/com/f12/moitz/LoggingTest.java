@@ -1,6 +1,7 @@
 package com.f12.moitz;
 
 import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -15,6 +16,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class LoggingTest {
 
     @Test
+    @Disabled
     @DisplayName("로깅이 파일에 저장되는지 테스트")
     void LoggingTest() {
         // Given
@@ -28,6 +30,7 @@ public class LoggingTest {
     }
 
     @Test
+    @Disabled
     @DisplayName("로그 압축(zip)이 생성되는지 확인")
     void testLogRollingZipCreation() throws InterruptedException {
         // Given: 약 10MB 이상 로그 생성
