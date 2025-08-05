@@ -1,4 +1,4 @@
-import startingLocationsMock from '../../../mocks/startingLocationsMock';
+import startingLocationsMock from '@mocks/startingLocationsMock';
 
 import StartingSpotName from './StartingSpotName';
 
