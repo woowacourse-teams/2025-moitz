@@ -3,7 +3,7 @@
 import SpotItemList from '@features/recommendation/components/spotItemList/SpotItemList';
 
 import StartingSpotWrapper from '@shared/components/startingSpotWrapper/StartingSpotWrapper';
-import { flex } from '@shared/styles/default.styled';
+import { flex, shadow } from '@shared/styles/default.styled';
 
 import { recommendedLocation } from '@shared/types/recommendedLocation';
 import { startingLocation } from '@shared/types/startingLocation';
@@ -20,7 +20,13 @@ function BottomSheet({
   recommendedLocations,
 }: BottomSheetProps) {
   return (
-    <div css={[flex({ direction: 'column', gap: 20 }), bottomSheet.base()]}>
+    <div
+      css={[
+        flex({ direction: 'column', gap: 20 }),
+        shadow.bottom_sheet,
+        bottomSheet.base(),
+      ]}
+    >
       <div css={[flex({ direction: 'column', gap: 20 }), bottomSheet.scroll()]}>
         <StartingSpotWrapper startingLocations={startingLocations} />
         <SpotItemList recommendedLocations={recommendedLocations} />
