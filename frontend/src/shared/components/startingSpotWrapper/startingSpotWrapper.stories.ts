@@ -1,5 +1,7 @@
 import startSpotNameListMock from '@mocks/startingLocationsMock';
 
+import { withContainer } from '../../../../.storybook/decorators/withContainer';
+
 import StartingSpotWrapper from './StartingSpotWrapper';
 
 import type { Meta, StoryObj } from '@storybook/react-webpack5';
@@ -7,6 +9,7 @@ import type { Meta, StoryObj } from '@storybook/react-webpack5';
 const meta = {
   title: 'shared/StartingSpotWrapper',
   component: StartingSpotWrapper,
+  decorators: [withContainer],
   parameters: {
     layout: 'centered',
   },
