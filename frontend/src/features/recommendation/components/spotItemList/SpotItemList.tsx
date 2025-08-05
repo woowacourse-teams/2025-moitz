@@ -5,9 +5,13 @@ import { recommendedLocation } from '@shared/types/recommendedLocation';
 
 interface SpotItemListProps {
   recommendedLocations: recommendedLocation[];
+  onSpotClick: (spot: recommendedLocation) => void;
 }
 
-function SpotItemList({ recommendedLocations }: SpotItemListProps) {
+function SpotItemList({
+  recommendedLocations,
+  onSpotClick,
+}: SpotItemListProps) {
   return (
     <div css={[flex({ direction: 'column', gap: 20 })]}>
       {recommendedLocations.map((location) => {
@@ -20,6 +24,7 @@ function SpotItemList({ recommendedLocations }: SpotItemListProps) {
             description={description}
             avgMinutes={avgMinutes}
             isBest={isBest}
+            onClick={() => onSpotClick(location)}
           />
         );
       })}
