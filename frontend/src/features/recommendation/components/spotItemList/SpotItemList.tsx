@@ -1,7 +1,7 @@
+import { RecommendedLocation } from '@entities/types/Location';
+
 import SpotItem from '@shared/components/spotItem/SpotItem';
 import { flex } from '@shared/styles/default.styled';
-
-import { RecommendedLocation } from '../../../../entities/types/Location';
 
 import * as spotItemList from './spotItemList.styled';
 

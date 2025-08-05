@@ -1,13 +1,13 @@
 /** @jsxImportSource @emotion/react */
 
+import { RecommendedLocation } from '@entities/types/Location';
+
 import SpotItemList from '@features/recommendation/components/spotItemList/SpotItemList';
 
 import StartingSpotWrapper from '@shared/components/startingSpotWrapper/StartingSpotWrapper';
 import { flex } from '@shared/styles/default.styled';
 
 import { startingLocation } from '@shared/types/startingLocation';
-
-import { RecommendedLocation } from '../../../../entities/types/Location';
 
 import * as bottomSheet from './bottomSheet.styled';
 

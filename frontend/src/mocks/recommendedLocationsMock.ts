@@ -1,4 +1,4 @@
-import { RecommendedLocation } from '../../src/entities/types/Location';
+import { RecommendedLocation } from '@entities/types/Location';
 
 const recommendedLocationsMock: RecommendedLocation[] = [
   {
