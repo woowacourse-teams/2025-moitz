@@ -1,4 +1,5 @@
 import { pageView } from '@config/gtag';
+import Clarity from '@microsoft/clarity';
 import { useEffect } from 'react';
 import { Route, Routes, useLocation } from 'react-router';
 
@@ -14,6 +15,8 @@ export default function App() {
       pageView(new URL(window.location.href));
     }, [location]);
 
+    const projectId = process.env.CLARITY_ID;
+    Clarity.init(projectId);
   }
 
   return (
