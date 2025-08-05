@@ -1,5 +1,3 @@
-/** @jsxImportSource @emotion/react */
-
 import { RecommendedLocation } from '@entities/types/Location';
 import { useEffect, useRef } from 'react';
 import { Link } from 'react-router';

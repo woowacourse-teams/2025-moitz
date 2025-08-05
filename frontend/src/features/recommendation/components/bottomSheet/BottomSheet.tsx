@@ -1,5 +1,3 @@
-/** @jsxImportSource @emotion/react */
-
 import { RecommendedLocation } from '@entities/types/Location';
 
 import SpotItemList from '@features/recommendation/components/spotItemList/SpotItemList';

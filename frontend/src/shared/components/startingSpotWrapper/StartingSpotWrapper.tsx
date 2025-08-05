@@ -1,5 +1,3 @@
-/** @jsxImportSource @emotion/react */
-
 import StartingSpotName from '@shared/components/startingSpotName/StartingSpotName';
 import { flex, typography } from '@shared/styles/default.styled';
 

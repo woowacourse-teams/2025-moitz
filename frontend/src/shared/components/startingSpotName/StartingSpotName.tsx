@@ -1,5 +1,3 @@
-/** @jsxImportSource @emotion/react */
-
 import { flex, typography } from '@shared/styles/default.styled';
 
 import { startingLocation } from '@shared/types/startingLocation';
