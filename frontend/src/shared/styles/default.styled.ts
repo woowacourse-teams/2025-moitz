@@ -41,6 +41,10 @@ export const typography = {
   `,
 };
 
+export const grid_padding = css`
+  padding: 0 20px;
+`;
+
 // Flex
 type flexOptions = {
   direction?: 'row' | 'column';
@@ -51,6 +55,7 @@ type flexOptions = {
     | 'space-between'
     | 'space-around';
   align?: 'flex-start' | 'center' | 'flex-end' | 'stretch';
+  wrap?: 'nowrap' | 'wrap' | 'wrap-reverse';
   gap?: number;
 };
 
@@ -59,6 +64,7 @@ export const flex = (options: flexOptions = {}) => css`
   ${options.direction && `flex-direction: ${options.direction};`}
   ${options.justify && `justify-content: ${options.justify};`}
   ${options.align && `align-items: ${options.align};`}
+  ${options.wrap && `flex-wrap: ${options.wrap};`}
   ${options.gap && `gap: ${options.gap}px;`}
 `;
 
@@ -67,5 +73,6 @@ export const inline_flex = (options: flexOptions = {}) => css`
   ${options.direction && `flex-direction: ${options.direction};`}
   ${options.justify && `justify-content: ${options.justify};`}
   ${options.align && `align-items: ${options.align};`}
+  ${options.wrap && `flex-wrap: ${options.wrap};`}
   ${options.gap && `gap: ${options.gap}px;`}
 `;
