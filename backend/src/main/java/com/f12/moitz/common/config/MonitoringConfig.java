@@ -7,6 +7,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import java.time.Duration;
+import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.cloudwatch.CloudWatchAsyncClient;
 
 @Configuration
@@ -33,7 +34,18 @@ public class MonitoringConfig {
     }
 
     @Bean
-    public CloudWatchMeterRegistry cloudWatchMeterRegistry(CloudWatchConfig config, Clock clock, CloudWatchAsyncClient client) {
+    public CloudWatchAsyncClient cloudWatchAsyncClient() {
+        return CloudWatchAsyncClient.builder()
+                .region(Region.AP_NORTHEAST_2)
+                .build();
+    }
+
+    @Bean
+    public CloudWatchMeterRegistry cloudWatchMeterRegistry(
+            final CloudWatchConfig config,
+            final Clock clock,
+            final CloudWatchAsyncClient client
+    ) {
         return new CloudWatchMeterRegistry(config, clock, client);
     }
 
