@@ -5,7 +5,8 @@ public enum TravelMethod {
     SUBWAY(1, "지하철"),
     BUS(2, "버스"),
     WALK(3, "도보"),
-    TRANSFER(4, "환승"),;
+    TRANSFER(4, "환승"),
+    ;
 
     private final int code;
     private final String name;
@@ -31,6 +32,10 @@ public enum TravelMethod {
             }
         }
         throw new IllegalArgumentException("존재하지 않는 이동 방법 이름입니다: " + name);
+    }
+
+    public boolean isTransfer() {
+        return this == TravelMethod.TRANSFER;
     }
 
 }

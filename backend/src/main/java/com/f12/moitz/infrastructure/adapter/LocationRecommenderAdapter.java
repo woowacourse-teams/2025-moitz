@@ -21,8 +21,10 @@ public class LocationRecommenderAdapter implements LocationRecommender {
 
     @Override
     public Map<Place, String> recommendLocations(final List<String> startPlaceNames, final String condition) {
-        final RecommendedLocationResponse recommendedLocationResponse = geminiClient.generateResponse(startPlaceNames,
-                condition);
+        final RecommendedLocationResponse recommendedLocationResponse = geminiClient.generateResponse(
+                startPlaceNames,
+                condition
+        );
 
         return recommendedLocationResponse.recommendations().stream()
                 .collect(Collectors.toMap(

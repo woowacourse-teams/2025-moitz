@@ -7,6 +7,7 @@ import com.f12.moitz.domain.Point;
 import com.f12.moitz.domain.Route;
 import com.f12.moitz.domain.TravelMethod;
 import com.f12.moitz.infrastructure.odsay.OdsayClient;
+import com.f12.moitz.infrastructure.odsay.SubwayCode;
 import com.f12.moitz.infrastructure.odsay.dto.SubPathResponse;
 import com.f12.moitz.infrastructure.odsay.dto.SubwayRouteSearchResponse;
 import java.util.ArrayList;
@@ -24,50 +25,51 @@ public class RouteFinderAdapter implements RouteFinder {
     @Override
     public Route findRoute(final Place startPlace, final Place endPlace) {
         return new Route(
-                startPlace,
-                endPlace,
                 convertPaths(odsayClient.getRoute(startPlace.getPoint(), endPlace.getPoint()))
         );
     }
 
     // 해당 로직은 OdsayClient로 옮기는 게 좋을까?
     private List<Path> convertPaths(final SubwayRouteSearchResponse odsayResponse) {
-        var bestRoute = odsayResponse.result().path().stream()
+        final var bestRoute = odsayResponse.result().path().stream()
                 .min(Comparator.comparingInt(path -> path.info().totalTime()))
                 .orElseThrow(() -> new IllegalStateException("경로 정보를 찾을 수 없습니다."));
 
         // 시작과 끝에 도보로 걸어가는 응답 제거
-        List<SubPathResponse> subPaths = bestRoute.subPath();
-        if (!subPaths.isEmpty() && subPaths.getFirst().trafficType() == 1) {
+        final List<SubPathResponse> subPaths = bestRoute.subPath();
+        if (!subPaths.isEmpty() && subPaths.getFirst().trafficType() != 1) {
             subPaths.removeFirst();
         }
-        if (!subPaths.isEmpty() && subPaths.getLast().trafficType() == 1) {
+        if (!subPaths.isEmpty() && subPaths.getLast().trafficType() != 1) {
             subPaths.removeLast();
         }
 
-        List<Path> resultingPaths = new ArrayList<>();
+        final List<Path> resultingPaths = new ArrayList<>();
         // 환승이 존재할 경우 마지막 유효한 역 이름과 좌표로 대치하도록
         String lastValidStationName = null;
         Point lastValidPoint = null;
 
         for (SubPathResponse subPath : subPaths) {
             if (subPath.startName() == null || subPath.endName() == null) {
+                // 환승인 경우
                 if (lastValidStationName != null) {
-                    Place transferPlace = new Place(lastValidStationName, lastValidPoint);
+                    final Place transferPlace = new Place(lastValidStationName, lastValidPoint);
                     resultingPaths.add(new Path(
                             transferPlace,
                             transferPlace,
                             TravelMethod.TRANSFER,
-                            subPath.sectionTime()
+                            // TODO: 환승 이동 시간 계산 고려
+                            3,
+                            null
                     ));
                 }
             }
             else {
-                Place startPlace = new Place(
+                final Place startPlace = new Place(
                         subPath.startName(),
                         new Point(subPath.startX(), subPath.startY())
                 );
-                Place endPlace = new Place(
+                final Place endPlace = new Place(
                         subPath.endName(),
                         new Point(subPath.endX(), subPath.endY())
                 );
@@ -75,7 +77,8 @@ public class RouteFinderAdapter implements RouteFinder {
                         startPlace,
                         endPlace,
                         TravelMethod.from(subPath.trafficType()),
-                        subPath.sectionTime()
+                        subPath.sectionTime(),
+                        SubwayCode.fromCode(subPath.lane().getFirst().subwayCode()).getTitle()
                 ));
 
                 lastValidStationName = subPath.endName();
