@@ -45,6 +45,15 @@ export const grid_padding = css`
   padding: 0 20px;
 `;
 
+export const shadow = {
+  map: css`
+    box-shadow: 0 2px 2px rgba(0, 0, 0, 0.25);
+  `,
+  bottom_sheet: css`
+    box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
+  `,
+};
+
 // Flex
 type flexOptions = {
   direction?: 'row' | 'column';
