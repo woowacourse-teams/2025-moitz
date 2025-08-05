@@ -41,6 +41,10 @@ export const typography = {
   `,
 };
 
+export const grid_padding = css`
+  padding: 0 20px;
+`;
+
 // Flex
 type flexOptions = {
   direction?: 'row' | 'column';
