@@ -55,6 +55,7 @@ module.exports = {
         '@shared/styles': path.resolve(__dirname, '../src/shared/styles'),
         '@shared/types': path.resolve(__dirname, '../src/shared/types'),
         '@icons': path.resolve(__dirname, '../assets/icon'),
+        '@mocks': path.resolve(__dirname, '../src/mocks'),
       };
     }
 
