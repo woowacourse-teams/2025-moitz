@@ -5,5 +5,5 @@
     "moduleResolution": "Node",
     "types": ["node"]
   },
-  "include": ["./main.ts", "./preview.ts"]
+  "include": ["./main.js", "./preview.ts"]
 }
