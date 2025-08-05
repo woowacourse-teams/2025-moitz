@@ -1,4 +1,4 @@
-import { withLayout } from '../../../../../.storybook/decorators/withLayout';
+import { withContainer } from '../../../../../.storybook/decorators/withContainer';
 import recommendedLocationsMock from '../../../../mocks/recommendedLocationsMock';
 import startingLocationsMock from '../../../../mocks/startingLocationsMock';
 
@@ -9,7 +9,7 @@ import type { Meta, StoryObj } from '@storybook/react-webpack5';
 const meta = {
   title: 'features/BottomSheet',
   component: BottomSheet,
-  decorators: [withLayout],
+  decorators: [withContainer],
   parameters: {
     layout: 'centered',
   },
