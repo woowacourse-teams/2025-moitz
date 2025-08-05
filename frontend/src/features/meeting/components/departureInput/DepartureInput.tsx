@@ -49,7 +49,7 @@ function DepartureInput({
         onKeyDown={handleKeyDown}
       />
       {departureList.length > 0 && (
-        <div css={[flex({ gap: 5 }), { flexWrap: 'wrap' }]}>
+        <div css={[flex({ gap: 5, wrap: 'wrap' })]}>
           {departureList.map((name, index) => (
             <Tag
               key={index}
