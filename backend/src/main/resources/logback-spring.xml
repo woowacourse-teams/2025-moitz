@@ -10,11 +10,23 @@
 
     <!-- 개발 환경용 설정 -->
     <springProfile name="dev">
-        <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
-            <encoder>
-                <pattern>${CONSOLE_PATTERN}</pattern>
-            </encoder>
+        <!-- INFO 전용 Appender -->
+        <appender name="FILE_INFO" class="ch.qos.logback.core.rolling.RollingFileAppender">
+            <encoder class="net.logstash.logback.encoder.LogstashEncoder"/>
+
+            <file>${LOG_PATH}/${INFO_PATH}/application-info.log</file>
+
+            <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+                <fileNamePattern>${INFO_LOG_PATH}/application-info-%d{yyyy-MM-dd}.%i.log.zip</fileNamePattern>
+                <maxHistory>${MAX_HISTORY}</maxHistory>
+                <maxFileSize>${MAX_FILE_SIZE}</maxFileSize>
+                <totalSizeCap>${TOTAL_SIZE}</totalSizeCap>
+            </rollingPolicy>
         </appender>
+
+        <root level="DEBUG">
+            <appender-ref ref="FILE_INFO"/>
+        </root>
 
         <!-- 프레임워크 기본 로거 수준 설정 -->
         <logger name="org.springframework" level="INFO"/>
@@ -22,10 +34,6 @@
         <logger name="org.hibernate" level="WARN"/>
         <logger name="org.apache.catalina" level="INFO"/>
         <logger name="com.zaxxer.hikari" level="WARN"/>
-
-        <root level="DEBUG">
-            <appender-ref ref="CONSOLE"/>
-        </root>
     </springProfile>
 
 <!-- ========================================================= -->
