@@ -1,9 +1,11 @@
 package com.f12.moitz.infrastructure.kakao;
 
+import com.f12.moitz.common.error.exception.ExternalApiErrorCode;
+import com.f12.moitz.common.error.exception.ExternalApiException;
 import com.f12.moitz.domain.Point;
 import com.f12.moitz.infrastructure.kakao.dto.KakaoApiResponse;
 import com.f12.moitz.infrastructure.kakao.dto.KakaoMapErrorResponse;
-import com.f12.moitz.infrastructure.odsay.dto.OdsayErrorResponse;
+import com.f12.moitz.infrastructure.kakao.dto.SearchPlacesRequest;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import lombok.RequiredArgsConstructor;
@@ -29,13 +31,28 @@ public class KakaoMapClient {
     public Point searchPointBy(final String placeName) {
         final String url = KAKAO_MAP_API_URL + "/keyword.json" + "?query=" + placeName;
         final KakaoApiResponse response = getData(url);
-        return new Point(response.getX(), response.getY());
+        return new Point(response.findStationX(), response.findStationY());
     }
 
     public String searchPlaceBy(final double longitude, final double latitude) {
-        final String url = KAKAO_MAP_API_URL + "/category.json" + "?x=" + longitude + "&y=" + latitude + "&category_group_code=SW8";
+        final String url = KAKAO_MAP_API_URL + "/category.json" + "?x=" + longitude + "&y=" + latitude
+                           + "&category_group_code=SW8";
         final KakaoApiResponse response = getData(url);
-        return response.getPlaceName();
+        return response.findStationPlaceName();
+    }
+
+    public KakaoApiResponse searchPlacesBy(final SearchPlacesRequest request) {
+        return searchPlacesBy(request.query(), String.valueOf(request.longitude()), String.valueOf(request.latitude()),
+                request.radius());
+    }
+
+    private KakaoApiResponse searchPlacesBy(final String keyword, final String longitude, final String latitude,
+                                            final int radius) {
+        final String url =
+                KAKAO_MAP_API_URL + "/keyword.json" + "?query=" + keyword + "&x=" + longitude + "&y=" + latitude
+                + "&radius=" + radius;
+        final KakaoApiResponse response = getData(url);
+        return response;
     }
 
     private KakaoApiResponse getData(final String url) {
@@ -50,7 +67,7 @@ public class KakaoMapClient {
                 )
                 .body(KakaoApiResponse.class);
 
-        log.info("카카오맵 장소 조회 API 응답 성공 : {}", response.getPlaceName());
+        log.info("카카오맵 장소 조회 API 응답 성공 : {}", response);
 
         return response;
     }
@@ -60,9 +77,10 @@ public class KakaoMapClient {
             byte[] body = res.getBody().readAllBytes();
             KakaoMapErrorResponse error = objectMapper.readValue(body,
                     KakaoMapErrorResponse.class);
-            throw new RuntimeException(error.msg());
+            log.error(error.msg());
+            throw new ExternalApiException(ExternalApiErrorCode.INVALID_KAKAO_MAP_API_RESPONSE);
         } catch (IOException e) {
-            throw new RuntimeException("응답 바디 파싱에 실패하였습니다.", e);
+            throw new ExternalApiException(ExternalApiErrorCode.INVALID_KAKAO_MAP_API_RESPONSE);
         }
     }
 

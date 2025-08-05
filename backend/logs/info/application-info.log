@@ -1,0 +1,14 @@
+2025-08-04 21:01:32.906  o.h.v.i.u.Version - HV000001: Hibernate Validator 8.0.2.Final 
+2025-08-04 21:01:32.943  c.f.m.LoggingTest - Starting LoggingTest using Java 21.0.7 with PID 34468 (started by 82108 in C:\dev\woocourse\2025-moitz\backend) 
+2025-08-04 21:01:32.944  c.f.m.LoggingTest - The following 2 profiles are active: "client", "prod" 
+2025-08-04 21:01:35.433  c.f.m.LoggingTest - Started LoggingTest in 3.147 seconds (process running for 4.614) 
+2025-08-04 21:01:36.168  c.f.m.LoggingTest - INFO 
+2025-08-04 21:01:36.168  c.f.m.LoggingTest - WARN 
+2025-08-04 21:01:36.168  c.f.m.LoggingTest - ERROR 
+{"@timestamp":"2025-08-04T21:09:48.2132375+09:00","@version":"1","message":"HV000001: Hibernate Validator 8.0.2.Final","logger_name":"org.hibernate.validator.internal.util.Version","thread_name":"background-preinit","level":"INFO","level_value":20000,"ERROR_LOG_PATH":"./logs/error","INFO_LOG_PATH":"./logs/info"}
+{"@timestamp":"2025-08-04T21:09:48.2487322+09:00","@version":"1","message":"Starting LoggingTest using Java 21.0.7 with PID 34604 (started by 82108 in C:\\dev\\woocourse\\2025-moitz\\backend)","logger_name":"com.f12.moitz.LoggingTest","thread_name":"Test worker","level":"INFO","level_value":20000,"ERROR_LOG_PATH":"./logs/error","INFO_LOG_PATH":"./logs/info"}
+{"@timestamp":"2025-08-04T21:09:48.2497322+09:00","@version":"1","message":"The following 2 profiles are active: \"client\", \"prod\"","logger_name":"com.f12.moitz.LoggingTest","thread_name":"Test worker","level":"INFO","level_value":20000,"ERROR_LOG_PATH":"./logs/error","INFO_LOG_PATH":"./logs/info"}
+{"@timestamp":"2025-08-04T21:09:50.1801167+09:00","@version":"1","message":"Started LoggingTest in 2.544 seconds (process running for 4.006)","logger_name":"com.f12.moitz.LoggingTest","thread_name":"Test worker","level":"INFO","level_value":20000,"ERROR_LOG_PATH":"./logs/error","INFO_LOG_PATH":"./logs/info"}
+{"@timestamp":"2025-08-04T21:09:50.8389902+09:00","@version":"1","message":"INFO","logger_name":"com.f12.moitz.LoggingTest","thread_name":"Test worker","level":"INFO","level_value":20000,"ERROR_LOG_PATH":"./logs/error","INFO_LOG_PATH":"./logs/info"}
+{"@timestamp":"2025-08-04T21:09:50.8394943+09:00","@version":"1","message":"WARN","logger_name":"com.f12.moitz.LoggingTest","thread_name":"Test worker","level":"WARN","level_value":30000,"ERROR_LOG_PATH":"./logs/error","INFO_LOG_PATH":"./logs/info"}
+{"@timestamp":"2025-08-04T21:09:50.8394943+09:00","@version":"1","message":"ERROR","logger_name":"com.f12.moitz.LoggingTest","thread_name":"Test worker","level":"ERROR","level_value":40000,"ERROR_LOG_PATH":"./logs/error","INFO_LOG_PATH":"./logs/info"}
