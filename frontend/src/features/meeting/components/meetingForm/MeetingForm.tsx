@@ -50,8 +50,6 @@ function MeetingForm() {
       showValidationError(formValidation);
       return;
     }
-
-    console.log(departureList, conditionID);
   };
 
   return (
