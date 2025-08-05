@@ -1,4 +1,4 @@
-import recommendedLocationMock from '@mocks/recommendedLocationsMock';
+import recommendedLocationMock from '@mocks/RecommendedLocationsMock';
 
 import { withContainer } from '../../../../../.storybook/decorators/withContainer';
 

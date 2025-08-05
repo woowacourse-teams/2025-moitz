@@ -1,6 +1,6 @@
 import { RecommendedLocation } from '@entities/types/Location';
 
-const recommendedLocationsMock: RecommendedLocation[] = [
+const RecommendedLocationsMock: RecommendedLocation[] = [
   {
     id: 1,
     index: 1,
@@ -58,4 +58,4 @@ const recommendedLocationsMock: RecommendedLocation[] = [
   },
 ];
 
-export default recommendedLocationsMock;
+export default RecommendedLocationsMock;

@@ -1,4 +1,4 @@
-import recommendedLocationsMock from '@mocks/recommendedLocationsMock';
+import RecommendedLocationsMock from '@mocks/RecommendedLocationsMock';
 import startingLocationsMock from '@mocks/startingLocationsMock';
 
 import { withContainer } from '../../../../../.storybook/decorators/withContainer';
@@ -33,13 +33,13 @@ type Story = StoryObj<typeof meta>;
 export const Default: Story = {
   args: {
     startingLocations: startingLocationsMock,
-    recommendedLocations: recommendedLocationsMock,
+    recommendedLocations: RecommendedLocationsMock,
   },
 };
 
 export const Short: Story = {
   args: {
     startingLocations: startingLocationsMock,
-    recommendedLocations: recommendedLocationsMock.slice(0, 2),
+    recommendedLocations: RecommendedLocationsMock.slice(0, 2),
   },
 };
