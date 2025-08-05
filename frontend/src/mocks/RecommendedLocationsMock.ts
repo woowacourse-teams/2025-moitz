@@ -1,0 +1,61 @@
+import { RecommendedLocation } from '@entities/types/Location';
+
+const RecommendedLocationsMock: RecommendedLocation[] = [
+  {
+    id: 1,
+    index: 1,
+    name: '서울역',
+    description: '서울의 중심역, 교통의 허브',
+    avgMinutes: 35,
+    isBest: true,
+    x: 126.9723,
+    y: 37.5563,
+    reason: '모든 노선이 모이는 교통의 요지',
+  },
+  {
+    id: 2,
+    index: 2,
+    name: '강남역',
+    description: '유동인구 많은 번화가',
+    avgMinutes: 40,
+    isBest: false,
+    x: 127.0286,
+    y: 37.4979,
+    reason: '회사, 음식점, 모임장소가 많음',
+  },
+  {
+    id: 3,
+    index: 3,
+    name: '잠실역',
+    description: '롯데월드와 석촌호수 인근',
+    avgMinutes: 25,
+    isBest: false,
+    x: 127.1002,
+    y: 37.5133,
+    reason: '야경이 예쁘고 주변 시설이 풍부함',
+  },
+  {
+    id: 4,
+    index: 4,
+    name: '홍대입구역',
+    description: '젊음의 거리와 예술의 거리',
+    avgMinutes: 20,
+    isBest: false,
+    x: 126.9239,
+    y: 37.5572,
+    reason: '공연과 문화 공간이 많아 흥미로움',
+  },
+  {
+    id: 5,
+    index: 5,
+    name: '신촌역',
+    description: '대학교 인근, 맛집 거리',
+    avgMinutes: 30,
+    isBest: false,
+    x: 126.9368,
+    y: 37.5551,
+    reason: '젊고 활기찬 분위기, 모임 장소로 적절',
+  },
+];
+
+export default RecommendedLocationsMock;
