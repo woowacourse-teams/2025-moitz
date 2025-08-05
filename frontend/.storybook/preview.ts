@@ -1,16 +1,29 @@
 import { createElement } from 'react';
+import { MemoryRouter } from 'react-router';
 
 import GlobalStyle from '../src/shared/styles/GlobalStyle';
 import { colorToken } from '../src/shared/styles/tokens';
 
-import type { Decorator } from '@storybook/react';
+import type { Decorator, StoryContext } from '@storybook/react';
 import type { Preview } from '@storybook/react-webpack5';
 
+// 글로벌 스타일 적용
 const withGlobalStyle: Decorator = (Story) => {
   return createElement(
     'div',
     null,
     createElement(GlobalStyle),
+    createElement(Story),
+  );
+};
+
+// 라우팅 적용
+const withMemoryRouter: Decorator = (Story, context: StoryContext) => {
+  const path = context.parameters?.pathname ?? '/';
+
+  return createElement(
+    MemoryRouter,
+    { initialEntries: [path] },
     createElement(Story),
   );
 };
@@ -35,7 +48,7 @@ const preview: Preview = {
   initialGlobals: {
     backgrounds: { value: 'bg1' },
   },
-  decorators: [withGlobalStyle],
+  decorators: [withMemoryRouter, withGlobalStyle],
 };
 
 export default preview;

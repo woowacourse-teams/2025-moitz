@@ -1,10 +1,8 @@
-/** @jsxImportSource @emotion/react */
 import React from 'react';
 
 import { typography } from '@shared/styles/default.styled';
 
 import * as textarea from './textarea.styled';
-
 interface TextareaProps {
   placeholder: string;
   value: string;

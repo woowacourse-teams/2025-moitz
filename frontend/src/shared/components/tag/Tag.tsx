@@ -1,5 +1,3 @@
-/** @jsxImportSource @emotion/react */
-
 import { flex, inline_flex, typography } from '@shared/styles/default.styled';
 
 import IconCancel from '@icons/icon-cancel.svg';

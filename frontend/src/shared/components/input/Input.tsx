@@ -1,10 +1,8 @@
-/** @jsxImportSource @emotion/react */
 import React from 'react';
 
 import { typography } from '@shared/styles/default.styled';
 
 import * as input from './input.styled';
-
 interface InputProps {
   placeholder: string;
   value: string;
