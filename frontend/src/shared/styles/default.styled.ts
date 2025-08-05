@@ -41,6 +41,10 @@ export const typography = {
   `,
 };
 
+export const grid_padding = css`
+  padding: 0 20px;
+`;
+
 // Flex
 type flexOptions = {
   direction?: 'row' | 'column';
@@ -68,8 +72,4 @@ export const inline_flex = (options: flexOptions = {}) => css`
   ${options.justify && `justify-content: ${options.justify};`}
   ${options.align && `align-items: ${options.align};`}
   ${options.gap && `gap: ${options.gap}px;`}
-`;
-
-export const grid_padding = css`
-  padding: 0 20px;
 `;
