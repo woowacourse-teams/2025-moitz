@@ -1,5 +1,6 @@
-import { withContainer } from '../../../../.storybook/decorators/withContainer';
 import startSpotNameListMock from '@mocks/startingLocationsMock';
+
+import { withContainer } from '../../../../.storybook/decorators/withContainer';
 
 import StartingSpotWrapper from './StartingSpotWrapper';
 

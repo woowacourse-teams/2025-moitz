@@ -1,5 +1,6 @@
-import { withContainer } from '../../../../../.storybook/decorators/withContainer';
 import recommendedLocationMock from '@mocks/recommendedLocationsMock';
+
+import { withContainer } from '../../../../../.storybook/decorators/withContainer';
 
 import SpotItemList from './SpotItemList';
 
