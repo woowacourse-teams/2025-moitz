@@ -21,7 +21,6 @@ const defineEnv = Object.entries(envVars).reduce(
 
 const isProduction = process.env.NODE_ENV === 'production';
 
-/** @type {import('webpack').Configuration} */
 const config = {
   entry: './main.tsx',
   output: {
