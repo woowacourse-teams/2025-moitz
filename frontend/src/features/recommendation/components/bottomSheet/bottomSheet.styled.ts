@@ -10,3 +10,15 @@ export const base = () => css`
   border-top-left-radius: ${borderRadiusToken.input};
   border-top-right-radius: ${borderRadiusToken.input};
 `;
+
+export const scroll = () => css`
+  padding-bottom: 20px;
+
+  overflow-y: auto;
+  -ms-overflow-style: none; /* IE, Edge */
+  scrollbar-width: none; /* Firefox */
+
+  &::-webkit-scrollbar {
+    display: none; /* Chrome, Safari */
+  }
+`;

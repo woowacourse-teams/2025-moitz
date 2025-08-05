@@ -21,10 +21,10 @@ function BottomSheet({
 }: BottomSheetProps) {
   return (
     <div css={[flex({ direction: 'column', gap: 20 }), bottomSheet.base()]}>
-      <StartingSpotWrapper
-        startingLocations={startingLocations}
-      ></StartingSpotWrapper>
-      <SpotItemList recommendedLocations={recommendedLocations} />
+      <div css={[flex({ direction: 'column', gap: 20 }), bottomSheet.scroll()]}>
+        <StartingSpotWrapper startingLocations={startingLocations} />
+        <SpotItemList recommendedLocations={recommendedLocations} />
+      </div>
     </div>
   );
 }
