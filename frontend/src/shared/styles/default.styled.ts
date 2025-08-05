@@ -39,6 +39,10 @@ export const typography = {
     font-size: ${typoToken.captions.c1};
     font-weight: ${typoToken.weight.regular};
   `,
+  c2: css`
+    font-size: ${typoToken.captions.c2};
+    font-weight: ${typoToken.weight.regular};
+  `,
 };
 
 export const grid_padding = css`
