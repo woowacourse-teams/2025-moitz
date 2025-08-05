@@ -14,10 +14,12 @@ const useLocations = (
   data: Location[];
   loading: boolean;
   error: boolean;
+  errorMessage: string;
 } => {
   const [data, setData] = useState<Location[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
 
   useEffect(() => {
     const fetchData = async () => {
@@ -26,7 +28,8 @@ const useLocations = (
         const locations = await fetchLocations(requestBody);
         setData(locations);
       } catch (error) {
-        setError(error);
+        setError(true);
+        setErrorMessage(error);
       } finally {
         setLoading(false);
       }
@@ -35,7 +38,7 @@ const useLocations = (
     fetchData();
   }, []);
 
-  return { data, loading, error };
+  return { data, loading, error, errorMessage };
 };
 
 export default useLocations;
