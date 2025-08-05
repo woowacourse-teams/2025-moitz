@@ -1,10 +1,21 @@
-import { Route, Routes } from 'react-router';
+import { pageView } from '@config/gtag';
+import { useEffect } from 'react';
+import { Route, Routes, useLocation } from 'react-router';
 
 import IndexPage from '@pages/indexPage/IndexPage';
 import NotFoundPage from '@pages/notFoundPage/NotFoundPage';
 import ResultPage from '@pages/resultPage/ResultPage';
 
 export default function App() {
+  if (process.env.NODE_ENV === 'production') {
+    const location = useLocation();
+
+    useEffect(() => {
+      pageView(new URL(window.location.href));
+    }, [location]);
+
+  }
+
   return (
     <Routes>
       <Route path="/" element={<IndexPage />} />
