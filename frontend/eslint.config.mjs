@@ -56,7 +56,6 @@ export default [
         'error',
         { argsIgnorePattern: '^_' },
       ],
-
       // Jest 권장 규칙들
       'no-unused-vars': 'warn',
       'no-undef': 'warn',
@@ -120,6 +119,12 @@ export default [
             // 6. assets
             {
               pattern: '@icons/**',
+              group: 'internal',
+              position: 'before',
+            },
+            // 7. mocks
+            {
+              pattern: '@mocks/**',
               group: 'internal',
               position: 'before',
             },

@@ -1,5 +1,5 @@
-import path from 'path';
-import { fileURLToPath } from 'url';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 import dotenv from 'dotenv';
 import HtmlWebpackPlugin from 'html-webpack-plugin';
@@ -10,10 +10,14 @@ const __dirname = path.dirname(__filename);
 
 const envVars = dotenv.config().parsed || {};
 
-const defineEnv = Object.entries(envVars).reduce((acc, [key, value]) => {
-  acc[`process.env.${key}`] = JSON.stringify(value);
-  return acc;
-}, {});
+// DefinePlugin용 환경변수 정제
+const defineEnv = Object.entries(envVars).reduce(
+  (acc, [key, value]) => {
+    acc[`process.env.${key}`] = JSON.stringify(value);
+    return acc;
+  },
+  {}
+);
 
 const isProduction = process.env.NODE_ENV === 'production';
 
@@ -40,7 +44,7 @@ const config = {
       {
         test: /\.(ts|tsx)$/i,
         loader: 'ts-loader',
-        exclude: ['/node_modules/'],
+        exclude: /node_modules/,
       },
       {
         test: /\.(eot|svg|ttf|woff|woff2|png|jpg|gif)$/i,
@@ -69,6 +73,7 @@ const config = {
       '@shared/styles': path.resolve(__dirname, 'src/shared/styles'),
       '@shared/types': path.resolve(__dirname, 'src/shared/types'),
       '@icons': path.resolve(__dirname, 'assets/icon'),
+      '@mocks': path.resolve(__dirname, 'src/mocks'),
     },
   },
   mode: isProduction ? 'production' : 'development',
