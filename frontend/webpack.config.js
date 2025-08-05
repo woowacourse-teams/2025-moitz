@@ -4,7 +4,6 @@ const dotenv = require('dotenv');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const webpack = require('webpack');
 
-
 // .env 파일 읽기
 const envVars = dotenv.config().parsed || {};
 
@@ -67,6 +66,7 @@ const config = {
       '@shared/styles': path.resolve(__dirname, 'src/shared/styles'),
       '@shared/types': path.resolve(__dirname, 'src/shared/types'),
       '@icons': path.resolve(__dirname, 'assets/icon'),
+      '@mocks': path.resolve(__dirname, 'src/mocks'),
     },
   },
 };

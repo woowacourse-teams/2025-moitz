@@ -1,6 +1,6 @@
 import { withContainer } from '../../../../../.storybook/decorators/withContainer';
-import recommendedLocationsMock from '../../../../mocks/recommendedLocationsMock';
-import startingLocationsMock from '../../../../mocks/startingLocationsMock';
+import recommendedLocationsMock from '@mocks/recommendedLocationsMock';
+import startingLocationsMock from '@mocks/startingLocationsMock';
 
 import BottomSheet from './BottomSheet';
 
