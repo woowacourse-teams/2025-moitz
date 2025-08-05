@@ -1,17 +1,26 @@
-const path = require('path');
+// webpack.config.ts 또는 webpack.config.js
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
-const dotenv = require('dotenv');
-const HtmlWebpackPlugin = require('html-webpack-plugin');
-const webpack = require('webpack');
+import dotenv from 'dotenv';
+import HtmlWebpackPlugin from 'html-webpack-plugin';
+import webpack from 'webpack';
+
+// __dirname 대체 (ESM에서는 기본 제공 안됨)
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // .env 파일 읽기
 const envVars = dotenv.config().parsed || {};
 
 // DefinePlugin용 환경변수 정제
-const defineEnv = Object.entries(envVars).reduce((acc, [key, value]) => {
-  acc[`process.env.${key}`] = JSON.stringify(value);
-  return acc;
-}, {});
+const defineEnv = Object.entries(envVars).reduce(
+  (acc, [key, value]) => {
+    acc[`process.env.${key}`] = JSON.stringify(value);
+    return acc;
+  },
+  {}
+);
 
 const isProduction = process.env.NODE_ENV === 'production';
 
@@ -28,16 +37,16 @@ const config = {
   plugins: [
     new HtmlWebpackPlugin({
       template: 'index.html',
-      templateParameters: envVars, // HTML에서 <%= BASE_URL %> 사용 가능
+      templateParameters: envVars,
     }),
-    new webpack.DefinePlugin(defineEnv), // JS에서 process.env.BASE_URL 사용 가능
+    new webpack.DefinePlugin(defineEnv),
   ],
   module: {
     rules: [
       {
         test: /\.(ts|tsx)$/i,
         loader: 'ts-loader',
-        exclude: ['/node_modules/'],
+        exclude: /node_modules/,
       },
       {
         test: /\.(eot|svg|ttf|woff|woff2|png|jpg|gif)$/i,
@@ -45,7 +54,7 @@ const config = {
       },
       {
         test: /\.html$/i,
-        exclude: /index\.html$/, // HtmlWebpackPlugin이 처리하도록 제외
+        exclude: /index\.html$/,
         use: ['html-loader'],
       },
       {
@@ -69,8 +78,8 @@ const config = {
       '@mocks': path.resolve(__dirname, 'src/mocks'),
     },
   },
+  mode: isProduction ? 'production' : 'development',
 };
 
-config.mode = isProduction ? 'production' : 'development';
-
-module.exports = config;
+// ESM에서는 export default
+export default config;
