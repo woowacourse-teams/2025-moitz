@@ -3,6 +3,7 @@ import { flex, typography } from '@shared/styles/default.styled';
 import { recommendedLocation } from '@shared/types/recommendedLocation';
 
 import DetailSection from '../detailSection/DetailSection';
+import PlaceCard from '../placeCard/PlaceCard';
 
 import * as detail from './detail.styled';
 
@@ -24,6 +25,7 @@ function Detail({ selectedLocation }: DetailProps) {
           </p>
         </div>
       </DetailSection>
+
       <DetailSection
         isHeader={false}
         title={'각 출발지로부터 이동 방법'}
@@ -31,8 +33,13 @@ function Detail({ selectedLocation }: DetailProps) {
       >
         <></>
       </DetailSection>
+
       <DetailSection isHeader={false} title={'추천 장소'} isBestBadge={false}>
-        <></>
+        <div css={[flex(), detail.placeList()]}>
+          {selectedLocation.places.map((place) => (
+            <PlaceCard key={place.index} place={place} />
+          ))}
+        </div>
       </DetailSection>
     </div>
   );
