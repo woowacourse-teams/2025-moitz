@@ -4,28 +4,20 @@ import java.util.List;
 import lombok.Getter;
 
 @Getter
-public class Location {
+public class Routes {
 
-    private final Place targetPlace;
+    private static final double FAIRNESS_FACTOR = 1.2;
+
     private final List<Route> routes;
-    private final List<RecommendedPlace> recommendedPlaces;
 
-    public Location(final Place targetPlace, final List<Route> routes, final List<RecommendedPlace> recommendedPlaces) {
-        validate(targetPlace, routes, recommendedPlaces);
-        this.targetPlace = targetPlace;
+    public Routes(final List<Route> routes) {
+        validate(routes);
         this.routes = routes;
-        this.recommendedPlaces = recommendedPlaces;
     }
 
-    private void validate(final Place targetPlace, final List<Route> routes, final List<RecommendedPlace> recommendedPlaces) {
-        if (targetPlace == null) {
-            throw new IllegalArgumentException("목표 장소는 필수입니다.");
-        }
+    private void validate(final List<Route> routes) {
         if (routes == null || routes.isEmpty()) {
-            throw new IllegalArgumentException("경로 목록은 비어 있을 수 없습니다.");
-        }
-        if (recommendedPlaces == null || recommendedPlaces.isEmpty()) {
-            throw new IllegalArgumentException("추천 장소 목록은 비어 있을 수 없습니다.");
+            throw new IllegalArgumentException("이동 경로는 비어있거나 null일 수 없습니다.");
         }
     }
 
@@ -40,7 +32,7 @@ public class Location {
                 .min()
                 .orElseThrow(() -> new IllegalStateException("경로 목록이 비어 있습니다."));
 
-        return max - min > calculateAverageTravelTime() * 1.5;
+        return max - min <= calculateAverageTravelTime() * FAIRNESS_FACTOR;
     }
 
     public int calculateAverageTravelTime() {
