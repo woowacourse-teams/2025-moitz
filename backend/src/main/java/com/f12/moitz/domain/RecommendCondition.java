@@ -1,5 +1,7 @@
 package com.f12.moitz.domain;
 
+import com.f12.moitz.common.error.exception.BadRequestException;
+import com.f12.moitz.common.error.exception.GeneralErrorCode;
 import java.util.Arrays;
 import java.util.List;
 import lombok.Getter;
@@ -28,7 +30,7 @@ public enum RecommendCondition {
         return Arrays.stream(values())
                 .filter(recommendCondition -> recommendCondition.title.equals(title))
                 .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("해당 하는 추천 조건이 없습니다."));
+                .orElseThrow(() -> new BadRequestException(GeneralErrorCode.INPUT_INVALID_DESCRIPTION));
     }
 
     public String getCategoryNames() {

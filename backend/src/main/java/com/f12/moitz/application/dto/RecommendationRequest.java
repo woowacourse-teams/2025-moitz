@@ -9,7 +9,7 @@ import java.util.List;
 public record RecommendationRequest(
         @Schema(description = "출발지 이름 목록", example = "[\"강변역\", \"동대문역\", \"서울대입구역\"]", requiredMode = Schema.RequiredMode.REQUIRED)
         List<String> startingPlaceNames,
-        @Schema(description = "추가 요청사항", example = "노래방은 있었으면 좋겠어요!")
+        @Schema(description = "카테고리에 따른 조건", example = "CHAT")
         String requirement
 ) {
 
