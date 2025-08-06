@@ -6,8 +6,9 @@ import com.f12.moitz.application.port.Recommender;
 import com.f12.moitz.application.port.RouteFinder;
 import com.f12.moitz.application.utils.RecommendationMapper;
 import com.f12.moitz.domain.Candidate;
-import com.f12.moitz.domain.Place;
+import com.f12.moitz.domain.RecommendCondition;
 import com.f12.moitz.domain.Recommendation;
+import com.f12.moitz.domain.Place;
 import com.f12.moitz.domain.RecommendedPlace;
 import com.f12.moitz.domain.Route;
 import com.f12.moitz.domain.Routes;
@@ -28,7 +29,7 @@ public class RecommendationService {
     private final RecommendationMapper recommendationMapper;
 
     public List<RecommendationResponse> recommendLocation(final RecommendationRequest request) {
-        final String requirement = request.requirement();
+        final String requirement = RecommendCondition.fromTitle(request.requirement()).getCategoryNames();
 
         final List<Place> startingPlaces = recommender.findPlacesByNames(request.startingPlaceNames());
         final Map<Place, String> generatedPlacesWithReason = recommender.recommendLocations(
