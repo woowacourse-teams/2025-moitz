@@ -41,9 +41,7 @@ public class GeminiRecommendPlaceClient {
                - These keywords will be used with the getPlacesByKeyword function.
                - Among the search results, identify the top places based on their star ratings, as shown on the place URLs, and include their rankings using index values (e.g., 1 for the highest-rated place).
 
-            2. For each station:
-               - First, use getPointByPlaceName function to retrieve the station's coordinates.
-               - Then, for each extracted keyword, use getPlacesByKeyword function to search for places within a 800m radius.
+            2. For each (station, keyword) pair, create one getPlacesByKeyword function call. Do not send them one by one. Instead, batch all function calls together in a single request.
   
             PHASE 2 - FINAL RECOMMENDATION:
             After collecting all the data from function calls, you MUST generate the final recommendation.
@@ -112,7 +110,9 @@ public class GeminiRecommendPlaceClient {
 
     public Map<Place,List<PlaceRecommendResponse>> generateWithParallelFunctionCalling(Set<Place> places, String requirement) {
         List<Content> history = new ArrayList<>();
-        String placeNames = places.stream().map(Place::getName).collect(Collectors.joining(", "));
+        String placeNames = places.stream()
+                .map(place -> place.getName() + "(x=" + place.getPoint().getX() + ", y=" + place.getPoint().getY() + ")")
+                .collect(Collectors.joining(", "));
         String prompt = String.format(PLACE_RECOMMEND_PROMPT, RECOMMENDATION_COUNT,RECOMMENDATION_COUNT, placeNames,requirement);
         history.add(Content.fromParts(Part.fromText(prompt)));
 

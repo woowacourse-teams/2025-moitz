@@ -1,8 +1,26 @@
-// Generated using webpack-cli https://github.com/webpack/webpack-cli
+// webpack.config.ts 또는 webpack.config.js
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
-const path = require('path');
+import dotenv from 'dotenv';
+import HtmlWebpackPlugin from 'html-webpack-plugin';
+import webpack from 'webpack';
 
-const HtmlWebpackPlugin = require('html-webpack-plugin');
+// __dirname 대체 (ESM에서는 기본 제공 안됨)
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// .env 파일 읽기
+const envVars = dotenv.config().parsed || {};
+
+// DefinePlugin용 환경변수 정제
+const defineEnv = Object.entries(envVars).reduce(
+  (acc, [key, value]) => {
+    acc[`process.env.${key}`] = JSON.stringify(value);
+    return acc;
+  },
+  {}
+);
 
 const isProduction = process.env.NODE_ENV === 'production';
 
@@ -19,30 +37,30 @@ const config = {
   plugins: [
     new HtmlWebpackPlugin({
       template: 'index.html',
+      templateParameters: envVars,
     }),
-
-    // Add your plugins here
-    // Learn more about plugins from https://webpack.js.org/configuration/plugins/
+    new webpack.DefinePlugin(defineEnv),
   ],
   module: {
     rules: [
       {
         test: /\.(ts|tsx)$/i,
         loader: 'ts-loader',
-        exclude: ['/node_modules/'],
+        exclude: /node_modules/,
       },
       {
         test: /\.(eot|svg|ttf|woff|woff2|png|jpg|gif)$/i,
         type: 'asset',
       },
-
       {
         test: /\.html$/i,
+        exclude: /index\.html$/,
         use: ['html-loader'],
       },
-
-      // Add your rules for custom modules here
-      // Learn more about loaders from https://webpack.js.org/loaders/
+      {
+        test: /\.css$/i,
+        use: ['style-loader', 'css-loader'],
+      },
     ],
   },
   resolve: {
@@ -57,19 +75,11 @@ const config = {
       '@shared/styles': path.resolve(__dirname, 'src/shared/styles'),
       '@shared/types': path.resolve(__dirname, 'src/shared/types'),
       '@icons': path.resolve(__dirname, 'assets/icon'),
+      '@mocks': path.resolve(__dirname, 'src/mocks'),
     },
   },
+  mode: isProduction ? 'production' : 'development',
 };
-if (isProduction) {
-  config.mode = 'production';
-} else {
-  config.mode = 'development';
-}
 
-// Add CSS loader rule
-config.module.rules.push({
-  test: /\.css$/i,
-  use: ['style-loader', 'css-loader'],
-});
-
-module.exports = config;
+// ESM에서는 export default
+export default config;
