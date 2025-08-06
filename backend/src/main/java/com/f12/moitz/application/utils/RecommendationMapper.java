@@ -3,7 +3,9 @@ package com.f12.moitz.application.utils;
 import com.f12.moitz.application.dto.RecommendationResponse;
 import com.f12.moitz.application.dto.PathResponse;
 import com.f12.moitz.application.dto.PlaceRecommendResponse;
+import com.f12.moitz.application.dto.RecommendationsResponse;
 import com.f12.moitz.application.dto.RouteResponse;
+import com.f12.moitz.application.dto.StartingPlaceResponse;
 import com.f12.moitz.domain.Candidate;
 import com.f12.moitz.domain.Recommendation;
 import com.f12.moitz.domain.Path;
@@ -20,19 +22,35 @@ import java.util.stream.IntStream;
 @Component
 public class RecommendationMapper {
 
-    public List<RecommendationResponse> toResponse(
+    public RecommendationsResponse toResponse(
+            final List<Place> startingPlaces,
             final Recommendation recommendation,
             final Map<Place, String> generatedPlaces
     ) {
         final int minTime = recommendation.getBestRecommendationTime();
 
-        return IntStream.range(0, recommendation.size())
+        return new RecommendationsResponse(
+                IntStream.range(0, recommendation.size())
+                .mapToObj(index -> toStartingPlaceResponse(index, startingPlaces.get(index)))
+                .toList(),
+                IntStream.range(0, recommendation.size())
                 .mapToObj(index -> {
                     Candidate currentCandidate = recommendation.get(index);
                     String reason = generatedPlaces.get(currentCandidate.getDestination());
                     return toLocationRecommendResponse(currentCandidate, index, minTime, reason);
                 })
-                .toList();
+                .toList()
+        );
+    }
+
+    private StartingPlaceResponse toStartingPlaceResponse(final int index, final Place startingPlace) {
+        return new StartingPlaceResponse(
+                index + 1,
+                index + 1,
+                startingPlace.getPoint().getX(),
+                startingPlace.getPoint().getY(),
+                startingPlace.getName()
+        );
     }
 
     private RecommendationResponse toLocationRecommendResponse(
@@ -80,20 +98,19 @@ public class RecommendationMapper {
     }
 
     private List<RouteResponse> toRouteResponses(final Routes routes) {
-        return routes.getRoutes().stream()
-                .map(this::toRouteResponse)
+        return IntStream.range(0, routes.getRoutes().size())
+                .mapToObj(index -> toRouteResponse(routes.getRoutes().get(index) ,index + 1))
                 .toList();
     }
 
-    private RouteResponse toRouteResponse(final Route route) {
+    private RouteResponse toRouteResponse(final Route route, final long id) {
         List<PathResponse> pathResponses = IntStream.range(0, route.getPaths().size())
                 .mapToObj(pathIndex -> toPathResponse(route.getPaths().get(pathIndex), pathIndex + 1))
                 .toList();
 
         return new RouteResponse(
-                route.getStartPlace().getName(),
-                route.getStartPlace().getPoint().getX(),
-                route.getStartPlace().getPoint().getY(),
+                // TODO: 아이디로 변경
+                id,
                 route.calculateTransferCount(),
                 route.calculateTotalTravelTime(),
                 pathResponses
