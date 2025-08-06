@@ -1,13 +1,14 @@
 package com.f12.moitz.application;
 
 import com.f12.moitz.application.dto.RecommendationRequest;
-import com.f12.moitz.application.dto.RecommendationResponse;
 import com.f12.moitz.application.port.Recommender;
+import com.f12.moitz.application.dto.RecommendationsResponse;
 import com.f12.moitz.application.port.RouteFinder;
 import com.f12.moitz.application.utils.RecommendationMapper;
 import com.f12.moitz.domain.Candidate;
-import com.f12.moitz.domain.Place;
+import com.f12.moitz.domain.RecommendCondition;
 import com.f12.moitz.domain.Recommendation;
+import com.f12.moitz.domain.Place;
 import com.f12.moitz.domain.RecommendedPlace;
 import com.f12.moitz.domain.Route;
 import com.f12.moitz.domain.Routes;
@@ -27,8 +28,8 @@ public class RecommendationService {
 
     private final RecommendationMapper recommendationMapper;
 
-    public List<RecommendationResponse> recommendLocation(final RecommendationRequest request) {
-        final String requirement = request.requirement();
+    public RecommendationsResponse recommendLocation(final RecommendationRequest request) {
+        final String requirement = RecommendCondition.fromTitle(request.requirement()).getCategoryNames();
 
         final List<Place> startingPlaces = recommender.findPlacesByNames(request.startingPlaceNames());
         final Map<Place, String> generatedPlacesWithReason = recommender.recommendLocations(
@@ -51,7 +52,7 @@ public class RecommendationService {
                 placeRoutes
         );
 
-        return recommendationMapper.toResponse(recommendation, generatedPlacesWithReason);
+        return recommendationMapper.toResponse(startingPlaces, recommendation, generatedPlacesWithReason);
     }
 
     private Map<Place, Routes> findRoutesForAll(final List<Place> startingPlaces, final List<Place> generatedPlaces) {

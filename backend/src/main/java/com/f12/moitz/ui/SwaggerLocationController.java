@@ -2,6 +2,7 @@ package com.f12.moitz.ui;
 
 import com.f12.moitz.application.dto.RecommendationRequest;
 import com.f12.moitz.application.dto.RecommendationResponse;
+import com.f12.moitz.application.dto.RecommendationsResponse;
 import com.f12.moitz.common.error.ErrorResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -9,7 +10,6 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import java.util.List;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
 
@@ -39,6 +39,6 @@ public interface SwaggerLocationController {
                     )
             )
     })
-    ResponseEntity<List<RecommendationResponse>> recommendLocations(@RequestBody RecommendationRequest request);
+    ResponseEntity<RecommendationsResponse> recommendLocations(@RequestBody RecommendationRequest request);
 
 }
