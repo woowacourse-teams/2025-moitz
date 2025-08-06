@@ -3,6 +3,7 @@ package com.f12.moitz.domain;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import com.f12.moitz.common.error.exception.BadRequestException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -29,7 +30,7 @@ class RecommendConditionTest {
 
         // When & Then
         assertThatThrownBy(() -> RecommendCondition.fromTitle(invalidTitle))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("해당 하는 추천 조건이 없습니다.");
+                .isInstanceOf(BadRequestException.class)
+                .hasMessage("유효하지 않은 성격입니다.");
     }
 }
