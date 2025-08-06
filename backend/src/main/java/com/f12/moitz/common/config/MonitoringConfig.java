@@ -55,7 +55,7 @@ public class MonitoringConfig {
         return MeterFilter.denyUnless(id -> {
             String uri = id.getTag("uri");
             return id.getName().startsWith("http.server.requests") &&
-                    uri != null && !uri.contains("actuator") && !uri.contains("swagger") && !uri.contains("api-docs");
+                    uri != null && !uri.contains("swagger") && !uri.contains("api-docs");
         });
     }
 
