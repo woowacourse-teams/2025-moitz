@@ -2,22 +2,21 @@ package com.f12.moitz.infrastructure.gemini.dto;
 
 import com.f12.moitz.application.dto.PlaceRecommendResponse;
 import com.fasterxml.jackson.annotation.JsonProperty;
-
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 public record RecommendedPlaceResponses(
         List<RecommendedPlaceResponse> responses
 ) {
-    public List<PlaceRecommendResponse> findPlacesByStationName(String stationName) {
-        List<RecommendedSpecificPlace> recommendedSpecificPlaces = responses.stream()
-                .filter(response -> stationName.equals(response.stationName()))
-                .findFirst()
-                .map(RecommendedPlaceResponse::places)
-                .get();
 
-        return recommendedSpecificPlaces.stream()
-                .map(RecommendedSpecificPlace::convertPlaceRecommendResponse)
-                .toList();
+    public Map<String, List<PlaceRecommendResponse>> getPlacesByStationName() {
+        return responses.stream()
+                .map(response -> Map.entry(
+                        response.stationName(),
+                        response.toPlaceRecommendResponses()
+                ))
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 }
 
@@ -25,6 +24,11 @@ record RecommendedPlaceResponse(
         String stationName,
         List<RecommendedSpecificPlace> places
 ) {
+    List<PlaceRecommendResponse> toPlaceRecommendResponses() {
+        return places.stream()
+                .map(RecommendedSpecificPlace::toPlaceRecommendResponse)
+                .toList();
+    }
 }
 
 record RecommendedSpecificPlace(
@@ -43,7 +47,7 @@ record RecommendedSpecificPlace(
         this.url = url;
     }
 
-    PlaceRecommendResponse convertPlaceRecommendResponse() {
+    PlaceRecommendResponse toPlaceRecommendResponse() {
         return new PlaceRecommendResponse(
                 index,
                 name,
