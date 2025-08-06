@@ -1,8 +1,9 @@
+import Map from '@features/map/components/map/Map';
+import BottomSheet from '@features/recommendation/components/bottomSheet/BottomSheet';
+
 import useLocations from '@entities/hooks/useLocations';
 import { RecommendedLocation } from '@entities/types/Location';
 
-import Map from '@features/map/components/map/Map';
-import BottomSheet from '@features/recommendation/components/bottomSheet/BottomSheet';
 
 import { flex } from '@shared/styles/default.styled';
 

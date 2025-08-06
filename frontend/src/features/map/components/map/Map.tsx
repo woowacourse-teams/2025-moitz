@@ -1,6 +1,7 @@
-import { RecommendedLocation } from '@entities/types/Location';
 import { useEffect, useRef } from 'react';
 import { Link } from 'react-router';
+
+import { RecommendedLocation } from '@entities/types/Location';
 
 import MapButton from '@shared/components/mapButton/MapButton';
 import MapPoint from '@shared/components/mapPoint/MapPoint';

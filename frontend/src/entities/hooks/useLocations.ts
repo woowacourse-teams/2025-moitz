@@ -1,6 +1,7 @@
+import { useEffect, useState } from 'react';
+
 import fetchLocations from '@entities/apis/fetchLocations';
 import { Location } from '@entities/types/Location';
-import { useEffect, useState } from 'react';
 
 interface LocationRequestBody {
   startingPlaceNames: string[];

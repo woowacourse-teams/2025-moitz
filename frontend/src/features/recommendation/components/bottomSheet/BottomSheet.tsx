@@ -1,6 +1,7 @@
+import SpotItemList from '@features/recommendation/components/spotItemList/SpotItemList';
+
 import { RecommendedLocation } from '@entities/types/Location';
 
-import SpotItemList from '@features/recommendation/components/spotItemList/SpotItemList';
 
 import StartingSpotWrapper from '@shared/components/startingSpotWrapper/StartingSpotWrapper';
 import { flex } from '@shared/styles/default.styled';
