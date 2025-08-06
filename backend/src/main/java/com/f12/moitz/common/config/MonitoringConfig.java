@@ -52,7 +52,11 @@ public class MonitoringConfig {
 
     @Bean
     public MeterFilter meterFilter() {
-        return MeterFilter.denyUnless(id -> id.getName().startsWith("http"));
+        return MeterFilter.denyUnless(id -> {
+            String uri = id.getTag("uri");
+            return id.getName().startsWith("http.server.requests") &&
+                    uri != null && !uri.contains("actuator") && !uri.contains("swagger") && !uri.contains("api-docs");
+        });
     }
 
 }
