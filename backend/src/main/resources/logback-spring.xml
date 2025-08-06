@@ -5,19 +5,20 @@
     <property resource="logback-variable.properties" />
 
     <!-- Spring 환경 변수 (application.properties 에서 주입됨) -->
+    <springProperty scope="context" name="DEBUG_LOG_PATH" source="logging.file.debug.path"/>
     <springProperty scope="context" name="INFO_LOG_PATH" source="logging.file.info.path"/>
     <springProperty scope="context" name="ERROR_LOG_PATH" source="logging.file.error.path"/>
 
     <!-- 개발 환경용 설정 -->
     <springProfile name="dev">
         <!-- INFO 전용 Appender -->
-        <appender name="FILE_INFO" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <appender name="FILE_DEBUG" class="ch.qos.logback.core.rolling.RollingFileAppender">
             <encoder class="net.logstash.logback.encoder.LogstashEncoder"/>
 
-            <file>${LOG_PATH}/${INFO_PATH}/application-info.log</file>
+            <file>${LOG_PATH}/${DEBUG_PATH}/application.log</file>
 
             <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
-                <fileNamePattern>${INFO_LOG_PATH}/application-info-%d{yyyy-MM-dd}.%i.log.zip</fileNamePattern>
+                <fileNamePattern>${DEBUG_LOG_PATH}/application-info-%d{yyyy-MM-dd}.%i.log.zip</fileNamePattern>
                 <maxHistory>${MAX_HISTORY}</maxHistory>
                 <maxFileSize>${MAX_FILE_SIZE}</maxFileSize>
                 <totalSizeCap>${TOTAL_SIZE}</totalSizeCap>
@@ -25,7 +26,7 @@
         </appender>
 
         <root level="DEBUG">
-            <appender-ref ref="FILE_INFO"/>
+            <appender-ref ref="FILE_DEBUG"/>
         </root>
 
         <!-- 프레임워크 기본 로거 수준 설정 -->
