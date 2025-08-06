@@ -12,7 +12,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import java.util.Set;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class GeminiRecommendPlaceClientTest {
+public class GeminiRecommendedPlaceClientTest {
 
     @Autowired
     private GeminiRecommendPlaceClient geminiClient;
