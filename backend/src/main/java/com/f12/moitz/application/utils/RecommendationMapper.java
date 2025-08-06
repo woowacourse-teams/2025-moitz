@@ -44,7 +44,7 @@ public class RecommendationMapper {
         final Place targetPlace = candidate.getDestination();
         final int totalTime = candidate.calculateAverageTravelTime();
 
-        final List<PlaceRecommendResponse> recommendedPlaces = toPlaceRecommendResponses(candidate.getRecommendedPlaces(), index + 1);
+        final List<PlaceRecommendResponse> recommendedPlaces = toPlaceRecommendResponses(candidate.getRecommendedPlaces());
         final List<RouteResponse> routes = toRouteResponses(candidate.getRoutes());
 
         return new RecommendationResponse(
@@ -63,17 +63,19 @@ public class RecommendationMapper {
     }
 
     private List<PlaceRecommendResponse> toPlaceRecommendResponses(
-            final List<RecommendedPlace> places,
-            final int rank
+            final List<RecommendedPlace> places
     ) {
-        return places.stream()
-                .map(p -> new PlaceRecommendResponse(
-                        rank,
-                        p.getPlaceName(),
-                        p.getCategory(),
-                        p.getWalkingTime(),
-                        p.getUrl()
-                ))
+        return IntStream.range(0, places.size())
+                .mapToObj(i -> {
+                    RecommendedPlace p = places.get(i);
+                    return new PlaceRecommendResponse(
+                            i + 1,
+                            p.getPlaceName(),
+                            p.getCategory(),
+                            p.getWalkingTime(),
+                            p.getUrl()
+                    );
+                })
                 .toList();
     }
 
