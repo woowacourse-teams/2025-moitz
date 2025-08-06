@@ -4,7 +4,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
 
 @Schema(description = "지역 추천 응답")
-public record LocationRecommendResponse(
+public record RecommendationResponse(
         @Schema(description = "ID", example = "1", requiredMode = Schema.RequiredMode.REQUIRED)
         Long id,
         @Schema(description = "순번", example = "1", requiredMode = Schema.RequiredMode.REQUIRED)

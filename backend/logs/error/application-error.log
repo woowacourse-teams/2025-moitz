@@ -1,2 +1,0 @@
-2025-08-04 21:01:36.168  c.f.m.LoggingTest - ERROR 
-{"@timestamp":"2025-08-04T21:09:50.8394943+09:00","@version":"1","message":"ERROR","logger_name":"com.f12.moitz.LoggingTest","thread_name":"Test worker","level":"ERROR","level_value":40000,"ERROR_LOG_PATH":"./logs/error","INFO_LOG_PATH":"./logs/info"}
