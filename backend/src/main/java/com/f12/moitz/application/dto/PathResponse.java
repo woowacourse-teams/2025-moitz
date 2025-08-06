@@ -3,11 +3,11 @@ package com.f12.moitz.application.dto;
 public record PathResponse(
         int index,
         String startStation,
-        double startX,
-        double startY,
+        double startingX,
+        double startingY,
         String endStation,
-        double endX,
-        double endY,
+        double endingX,
+        double endingY,
         String lineCode,
         int travelTime
 ) {
