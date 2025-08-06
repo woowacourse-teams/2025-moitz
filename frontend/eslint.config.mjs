@@ -98,6 +98,11 @@ export default [
               group: 'internal',
               position: 'before',
             },
+            {
+              pattern: '@entities/**',
+              group: 'internal',
+              position: 'before',
+            },
             // 3. shared 하위 모듈들 (components, styles, types 제외)
             {
               pattern: '@shared/!(types)/**',
