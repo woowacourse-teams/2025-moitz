@@ -8,23 +8,27 @@ public record KakaoApiResponse(
         Meta meta
 ) {
 
-    private Document getStation() {
+    private Document findStation() {
         return documents.stream()
                 .filter(document -> "지하철역".equals(document.categoryGroupName()))
                 .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("지하철역 정보가 없습니다."));
+                .orElse(null);
     }
 
-    public String getPlaceName() {
-        return getStation().placeName();
+    public String findStationPlaceName() {
+        return findStation().placeName();
     }
 
-    public double getX() {
-        return Double.parseDouble(getStation().x());
+    public double findStationX() {
+        return Double.parseDouble(findStation().x());
     }
 
-    public double getY() {
-        return Double.parseDouble(getStation().y());
+    public double findStationY() {
+        return Double.parseDouble(findStation().y());
+    }
+
+    public int totalCount() {
+        return meta().totalCount();
     }
 
 }

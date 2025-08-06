@@ -1,8 +1,8 @@
 package com.f12.moitz.ui;
 
-import com.f12.moitz.application.LocationService;
-import com.f12.moitz.application.dto.LocationRecommendRequest;
-import com.f12.moitz.application.dto.LocationRecommendResponse;
+import com.f12.moitz.application.RecommendationService;
+import com.f12.moitz.application.dto.RecommendationRequest;
+import com.f12.moitz.application.dto.RecommendationResponse;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -16,11 +16,11 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/locations")
 public class LocationController implements SwaggerLocationController {
 
-    private final LocationService locationService;
+    private final RecommendationService recommendationService;
 
     @PostMapping
-    public ResponseEntity<List<LocationRecommendResponse>> recommendLocations(@RequestBody LocationRecommendRequest request) {
-        return ResponseEntity.ok(locationService.recommendLocation(request));
+    public ResponseEntity<List<RecommendationResponse>> recommendLocations(@RequestBody RecommendationRequest request) {
+        return ResponseEntity.ok(recommendationService.recommendLocation(request));
     }
 
 }
