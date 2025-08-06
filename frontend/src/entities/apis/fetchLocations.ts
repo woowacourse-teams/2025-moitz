@@ -1,8 +1,8 @@
-interface LocationRequestBody {
+type LocationRequestBody = {
   startingPlaceNames: string[];
   meetingTime: string;
   requirement: string;
-}
+};
 
 const BASE_URL = process.env.API_BASE_URL;
 

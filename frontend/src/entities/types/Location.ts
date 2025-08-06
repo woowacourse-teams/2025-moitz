@@ -1,29 +1,29 @@
-export interface RecommendedPlace {
+export type RecommendedPlace = {
   index: number;
   name: string;
   category: string;
   walkingTime: number;
   url: string;
-}
+};
 
-export interface RecommendedPath {
+export type RecommendedPath = {
   index: number;
   startStation: string;
   endStation: string;
   lineCode: string;
   travelTime: number;
-}
+};
 
-export interface RecommendedRoute {
+export type RecommendedRoute = {
   startPlace: string;
   startingX: number;
   startingY: number;
   transferCount: number;
   totalTravelTime: number;
   paths: RecommendedPath[];
-}
+};
 
-export interface RecommendedLocation {
+export type RecommendedLocation = {
   id: number;
   index: number;
   x: number;
@@ -33,8 +33,8 @@ export interface RecommendedLocation {
   isBest: boolean;
   description: string;
   reason: string;
-}
-export interface Location extends RecommendedLocation {
+};
+export type Location = {
   places: RecommendedPlace[];
   routes: RecommendedRoute[];
-}
+} & RecommendedLocation;
