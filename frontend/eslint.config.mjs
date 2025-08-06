@@ -57,7 +57,6 @@ export default [
         { argsIgnorePattern: '^_' },
       ],
       // Jest 권장 규칙들
-      'no-unused-vars': 'warn',
       'no-undef': 'warn',
 
       // emotion css prop를 쓰기 위한 규칙
