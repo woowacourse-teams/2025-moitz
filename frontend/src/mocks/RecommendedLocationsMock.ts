@@ -1,6 +1,6 @@
 import { RecommendedLocation } from '@entities/types/Location';
 
-const RecommendedLocationsMock: RecommendedLocation[] = [
+export const RecommendedLocationsMock: RecommendedLocation[] = [
   {
     id: 1,
     index: 1,
@@ -57,5 +57,3 @@ const RecommendedLocationsMock: RecommendedLocation[] = [
     reason: '젊고 활기찬 분위기, 모임 장소로 적절',
   },
 ];
-
-export default RecommendedLocationsMock;

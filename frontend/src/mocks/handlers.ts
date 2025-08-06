@@ -1,7 +1,7 @@
 import dotenv from 'dotenv';
 import { http, HttpResponse } from 'msw';
 
-import LocationsMock from './LocationsMock';
+import { LocationsMock } from './LocationsMock';
 
 dotenv.config({ path: '.env' });
 

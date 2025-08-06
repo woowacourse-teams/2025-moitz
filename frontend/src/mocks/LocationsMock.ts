@@ -1,6 +1,6 @@
 import { Location } from '@entities/types/Location';
 
-const LocationsMock: Location[] = [
+export const LocationsMock: Location[] = [
   {
     id: 1,
     index: 1,
@@ -93,5 +93,3 @@ const LocationsMock: Location[] = [
     ],
   },
 ];
-
-export default LocationsMock;
