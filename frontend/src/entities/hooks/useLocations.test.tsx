@@ -19,12 +19,12 @@ describe('useLocations', () => {
     const { result } = renderHook(() => useLocations(requestBody));
 
     // then: 초기에는 로딩 중이어야 한다
-    expect(result.current.loading).toBe(true);
+    expect(result.current.isLoading).toBe(true);
 
     // then: 데이터가 정상적으로 로드되어야 한다
     await waitFor(() => {
-      expect(result.current.loading).toBe(false);
-      expect(result.current.error).toBe(false);
+      expect(result.current.isLoading).toBe(false);
+      expect(result.current.isError).toBe(false);
       expect(result.current.data.length).toBeGreaterThan(0);
     });
   });
@@ -44,12 +44,12 @@ describe('useLocations', () => {
     const { result } = renderHook(() => useLocations(requestBody));
 
     // then: 초기에는 로딩 중이어야 한다
-    expect(result.current.loading).toBe(true);
+    expect(result.current.isLoading).toBe(true);
 
     // then: 요청 실패 후 error는 true, data는 비어 있어야 한다
     await waitFor(() => {
-      expect(result.current.loading).toBe(false);
-      expect(result.current.error).toBe(true);
+      expect(result.current.isLoading).toBe(false);
+      expect(result.current.isError).toBe(true);
       expect(result.current.data.length).toBe(0);
     });
   });

@@ -12,10 +12,10 @@ import startingLocationsMock from '@mocks/startingLocationsMock';
 import * as resultPage from './resultPage.styled';
 
 function ResultPage() {
-  const { data: locations, loading, error } = useLocations(RequestBodyMock);
+  const { data: locations, isLoading, isError } = useLocations(RequestBodyMock);
 
-  if (loading) return <p>로딩중...</p>;
-  if (error) return <p>에러 발생!</p>;
+  if (isLoading) return <p>로딩중...</p>;
+  if (isError) return <p>에러 발생!</p>;
   if (!locations || locations.length === 0) return <p>추천 결과가 없습니다.</p>;
 
   const recommendedLocations: RecommendedLocation[] = locations.map(
