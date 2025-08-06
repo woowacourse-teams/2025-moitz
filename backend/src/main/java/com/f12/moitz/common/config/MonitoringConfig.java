@@ -3,6 +3,7 @@ package com.f12.moitz.common.config;
 import io.micrometer.cloudwatch2.CloudWatchConfig;
 import io.micrometer.cloudwatch2.CloudWatchMeterRegistry;
 import io.micrometer.core.instrument.Clock;
+import io.micrometer.core.instrument.config.MeterFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -47,6 +48,11 @@ public class MonitoringConfig {
             final CloudWatchAsyncClient client
     ) {
         return new CloudWatchMeterRegistry(config, clock, client);
+    }
+
+    @Bean
+    public MeterFilter meterFilter() {
+        return MeterFilter.denyUnless(id -> id.getName().startsWith("http"));
     }
 
 }
