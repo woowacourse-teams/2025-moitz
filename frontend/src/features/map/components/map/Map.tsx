@@ -11,7 +11,6 @@ import { recommendedLocation } from '@shared/types/recommendedLocation';
 import { startingLocation } from '@shared/types/startingLocation';
 
 import IconBack from '@icons/icon-back.svg';
-import IconShare from '@icons/icon-share.svg';
 
 import * as map from './map.styled';
 
@@ -51,9 +50,6 @@ function Map({ startingLocations }: MapProps) {
       <div css={[flex({ justify: 'space-between' }), map.top_overlay()]}>
         <Link to="/">
           <MapButton src={IconBack} alt="back" />
-        </Link>
-        <Link to="/">
-          <MapButton src={IconShare} alt="share" />
         </Link>
       </div>
       <div css={[flex({ justify: 'space-between' }), map.bottom_overlay()]}>
