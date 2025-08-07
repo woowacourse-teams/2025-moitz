@@ -1,8 +1,8 @@
-import { useEffect, useRef } from 'react';
 import { Link } from 'react-router';
 
-import { RecommendedLocation } from '@entities/types/Location';
-import { StartingPlace } from '@entities/types/Location';
+import { useCustomOverlays } from '@features/map/hooks/useCustomOverlays';
+
+import { RecommendedLocation, StartingPlace } from '@entities/types/Location';
 
 import MapButton from '@shared/components/mapButton/MapButton';
 import MapPoint from '@shared/components/mapPoint/MapPoint';
@@ -18,30 +18,11 @@ interface MapProps {
   recommendedLocations: RecommendedLocation[];
 }
 
-function Map({ startingLocations }: MapProps) {
-  const mapRef = useRef<HTMLDivElement | null>(null);
-
-  useEffect(() => {
-    const { naver } = window;
-
-    if (!naver || !mapRef.current) return;
-
-    const locations = startingLocations.map(
-      (location) => new naver.maps.LatLng(location.y, location.x),
-    );
-
-    const map = new naver.maps.Map(mapRef.current, {
-      center: locations[0],
-      zoom: 11,
-    });
-
-    locations.forEach((location) => {
-      new naver.maps.Marker({
-        map,
-        position: location,
-      });
-    });
-  }, []);
+function Map({ startingLocations, recommendedLocations }: MapProps) {
+  const mapRef = useCustomOverlays({
+    startingLocations,
+    recommendedLocations,
+  });
 
   return (
     <div css={map.container()}>
