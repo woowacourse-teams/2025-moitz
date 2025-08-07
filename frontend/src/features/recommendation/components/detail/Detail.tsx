@@ -1,9 +1,10 @@
-import { flex, scroll, typography } from '@shared/styles/default.styled';
+import { RecommendedLocation } from '@entities/types/Location';
 
-import { RecommendedLocation } from '@shared/types/LocationResponse';
+import { flex, scroll, typography } from '@shared/styles/default.styled';
 
 import DetailSection from '../detailSection/DetailSection';
 import PlaceCard from '../placeCard/PlaceCard';
+import RouteCard from '../routeCard/RouteCard';
 
 import * as detail from './detail.styled';
 
@@ -31,7 +32,15 @@ function Detail({ selectedLocation }: DetailProps) {
         title={'각 출발지로부터 이동 방법'}
         isBestBadge={false}
       >
-        <></>
+        <div css={flex({ direction: 'column', gap: 20 })}>
+          {selectedLocation.routes.map((route) => (
+            <RouteCard
+              key={route.startingPlaceId}
+              startingPlaceName={selectedLocation.name}
+              route={route}
+            />
+          ))}
+        </div>
       </DetailSection>
 
       <DetailSection isHeader={false} title={'추천 장소'} isBestBadge={false}>
