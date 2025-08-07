@@ -16,6 +16,8 @@ import ConditionSelector from '../conditionSelector/ConditionSelector';
 import DepartureInput from '../departureInput/DepartureInput';
 
 function MeetingForm() {
+  let navigate = useNavigate();
+
   const {
     departureList,
     conditionID,
@@ -60,6 +62,8 @@ function MeetingForm() {
       startingPlaceNames: departureList,
       requirement: conditionID,
     });
+
+    navigate('/result');
   };
 
   return (
