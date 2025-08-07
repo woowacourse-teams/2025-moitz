@@ -1,11 +1,11 @@
 import { flex, typography } from '@shared/styles/default.styled';
 
-import { RecommendedLocation } from '@shared/types/LocationResponse';
+import { Place } from '@shared/types/LocationResponse';
 
 import * as card from './placeCard.styled';
 
 interface PlaceCardProps {
-  place: RecommendedLocation['places'][number];
+  place: Place;
 }
 
 function PlaceCard({ place }: PlaceCardProps) {
