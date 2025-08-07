@@ -17,10 +17,10 @@ export const stroke = () => css`
 
 export const circle_base = () => css`
   border-radius: ${borderRadiusToken.round};
+`;
 
-  span {
-    transform: translate(5%, 5%);
-  }
+export const circle_font = () => css`
+  transform: translate(5%, 5%);
 `;
 
 export const circle_recommended = () => css`

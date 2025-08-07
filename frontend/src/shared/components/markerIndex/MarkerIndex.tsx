@@ -43,7 +43,7 @@ function MarkerIndex({
           hasShadow && shadow.map,
         ]}
       >
-        <span css={typography.h3}>{index}</span>
+        <span css={[typography.h3, marker.circle_font()]}>{index}</span>
       </div>
       {label && <p css={[label_base(), label_type()]}>{label}</p>}
     </div>
