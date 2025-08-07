@@ -13,6 +13,9 @@ jobs:
   deploy:
     if: github.event.pull_request.merged == true
     runs-on: [ self-hosted ]
+    defaults:
+      run:
+        working-directory: ./backend
     steps:
       - name: 최신 커밋 내역으로 checkout 한다
         uses: actions/checkout@v4
@@ -21,8 +24,6 @@ jobs:
         env:
           APPLICATION_CLIENT_PROPERTIES: ${{ secrets.APPLICATION_CLIENT_PROPERTIES }}
         run: |
-          cd backend
-
           # 이전 step에서 checkout한 코드로 JAR 파일을 새로 빌드한다
           echo "=== JAR 빌드 ==="
           rm -rf src/main/resources/application-client.properties
@@ -54,7 +55,7 @@ jobs:
           # 빌드한 JAR 파일을 실행시킨다
           echo "=== 앱 실행 ==="
           mkdir -p ./logs
-          RUNNER_TRACKING_ID="" && nohup java -jar "$JAR_PATH" > ./logs/error.log 2>&1 &
+          RUNNER_TRACKING_ID="" && nohup java -jar -Duser.timezone=Asia/Seoul "$JAR_PATH" > ./logs/nohup.log 2>&1 &
           sleep 3
 
           NEW_PID=$(pgrep -f "$JAR_PATH" || true)
@@ -62,6 +63,6 @@ jobs:
           if [ -n "$NEW_PID" ]; then
             echo "앱 실행 성공 (PID: $NEW_PID)"
           else
-            echo "앱 실행 실패 ./logs/error.log"
+            echo "앱 실행 실패 ./logs/nohup.log"
             exit 1
           fi
