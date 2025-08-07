@@ -5,6 +5,7 @@ import static com.f12.moitz.infrastructure.PromptGenerator.PLACE_RECOMMEND_PROMP
 
 import com.f12.moitz.application.dto.PlaceRecommendResponse;
 import com.f12.moitz.application.port.Recommender;
+import com.f12.moitz.common.error.exception.RetryableApiException;
 import com.f12.moitz.domain.Place;
 import com.f12.moitz.domain.RecommendedPlace;
 import com.f12.moitz.infrastructure.gemini.GeminiFunctionCaller;
@@ -45,12 +46,15 @@ public class GeminiRecommenderAdapter implements Recommender {
     }
 
     @Retryable(
-            interceptor = "getGeminiOperationInterceptor",
+            retryFor = RetryableApiException.class,
+            maxAttempts = 2,
             recover = "recoverRecommendedLocations"
     )
     @Override
-    public RecommendedLocationResponse getRecommendedLocations(final List<String> startPlaceNames, final String condition) {
-        log.info("재재시시도도");
+    public RecommendedLocationResponse getRecommendedLocations(
+            final List<String> startPlaceNames,
+            final String condition
+    ) {
         return geminiClient.generateResponse(
                 startPlaceNames,
                 condition
@@ -58,8 +62,10 @@ public class GeminiRecommenderAdapter implements Recommender {
     }
 
     @Recover
-    public RecommendedLocationResponse recoverRecommendedLocations(final List<String> startPlaceNames, final String condition) {
-        log.info("지피티지피티");
+    public RecommendedLocationResponse recoverRecommendedLocations(
+            final List<String> startPlaceNames,
+            final String condition
+    ) {
         return gptClient.generateResponse(
                 startPlaceNames,
                 condition

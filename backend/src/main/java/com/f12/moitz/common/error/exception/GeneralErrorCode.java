@@ -30,8 +30,4 @@ public enum GeneralErrorCode implements ErrorCode {
         return message;
     }
 
-    @Override
-    public boolean getCanRetry() {
-        return false;
-    }
 }
