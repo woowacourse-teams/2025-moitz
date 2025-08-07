@@ -1,4 +1,3 @@
-/** @jsxImportSource @emotion/react */
 import React from 'react';
 
 import { useFormInfo } from '@features/meeting/hooks/useFormInfo';
@@ -51,8 +50,6 @@ function MeetingForm() {
       showValidationError(formValidation);
       return;
     }
-
-    console.log(departureList, conditionID);
   };
 
   return (

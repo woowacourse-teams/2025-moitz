@@ -1,14 +1,12 @@
-/** @jsxImportSource @emotion/react */
-
 import { useEffect, useRef } from 'react';
 import { Link } from 'react-router';
+
+import { RecommendedLocation } from '@entities/types/Location';
+import { StartingPlace } from '@entities/types/Location';
 
 import MapButton from '@shared/components/mapButton/MapButton';
 import MapPoint from '@shared/components/mapPoint/MapPoint';
 import { flex } from '@shared/styles/default.styled';
-
-import { recommendedLocation } from '@shared/types/recommendedLocation';
-import { startingLocation } from '@shared/types/startingLocation';
 
 import IconBack from '@icons/icon-back.svg';
 import IconShare from '@icons/icon-share.svg';
@@ -16,8 +14,8 @@ import IconShare from '@icons/icon-share.svg';
 import * as map from './map.styled';
 
 interface MapProps {
-  startingLocations: startingLocation[];
-  recommendedLocations: recommendedLocation[];
+  startingLocations: StartingPlace[];
+  recommendedLocations: RecommendedLocation[];
 }
 
 function Map({ startingLocations }: MapProps) {

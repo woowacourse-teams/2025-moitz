@@ -1,14 +1,42 @@
 import Map from '@features/map/components/map/Map';
 import BottomSheet from '@features/recommendation/components/bottomSheet/BottomSheet';
 
+import useLocations from '@entities/hooks/useLocations';
+import { RecommendedLocation } from '@entities/types/Location';
+
 import { flex } from '@shared/styles/default.styled';
 
-import recommendedLocationsMock from '@mocks/recommendedLocationsMock';
-import startingLocationsMock from '@mocks/startingLocationsMock';
+import { StartingPlacesMock } from '@mocks/LocationsMock';
+import { LocationsRequestBodyMock } from '@mocks/LocationsRequestBodyMock';
 
 import * as resultPage from './resultPage.styled';
 
 function ResultPage() {
+  const {
+    data: location,
+    isLoading,
+    isError,
+  } = useLocations(LocationsRequestBodyMock);
+
+  if (isLoading) return <p>로딩중...</p>;
+  if (isError) return <p>에러 발생!</p>;
+  if (!location || location.recommendedLocations.length === 0)
+    return <p>추천 결과가 없습니다.</p>;
+
+  const recommendedLocations: RecommendedLocation[] =
+    location.recommendedLocations.map((location) => {
+      return {
+        id: location.id,
+        index: location.index,
+        x: location.x,
+        y: location.y,
+        name: location.name,
+        avgMinutes: location.avgMinutes,
+        isBest: location.isBest,
+        description: location.description,
+        reason: location.reason,
+      };
+    });
   return (
     <div
       css={[
@@ -17,12 +45,12 @@ function ResultPage() {
       ]}
     >
       <Map
-        startingLocations={startingLocationsMock}
-        recommendedLocations={recommendedLocationsMock}
+        startingLocations={StartingPlacesMock}
+        recommendedLocations={recommendedLocations}
       />
       <BottomSheet
-        startingLocations={startingLocationsMock}
-        recommendedLocations={recommendedLocationsMock}
+        startingLocations={StartingPlacesMock}
+        recommendedLocations={recommendedLocations}
       />
     </div>
   );

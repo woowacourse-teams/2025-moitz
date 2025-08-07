@@ -1,5 +1,3 @@
-/** @jsxImportSource @emotion/react */
-
 import Logo from '@shared/components/logo/Logo';
 import { flex, typography } from '@shared/styles/default.styled';
 

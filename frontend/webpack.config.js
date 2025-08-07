@@ -1,4 +1,3 @@
-// webpack.config.ts 또는 webpack.config.js
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -6,11 +5,9 @@ import dotenv from 'dotenv';
 import HtmlWebpackPlugin from 'html-webpack-plugin';
 import webpack from 'webpack';
 
-// __dirname 대체 (ESM에서는 기본 제공 안됨)
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// .env 파일 읽기
 const envVars = dotenv.config().parsed || {};
 
 // DefinePlugin용 환경변수 정제
@@ -70,6 +67,7 @@ const config = {
       '@pages': path.resolve(__dirname, 'src/pages'),
       '@widgets': path.resolve(__dirname, 'src/widgets'),
       '@features': path.resolve(__dirname, 'src/features'),
+      '@entities': path.resolve(__dirname, 'src/entities'),
       '@shared': path.resolve(__dirname, 'src/shared'),
       '@shared/components': path.resolve(__dirname, 'src/shared/components'),
       '@shared/styles': path.resolve(__dirname, 'src/shared/styles'),
@@ -81,5 +79,4 @@ const config = {
   mode: isProduction ? 'production' : 'development',
 };
 
-// ESM에서는 export default
 export default config;

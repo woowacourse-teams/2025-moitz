@@ -1,10 +1,10 @@
 import { useState, useCallback, useEffect } from 'react';
 
-interface UseToastReturn {
+type UseToastReturn = {
   isVisible: boolean;
   message: string;
   showToast: (message: string) => void;
-}
+};
 
 export function useToast(): UseToastReturn {
   const [isVisible, setIsVisible] = useState(false);

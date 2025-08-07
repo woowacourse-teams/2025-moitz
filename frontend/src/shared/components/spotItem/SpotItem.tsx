@@ -1,5 +1,3 @@
-/** @jsxImportSource @emotion/react */
-
 import Badge from '@shared/components/badge/Badge';
 import MarkerIndex from '@shared/components/markerIndex/MarkerIndex';
 import { flex, typography } from '@shared/styles/default.styled';
