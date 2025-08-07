@@ -1,4 +1,4 @@
-import recommendedLocationMock from '@mocks/recommendedLocationsMock';
+import { RecommendedLocationsMock } from '@mocks/LocationsMock';
 
 import { withContainer } from '../../../../../.storybook/decorators/withContainer';
 
@@ -26,7 +26,7 @@ type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {
   args: {
-    recommendedLocations: recommendedLocationMock.recommendedLocations,
+    recommendedLocations: RecommendedLocationsMock,
     onSpotClick: () => {},
   },
 };

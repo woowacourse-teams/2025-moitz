@@ -1,13 +1,11 @@
-/** @jsxImportSource @emotion/react */
+import { StartingPlace } from '@entities/types/Location';
 
 import { flex, typography } from '@shared/styles/default.styled';
-
-import { startingLocation } from '@shared/types/startingLocation';
 
 import * as startingSpotNameStyled from './startingSpotName.styled';
 
 interface StartSpotNameProps {
-  location: startingLocation;
+  location: StartingPlace;
   isLast: boolean;
 }
 

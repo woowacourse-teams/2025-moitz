@@ -9,14 +9,14 @@ import {
 
 import { ValidationError } from '@shared/types/validationError';
 
-interface UseFormInfoReturn {
+type UseFormInfoReturn = {
   departureList: string[];
   conditionID: string;
   addDepartureWithValidation: (departure: string) => ValidationError;
   removeDepartureAtIndex: (index: number) => void;
   updateConditionID: (condition: string) => void;
   validateFormSubmit: () => ValidationError;
-}
+};
 
 export function useFormInfo(): UseFormInfoReturn {
   const [departureList, setDepartureList] = useState<string[]>([]);

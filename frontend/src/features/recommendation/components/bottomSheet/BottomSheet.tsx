@@ -1,9 +1,8 @@
 import { useState } from 'react';
 
-import { flex, scroll, shadow } from '@shared/styles/default.styled';
+import { RecommendedLocation, StartingPlace } from '@entities/types/Location';
 
-import { RecommendedLocation } from '@shared/types/LocationResponse';
-import { startingLocation } from '@shared/types/startingLocation';
+import { flex, scroll, shadow } from '@shared/styles/default.styled';
 
 import Detail from '../detail/Detail';
 import List from '../list/List';
@@ -11,7 +10,7 @@ import List from '../list/List';
 import * as bottomSheet from './bottomSheet.styled';
 type View = 'list' | 'detail';
 interface BottomSheetProps {
-  startingLocations: startingLocation[];
+  startingLocations: StartingPlace[];
   recommendedLocations: RecommendedLocation[];
 }
 

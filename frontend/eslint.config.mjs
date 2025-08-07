@@ -17,7 +17,11 @@ export default [
       react: pluginReact,
     },
     languageOptions: {
-      globals: {...globals.browser, ...globals.node},
+      globals: {
+        ...globals.browser,
+        ...globals.node,
+        ...globals.jest,
+      },
       parser: tsParser,
       parserOptions: {
         ecmaVersion: 'latest',
@@ -52,6 +56,8 @@ export default [
         'error',
         { argsIgnorePattern: '^_' },
       ],
+      // Jest 권장 규칙들
+      'no-undef': 'warn',
 
       // emotion css prop를 쓰기 위한 규칙
       'react/no-unknown-property': ['error', { ignore: ['css'] }],
@@ -88,6 +94,11 @@ export default [
             },
             {
               pattern: '@features/**',
+              group: 'internal',
+              position: 'before',
+            },
+            {
+              pattern: '@entities/**',
               group: 'internal',
               position: 'before',
             },

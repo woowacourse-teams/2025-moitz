@@ -1,5 +1,3 @@
-/** @jsxImportSource @emotion/react */
-
 import { createPortal } from 'react-dom';
 
 import { flex, typography } from '@shared/styles/default.styled';
