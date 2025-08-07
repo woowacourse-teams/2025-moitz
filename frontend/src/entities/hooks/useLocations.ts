@@ -4,7 +4,7 @@ import fetchLocations from '@entities/apis/fetchLocations';
 import { Location } from '@entities/types/Location';
 import { LocationRequestBody } from '@entities/types/LocationRequestBody';
 
-type useLocationsReturn = {
+export type useLocationsReturn = {
   data: Location;
   isLoading: boolean;
   isError: boolean;
