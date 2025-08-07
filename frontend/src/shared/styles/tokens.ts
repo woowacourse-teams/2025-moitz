@@ -47,6 +47,7 @@ const typoToken = {
   },
   captions: {
     c1: 'var(--font-caption-c1)',
+    c2: 'var(--font-caption-c2)',
   },
   weight: {
     bold: 'var(--font-weight-bold)',

@@ -18,3 +18,10 @@ export const base = () => css`
 export const contents_container = () => css`
   width: 100%;
 `;
+
+export const description = () => css`
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+`;
