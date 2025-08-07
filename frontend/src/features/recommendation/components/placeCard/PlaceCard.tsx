@@ -1,3 +1,4 @@
+import Badge from '@shared/components/badge/Badge';
 import { flex, typography } from '@shared/styles/default.styled';
 
 import { Place } from '@shared/types/LocationResponse';
@@ -19,7 +20,11 @@ function PlaceCard({ place }: PlaceCardProps) {
       onClick={handleClick}
       aria-label={`${place.name} 장소 정보 보기`}
     >
-      <div css={card.image()}></div>
+      <div css={card.image()}>
+        <div css={card.badge()}>
+          <Badge type="category" text={place.category} />
+        </div>
+      </div>
       <div
         css={[
           flex({ direction: 'column', justify: 'flex-start', gap: 7 }),

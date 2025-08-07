@@ -15,11 +15,18 @@ export const container = () => css`
 `;
 
 export const image = () => css`
+  position: relative;
   width: 100%;
   height: 60px;
   background: linear-gradient(90deg, #1dcfc1 0%, #ff9e42 100%);
   border-top-left-radius: ${borderRadiusToken.input};
   border-top-right-radius: ${borderRadiusToken.input};
+`;
+
+export const badge = () => css`
+  position: absolute;
+  top: 5px;
+  right: 10px;
 `;
 
 export const content = () => css`
