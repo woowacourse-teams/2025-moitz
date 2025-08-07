@@ -17,8 +17,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class RecommendationService {
@@ -74,6 +76,7 @@ public class RecommendationService {
         placeRoutes.forEach((key, value) -> {
             if (!value.isAcceptable()) {
                 generatedPlaces.remove(key);
+                log.warn("장소 제거 {}", key.getName());
             }
         });
     }
