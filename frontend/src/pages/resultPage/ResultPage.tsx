@@ -18,11 +18,11 @@ function ResultPage() {
     >
       <Map
         startingLocations={startingLocationsMock}
-        recommendedLocations={recommendedLocationsMock}
+        recommendedLocations={recommendedLocationsMock.recommendedLocations}
       />
       <BottomSheet
         startingLocations={startingLocationsMock}
-        recommendedLocations={recommendedLocationsMock}
+        recommendedLocations={recommendedLocationsMock.recommendedLocations}
       />
     </div>
   );

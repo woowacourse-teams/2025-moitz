@@ -1,11 +1,11 @@
 import SpotItem from '@shared/components/spotItem/SpotItem';
 import { flex } from '@shared/styles/default.styled';
 
-import { recommendedLocation } from '@shared/types/recommendedLocation';
+import { RecommendedLocation } from '@shared/types/LocationResponse';
 
 interface SpotItemListProps {
-  recommendedLocations: recommendedLocation[];
-  onSpotClick: (spot: recommendedLocation) => void;
+  recommendedLocations: RecommendedLocation[];
+  onSpotClick: (spot: RecommendedLocation) => void;
 }
 
 function SpotItemList({

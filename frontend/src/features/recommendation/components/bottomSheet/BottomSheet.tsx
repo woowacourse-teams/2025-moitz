@@ -2,7 +2,7 @@ import { useState } from 'react';
 
 import { flex, scroll, shadow } from '@shared/styles/default.styled';
 
-import { recommendedLocation } from '@shared/types/recommendedLocation';
+import { RecommendedLocation } from '@shared/types/LocationResponse';
 import { startingLocation } from '@shared/types/startingLocation';
 
 import Detail from '../detail/Detail';
@@ -12,7 +12,7 @@ import * as bottomSheet from './bottomSheet.styled';
 type View = 'list' | 'detail';
 interface BottomSheetProps {
   startingLocations: startingLocation[];
-  recommendedLocations: recommendedLocation[];
+  recommendedLocations: RecommendedLocation[];
 }
 
 function BottomSheet({
@@ -21,9 +21,9 @@ function BottomSheet({
 }: BottomSheetProps) {
   const [currentView, setCurrentView] = useState<View>('list');
   const [selectedLocation, setSelectedLocation] =
-    useState<recommendedLocation | null>(null);
+    useState<RecommendedLocation | null>(null);
 
-  const handleSpotClick = (spot: recommendedLocation) => {
+  const handleSpotClick = (spot: RecommendedLocation) => {
     setSelectedLocation(spot);
     setCurrentView('detail');
   };

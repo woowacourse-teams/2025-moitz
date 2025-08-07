@@ -1,14 +1,14 @@
 import StartingSpotWrapper from '@shared/components/startingSpotWrapper/StartingSpotWrapper';
 
-import { recommendedLocation } from '@shared/types/recommendedLocation';
+import { RecommendedLocation } from '@shared/types/LocationResponse';
 import { startingLocation } from '@shared/types/startingLocation';
 
 import SpotItemList from '../spotItemList/SpotItemList';
 
 interface ListProps {
   startingLocations: startingLocation[];
-  recommendedLocations: recommendedLocation[];
-  onSpotClick: (spot: recommendedLocation) => void;
+  recommendedLocations: RecommendedLocation[];
+  onSpotClick: (spot: RecommendedLocation) => void;
 }
 
 function List({

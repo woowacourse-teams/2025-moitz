@@ -1,6 +1,6 @@
 import { flex, scroll, typography } from '@shared/styles/default.styled';
 
-import { recommendedLocation } from '@shared/types/recommendedLocation';
+import { RecommendedLocation } from '@shared/types/LocationResponse';
 
 import DetailSection from '../detailSection/DetailSection';
 import PlaceCard from '../placeCard/PlaceCard';
@@ -8,7 +8,7 @@ import PlaceCard from '../placeCard/PlaceCard';
 import * as detail from './detail.styled';
 
 interface DetailProps {
-  selectedLocation: recommendedLocation;
+  selectedLocation: RecommendedLocation;
 }
 
 function Detail({ selectedLocation }: DetailProps) {
