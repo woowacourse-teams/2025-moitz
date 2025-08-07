@@ -25,7 +25,7 @@ public enum SubwayCode {
     GYEONGGANG("경강선", 112),
     WOOE_SINSEUL_LRT("우이 신설선", 113),
     SEOHAE_LINE("서해선", 114),
-    GIMPO_LRT("김포골라인", 115),
+    GIMPO_LRT("김포골드라인", 115),
     SUIN_BUNDANG("수인분당선", 116),
     SILLIM_LRT("신림선", 117),
     INCHEON1("인천 1호선", 21),

@@ -29,4 +29,5 @@ public enum GeneralErrorCode implements ErrorCode {
     public String getClientMessage() {
         return message;
     }
+
 }

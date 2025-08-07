@@ -30,7 +30,7 @@ public class RecommendationMapper {
         final int minTime = recommendation.getBestRecommendationTime();
 
         return new RecommendationsResponse(
-                IntStream.range(0, recommendation.size())
+                IntStream.range(0, startingPlaces.size())
                 .mapToObj(index -> toStartingPlaceResponse(index, startingPlaces.get(index)))
                 .toList(),
                 IntStream.range(0, recommendation.size())

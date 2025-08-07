@@ -4,7 +4,7 @@ import static com.f12.moitz.infrastructure.PromptGenerator.ADDITIONAL_PROMPT;
 import static com.f12.moitz.infrastructure.PromptGenerator.RECOMMENDATION_COUNT;
 
 import com.f12.moitz.common.error.exception.ExternalApiErrorCode;
-import com.f12.moitz.common.error.exception.ExternalApiException;
+import com.f12.moitz.common.error.exception.RetryableApiException;
 import com.f12.moitz.infrastructure.PromptGenerator;
 import com.f12.moitz.infrastructure.gemini.dto.RecommendedLocationResponse;
 import com.f12.moitz.infrastructure.gemini.dto.RecommendedPlaceResponses;
@@ -102,7 +102,7 @@ public class GoogleGeminiClient {
         try {
             return objectMapper.readValue(content, valueType);
         } catch (JsonProcessingException e) {
-            throw new ExternalApiException(ExternalApiErrorCode.INVALID_GEMINI_RESPONSE_FORMAT);
+            throw new RetryableApiException(ExternalApiErrorCode.INVALID_GEMINI_RESPONSE_FORMAT);
         }
     }
 

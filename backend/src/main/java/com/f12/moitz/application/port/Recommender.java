@@ -2,6 +2,8 @@ package com.f12.moitz.application.port;
 
 import com.f12.moitz.domain.Place;
 import com.f12.moitz.domain.RecommendedPlace;
+import com.f12.moitz.infrastructure.gemini.dto.RecommendedLocationResponse;
+
 import java.util.List;
 import java.util.Map;
 
@@ -11,7 +13,9 @@ public interface Recommender {
 
     List<Place> findPlacesByNames(List<String> placeNames);
 
-    Map<Place, String> recommendLocations(List<String> startPlaceNames, String condition);
+    RecommendedLocationResponse getRecommendedLocations(final List<String> startPlaceNames, final String condition);
+
+    Map<Place, String> recommendLocations(RecommendedLocationResponse recommendedLocationResponse);
 
     Map<Place, List<RecommendedPlace>> recommendPlaces(List<Place> targetPlaces, String requirement);
 

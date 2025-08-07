@@ -16,9 +16,13 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import com.f12.moitz.infrastructure.gemini.dto.RecommendedLocationResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class RecommendationService {
@@ -32,10 +36,14 @@ public class RecommendationService {
         final String requirement = RecommendCondition.fromTitle(request.requirement()).getCategoryNames();
 
         final List<Place> startingPlaces = recommender.findPlacesByNames(request.startingPlaceNames());
-        final Map<Place, String> generatedPlacesWithReason = recommender.recommendLocations(
+
+        final RecommendedLocationResponse recommendedLocationResponse = recommender.getRecommendedLocations(
                 request.startingPlaceNames(),
                 requirement
         );
+
+        final Map<Place, String> generatedPlacesWithReason = recommender.recommendLocations(recommendedLocationResponse);
+
         final List<Place> generatedPlaces = generatedPlacesWithReason.keySet().stream().toList();
 
         final Map<Place, Routes> placeRoutes = findRoutesForAll(startingPlaces, generatedPlaces);
@@ -74,6 +82,7 @@ public class RecommendationService {
         placeRoutes.forEach((key, value) -> {
             if (!value.isAcceptable()) {
                 generatedPlaces.remove(key);
+                log.warn("장소 제거 {}", key.getName());
             }
         });
     }

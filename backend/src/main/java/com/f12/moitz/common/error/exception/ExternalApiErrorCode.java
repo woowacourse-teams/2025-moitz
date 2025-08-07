@@ -43,6 +43,7 @@ public enum ExternalApiErrorCode implements ErrorCode {
         return message;
     }
 
+
     @Override
     public String getClientMessage() {
         if (canRetry) {
