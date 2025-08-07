@@ -62,16 +62,17 @@ class RoutesTest {
         final String subwayLineName = "2호선";
 
         final Path path1 = new Path(startPlace, intermediatePlace, TravelMethod.SUBWAY, 10, subwayLineName);
-        final Path path2 = new Path(intermediatePlace, endPlace, TravelMethod.SUBWAY, 50, subwayLineName);
+        final Path path2 = new Path(intermediatePlace, endPlace, TravelMethod.SUBWAY, 5, subwayLineName);
+        final Path path3 = new Path(startPlace, endPlace, TravelMethod.SUBWAY, 100, subwayLineName);
 
-        final List<Path> paths1 = List.of(path2);
-        final List<Path> paths2 = List.of(path1);
+        final List<Path> paths1 = List.of(path1, path2);
+        final List<Path> paths2 = List.of(path1, path2, path3);
 
         final Route route1 = new Route(paths1);
         final Route route2 = new Route(paths2);
 
         final Routes routes1 = new Routes(List.of(route1, route1));
-        final Routes routes2 = new Routes(List.of(route1, route2));
+        final Routes routes2 = new Routes(List.of(route1, route2, route1, route1, route1));
 
         // When
         final boolean acceptable1 = routes1.isAcceptable();
