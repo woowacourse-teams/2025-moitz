@@ -40,6 +40,7 @@ const typoToken = {
   subHeaders: {
     sh1: 'var(--font-subheader-sh1)',
     sh2: 'var(--font-subheader-sh2)',
+    sh3: 'var(--font-subheader-sh3)',
   },
   body: {
     b1: 'var(--font-body-b1)',
