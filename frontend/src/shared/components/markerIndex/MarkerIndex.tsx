@@ -4,7 +4,7 @@ import * as marker from './markerIndex.styled';
 import { label_base } from './markerIndex.styled';
 
 interface MarkerIndexProps {
-  index: number;
+  index: number | string;
   type: 'recommended' | 'starting';
   label?: string;
   hasStroke?: boolean;

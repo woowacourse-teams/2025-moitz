@@ -11,7 +11,6 @@ const meta = {
   tags: ['autodocs'],
   argTypes: {
     index: {
-      control: { type: 'number', min: 0, max: 10 },
       description: '마커에 표시될 인덱스 번호',
     },
     type: {
@@ -62,7 +61,7 @@ export const Case2_Recommended_None: Story = {
 export const Case3_Starting_All: Story = {
   name: 'Case3 - 출발지, 라벨 + 스트로크 + 그림자',
   args: {
-    index: 3,
+    index: 'A',
     type: 'starting',
     label: '출발역',
     hasStroke: true,
@@ -73,7 +72,7 @@ export const Case3_Starting_All: Story = {
 export const Case4_Starting_StrokeShadow: Story = {
   name: 'Case4 - 출발지, 스트로크 + 그림자',
   args: {
-    index: 4,
+    index: 'B',
     type: 'starting',
     label: '',
     hasStroke: true,
