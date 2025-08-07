@@ -1,10 +1,11 @@
 import React from 'react';
+import { useNavigate } from 'react-router';
 
 import { useFormInfo } from '@features/meeting/hooks/useFormInfo';
 import Toast from '@features/toast/components/Toast';
 import { useToast } from '@features/toast/hooks/useToast';
 
-import useLocations from '@entities/hooks/useLocations';
+import { useLocationsContext } from '@entities/contexts/useLocationsContext';
 
 import BottomButton from '@shared/components/bottomButton/BottomButton';
 import { flex } from '@shared/styles/default.styled';
@@ -25,7 +26,7 @@ function MeetingForm() {
   } = useFormInfo();
   const { isVisible, message, showToast } = useToast();
 
-  const { trigger } = useLocations();
+  const { trigger } = useLocationsContext();
 
   const showValidationError = (error: ValidationError) => {
     if (!error.isValid) {
