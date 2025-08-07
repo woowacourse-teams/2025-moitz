@@ -7,17 +7,19 @@ import App from './src/app/App';
 import Layout from './src/shared/components/layout/Layout';
 import GlobalStyle from './src/shared/styles/GlobalStyle';
 
-Sentry.init({
-  dsn: process.env.SENTRY_DSN,
-  // Setting this option to true will send default PII data to Sentry.
-  // For example, automatic IP address collection on events
-  sendDefaultPii: true,
-  integrations: [
-    Sentry.feedbackIntegration({
-      colorScheme: 'system',
-    }),
-  ],
-});
+if (process.env.NODE_ENV === 'production') {
+  Sentry.init({
+    dsn: process.env.SENTRY_DSN,
+    // Setting this option to true will send default PII data to Sentry.
+    // For example, automatic IP address collection on events
+    sendDefaultPii: true,
+    integrations: [
+      Sentry.feedbackIntegration({
+        colorScheme: 'system',
+      }),
+    ],
+  });
+}
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
