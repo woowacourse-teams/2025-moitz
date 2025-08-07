@@ -1,4 +1,4 @@
-// src/types/global.d.ts
+/* eslint-disable no-undef */
 export {};
 
 declare global {

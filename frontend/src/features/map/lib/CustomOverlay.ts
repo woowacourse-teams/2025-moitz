@@ -1,10 +1,6 @@
+/* eslint-disable no-undef */
 import ReactDOM from 'react-dom/client';
 
-declare global {
-  interface Window {
-    naver: typeof naver;
-  }
-}
 export class CustomOverlay extends window.naver.maps.OverlayView {
   private position: naver.maps.LatLng;
   private container: HTMLDivElement;
