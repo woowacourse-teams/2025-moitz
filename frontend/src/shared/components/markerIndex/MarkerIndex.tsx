@@ -1,7 +1,6 @@
 import { flex, typography, shadow } from '@shared/styles/default.styled';
 
 import * as marker from './markerIndex.styled';
-import { label_base } from './markerIndex.styled';
 
 interface MarkerIndexProps {
   index: number | string;
@@ -45,7 +44,7 @@ function MarkerIndex({
       >
         <span css={[typography.h3, marker.circle_font()]}>{index}</span>
       </div>
-      {label && <p css={[label_base(), label_type()]}>{label}</p>}
+      {label && <p css={[marker.label_base(), label_type()]}>{label}</p>}
     </div>
   );
 }

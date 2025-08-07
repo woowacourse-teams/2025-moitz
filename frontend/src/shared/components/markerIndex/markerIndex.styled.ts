@@ -42,6 +42,11 @@ export const circle_starting = () => css`
 export const label_base = () => css`
   font-weight: 600;
   font-size: 10px;
+  text-shadow:
+    -0.5px -0.5px 0 white,
+    0.5px -0.5px 0 white,
+    -0.5px 0.5px 0 white,
+    0.5px 0.5px 0 white;
 `;
 
 export const label_recommended = () => css`
