@@ -1,12 +1,12 @@
+import { RecommendedPlace } from '@entities/types/Location';
+
 import Badge from '@shared/components/badge/Badge';
 import { flex, typography } from '@shared/styles/default.styled';
-
-import { Place } from '@shared/types/LocationResponse';
 
 import * as card from './placeCard.styled';
 
 interface PlaceCardProps {
-  place: Place;
+  place: RecommendedPlace;
 }
 
 function PlaceCard({ place }: PlaceCardProps) {

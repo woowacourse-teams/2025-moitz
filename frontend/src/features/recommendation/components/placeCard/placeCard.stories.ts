@@ -1,4 +1,4 @@
-import recommendedLocationsMock from '@mocks/recommendedLocationsMock';
+import { LocationsMock } from '@mocks/LocationsMock';
 
 import PlaceCard from './PlaceCard';
 
@@ -24,6 +24,6 @@ type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {
   args: {
-    place: recommendedLocationsMock.recommendedLocations[0].places[0],
+    place: LocationsMock.recommendedLocations[0].places[0],
   },
 };
