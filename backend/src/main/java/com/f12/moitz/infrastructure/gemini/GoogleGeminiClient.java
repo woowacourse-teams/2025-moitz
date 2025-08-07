@@ -20,12 +20,14 @@ import com.google.genai.types.GenerateContentResponse;
 import com.google.genai.types.Part;
 import java.util.List;
 import java.util.Map;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
 @Component
+@RequiredArgsConstructor(onConstructor = @__(@Autowired))
 @Slf4j
 public class GoogleGeminiClient {
 
@@ -34,16 +36,10 @@ public class GoogleGeminiClient {
     private final Client geminiClient;
     private final ObjectMapper objectMapper;
 
-    public GoogleGeminiClient(
-            final @Autowired Client.Builder geminiClientBuilder,
-            final @Value("${gemini.api.key}") String apiKey,
-            final @Autowired ObjectMapper objectMapper
+    public RecommendedLocationResponse generateResponse(
+            final List<String> stationNames,
+            final String requirement
     ) {
-        this.geminiClient = geminiClientBuilder.apiKey(apiKey).build();
-        this.objectMapper = objectMapper;
-    }
-
-    public RecommendedLocationResponse generateResponse(final List<String> stationNames, final String requirement) {
         return readValue(
                 generateContent(stationNames, requirement, PromptGenerator.getSchema()).text(),
                 RecommendedLocationResponse.class
