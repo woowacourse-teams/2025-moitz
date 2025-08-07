@@ -21,7 +21,7 @@ public interface SwaggerLocationController {
                     responseCode = "200",
                     description = "지역 추천 성공",
                     content = @Content(
-                            array = @ArraySchema(schema = @Schema(implementation = RecommendationResponse.class))
+                            array = @ArraySchema(schema = @Schema(implementation = RecommendationsResponse.class))
                     )
             ),
             @ApiResponse(
