@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { View } from '@features/recommendation/types/bottomSheetView';
 
 import { RecommendedLocation, StartingPlace } from '@entities/types/Location';
 
@@ -8,25 +8,22 @@ import Detail from '../detail/Detail';
 import List from '../list/List';
 
 import * as bottomSheet from './bottomSheet.styled';
-type View = 'list' | 'detail';
+
 interface BottomSheetProps {
   startingLocations: StartingPlace[];
   recommendedLocations: RecommendedLocation[];
+  currentView: View;
+  selectedLocation: RecommendedLocation | null;
+  handleSpotClick: (spot: RecommendedLocation) => void;
 }
 
 function BottomSheet({
   startingLocations,
   recommendedLocations,
+  currentView,
+  selectedLocation,
+  handleSpotClick,
 }: BottomSheetProps) {
-  const [currentView, setCurrentView] = useState<View>('list');
-  const [selectedLocation, setSelectedLocation] =
-    useState<RecommendedLocation | null>(null);
-
-  const handleSpotClick = (spot: RecommendedLocation) => {
-    setSelectedLocation(spot);
-    setCurrentView('detail');
-  };
-
   return (
     <div
       css={[
@@ -45,7 +42,7 @@ function BottomSheet({
         {currentView === 'list' ? (
           <>
             <List
-              startingLocations={startingLocations}
+              startingPlaces={startingLocations}
               recommendedLocations={recommendedLocations}
               onSpotClick={handleSpotClick}
             />

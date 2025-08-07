@@ -26,6 +26,17 @@ const meta = {
       control: { type: 'object' },
       description: '추천 장소 리스트',
     },
+    currentView: {
+      control: { type: 'select' },
+      options: ['list', 'detail'],
+    },
+    selectedLocation: {
+      control: { type: 'object' },
+      description: '선택된 장소',
+    },
+    handleSpotClick: {
+      action: 'handleSpotClick',
+    },
   },
 } satisfies Meta<typeof BottomSheet>;
 
@@ -36,6 +47,9 @@ export const Default: Story = {
   args: {
     startingLocations: StartingPlacesMock,
     recommendedLocations: RecommendedLocationsMock,
+    currentView: 'list',
+    selectedLocation: null,
+    handleSpotClick: () => {},
   },
 };
 
@@ -43,5 +57,8 @@ export const Short: Story = {
   args: {
     startingLocations: StartingPlacesMock,
     recommendedLocations: RecommendedLocationsMock.slice(0, 2),
+    currentView: 'list',
+    selectedLocation: null,
+    handleSpotClick: () => {},
   },
 };
