@@ -23,6 +23,7 @@ import com.f12.moitz.domain.RecommendedPlace;
 import com.f12.moitz.domain.Route;
 import com.f12.moitz.domain.Path;
 import com.f12.moitz.domain.TravelMethod;
+import com.f12.moitz.infrastructure.gemini.dto.RecommendedLocationResponse;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -31,6 +32,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
@@ -63,7 +65,9 @@ class RecommendationServiceTest {
         final RecommendedPlace recommendedPlace = new RecommendedPlace("스타벅스", "카페", 5, "url");
 
         given(recommender.findPlacesByNames(anyList())).willReturn(startingPlaces);
-        given(recommender.recommendLocations(anyList(), anyString())).willReturn(generatedPlacesWithReason);
+        RecommendedLocationResponse mock = Mockito.mock(RecommendedLocationResponse.class);
+        given(recommender.getRecommendedLocations(anyList(), anyString())).willReturn(mock);
+        given(recommender.recommendLocations(any(RecommendedLocationResponse.class))).willReturn(generatedPlacesWithReason);
         given(routeFinder.findRoute(any(Place.class), any(Place.class))).willReturn(route);
         given(recommender.recommendPlaces(anyList(), anyString())).willReturn(Map.of(generatedPlace, List.of(recommendedPlace)));
 
