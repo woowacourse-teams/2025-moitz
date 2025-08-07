@@ -9,11 +9,25 @@ const meta = {
     layout: 'centered',
   },
   tags: ['autodocs'],
+  argTypes: {
+    type: {
+      control: 'select',
+      options: ['black', 'white'],
+    },
+  },
 } satisfies Meta<typeof Logo>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {
-  args: {},
+  args: {
+    type: 'black',
+  },
+};
+
+export const White: Story = {
+  args: {
+    type: 'white',
+  },
 };
