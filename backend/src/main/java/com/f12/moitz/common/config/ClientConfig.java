@@ -11,14 +11,30 @@ import org.springframework.web.client.RestClient;
 public class ClientConfig {
 
     @Bean
-    public RestClient restClient() {
+    public RestClient kakaoRestClient() {
+        return restClientBuilder()
+                .baseUrl("https://dapi.kakao.com/v2/local/search")
+                .requestFactory(simpleClientHttpRequestFactory())
+                .build();
+    }
+
+    @Bean
+    public RestClient odsayRestClient() {
+        return restClientBuilder()
+                .baseUrl("https://api.odsay.com/v1/api")
+                .requestFactory(simpleClientHttpRequestFactory())
+                .build();
+    }
+
+    private SimpleClientHttpRequestFactory simpleClientHttpRequestFactory() {
         SimpleClientHttpRequestFactory requestFactory = new SimpleClientHttpRequestFactory();
         requestFactory.setConnectTimeout(Duration.ofSeconds(3));
         requestFactory.setReadTimeout(Duration.ofSeconds(5));
+        return requestFactory;
+    }
 
-        return RestClient.builder()
-                .requestFactory(requestFactory)
-                .build();
+    private RestClient.Builder restClientBuilder() {
+        return RestClient.builder();
     }
 
     @Bean

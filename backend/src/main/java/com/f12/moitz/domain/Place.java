@@ -16,7 +16,7 @@ public class Place {
 
     private void validate(final String name, final Point point) {
         if (name == null || name.isEmpty()) {
-            throw new IllegalArgumentException("장소 이름은 필수입니다.");
+            throw new IllegalArgumentException("이름은 비어있거나 null일 수 없습니다.");
         }
         if (point == null) {
             throw new IllegalArgumentException("좌표는 필수입니다.");

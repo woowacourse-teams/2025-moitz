@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,7 +28,7 @@ public class GeminiFunctionCallerTest {
     @Autowired
     private GoogleGeminiClient geminiClient;
 
-    //    @Disabled
+    @Disabled
     @DisplayName("장소 추천 테스트")
     @Test
     void recommendPlaces() {

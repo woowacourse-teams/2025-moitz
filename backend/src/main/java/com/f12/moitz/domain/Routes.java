@@ -6,7 +6,7 @@ import lombok.Getter;
 @Getter
 public class Routes {
 
-    private static final double FAIRNESS_FACTOR = 1.2;
+    private static final double FAIRNESS_FACTOR = 2.0;
 
     private final List<Route> routes;
 

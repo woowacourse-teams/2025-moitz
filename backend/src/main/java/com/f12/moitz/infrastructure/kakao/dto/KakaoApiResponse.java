@@ -8,17 +8,6 @@ public record KakaoApiResponse(
         Meta meta
 ) {
 
-    private Document findStation() {
-        return documents.stream()
-                .filter(document -> "지하철역".equals(document.categoryGroupName()))
-                .findFirst()
-                .orElse(null);
-    }
-
-    public String findStationPlaceName() {
-        return findStation().placeName();
-    }
-
     public double findStationX() {
         return Double.parseDouble(findStation().x());
     }
@@ -27,8 +16,11 @@ public record KakaoApiResponse(
         return Double.parseDouble(findStation().y());
     }
 
-    public int totalCount() {
-        return meta().totalCount();
+    private Document findStation() {
+        return documents.stream()
+                .filter(document -> "지하철역".equals(document.categoryGroupName()))
+                .findFirst()
+                .orElse(null);
     }
 
 }

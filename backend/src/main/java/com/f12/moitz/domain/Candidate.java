@@ -33,6 +33,4 @@ public class Candidate {
         return routes.calculateAverageTravelTime();
     }
 
-
-
 }
