@@ -25,7 +25,7 @@ export type RecommendedLocation = {
   routes: Route[];
 };
 
-type Place = {
+export type Place = {
   index: number;
   name: string;
   category: string;
@@ -33,7 +33,7 @@ type Place = {
   url: string;
 };
 
-type Route = {
+export type Route = {
   startingPlaceId: number;
   transferCount: number;
   totalTravelTime: number;
