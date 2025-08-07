@@ -40,10 +40,11 @@ public class GoogleGeminiClient {
     }
 
     public RecommendedLocationResponse generateResponse(final List<String> stationNames, final String requirement) {
-        return readValue(
+        throw new ExternalApiException(ExternalApiErrorCode.INVALID_GEMINI_API_RESPONSE);
+        /* return readValue(
                 generateContent(stationNames, requirement, PromptGenerator.getSchema()).text(),
                 RecommendedLocationResponse.class
-        );
+        );*/
     }
 
     private GenerateContentResponse generateContent(

@@ -15,6 +15,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import com.f12.moitz.infrastructure.gemini.dto.RecommendedLocationResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -31,10 +33,14 @@ public class RecommendationService {
         final String requirement = request.requirement();
 
         final List<Place> startingPlaces = recommender.findPlacesByNames(request.startingPlaceNames());
-        final Map<Place, String> generatedPlacesWithReason = recommender.recommendLocations(
+
+        final RecommendedLocationResponse recommendedLocationResponse = recommender.getRecommendedLocations(
                 request.startingPlaceNames(),
                 requirement
         );
+
+        final Map<Place, String> generatedPlacesWithReason = recommender.recommendLocations(recommendedLocationResponse);
+
         final List<Place> generatedPlaces = generatedPlacesWithReason.keySet().stream().toList();
 
         final Map<Place, Routes> placeRoutes = findRoutesForAll(startingPlaces, generatedPlaces);

@@ -43,12 +43,18 @@ public enum ExternalApiErrorCode implements ErrorCode {
         return message;
     }
 
+
     @Override
     public String getClientMessage() {
         if (canRetry) {
             return CLIENT_RETRY_ERROR_MESSAGE;
         }
         return CLIENT_ERROR_MESSAGE;
+    }
+
+    @Override
+    public boolean getCanRetry() {
+        return canRetry;
     }
 
 }

@@ -8,4 +8,6 @@ public interface ErrorCode {
 
     String getClientMessage();
 
+    boolean getCanRetry();
+
 }
