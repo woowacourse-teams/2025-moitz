@@ -1,4 +1,3 @@
-/** @jsxImportSource @emotion/react */
 import { flex, typography } from '@shared/styles/default.styled';
 
 import * as conditionCard from './conditionCard.styled';

@@ -1,8 +1,8 @@
 import { createElement } from 'react';
 import { MemoryRouter } from 'react-router';
 
-import GlobalStyle from '../src/shared/styles/GlobalStyle';
-import { colorToken } from '../src/shared/styles/tokens';
+import GlobalStyle from '@shared/styles/GlobalStyle';
+import { colorToken } from '@shared/styles/tokens';
 
 import type { Decorator, StoryContext } from '@storybook/react';
 import type { Preview } from '@storybook/react-webpack5';
