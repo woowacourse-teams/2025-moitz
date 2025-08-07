@@ -4,8 +4,8 @@ import { colorToken, borderRadiusToken } from '@shared/styles/tokens';
 
 export const container = () => css`
   width: 100%;
-  height: 50%;
-  min-height: calc(50vh);
+  height: 50vh;
+  min-height: 50vh;
   padding: 20px 20px 0px 20px;
   background-color: ${colorToken.gray[8]};
   border-top-left-radius: ${borderRadiusToken.input};
