@@ -21,7 +21,7 @@ export const contents_container = () => css`
 
 export const description = () => css`
   display: -webkit-box;
-  -webkit-line-clamp: 2; // TODO : 한줄? 두줄?
+  -webkit-line-clamp: 1;
   -webkit-box-orient: vertical;
   overflow: hidden;
 `;
