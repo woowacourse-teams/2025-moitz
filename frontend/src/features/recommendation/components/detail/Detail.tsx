@@ -1,6 +1,7 @@
 import { RecommendedLocation } from '@entities/types/Location';
 
 import { flex, scroll, typography } from '@shared/styles/default.styled';
+import { getAlphabetIndex } from '@shared/utils/getAlphabet';
 
 import DetailSection from '../detailSection/DetailSection';
 import PlaceCard from '../placeCard/PlaceCard';
@@ -36,6 +37,7 @@ function Detail({ selectedLocation }: DetailProps) {
           {selectedLocation.routes.map((route) => (
             <RouteCard
               key={route.startingPlaceId}
+              startingPlaceIndex={getAlphabetIndex(route.startingPlaceId)}
               startingPlaceName={selectedLocation.name}
               route={route}
             />

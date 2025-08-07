@@ -15,6 +15,10 @@ const meta = {
   },
   tags: ['autodocs'],
   argTypes: {
+    startingPlaceIndex: {
+      control: { type: 'text' },
+      description: '출발지 인덱스',
+    },
     startingPlaceName: {
       control: { type: 'text' },
       description: '출발지 이름',
@@ -31,6 +35,7 @@ type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {
   args: {
+    startingPlaceIndex: 'A',
     startingPlaceName: '선릉역',
     route: routeCardMock,
   },
