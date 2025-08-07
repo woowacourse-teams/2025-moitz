@@ -54,7 +54,7 @@ public class GlobalExceptionHandler {
         ErrorResponse errorResponse = new ErrorResponse(
                 HttpStatus.INTERNAL_SERVER_ERROR.value(),
                 "I0001",
-                e.getMessage(),
+                "오류가 발생하였습니다.",
                 request.getMethod(),
                 request.getRequestURI()
         );
