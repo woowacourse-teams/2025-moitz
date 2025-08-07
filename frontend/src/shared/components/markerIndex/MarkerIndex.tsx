@@ -29,7 +29,7 @@ function MarkerIndex({
           direction: 'column',
           justify: 'center',
           align: 'center',
-          gap: 5,
+          gap: 6,
         }),
       ]}
     >
