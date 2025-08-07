@@ -26,7 +26,7 @@ function SpotItem({
         spotItem.base(),
       ]}
     >
-      <MarkerIndex index={index} />
+      <MarkerIndex index={index} type="recommended" />
       <div
         css={[
           flex({ direction: 'column', gap: 10 }),
