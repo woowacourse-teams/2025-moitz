@@ -58,6 +58,17 @@ export const shadow = {
   `,
 };
 
+export const scroll = css`
+  overflow-y: auto;
+  -ms-overflow-style: none; /* IE, Edge */
+  scrollbar-width: none; /* Firefox */
+  -webkit-overflow-scrolling: touch;
+
+  &::-webkit-scrollbar {
+    display: none; /* Chrome, Safari */
+  }
+`;
+
 // Flex
 type flexOptions = {
   direction?: 'row' | 'column';
