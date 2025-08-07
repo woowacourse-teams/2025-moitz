@@ -190,7 +190,7 @@ class GoogleGeminiClientTest {
                 .isEqualTo(ExternalApiErrorCode.GEMINI_API_SERVER_UNAVAILABLE);
     }
 
-    @DisplayName("Gemini API 응답이 정상적으로 파싱되지 않을 경우 ExternalApiException(INVALID_GEMINI_RESPONSE_FORMAT)을 던진다")
+    @DisplayName("Gemini API 응답이 정상적으로 파싱되지 않을 경우 RetryableApiException(INVALID_GEMINI_RESPONSE_FORMAT)을 던진다")
     @Test
     void parsingErrorTest() throws JsonProcessingException {
         // Given
