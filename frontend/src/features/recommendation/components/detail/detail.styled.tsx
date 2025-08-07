@@ -18,13 +18,4 @@ export const placeList = () => css`
   padding-bottom: 10px;
   margin-bottom: -10px;
   white-space: nowrap;
-
-  scrollbar-width: none;
-  -ms-overflow-style: none; /* IE, Edge */
-  scrollbar-width: none; /* Firefox */
-  -webkit-overflow-scrolling: touch;
-
-  &::-webkit-scrollbar {
-    display: none; /* Chrome, Safari */
-  }
 `;

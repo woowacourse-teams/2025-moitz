@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-import { flex, shadow } from '@shared/styles/default.styled';
+import { flex, scroll, shadow } from '@shared/styles/default.styled';
 
 import { recommendedLocation } from '@shared/types/recommendedLocation';
 import { startingLocation } from '@shared/types/startingLocation';
@@ -33,10 +33,16 @@ function BottomSheet({
       css={[
         flex({ direction: 'column', gap: 20 }),
         shadow.bottom_sheet,
-        bottomSheet.base(),
+        bottomSheet.container(),
       ]}
     >
-      <div css={[flex({ direction: 'column', gap: 20 }), bottomSheet.scroll()]}>
+      <div
+        css={[
+          flex({ direction: 'column', gap: 20 }),
+          scroll,
+          bottomSheet.content(),
+        ]}
+      >
         {currentView === 'list' ? (
           <>
             <List

@@ -2,7 +2,7 @@ import { css } from '@emotion/react';
 
 import { colorToken, borderRadiusToken } from '@shared/styles/tokens';
 
-export const base = () => css`
+export const container = () => css`
   width: 100%;
   height: 50%;
   min-height: calc(50vh);
@@ -12,14 +12,6 @@ export const base = () => css`
   border-top-right-radius: ${borderRadiusToken.input};
 `;
 
-export const scroll = () => css`
+export const content = () => css`
   padding-bottom: 20px;
-
-  overflow-y: auto;
-  -ms-overflow-style: none; /* IE, Edge */
-  scrollbar-width: none; /* Firefox */
-
-  &::-webkit-scrollbar {
-    display: none; /* Chrome, Safari */
-  }
 `;

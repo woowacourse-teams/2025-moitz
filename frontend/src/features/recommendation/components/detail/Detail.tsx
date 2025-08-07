@@ -1,4 +1,4 @@
-import { flex, typography } from '@shared/styles/default.styled';
+import { flex, scroll, typography } from '@shared/styles/default.styled';
 
 import { recommendedLocation } from '@shared/types/recommendedLocation';
 
@@ -35,7 +35,7 @@ function Detail({ selectedLocation }: DetailProps) {
       </DetailSection>
 
       <DetailSection isHeader={false} title={'추천 장소'} isBestBadge={false}>
-        <div css={[flex(), detail.placeList()]}>
+        <div css={[flex(), scroll, detail.placeList()]}>
           {selectedLocation.places.map((place) => (
             <PlaceCard key={place.index} place={place} />
           ))}
