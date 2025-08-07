@@ -1,5 +1,7 @@
 package com.f12.moitz.infrastructure.odsay;
 
+import com.f12.moitz.common.error.exception.ExternalApiErrorCode;
+import com.f12.moitz.common.error.exception.ExternalApiException;
 import com.f12.moitz.domain.Point;
 import com.f12.moitz.infrastructure.odsay.dto.OdsayErrorResponse;
 import com.f12.moitz.infrastructure.odsay.dto.SubwayRouteSearchResponse;
@@ -52,22 +54,26 @@ public class OdsayClient {
                 .retrieve()
                 .onStatus(
                         status -> status.is4xxClientError() || status.is5xxServerError(),
-                        (req, res) -> handleError(res)
+                        (req, res) -> {
+                            throw new ExternalApiException(ExternalApiErrorCode.INVALID_ODSAY_API_RESPONSE);
+                        }
                 )
                 .body(SubwayRouteSearchResponse.class);
-        log.info("Odsay 응답 성공, url : {}", url);
-        return response;
-    }
-
-    private void handleError(ClientHttpResponse res) {
-        try {
-            byte[] body = res.getBody().readAllBytes();
-            OdsayErrorResponse error = objectMapper.readValue(body,
-                    OdsayErrorResponse.class);
-            throw new RuntimeException(error.msg());
-        } catch (IOException e) {
-            throw new RuntimeException("응답 바디 파싱에 실패하였습니다.", e);
+        if (response == null) {
+            throw new ExternalApiException(ExternalApiErrorCode.INVALID_ODSAY_API_RESPONSE);
         }
+        if (response.error().isPresent()) {
+            // TODO: RETRYABLE 어노테이션을 사용하여 재시도 로직 구현
+            if ("429".equals(response.error().get().getFirst().code())) {
+                throw new ExternalApiException(ExternalApiErrorCode.ODSAY_API_BLOCKED);
+            }
+            throw new ExternalApiException(ExternalApiErrorCode.INVALID_ODSAY_API_RESPONSE);
+        }
+        if (response.result() == null) {
+            throw new ExternalApiException(ExternalApiErrorCode.INVALID_ODSAY_API_RESPONSE);
+        }
+        log.debug("Odsay 응답 성공, url : {}", url);
+        return response;
     }
 
 }

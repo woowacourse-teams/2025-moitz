@@ -47,11 +47,14 @@
       ],
       "@mocks/*": [
         "src/mocks/*"
+      ],
+      "@config/*": [
+        "src/config/*"
       ]
     }
   },
   "include": [
     "src",
     "main.tsx",
- ]
+  ]
 }
