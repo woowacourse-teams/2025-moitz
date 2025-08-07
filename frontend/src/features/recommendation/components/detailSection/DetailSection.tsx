@@ -29,7 +29,7 @@ function DetailSection({
         >
           {title}
         </span>
-        {isBestBadge && <Badge text="best" />}
+        {isBestBadge && <Badge type="best" text="best" />}
       </div>
       {children}
     </div>
