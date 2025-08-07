@@ -34,6 +34,7 @@ const BADGE_STYLES: Record<BadgeType, BadgeStyle> = {
 };
 
 export const base = (type: BadgeType) => css`
+  width: fit-content;
   padding: ${BADGE_STYLES[type].padding};
   border-radius: ${borderRadiusToken.global};
   color: ${BADGE_STYLES[type].color};
