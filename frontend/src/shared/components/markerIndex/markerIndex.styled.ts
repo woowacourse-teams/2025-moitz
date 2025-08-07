@@ -20,7 +20,7 @@ export const circle_base = () => css`
 `;
 
 export const circle_font = () => css`
-  transform: translate(5%, 5%);
+  transform: translate(0%, 5%);
 `;
 
 export const circle_recommended = () => css`
