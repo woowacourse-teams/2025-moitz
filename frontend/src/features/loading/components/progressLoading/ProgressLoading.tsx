@@ -11,13 +11,9 @@ import * as loading from './progressLoading.styled';
 
 interface ProgressLoadingProps {
   isLoading?: boolean;
-  onLoadingComplete?: () => void;
 }
 
-function ProgressLoading({
-  isLoading = true,
-  onLoadingComplete,
-}: ProgressLoadingProps) {
+function ProgressLoading({ isLoading = true }: ProgressLoadingProps) {
   const { progress, isComplete, complete } = useProgress();
   const [textIndex, setTextIndex] = useState(0);
 
@@ -26,12 +22,6 @@ function ProgressLoading({
       complete();
     }
   }, [isLoading, isComplete]);
-
-  useEffect(() => {
-    if (isComplete && onLoadingComplete) {
-      onLoadingComplete();
-    }
-  }, [isComplete, onLoadingComplete]);
 
   useEffect(() => {
     if (!isLoading || isComplete) return;
