@@ -41,5 +41,6 @@ export const base = (type: BadgeType) => css`
 `;
 
 export const text = (type: BadgeType) => css`
+  transform: translate(0%, 5%);
   ${BADGE_STYLES[type].typography};
 `;
