@@ -43,10 +43,10 @@ export const label_base = () => css`
   font-weight: 600;
   font-size: 10px;
   text-shadow:
-    -0.5px -0.5px 0 white,
-    0.5px -0.5px 0 white,
-    -0.5px 0.5px 0 white,
-    0.5px 0.5px 0 white;
+    -0.5px -0.5px 0 ${colorToken.gray[8]},
+    0.5px -0.5px 0 ${colorToken.gray[8]},
+    -0.5px 0.5px 0 ${colorToken.gray[8]},
+    0.5px 0.5px 0 ${colorToken.gray[8]};
 `;
 
 export const label_recommended = () => css`
