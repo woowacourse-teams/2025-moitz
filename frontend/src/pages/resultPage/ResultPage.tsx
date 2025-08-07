@@ -65,6 +65,8 @@ function ResultPage() {
       <Map
         startingLocations={StartingPlacesMock}
         recommendedLocations={recommendedLocations}
+        currentView={currentView}
+        handleBackButtonClick={handleBackButtonClick}
       />
       <BottomSheet
         startingLocations={StartingPlacesMock}

@@ -1,6 +1,8 @@
 import { useEffect, useRef } from 'react';
 import { Link } from 'react-router';
 
+import { View } from '@features/recommendation/types/bottomSheetView';
+
 import { StartingPlace, RecommendedLocation } from '@entities/types/Location';
 
 import MapButton from '@shared/components/mapButton/MapButton';
@@ -15,9 +17,16 @@ import * as map from './map.styled';
 interface MapProps {
   startingLocations: StartingPlace[];
   recommendedLocations: RecommendedLocation[];
+  currentView: View;
+  handleBackButtonClick: () => void;
 }
 
-function Map({ startingLocations }: MapProps) {
+function Map({
+  startingLocations,
+  recommendedLocations,
+  currentView,
+  handleBackButtonClick,
+}: MapProps) {
   const mapRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
@@ -46,9 +55,17 @@ function Map({ startingLocations }: MapProps) {
     <div css={map.container()}>
       <div ref={mapRef} css={map.base()} />
       <div css={[flex({ justify: 'space-between' }), map.top_overlay()]}>
-        <Link to="/">
-          <MapButton src={IconBack} alt="back" />
-        </Link>
+        {currentView === 'list' ? (
+          <Link to="/">
+            <MapButton src={IconBack} alt="back" />
+          </Link>
+        ) : (
+          <MapButton
+            src={IconBack}
+            alt="back"
+            onClick={handleBackButtonClick}
+          />
+        )}
         <Link to="/">
           <MapButton src={IconShare} alt="share" />
         </Link>
