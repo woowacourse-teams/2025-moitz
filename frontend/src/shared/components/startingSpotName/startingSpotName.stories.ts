@@ -1,4 +1,4 @@
-import startingLocationsMock from '@mocks/startingLocationsMock';
+import { StartingPlacesMock } from '@mocks/LocationsMock';
 
 import StartingSpotName from './StartingSpotName';
 
@@ -24,14 +24,14 @@ type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {
   args: {
-    location: startingLocationsMock[0],
+    location: StartingPlacesMock[0],
     isLast: false,
   },
 };
 
 export const Last: Story = {
   args: {
-    location: startingLocationsMock[0],
+    location: StartingPlacesMock[0],
     isLast: true,
   },
 };

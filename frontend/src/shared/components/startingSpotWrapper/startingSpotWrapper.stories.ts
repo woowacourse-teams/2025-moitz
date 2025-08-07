@@ -1,4 +1,4 @@
-import startSpotNameListMock from '@mocks/startingLocationsMock';
+import { StartingPlacesMock } from '@mocks/LocationsMock';
 
 import { withContainer } from '../../../../.storybook/decorators/withContainer';
 
@@ -27,7 +27,7 @@ type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {
   args: {
-    startingLocations: startSpotNameListMock,
+    startingLocations: StartingPlacesMock,
   },
 };
 

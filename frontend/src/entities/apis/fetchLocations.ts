@@ -1,8 +1,4 @@
-type LocationRequestBody = {
-  startingPlaceNames: string[];
-  meetingTime: string;
-  requirement: string;
-};
+import { LocationRequestBody } from '@entities/types/LocationRequestBody';
 
 const BASE_URL = process.env.API_BASE_URL;
 

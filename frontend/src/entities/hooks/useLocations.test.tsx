@@ -1,22 +1,17 @@
 import { renderHook, waitFor } from '@testing-library/react';
 import { http, HttpResponse } from 'msw';
 
+import { LocationsRequestBodyMock } from '@mocks/LocationsRequestBodyMock';
 import { server } from '@mocks/server';
 
 import useLocations from './useLocations';
 
 const BASE_URL = process.env.API_BASE_URL;
 
-const requestBody = {
-  startingPlaceNames: ['강변역', '신촌역'],
-  meetingTime: '14:00',
-  requirement: '노래방',
-};
-
 describe('useLocations', () => {
   it('정상적으로 추천 장소를 받아온다', async () => {
     // when: 훅을 실행하면
-    const { result } = renderHook(() => useLocations(requestBody));
+    const { result } = renderHook(() => useLocations(LocationsRequestBodyMock));
 
     // then: 초기에는 로딩 중이어야 한다
     expect(result.current.isLoading).toBe(true);
@@ -25,7 +20,9 @@ describe('useLocations', () => {
     await waitFor(() => {
       expect(result.current.isLoading).toBe(false);
       expect(result.current.isError).toBe(false);
-      expect(result.current.data.length).toBeGreaterThan(0);
+      expect(result.current.data.recommendedLocations.length).toBeGreaterThan(
+        0,
+      );
     });
   });
 
@@ -41,7 +38,7 @@ describe('useLocations', () => {
     );
 
     // when: 훅을 실행하면
-    const { result } = renderHook(() => useLocations(requestBody));
+    const { result } = renderHook(() => useLocations(LocationsRequestBodyMock));
 
     // then: 초기에는 로딩 중이어야 한다
     expect(result.current.isLoading).toBe(true);
@@ -50,7 +47,7 @@ describe('useLocations', () => {
     await waitFor(() => {
       expect(result.current.isLoading).toBe(false);
       expect(result.current.isError).toBe(true);
-      expect(result.current.data.length).toBe(0);
+      expect(result.current.data.recommendedLocations.length).toBe(0);
     });
   });
 });

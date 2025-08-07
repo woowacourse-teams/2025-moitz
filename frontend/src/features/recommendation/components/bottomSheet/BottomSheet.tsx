@@ -1,17 +1,14 @@
 import SpotItemList from '@features/recommendation/components/spotItemList/SpotItemList';
 
-import { RecommendedLocation } from '@entities/types/Location';
-
+import { RecommendedLocation, StartingPlace } from '@entities/types/Location';
 
 import StartingSpotWrapper from '@shared/components/startingSpotWrapper/StartingSpotWrapper';
 import { flex } from '@shared/styles/default.styled';
 
-import { startingLocation } from '@shared/types/startingLocation';
-
 import * as bottomSheet from './bottomSheet.styled';
 
 interface BottomSheetProps {
-  startingLocations: startingLocation[];
+  startingLocations: StartingPlace[];
   recommendedLocations: RecommendedLocation[];
 }
 

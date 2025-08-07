@@ -1,11 +1,11 @@
-import { flex, typography } from '@shared/styles/default.styled';
+import { StartingPlace } from '@entities/types/Location';
 
-import { startingLocation } from '@shared/types/startingLocation';
+import { flex, typography } from '@shared/styles/default.styled';
 
 import * as startingSpotNameStyled from './startingSpotName.styled';
 
 interface StartSpotNameProps {
-  location: startingLocation;
+  location: StartingPlace;
   isLast: boolean;
 }
 

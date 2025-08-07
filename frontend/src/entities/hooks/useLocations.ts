@@ -2,22 +2,22 @@ import { useEffect, useState } from 'react';
 
 import fetchLocations from '@entities/apis/fetchLocations';
 import { Location } from '@entities/types/Location';
+import { LocationRequestBody } from '@entities/types/LocationRequestBody';
 
 type useLocationsReturn = {
-  data: Location[];
+  data: Location;
   isLoading: boolean;
   isError: boolean;
   errorMessage: string;
 };
 
-export type LocationRequestBody = {
-  startingPlaceNames: string[];
-  meetingTime: string;
-  requirement: string;
+const initialData = {
+  startingPlaces: [],
+  recommendedLocations: [],
 };
 
 const useLocations = (requestBody: LocationRequestBody): useLocationsReturn => {
-  const [data, setData] = useState<Location[]>([]);
+  const [data, setData] = useState<Location>(initialData);
   const [isLoading, setIsLoading] = useState(true);
   const [isError, setIsError] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');

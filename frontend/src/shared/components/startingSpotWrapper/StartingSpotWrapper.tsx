@@ -1,12 +1,12 @@
+import { StartingPlace } from '@entities/types/Location';
+
 import StartingSpotName from '@shared/components/startingSpotName/StartingSpotName';
 import { flex, typography } from '@shared/styles/default.styled';
-
-import { startingLocation } from '@shared/types/startingLocation';
 
 import * as startSpotWrapper from './startingSpotWrapper.styled';
 
 interface StaringSpotWrapperProps {
-  startingLocations: startingLocation[];
+  startingLocations: StartingPlace[];
 }
 
 function StartingSpotWrapper({ startingLocations }: StaringSpotWrapperProps) {

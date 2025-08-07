@@ -1,3 +1,11 @@
+export type StartingPlace = {
+  id: number;
+  index: number;
+  x: number;
+  y: number;
+  name: string;
+};
+
 export type RecommendedPlace = {
   index: number;
   name: string;
@@ -9,15 +17,17 @@ export type RecommendedPlace = {
 export type RecommendedPath = {
   index: number;
   startStation: string;
+  startingX: number;
+  startingY: number;
   endStation: string;
+  endingX: number;
+  endingY: number;
   lineCode: string;
   travelTime: number;
 };
 
 export type RecommendedRoute = {
-  startPlace: string;
-  startingX: number;
-  startingY: number;
+  startingPlaceId: number;
   transferCount: number;
   totalTravelTime: number;
   paths: RecommendedPath[];
@@ -33,8 +43,11 @@ export type RecommendedLocation = {
   isBest: boolean;
   description: string;
   reason: string;
+  places?: RecommendedPlace[];
+  routes?: RecommendedRoute[];
 };
+
 export type Location = {
-  places: RecommendedPlace[];
-  routes: RecommendedRoute[];
-} & RecommendedLocation;
+  startingPlaces: StartingPlace[];
+  recommendedLocations: RecommendedLocation[];
+};
