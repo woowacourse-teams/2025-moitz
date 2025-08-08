@@ -82,7 +82,7 @@ public class RecommendationService {
         placeRoutes.forEach((key, value) -> {
             if (!value.isAcceptable()) {
                 generatedPlaces.remove(key);
-                log.warn("장소 제거 {}", key.getName());
+                log.debug("장소 제거 {}", key.getName());
             }
         });
     }
