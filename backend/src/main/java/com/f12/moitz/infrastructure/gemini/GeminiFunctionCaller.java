@@ -82,6 +82,9 @@ public class GeminiFunctionCaller {
                     .build();
             log.debug("함수 호출 결과 content 생성: {}", content.parts()
                     .orElseThrow(() -> new IllegalStateException("함수 호출 결과 content 생성 실패"))
+                    .getFirst()
+                    .functionResponse()
+                    .isPresent()
             );
 
             history.add(content);
