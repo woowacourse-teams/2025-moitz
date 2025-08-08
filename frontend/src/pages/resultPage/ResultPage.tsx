@@ -1,21 +1,15 @@
 import Map from '@features/map/components/map/Map';
 import BottomSheet from '@features/recommendation/components/bottomSheet/BottomSheet';
 
-import useLocations from '@entities/hooks/useLocations';
+import { useLocationsContext } from '@entities/contexts/useLocationsContext';
 import { RecommendedLocation, StartingPlace } from '@entities/types/Location';
 
 import { flex } from '@shared/styles/default.styled';
 
-import { LocationsRequestBodyMock } from '@mocks/LocationsRequestBodyMock';
-
 import * as resultPage from './resultPage.styled';
 
 function ResultPage() {
-  const {
-    data: location,
-    isLoading,
-    isError,
-  } = useLocations(LocationsRequestBodyMock);
+  const { data: location, isLoading, isError } = useLocationsContext();
 
   if (isLoading) return <p>로딩중...</p>;
   if (isError) return <p>에러 발생!</p>;

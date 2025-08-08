@@ -7,11 +7,13 @@ import {
   validateForm,
 } from '@features/meeting/utils/formValidation';
 
+import { LocationRequirement } from '@entities/types/LocationRequestBody';
+
 import { ValidationError } from '@shared/types/validationError';
 
 type UseFormInfoReturn = {
   departureList: string[];
-  conditionID: string;
+  conditionID: LocationRequirement;
   addDepartureWithValidation: (departure: string) => ValidationError;
   removeDepartureAtIndex: (index: number) => void;
   updateConditionID: (condition: string) => void;
@@ -20,7 +22,7 @@ type UseFormInfoReturn = {
 
 export function useFormInfo(): UseFormInfoReturn {
   const [departureList, setDepartureList] = useState<string[]>([]);
-  const [conditionID, setConditionID] = useState<string>('');
+  const [conditionID, setConditionID] = useState<LocationRequirement>();
 
   const addDepartureWithValidation = (departure: string): ValidationError => {
     const stationNameValidation = validateStationName(departure);
@@ -51,7 +53,7 @@ export function useFormInfo(): UseFormInfoReturn {
     setDepartureList((prev) => prev.filter((_, i) => i !== index));
   };
 
-  const updateConditionID = (condition: string) => {
+  const updateConditionID = (condition: LocationRequirement) => {
     setConditionID(condition);
   };
 
