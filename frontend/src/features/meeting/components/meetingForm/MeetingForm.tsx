@@ -58,12 +58,12 @@ function MeetingForm() {
       return;
     }
 
+    navigate('/result');
+
     await trigger({
       startingPlaceNames: departureList,
       requirement: conditionID,
     });
-
-    navigate('/result');
   };
 
   return (
