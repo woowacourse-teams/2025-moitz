@@ -12,7 +12,7 @@ const meta = {
   },
   tags: ['autodocs'],
   argTypes: {
-    location: {
+    place: {
       control: { type: 'object' },
       description: '출발지 이름 목록',
     },
@@ -24,14 +24,14 @@ type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {
   args: {
-    location: StartingPlacesMock[0],
+    place: StartingPlacesMock[0],
     isLast: false,
   },
 };
 
 export const Last: Story = {
   args: {
-    location: StartingPlacesMock[0],
+    place: StartingPlacesMock[0],
     isLast: true,
   },
 };

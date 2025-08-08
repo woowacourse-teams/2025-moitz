@@ -1,32 +1,32 @@
-import { RecommendedLocationsMock } from '@mocks/LocationsMock';
+import { routeCardMock } from '@mocks/routeCardMock';
 
 import { withContainer } from '../../../../../.storybook/decorators/withContainer';
 
-import SpotItemList from './SpotItemList';
+import RouteCardDetail from './RouteCardDetail';
 
 import type { Meta, StoryObj } from '@storybook/react-webpack5';
 
 const meta = {
-  title: 'features/SpotItemList',
-  component: SpotItemList,
+  title: 'features/detail/RouteCardDetail',
+  component: RouteCardDetail,
   decorators: [withContainer],
   parameters: {
     layout: 'centered',
   },
   tags: ['autodocs'],
   argTypes: {
-    onSpotClick: {
-      action: 'onSpotClick',
+    paths: {
+      control: { type: 'object' },
+      description: '경로 정보',
     },
   },
-} satisfies Meta<typeof SpotItemList>;
+} satisfies Meta<typeof RouteCardDetail>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {
   args: {
-    recommendedLocations: RecommendedLocationsMock,
-    onSpotClick: () => {},
+    paths: routeCardMock.paths,
   },
 };

@@ -33,6 +33,9 @@ const meta = {
       control: { type: 'boolean' },
       description: '추천 장소의 best 여부',
     },
+    onClick: {
+      action: 'onClick',
+    },
   },
 } satisfies Meta<typeof SpotItem>;
 
@@ -46,6 +49,7 @@ export const Default: Story = {
     description: '설명입니다.',
     avgMinutes: 10,
     isBest: false,
+    onClick: () => {},
   },
 };
 
@@ -56,5 +60,6 @@ export const Best: Story = {
     description: '설명입니다.',
     avgMinutes: 10,
     isBest: true,
+    onClick: () => {},
   },
 };

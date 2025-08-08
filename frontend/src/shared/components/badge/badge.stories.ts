@@ -10,6 +10,11 @@ const meta = {
   },
   tags: ['autodocs'],
   argTypes: {
+    type: {
+      control: { type: 'radio' },
+      options: ['best', 'category', 'transfer'],
+      description: '뱃지 타입',
+    },
     text: {
       control: { type: 'text' },
       description: '뱃지에 표시될 텍스트',
@@ -20,6 +25,18 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const Default: Story = {
-  args: { text: 'best' },
+export const Best: Story = {
+  args: { type: 'best', text: 'best' },
+};
+
+export const Category: Story = {
+  args: { type: 'category', text: 'category' },
+};
+
+export const TransferCount: Story = {
+  args: { type: 'transfer', text: '🚊 환승 0회' },
+};
+
+export const TransferTime: Story = {
+  args: { type: 'transfer', text: '🕐 00분' },
 };
