@@ -22,6 +22,7 @@ import com.f12.moitz.domain.Recommendation;
 import com.f12.moitz.domain.RecommendedPlace;
 import com.f12.moitz.domain.Route;
 import com.f12.moitz.domain.TravelMethod;
+import com.f12.moitz.infrastructure.gemini.dto.LocationNameAndReason;
 import com.f12.moitz.infrastructure.gemini.dto.RecommendedLocationResponse;
 import java.util.Collections;
 import java.util.List;
@@ -58,28 +59,34 @@ class RecommendationServiceTest {
         final Place yeoksam = new Place("역삼역", new Point(127.036, 37.501));
         final List<Place> startingPlaces = List.of(gangnam, yeoksam);
 
-        final Place seolleung = new Place("선릉역", new Point(127.048, 37.504)); // 좋은 후보지
-        final Place samsung = new Place("삼성역", new Point(127.063, 37.508)); // 나쁜 후보지 (제거 대상)
+        final Place seolleung = new Place("선릉역", new Point(127.048, 37.504));
+        final Place samsung = new Place("삼성역", new Point(127.063, 37.508));
+
+        given(recommender.findPlacesByNames(anyList())).willReturn(startingPlaces);
+        final RecommendedLocationResponse mockLocationResponse = new RecommendedLocationResponse(List.of(
+                new LocationNameAndReason("선릉역", "이유1"),
+                new LocationNameAndReason("삼성역", "이유2")
+        ));
+
+        given(recommender.getRecommendedLocations(anyList(), anyString())).willReturn(mockLocationResponse);
         final Map<Place, String> generatedPlacesWithReason = Map.of(
                 seolleung, "이유1",
                 samsung, "이유2"
         );
 
-        given(recommender.findPlacesByNames(anyList())).willReturn(startingPlaces);
-        given(recommender.recommendLocations(anyList(), any(String.class))).willReturn(generatedPlacesWithReason);
-
+        given(recommender.recommendLocations(any())).willReturn(generatedPlacesWithReason);
         Map<Place, List<RecommendedPlace>> mockRecommendedPlaces = Map.of(
                 seolleung, List.of(new RecommendedPlace("스타벅스 선릉점", "카페", 5, "url")),
-                samsung, List.of(new RecommendedPlace("스타벅스 삼성점", "카페", 4, "url")) // 삼성역에 대한 데이터도 추가
+                samsung, List.of(new RecommendedPlace("스타벅스 삼성점", "카페", 4, "url"))
         );
+
         given(recommender.recommendPlaces(anyList(), any(String.class))).willReturn(mockRecommendedPlaces);
-        given(recommender.recommendLocations(any(RecommendedLocationResponse.class))).willReturn(generatedPlacesWithReason);
 
         List<Route> mockRoutes = List.of(
-                new Route(List.of(new Path(gangnam, seolleung, TravelMethod.SUBWAY, 10, "2호선"))), // OK
-                new Route(List.of(new Path(yeoksam, seolleung, TravelMethod.SUBWAY, 5, "2호선"))),  // OK
-                new Route(List.of(new Path(gangnam, samsung, TravelMethod.SUBWAY, 999, "2호선"))),// 🚨 제거될 경로 (시간 초과)
-                new Route(List.of(new Path(yeoksam, samsung, TravelMethod.SUBWAY, 10, "2호선"))) // OK
+                new Route(List.of(new Path(gangnam, seolleung, TravelMethod.SUBWAY, 10, "2호선"))),
+                new Route(List.of(new Path(yeoksam, seolleung, TravelMethod.SUBWAY, 5, "2호선"))),
+                new Route(List.of(new Path(gangnam, samsung, TravelMethod.SUBWAY, 999, "2호선"))),
+                new Route(List.of(new Path(yeoksam, samsung, TravelMethod.SUBWAY, 10, "2호선")))
         );
         given(routeFinder.findRoutes(anyList())).willReturn(mockRoutes);
 
@@ -96,7 +103,6 @@ class RecommendationServiceTest {
         assertThat(actualResponse.recommendedLocations()).hasSize(1);
         assertThat(actualResponse.recommendedLocations().getFirst().name()).isEqualTo("선릉역");
 
-        // routeFinder의 findRoutes가 정확히 1번 호출되었는지 검증
         verify(routeFinder, times(1)).findRoutes(anyList());
     }
 
