@@ -83,7 +83,7 @@ function MeetingForm() {
 
       <BottomButton
         type="submit"
-        text="중간지점 찾기"
+        text="모임 지점 찾기"
         active={validateActive()}
       />
       <Toast message={message} isVisible={isVisible} />
