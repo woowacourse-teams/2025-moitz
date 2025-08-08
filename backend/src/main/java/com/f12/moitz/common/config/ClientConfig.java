@@ -1,11 +1,16 @@
 package com.f12.moitz.common.config;
 
 import com.google.genai.Client;
+import io.netty.handler.timeout.ReadTimeoutHandler;
+import io.netty.handler.timeout.WriteTimeoutHandler;
 import java.time.Duration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
+import org.springframework.http.client.reactive.ReactorClientHttpConnector;
 import org.springframework.web.client.RestClient;
+import org.springframework.web.reactive.function.client.WebClient;
+import reactor.netty.http.client.HttpClient;
 
 @Configuration
 public class ClientConfig {
@@ -40,6 +45,19 @@ public class ClientConfig {
     @Bean
     public Client.Builder geminiClientBuilder() {
         return Client.builder();
+    }
+
+    @Bean
+    public WebClient odsayWebClient() {
+        HttpClient httpClient = HttpClient.create()
+                .responseTimeout(Duration.ofSeconds(5))
+                .doOnConnected(conn -> conn.addHandlerLast(new ReadTimeoutHandler(5))
+                        .addHandlerLast(new WriteTimeoutHandler(5)));
+
+        return WebClient.builder()
+                .baseUrl("https://api.odsay.com/v1/api")
+                .clientConnector(new ReactorClientHttpConnector(httpClient))
+                .build();
     }
 
 }

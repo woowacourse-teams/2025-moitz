@@ -4,6 +4,7 @@ import com.f12.moitz.application.dto.RecommendationRequest;
 import com.f12.moitz.application.port.Recommender;
 import com.f12.moitz.application.dto.RecommendationsResponse;
 import com.f12.moitz.application.port.RouteFinder;
+import com.f12.moitz.application.port.dto.StartEndPair;
 import com.f12.moitz.application.utils.RecommendationMapper;
 import com.f12.moitz.domain.Candidate;
 import com.f12.moitz.domain.RecommendCondition;
@@ -12,23 +13,34 @@ import com.f12.moitz.domain.Place;
 import com.f12.moitz.domain.RecommendedPlace;
 import com.f12.moitz.domain.Route;
 import com.f12.moitz.domain.Routes;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import lombok.RequiredArgsConstructor;
+import java.util.Map.Entry;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 @Slf4j
 @Service
-@RequiredArgsConstructor
 public class RecommendationService {
 
     private final Recommender recommender;
     private final RouteFinder routeFinder;
 
     private final RecommendationMapper recommendationMapper;
+
+    public RecommendationService(
+            @Autowired final Recommender recommender,
+            @Qualifier("routeFinderAsyncAdapter") final RouteFinder routeFinder,
+            @Autowired final RecommendationMapper recommendationMapper
+    ) {
+        this.recommender = recommender;
+        this.routeFinder = routeFinder;
+        this.recommendationMapper = recommendationMapper;
+    }
 
     public RecommendationsResponse recommendLocation(final RecommendationRequest request) {
         final String requirement = RecommendCondition.fromTitle(request.requirement()).getCategoryNames();
@@ -40,7 +52,7 @@ public class RecommendationService {
         );
         final List<Place> generatedPlaces = generatedPlacesWithReason.keySet().stream().toList();
 
-        final Map<Place, Routes> placeRoutes = findRoutesForAll(startingPlaces, generatedPlaces);
+        final Map<Place, Routes> placeRoutes = findRoutesForAllAsync(startingPlaces, generatedPlaces);
         removePlacesBeyondRange(placeRoutes, generatedPlacesWithReason);
 
         final Map<Place, List<RecommendedPlace>> recommendedPlaces = recommender.recommendPlaces(
@@ -57,16 +69,28 @@ public class RecommendationService {
         return recommendationMapper.toResponse(startingPlaces, recommendation, generatedPlacesWithReason);
     }
 
-    private Map<Place, Routes> findRoutesForAll(final List<Place> startingPlaces, final List<Place> generatedPlaces) {
-        final Map<Place, Routes> placeRoutes = new HashMap<>();
-        for (Place generatedPlace : generatedPlaces) {
-            final List<Route> routes = new ArrayList<>();
-            for (Place startingPlace : startingPlaces) {
-                routes.add(routeFinder.findRoute(startingPlace, generatedPlace));
-            }
-            placeRoutes.put(generatedPlace, new Routes(routes));
-        }
-        return placeRoutes;
+    public Map<Place, Routes> findRoutesForAllAsync(final List<Place> startingPlaces, final List<Place> generatedPlaces) {
+        final List<StartEndPair> allPairs = generatedPlaces.stream()
+                .flatMap(endPlace -> startingPlaces.stream()
+                        .map(startPlace -> new StartEndPair(startPlace, endPlace)))
+                .collect(Collectors.toList());
+
+        final List<Route> allRoutes = routeFinder.findRoutes(allPairs);
+
+        return IntStream.range(0, allPairs.size())
+                .boxed()
+                .collect(Collectors.groupingBy(
+                        i -> allPairs.get(i).end(),
+                        Collectors.mapping(
+                                allRoutes::get,
+                                Collectors.toList()
+                        )
+                ))
+                .entrySet().stream()
+                .collect(Collectors.toMap(
+                        Entry::getKey,
+                        entry -> new Routes(entry.getValue())
+                ));
     }
 
     private void removePlacesBeyondRange(
