@@ -23,6 +23,13 @@ public record KakaoApiResponse(
                 .orElse(null);
     }
 
+    public int size() {
+        if (documents == null) {
+            return 0;
+        }
+        return documents.size();
+    }
+
 }
 
 record Document(
