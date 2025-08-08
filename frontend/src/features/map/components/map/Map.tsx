@@ -1,9 +1,9 @@
-import { useEffect, useRef } from 'react';
 import { Link } from 'react-router';
 
+import { useCustomOverlays } from '@features/map/hooks/useCustomOverlays';
 import { View } from '@features/recommendation/types/bottomSheetView';
 
-import { StartingPlace } from '@entities/types/Location';
+import { RecommendedLocation, StartingPlace } from '@entities/types/Location';
 
 import MapButton from '@shared/components/mapButton/MapButton';
 import MapPoint from '@shared/components/mapPoint/MapPoint';
@@ -14,6 +14,7 @@ import IconBack from '@icons/icon-back.svg';
 import * as map from './map.styled';
 
 interface MapProps {
+  recommendedLocations: RecommendedLocation[];
   startingLocations: StartingPlace[];
   currentView: View;
   handleBackButtonClick: () => void;
@@ -21,32 +22,14 @@ interface MapProps {
 
 function Map({
   startingLocations,
+  recommendedLocations,
   currentView,
   handleBackButtonClick,
 }: MapProps) {
-  const mapRef = useRef<HTMLDivElement | null>(null);
-
-  useEffect(() => {
-    const { naver } = window;
-
-    if (!naver || !mapRef.current) return;
-
-    const locations = startingLocations.map(
-      (location) => new naver.maps.LatLng(location.y, location.x),
-    );
-
-    const map = new naver.maps.Map(mapRef.current, {
-      center: locations[0],
-      zoom: 11,
-    });
-
-    locations.forEach((location) => {
-      new naver.maps.Marker({
-        map,
-        position: location,
-      });
-    });
-  }, []);
+  const mapRef = useCustomOverlays({
+    startingLocations,
+    recommendedLocations,
+  });
 
   return (
     <div css={map.container()}>

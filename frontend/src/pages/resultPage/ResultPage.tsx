@@ -5,13 +5,10 @@ import Map from '@features/map/components/map/Map';
 import BottomSheet from '@features/recommendation/components/bottomSheet/BottomSheet';
 import { View } from '@features/recommendation/types/bottomSheetView';
 
-import useLocations from '@entities/hooks/useLocations';
-import { RecommendedLocation } from '@entities/types/Location';
+import { useLocationsContext } from '@entities/contexts/useLocationsContext';
+import { RecommendedLocation, StartingPlace } from '@entities/types/Location';
 
 import { flex } from '@shared/styles/default.styled';
-
-import { StartingPlacesMock } from '@mocks/LocationsMock';
-import { LocationsRequestBodyMock } from '@mocks/LocationsRequestBodyMock';
 
 import * as resultPage from './resultPage.styled';
 
@@ -20,32 +17,12 @@ function ResultPage() {
   const [selectedLocation, setSelectedLocation] =
     useState<RecommendedLocation | null>(null);
 
-  const {
-    data: location,
-    isLoading,
-    isError,
-  } = useLocations(LocationsRequestBodyMock);
+  const { data: location, isLoading, isError } = useLocationsContext();
 
   if (isLoading) return <ProgressLoading isLoading={isLoading} />;
   if (isError) return <p>에러 발생!</p>;
   if (!location || location.recommendedLocations.length === 0)
     return <p>추천 결과가 없습니다.</p>;
-
-  // TODO : 일단 맵에서 안쓰이는데
-  // const recommendedLocations: RecommendedLocation[] =
-  //   location.recommendedLocations.map((location) => {
-  //     return {
-  //       id: location.id,
-  //       index: location.index,
-  //       x: location.x,
-  //       y: location.y,
-  //       name: location.name,
-  //       avgMinutes: location.avgMinutes,
-  //       isBest: location.isBest,
-  //       description: location.description,
-  //       reason: location.reason,
-  //     };
-  //   });
 
   const handleSpotClick = (spot: RecommendedLocation) => {
     setSelectedLocation(spot);
@@ -62,6 +39,33 @@ function ResultPage() {
   if (!location || location.recommendedLocations.length === 0)
     return <p>추천 결과가 없습니다.</p>;
 
+  const startingPlaces: StartingPlace[] = location.startingPlaces.map(
+    (location) => {
+      return {
+        id: location.id,
+        index: location.index,
+        x: location.x,
+        y: location.y,
+        name: location.name,
+      };
+    },
+  );
+
+  const recommendedLocations: RecommendedLocation[] =
+    location.recommendedLocations.map((location) => {
+      return {
+        id: location.id,
+        index: location.index,
+        x: location.x,
+        y: location.y,
+        name: location.name,
+        avgMinutes: location.avgMinutes,
+        isBest: location.isBest,
+        description: location.description,
+        reason: location.reason,
+      };
+    });
+
   return (
     <div
       css={[
@@ -70,12 +74,13 @@ function ResultPage() {
       ]}
     >
       <Map
-        startingLocations={StartingPlacesMock}
+        startingLocations={startingPlaces}
+        recommendedLocations={recommendedLocations}
         currentView={currentView}
         handleBackButtonClick={handleBackButtonClick}
       />
       <BottomSheet
-        startingLocations={StartingPlacesMock}
+        startingLocations={startingPlaces}
         recommendedLocations={location.recommendedLocations}
         currentView={currentView}
         selectedLocation={selectedLocation}

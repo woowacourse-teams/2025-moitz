@@ -1,8 +1,11 @@
 import React from 'react';
+import { useNavigate } from 'react-router';
 
 import { useFormInfo } from '@features/meeting/hooks/useFormInfo';
 import Toast from '@features/toast/components/Toast';
 import { useToast } from '@features/toast/hooks/useToast';
+
+import { useLocationsContext } from '@entities/contexts/useLocationsContext';
 
 import BottomButton from '@shared/components/bottomButton/BottomButton';
 import { flex } from '@shared/styles/default.styled';
@@ -13,6 +16,8 @@ import ConditionSelector from '../conditionSelector/ConditionSelector';
 import DepartureInput from '../departureInput/DepartureInput';
 
 function MeetingForm() {
+  let navigate = useNavigate();
+
   const {
     departureList,
     conditionID,
@@ -22,6 +27,8 @@ function MeetingForm() {
     validateFormSubmit,
   } = useFormInfo();
   const { isVisible, message, showToast } = useToast();
+
+  const { trigger } = useLocationsContext();
 
   const showValidationError = (error: ValidationError) => {
     if (!error.isValid) {
@@ -42,7 +49,7 @@ function MeetingForm() {
     return formValidation.isValid;
   };
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     const formValidation = validateFormSubmit();
@@ -50,6 +57,13 @@ function MeetingForm() {
       showValidationError(formValidation);
       return;
     }
+
+    await trigger({
+      startingPlaceNames: departureList,
+      requirement: conditionID,
+    });
+
+    navigate('/result');
   };
 
   return (
