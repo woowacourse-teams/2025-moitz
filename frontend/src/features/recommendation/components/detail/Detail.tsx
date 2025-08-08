@@ -1,3 +1,4 @@
+import { useLocationsContext } from '@entities/contexts/useLocationsContext';
 import { RecommendedLocation } from '@entities/types/Location';
 
 import { flex, scroll, typography } from '@shared/styles/default.styled';
@@ -14,6 +15,8 @@ interface DetailProps {
 }
 
 function Detail({ selectedLocation }: DetailProps) {
+  const { data: location } = useLocationsContext();
+
   return (
     <div css={[flex({ direction: 'column', gap: 30 }), detail.container()]}>
       <DetailSection
@@ -38,7 +41,11 @@ function Detail({ selectedLocation }: DetailProps) {
             <RouteCard
               key={route.startingPlaceId}
               startingPlaceIndex={getAlphabetIndex(route.startingPlaceId)}
-              startingPlaceName={selectedLocation.name}
+              startingPlaceName={
+                location?.startingPlaces.find(
+                  (startingPlace) => startingPlace.id === route.startingPlaceId,
+                )?.name
+              }
               route={route}
             />
           ))}
