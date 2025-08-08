@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 
+import com.f12.moitz.application.port.dto.StartEndPair;
 import com.f12.moitz.domain.Path;
 import com.f12.moitz.domain.Place;
 import com.f12.moitz.domain.Point;
@@ -43,6 +44,7 @@ class RouteFinderAdapterTest {
         // Given
         final Place start = new Place("강남역", new Point(127.027, 37.497));
         final Place end = new Place("광화문역", new Point(126.977, 37.575));
+        final List<StartEndPair> pairs = List.of(new StartEndPair(start, end));
 
         final var walkPathStart = new SubPathResponse(3, 5, 0, "출발지", 0, 0, "강남역", 0, 0, Collections.emptyList(), null, null, null, null, null, null, null);
         final var subwayPath1 = new SubPathResponse(1, 15, 0, "강남역", 127.02, 37.49, "시청역", 126.97, 37.56, List.of(new LaneResponse("2호선", 2)), null, null, null, null, null, null, null);
@@ -62,12 +64,12 @@ class RouteFinderAdapterTest {
         given(odsayClient.getRoute(any(Point.class), any(Point.class))).willReturn(mockResponse);
 
         // When
-        final Route actualRoute = routeFinderAdapter.findRoute(start, end);
+        final List<Route> actualRoute = routeFinderAdapter.findRoutes(pairs);
 
         // Then
         SoftAssertions.assertSoftly(softAssertions -> {
             softAssertions.assertThat(actualRoute).isNotNull();
-            final List<Path> actualPaths = actualRoute.getPaths();
+            final List<Path> actualPaths = actualRoute.getFirst().getPaths();
 
             softAssertions.assertThat(actualPaths).hasSize(3);
 
@@ -98,13 +100,14 @@ class RouteFinderAdapterTest {
         // Given
         final Place startPlace = new Place("출발지", new Point(127.0, 37.0));
         final Place endPlace = new Place("도착지", new Point(127.1, 37.1));
+        final List<StartEndPair> pairs = List.of(new StartEndPair(startPlace, endPlace));
 
         final var resultResponse = new ResultResponse(0, Collections.emptyList());
         final var mockResponseWithEmptyPath = new SubwayRouteSearchResponse(resultResponse, Optional.empty());
         given(odsayClient.getRoute(any(Point.class), any(Point.class))).willReturn(mockResponseWithEmptyPath);
 
         // When & Then
-        assertThatThrownBy(() -> routeFinderAdapter.findRoute(startPlace, endPlace))
+        assertThatThrownBy(() -> routeFinderAdapter.findRoutes(pairs))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessage("경로 정보를 찾을 수 없습니다.");
     }

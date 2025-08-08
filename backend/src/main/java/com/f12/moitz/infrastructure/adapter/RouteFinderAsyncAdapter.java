@@ -7,7 +7,6 @@ import com.f12.moitz.domain.Place;
 import com.f12.moitz.domain.Point;
 import com.f12.moitz.domain.Route;
 import com.f12.moitz.domain.TravelMethod;
-import com.f12.moitz.infrastructure.odsay.OdsayClient;
 import com.f12.moitz.infrastructure.odsay.OdsayMultiClient;
 import com.f12.moitz.infrastructure.odsay.SubwayCode;
 import com.f12.moitz.infrastructure.odsay.dto.SubPathResponse;
@@ -25,21 +24,20 @@ import reactor.core.publisher.Mono;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class RouteFinderAdapter implements RouteFinder {
+public class RouteFinderAsyncAdapter implements RouteFinder {
 
-    private final OdsayClient odsayClient;
+    private final OdsayMultiClient odsayMultiClient;
 
     @Override
     public List<Route> findRoutes(final List<StartEndPair> placePairs) {
-        return placePairs.stream()
-                .map(pair -> {
-                    final Place startPlace = pair.start();
-                    final Place endPlace = pair.end();
-                    return new Route(
-                            convertPaths(odsayClient.getRoute(startPlace.getPoint(), endPlace.getPoint()))
-                    );
-                })
-                .toList();
+        return Flux.fromIterable(placePairs)
+                .flatMap(pair -> Mono.delay(Duration.ofMillis(1000))
+                                .then(odsayMultiClient.getRoute(pair.start().getPoint(), pair.end().getPoint())),
+                        5)
+                .map(this::convertPaths)
+                .map(Route::new)
+                .collectList()
+                .block();
     }
 
     // 해당 로직은 OdsayClient로 옮기는 게 좋을까?
