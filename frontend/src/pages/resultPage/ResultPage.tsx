@@ -19,11 +19,6 @@ function ResultPage() {
 
   const { data: location, isLoading, isError } = useLocationsContext();
 
-  if (isLoading) return <ProgressLoading isLoading={isLoading} />;
-  if (isError) return <p>에러 발생!</p>;
-  if (!location || location.recommendedLocations.length === 0)
-    return <p>추천 결과가 없습니다.</p>;
-
   const handleSpotClick = (spot: RecommendedLocation) => {
     setSelectedLocation(spot);
     setCurrentView('detail');
@@ -34,7 +29,7 @@ function ResultPage() {
     setCurrentView('list');
   };
 
-  if (isLoading) return <p>로딩중...</p>;
+  if (isLoading) return <ProgressLoading isLoading={isLoading} />;
   if (isError) return <p>에러 발생!</p>;
   if (!location || location.recommendedLocations.length === 0)
     return <p>추천 결과가 없습니다.</p>;
