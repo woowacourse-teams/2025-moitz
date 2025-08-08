@@ -31,20 +31,21 @@ function ResultPage() {
   if (!location || location.recommendedLocations.length === 0)
     return <p>추천 결과가 없습니다.</p>;
 
-  const recommendedLocations: RecommendedLocation[] =
-    location.recommendedLocations.map((location) => {
-      return {
-        id: location.id,
-        index: location.index,
-        x: location.x,
-        y: location.y,
-        name: location.name,
-        avgMinutes: location.avgMinutes,
-        isBest: location.isBest,
-        description: location.description,
-        reason: location.reason,
-      };
-    });
+  // TODO : 일단 맵에서 안쓰이는데
+  // const recommendedLocations: RecommendedLocation[] =
+  //   location.recommendedLocations.map((location) => {
+  //     return {
+  //       id: location.id,
+  //       index: location.index,
+  //       x: location.x,
+  //       y: location.y,
+  //       name: location.name,
+  //       avgMinutes: location.avgMinutes,
+  //       isBest: location.isBest,
+  //       description: location.description,
+  //       reason: location.reason,
+  //     };
+  //   });
 
   const handleSpotClick = (spot: RecommendedLocation) => {
     setSelectedLocation(spot);
@@ -70,7 +71,6 @@ function ResultPage() {
     >
       <Map
         startingLocations={StartingPlacesMock}
-        recommendedLocations={recommendedLocations}
         currentView={currentView}
         handleBackButtonClick={handleBackButtonClick}
       />
