@@ -15,7 +15,7 @@ interface DetailProps {
 
 function Detail({ selectedLocation }: DetailProps) {
   return (
-    <div css={flex({ direction: 'column', gap: 30 })}>
+    <div css={[flex({ direction: 'column', gap: 30 }), detail.container()]}>
       <DetailSection
         isHeader={true}
         title={selectedLocation.name}
