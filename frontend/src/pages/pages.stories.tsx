@@ -1,4 +1,5 @@
-import { withLayout } from '../../.storybook/decorators/withLayout';
+import { withLayout } from '@sb/decorators/withLayout';
+
 import App from '../app/App';
 
 import type { Meta, StoryObj } from '@storybook/react-webpack5';
