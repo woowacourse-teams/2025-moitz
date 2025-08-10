@@ -14,7 +14,6 @@ module.exports = {
     { directory: '../src/features', titlePrefix: 'features', files: '**/*.stories.@(ts|tsx)'},
     { directory: '../src/entities', titlePrefix: 'entities', files: '**/*.stories.@(ts|tsx)' },
     { directory: '../src/widgets', titlePrefix: 'widgets', files: '**/*.stories.@(ts|tsx)' },
-    { directory: '../src/pages', titlePrefix: 'pages', files: '**/*.stories.@(ts|tsx)' },
     { directory: '../src/shared', titlePrefix: 'shared', files: '**/*.stories.@(ts|tsx)' },
   ],
 
