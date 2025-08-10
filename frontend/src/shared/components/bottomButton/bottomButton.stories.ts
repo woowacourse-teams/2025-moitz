@@ -3,7 +3,6 @@ import BottomButton from './BottomButton';
 import type { Meta, StoryObj } from '@storybook/react-webpack5';
 
 const meta = {
-  title: 'shared/BottomButton',
   component: BottomButton,
   parameters: {
     layout: 'centered',

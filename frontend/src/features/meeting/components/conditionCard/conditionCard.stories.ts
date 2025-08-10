@@ -3,7 +3,6 @@ import ConditionCard from './ConditionCard';
 import type { Meta, StoryObj } from '@storybook/react-webpack5';
 
 const meta = {
-  title: 'features/meeting/ConditionCard',
   component: ConditionCard,
   parameters: {
     layout: 'centered',

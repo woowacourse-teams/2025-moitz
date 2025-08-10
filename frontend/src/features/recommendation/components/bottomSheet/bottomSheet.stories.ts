@@ -10,7 +10,6 @@ import BottomSheet from './BottomSheet';
 import type { Meta, StoryObj } from '@storybook/react-webpack5';
 
 const meta = {
-  title: 'features/BottomSheet',
   component: BottomSheet,
   decorators: [withContainer],
   parameters: {

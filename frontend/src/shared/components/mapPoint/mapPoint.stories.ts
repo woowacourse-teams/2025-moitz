@@ -3,7 +3,6 @@ import MapPoint from './MapPoint';
 import type { Meta, StoryObj } from '@storybook/react-webpack5';
 
 const meta = {
-  title: 'shared/MapPoint',
   component: MapPoint,
   parameters: {
     layout: 'centered',

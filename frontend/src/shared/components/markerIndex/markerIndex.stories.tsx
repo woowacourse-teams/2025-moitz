@@ -3,7 +3,6 @@ import MarkerIndex from './MarkerIndex';
 import type { Meta, StoryObj } from '@storybook/react-webpack5';
 
 const meta = {
-  title: 'shared/MarkerIndex',
   component: MarkerIndex,
   parameters: {
     layout: 'centered',
