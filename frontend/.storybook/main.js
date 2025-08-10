@@ -58,6 +58,7 @@ module.exports = {
         '@icons': path.resolve(__dirname, '../assets/icon'),
         '@mocks': path.resolve(__dirname, '../src/mocks'),
         '@config': path.resolve(__dirname, '../src/config'),
+        '@sb': path.resolve(__dirname, './'),
       };
     }
 
