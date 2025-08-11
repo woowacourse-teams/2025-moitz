@@ -48,7 +48,10 @@ function BottomSheet({
             />
           </>
         ) : (
-          <Detail selectedLocation={selectedLocation} />
+          <Detail
+            startingPlaces={startingLocations}
+            selectedLocation={selectedLocation}
+          />
         )}
       </div>
     </div>

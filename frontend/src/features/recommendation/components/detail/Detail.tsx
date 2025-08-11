@@ -1,4 +1,4 @@
-import { RecommendedLocation } from '@entities/types/Location';
+import { RecommendedLocation, StartingPlace } from '@entities/types/Location';
 
 import { flex, scroll, typography } from '@shared/styles/default.styled';
 import { getAlphabetIndex } from '@shared/utils/getAlphabet';
@@ -10,10 +10,11 @@ import RouteCard from '../routeCard/RouteCard';
 import * as detail from './detail.styled';
 
 interface DetailProps {
+  startingPlaces: StartingPlace[];
   selectedLocation: RecommendedLocation;
 }
 
-function Detail({ selectedLocation }: DetailProps) {
+function Detail({ startingPlaces, selectedLocation }: DetailProps) {
   return (
     <div css={flex({ direction: 'column', gap: 30 })}>
       <DetailSection
@@ -38,7 +39,11 @@ function Detail({ selectedLocation }: DetailProps) {
             <RouteCard
               key={route.startingPlaceId}
               startingPlaceIndex={getAlphabetIndex(route.startingPlaceId)}
-              startingPlaceName={selectedLocation.name}
+              startingPlaceName={
+                startingPlaces.find(
+                  (place) => place.id === route.startingPlaceId,
+                )?.name || ''
+              }
               route={route}
             />
           ))}
