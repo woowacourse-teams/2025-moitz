@@ -59,7 +59,7 @@ public class OdsayClient {
         }
         if (response.error().isPresent()) {
             // TODO: RETRYABLE 어노테이션을 사용하여 재시도 로직 구현
-            if ("429".equals(response.error().get().getFirst().code())) {
+            if ("429".equals(response.error().get().code())) {
                 throw new ExternalApiException(ExternalApiErrorCode.ODSAY_API_BLOCKED);
             }
             throw new ExternalApiException(ExternalApiErrorCode.INVALID_ODSAY_API_RESPONSE);

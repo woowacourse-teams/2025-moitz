@@ -33,7 +33,7 @@ class OdsayClientTest {
 
     @Mock
     private RestClient restClient;
-    
+
     @Mock
     private RestClient.RequestHeadersUriSpec requestHeadersUriSpec;
 
@@ -87,7 +87,7 @@ class OdsayClientTest {
         OdsayErrorResponse error = new OdsayErrorResponse("429", "API rate limit exceeded", "id");
         SubwayRouteSearchResponse errorResponse = new SubwayRouteSearchResponse(
                 null,
-                Optional.of(List.of(error))
+                Optional.of(error)
         );
 
         given(responseSpec.body(SubwayRouteSearchResponse.class)).willReturn(errorResponse);
@@ -108,7 +108,7 @@ class OdsayClientTest {
         OdsayErrorResponse error = new OdsayErrorResponse("500", "Internal Server Error", "id");
         SubwayRouteSearchResponse errorResponse = new SubwayRouteSearchResponse(
                 null,
-                Optional.of(List.of(error))
+                Optional.of(error)
         );
 
         given(responseSpec.body(SubwayRouteSearchResponse.class)).willReturn(errorResponse);
