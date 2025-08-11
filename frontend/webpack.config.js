@@ -22,6 +22,7 @@ const config = {
   entry: './main.tsx',
   output: {
     path: path.resolve(__dirname, 'dist'),
+    publicPath: '/',
   },
   devServer: {
     open: true,
@@ -32,6 +33,7 @@ const config = {
     new HtmlWebpackPlugin({
       template: 'index.html',
       templateParameters: envVars,
+      favicon: './assets/icon/logo-icon.svg',
     }),
     new webpack.DefinePlugin(defineEnv),
   ],
