@@ -25,21 +25,6 @@ function ResultPage() {
     isError,
   } = useLocations(LocationsRequestBodyMock);
 
-  const recommendedLocations: RecommendedLocation[] =
-    location.recommendedLocations.map((location) => {
-      return {
-        id: location.id,
-        index: location.index,
-        x: location.x,
-        y: location.y,
-        name: location.name,
-        avgMinutes: location.avgMinutes,
-        isBest: location.isBest,
-        description: location.description,
-        reason: location.reason,
-      };
-    });
-
   const handleSpotClick = (spot: RecommendedLocation) => {
     setSelectedLocation(spot);
     setCurrentView('detail');
@@ -64,7 +49,6 @@ function ResultPage() {
     >
       <Map
         startingLocations={StartingPlacesMock}
-        recommendedLocations={recommendedLocations}
         currentView={currentView}
         handleBackButtonClick={handleBackButtonClick}
       />

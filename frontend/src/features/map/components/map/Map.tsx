@@ -3,7 +3,7 @@ import { Link } from 'react-router';
 
 import { View } from '@features/recommendation/types/bottomSheetView';
 
-import { StartingPlace, RecommendedLocation } from '@entities/types/Location';
+import { StartingPlace } from '@entities/types/Location';
 
 import MapButton from '@shared/components/mapButton/MapButton';
 import MapPoint from '@shared/components/mapPoint/MapPoint';
@@ -16,14 +16,12 @@ import * as map from './map.styled';
 
 interface MapProps {
   startingLocations: StartingPlace[];
-  recommendedLocations: RecommendedLocation[];
   currentView: View;
   handleBackButtonClick: () => void;
 }
 
 function Map({
   startingLocations,
-  recommendedLocations,
   currentView,
   handleBackButtonClick,
 }: MapProps) {
