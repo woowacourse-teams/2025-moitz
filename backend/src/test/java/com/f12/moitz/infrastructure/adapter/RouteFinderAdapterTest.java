@@ -59,7 +59,7 @@ class RouteFinderAdapterTest {
         final var pathResponseLong = new PathResponse(1, new InfoResponse(0, 0, 40, 0, 0, "", "", "", 0, null), subPathListLong);
 
         final var resultResponse = new ResultResponse(2, List.of(pathResponseLong, pathResponseShort));
-        final var mockResponse = new SubwayRouteSearchResponse(resultResponse, Optional.empty());
+        final var mockResponse = new SubwayRouteSearchResponse(resultResponse, null);
 
         given(odsayClient.getRoute(any(Point.class), any(Point.class))).willReturn(mockResponse);
 
@@ -103,7 +103,7 @@ class RouteFinderAdapterTest {
         final List<StartEndPair> pairs = List.of(new StartEndPair(startPlace, endPlace));
 
         final var resultResponse = new ResultResponse(0, Collections.emptyList());
-        final var mockResponseWithEmptyPath = new SubwayRouteSearchResponse(resultResponse, Optional.empty());
+        final var mockResponseWithEmptyPath = new SubwayRouteSearchResponse(resultResponse, null);
         given(odsayClient.getRoute(any(Point.class), any(Point.class))).willReturn(mockResponseWithEmptyPath);
 
         // When & Then

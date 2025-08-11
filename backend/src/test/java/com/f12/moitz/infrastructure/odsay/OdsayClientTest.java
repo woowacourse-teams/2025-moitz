@@ -65,7 +65,7 @@ class OdsayClientTest {
 
         SubwayRouteSearchResponse expectedResponse = new SubwayRouteSearchResponse(
                 new ResultResponse(1, Collections.emptyList()),
-                Optional.empty()
+                null
         );
 
         given(responseSpec.body(SubwayRouteSearchResponse.class)).willReturn(expectedResponse);
@@ -87,7 +87,7 @@ class OdsayClientTest {
         OdsayErrorResponse error = new OdsayErrorResponse("429", "API rate limit exceeded", "id");
         SubwayRouteSearchResponse errorResponse = new SubwayRouteSearchResponse(
                 null,
-                Optional.of(error)
+                error
         );
 
         given(responseSpec.body(SubwayRouteSearchResponse.class)).willReturn(errorResponse);
@@ -108,7 +108,7 @@ class OdsayClientTest {
         OdsayErrorResponse error = new OdsayErrorResponse("500", "Internal Server Error", "id");
         SubwayRouteSearchResponse errorResponse = new SubwayRouteSearchResponse(
                 null,
-                Optional.of(error)
+                error
         );
 
         given(responseSpec.body(SubwayRouteSearchResponse.class)).willReturn(errorResponse);
@@ -126,7 +126,7 @@ class OdsayClientTest {
         Point startPoint = new Point(127.0, 37.5);
         Point endPoint = new Point(127.1, 37.6);
 
-        SubwayRouteSearchResponse responseWithNullResult = new SubwayRouteSearchResponse(null, Optional.empty());
+        SubwayRouteSearchResponse responseWithNullResult = new SubwayRouteSearchResponse(null, null);
 
         given(responseSpec.body(SubwayRouteSearchResponse.class)).willReturn(responseWithNullResult);
 
