@@ -14,24 +14,20 @@ interface ProgressLoadingProps {
 }
 
 function ProgressLoading({ isLoading = true }: ProgressLoadingProps) {
-  const { progress, isComplete, complete } = useProgress();
+  const { progress, complete } = useProgress();
   const [textIndex, setTextIndex] = useState(0);
 
   useEffect(() => {
-    if (!isLoading && !isComplete) {
+    if (!isLoading) {
       complete();
     }
-  }, [isLoading, isComplete]);
-
-  useEffect(() => {
-    if (!isLoading || isComplete) return;
 
     const interval = setInterval(() => {
       setTextIndex((prev) => (prev + 1) % LOADING_TEXT.length);
     }, 600);
 
     return () => clearInterval(interval);
-  }, [isLoading, isComplete]);
+  }, [isLoading]);
 
   return (
     <BaseLoading>

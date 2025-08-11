@@ -8,7 +8,6 @@ type UseProgressProps = {
 
 type UseProgressReturn = {
   progress: number;
-  isComplete: boolean;
   complete: () => void;
 };
 
@@ -18,7 +17,6 @@ export const useProgress = ({
   targetProgress = 90,
 }: UseProgressProps = {}): UseProgressReturn => {
   const [progress, setProgress] = useState(initialProgress);
-  const [isComplete, setIsComplete] = useState(false);
 
   useEffect(() => {
     const startTime = Date.now();
@@ -53,12 +51,10 @@ export const useProgress = ({
 
   const complete = () => {
     setProgress(100);
-    setIsComplete(true);
   };
 
   return {
     progress,
-    isComplete,
     complete,
   };
 };
