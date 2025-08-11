@@ -24,9 +24,9 @@ function DepartureInput({
   const [inputValue, setInputValue] = useState<string>('');
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
-  const filteredStations = !inputValue.trim()
-    ? []
-    : STATION_LIST.filter((station) => station.includes(inputValue.trim()));
+  const filteredStations = STATION_LIST.filter((station) =>
+    station.includes(inputValue.trim()),
+  );
 
   const handleInputValue = (e: React.ChangeEvent<HTMLInputElement>) => {
     setInputValue(e.target.value);
