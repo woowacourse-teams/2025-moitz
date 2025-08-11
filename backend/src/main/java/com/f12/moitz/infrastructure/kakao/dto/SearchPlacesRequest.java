@@ -6,4 +6,5 @@ public record SearchPlacesRequest(
         Double latitude,
         Integer radius
 ) {
+
 }
