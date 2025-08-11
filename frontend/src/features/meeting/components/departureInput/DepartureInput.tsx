@@ -29,8 +29,9 @@ function DepartureInput({
   );
 
   const handleInputValue = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setInputValue(e.target.value);
-    setIsDropdownOpen(true);
+    const newValue = e.target.value;
+    setInputValue(newValue);
+    setIsDropdownOpen(newValue.trim() !== '');
   };
 
   const handleStationSelect = (station: string) => {
