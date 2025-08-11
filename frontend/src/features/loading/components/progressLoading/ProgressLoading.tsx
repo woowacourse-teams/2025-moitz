@@ -9,25 +9,17 @@ import { typography } from '@shared/styles/default.styled';
 
 import * as loading from './progressLoading.styled';
 
-interface ProgressLoadingProps {
-  isLoading?: boolean;
-}
-
-function ProgressLoading({ isLoading = true }: ProgressLoadingProps) {
-  const { progress, complete } = useProgress();
+function ProgressLoading() {
+  const { progress } = useProgress();
   const [textIndex, setTextIndex] = useState(0);
 
   useEffect(() => {
-    if (!isLoading) {
-      complete();
-    }
-
     const interval = setInterval(() => {
       setTextIndex((prev) => (prev + 1) % LOADING_TEXT.length);
     }, 600);
 
     return () => clearInterval(interval);
-  }, [isLoading]);
+  }, []);
 
   return (
     <BaseLoading>
