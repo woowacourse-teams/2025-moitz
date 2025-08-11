@@ -31,7 +31,7 @@ public class RouteFinderAsyncAdapter implements RouteFinder {
     @Override
     public List<Route> findRoutes(final List<StartEndPair> placePairs) {
         return Flux.fromIterable(placePairs)
-                .flatMap(pair -> Mono.delay(Duration.ofMillis(1000))
+                .flatMapSequential(pair -> Mono.delay(Duration.ofMillis(1000))
                                 .then(odsayMultiClient.getRoute(pair.start().getPoint(), pair.end().getPoint())),
                         5)
                 .map(this::convertPaths)

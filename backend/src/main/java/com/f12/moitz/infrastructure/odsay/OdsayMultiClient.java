@@ -48,8 +48,8 @@ public class OdsayMultiClient {
                                     if (response == null) {
                                         throw new ExternalApiException(ExternalApiErrorCode.ODSAY_API_SERVER_UNRESPONSIVE);
                                     }
-                                    if (response.error().isPresent()) {
-                                        log.error("코드 : {} / 메시지 : {}", response.error().get().code(), response.error().get().message());
+                                    if (response.error() != null) {
+                                        log.error("코드 : {} / 메시지 : {}", response.error().code(), response.error().message());
                                         throw new ExternalApiException(ExternalApiErrorCode.INVALID_ODSAY_API_RESPONSE);
                                     }
                                     if (response.result() == null) {
