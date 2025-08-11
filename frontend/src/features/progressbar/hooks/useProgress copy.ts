@@ -8,7 +8,6 @@ type UseProgressProps = {
 
 type UseProgressReturn = {
   progress: number;
-  isComplete: boolean;
   complete: () => void;
 };
 
@@ -18,7 +17,6 @@ export const useProgress = ({
   targetProgress = 90,
 }: UseProgressProps = {}): UseProgressReturn => {
   const [progress, setProgress] = useState(initialProgress);
-  const [isComplete, setIsComplete] = useState(false);
 
   useEffect(() => {
     const startTime = Date.now();
@@ -28,18 +26,19 @@ export const useProgress = ({
       const currentTime = Date.now();
       const elapsed = currentTime - startTime;
 
-      if (elapsed < duration) {
-        const ratio = elapsed / duration;
-        const easedProgress = Math.min(
-          targetProgress,
-          targetProgress * (1 - Math.pow(1 - ratio, 3)),
-        );
-
-        setProgress(easedProgress);
-        animationId = requestAnimationFrame(animationFrame);
-      } else {
+      if (elapsed >= duration) {
         setProgress(targetProgress);
+        return;
       }
+
+      const ratio = elapsed / duration;
+      const easedProgress = Math.min(
+        targetProgress,
+        targetProgress * (1 - Math.pow(1 - ratio, 3)),
+      );
+
+      setProgress(easedProgress);
+      animationId = requestAnimationFrame(animationFrame);
     };
 
     animationId = requestAnimationFrame(animationFrame);
@@ -52,12 +51,10 @@ export const useProgress = ({
 
   const complete = () => {
     setProgress(100);
-    setIsComplete(true);
   };
 
   return {
     progress,
-    isComplete,
     complete,
   };
 };
