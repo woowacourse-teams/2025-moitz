@@ -9,7 +9,6 @@ import { RecommendedLocation } from '@entities/types/Location';
 
 import { flex } from '@shared/styles/default.styled';
 
-import { StartingPlacesMock } from '@mocks/LocationsMock';
 import { LocationsRequestBodyMock } from '@mocks/LocationsRequestBodyMock';
 
 import * as resultPage from './resultPage.styled';
@@ -48,12 +47,12 @@ function ResultPage() {
       ]}
     >
       <Map
-        startingLocations={StartingPlacesMock}
+        startingLocations={location.startingPlaces}
         currentView={currentView}
         handleBackButtonClick={handleBackButtonClick}
       />
       <BottomSheet
-        startingLocations={StartingPlacesMock}
+        startingLocations={location.startingPlaces}
         recommendedLocations={location.recommendedLocations}
         currentView={currentView}
         selectedLocation={selectedLocation}
