@@ -58,7 +58,8 @@ public class MonitoringConfig {
                     uri != null && !uri.contains("swagger") && !uri.contains("api-docs")
                     || id.getName().startsWith("executor.completed") || id.getName().startsWith("executor.queued")
                     || id.getName().startsWith("jvm.threads")
-                    || id.getName().startsWith("jvm.memory.used");
+                    || id.getName().startsWith("jvm.memory.used")
+                    || id.getName().startsWith("process");
         });
     }
 
