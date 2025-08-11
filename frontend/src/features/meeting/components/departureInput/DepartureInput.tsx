@@ -84,17 +84,15 @@ function DepartureInput({
         )}
       </div>
 
-      {departureList.length > 0 && (
-        <div css={[flex({ gap: 5, wrap: 'wrap' })]}>
-          {departureList.map((name, index) => (
-            <Tag
-              key={index}
-              text={name}
-              onClick={() => onRemoveDeparture(index)}
-            />
-          ))}
-        </div>
-      )}
+      <div css={[flex({ gap: 5, wrap: 'wrap' })]}>
+        {departureList.map((name, index) => (
+          <Tag
+            key={index}
+            text={name}
+            onClick={() => onRemoveDeparture(index)}
+          />
+        ))}
+      </div>
     </InputFormSection>
   );
 }
