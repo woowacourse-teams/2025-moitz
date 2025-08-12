@@ -4,8 +4,8 @@ import { RecommendedLocation, StartingPlace } from '@entities/types/Location';
 
 import { flex, scroll, shadow } from '@shared/styles/default.styled';
 
-import Detail from '../detail/Detail';
-import List from '../list/List';
+import BottomSheetDetail from '../bottomSheetDetail/BottomSheetDetail';
+import BottomSheetList from '../bottomSheetList/BottomSheetList';
 
 import * as bottomSheet from './bottomSheet.styled';
 
@@ -40,14 +40,14 @@ function BottomSheet({
         ]}
       >
         {currentView === 'list' && (
-          <List
+          <BottomSheetList
             startingPlaces={startingLocations}
             recommendedLocations={recommendedLocations}
             onSpotClick={handleSpotClick}
           />
         )}
         {currentView === 'detail' && (
-          <Detail
+          <BottomSheetDetail
             startingPlaces={startingLocations}
             selectedLocation={selectedLocation}
           />
