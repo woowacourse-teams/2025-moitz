@@ -12,7 +12,9 @@ import com.f12.moitz.application.dto.RecommendationRequest;
 import com.f12.moitz.application.dto.RecommendationResponse;
 import com.f12.moitz.application.dto.RecommendationsResponse;
 import com.f12.moitz.application.dto.StartingPlaceResponse;
-import com.f12.moitz.application.port.Recommender;
+import com.f12.moitz.application.port.LocationRecommender;
+import com.f12.moitz.application.port.PlaceFinder;
+import com.f12.moitz.application.port.PlaceRecommender;
 import com.f12.moitz.application.port.RouteFinder;
 import com.f12.moitz.application.utils.RecommendationMapper;
 import com.f12.moitz.domain.Path;
@@ -22,8 +24,8 @@ import com.f12.moitz.domain.Recommendation;
 import com.f12.moitz.domain.RecommendedPlace;
 import com.f12.moitz.domain.Route;
 import com.f12.moitz.domain.TravelMethod;
-import com.f12.moitz.infrastructure.gemini.dto.LocationNameAndReason;
-import com.f12.moitz.infrastructure.gemini.dto.RecommendedLocationResponse;
+import com.f12.moitz.infrastructure.client.gemini.dto.LocationNameAndReason;
+import com.f12.moitz.infrastructure.client.gemini.dto.RecommendedLocationResponse;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -32,7 +34,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
@@ -42,7 +43,13 @@ class RecommendationServiceTest {
     private RecommendationService recommendationService;
 
     @Mock
-    private Recommender recommender;
+    private LocationRecommender locationRecommender;
+
+    @Mock
+    private PlaceRecommender placeRecommender;
+
+    @Mock
+    private PlaceFinder placeFinder;
 
     @Mock
     private RouteFinder routeFinder;
@@ -62,25 +69,25 @@ class RecommendationServiceTest {
         final Place seolleung = new Place("선릉역", new Point(127.048, 37.504));
         final Place samsung = new Place("삼성역", new Point(127.063, 37.508));
 
-        given(recommender.findPlacesByNames(anyList())).willReturn(startingPlaces);
+        given(placeFinder.findPlacesByNames(anyList())).willReturn(startingPlaces);
         final RecommendedLocationResponse mockLocationResponse = new RecommendedLocationResponse(List.of(
                 new LocationNameAndReason("선릉역", "이유1"),
                 new LocationNameAndReason("삼성역", "이유2")
         ));
 
-        given(recommender.getRecommendedLocations(anyList(), anyString())).willReturn(mockLocationResponse);
+        given(locationRecommender.getRecommendedLocations(anyList(), anyString())).willReturn(mockLocationResponse);
         final Map<Place, String> generatedPlacesWithReason = Map.of(
                 seolleung, "이유1",
                 samsung, "이유2"
         );
 
-        given(recommender.recommendLocations(any())).willReturn(generatedPlacesWithReason);
+        given(locationRecommender.recommendLocations(any())).willReturn(generatedPlacesWithReason);
         Map<Place, List<RecommendedPlace>> mockRecommendedPlaces = Map.of(
                 seolleung, List.of(new RecommendedPlace("스타벅스 선릉점", "카페", 5, "url")),
                 samsung, List.of(new RecommendedPlace("스타벅스 삼성점", "카페", 4, "url"))
         );
 
-        given(recommender.recommendPlaces(anyList(), any(String.class))).willReturn(mockRecommendedPlaces);
+        given(placeRecommender.recommendPlaces(anyList(), any(String.class))).willReturn(mockRecommendedPlaces);
 
         List<Route> mockRoutes = List.of(
                 new Route(List.of(new Path(gangnam, seolleung, TravelMethod.SUBWAY, 10, "2호선"))),

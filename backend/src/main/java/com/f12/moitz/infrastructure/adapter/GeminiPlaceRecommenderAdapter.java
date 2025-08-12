@@ -1,77 +1,32 @@
 package com.f12.moitz.infrastructure.adapter;
 
+import static com.f12.moitz.infrastructure.PromptGenerator.PLACE_RECOMMENDATION_COUNT;
+import static com.f12.moitz.infrastructure.PromptGenerator.PLACE_RECOMMEND_PROMPT;
+
 import com.f12.moitz.application.dto.PlaceRecommendResponse;
-import com.f12.moitz.application.port.LocationRecommender;
-import com.f12.moitz.application.port.PlaceFinder;
-import com.f12.moitz.common.error.exception.RetryableApiException;
+import com.f12.moitz.application.port.PlaceRecommender;
 import com.f12.moitz.domain.Place;
-import com.f12.moitz.domain.Point;
 import com.f12.moitz.domain.RecommendedPlace;
 import com.f12.moitz.infrastructure.client.gemini.GoogleGeminiClient;
-import com.f12.moitz.infrastructure.client.gemini.dto.LocationNameAndReason;
-import com.f12.moitz.infrastructure.client.gemini.dto.RecommendedLocationResponse;
 import com.f12.moitz.infrastructure.client.gpt.GptClient;
 import com.f12.moitz.infrastructure.client.kakao.KakaoMapClient;
 import com.f12.moitz.infrastructure.client.kakao.dto.KakaoApiResponse;
 import com.f12.moitz.infrastructure.client.kakao.dto.SearchPlacesRequest;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.retry.annotation.Recover;
-import org.springframework.retry.annotation.Retryable;
-import org.springframework.stereotype.Component;
-
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-
-import static com.f12.moitz.infrastructure.PromptGenerator.PLACE_RECOMMENDATION_COUNT;
-import static com.f12.moitz.infrastructure.PromptGenerator.PLACE_RECOMMEND_PROMPT;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
 
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class GeminiLocationRecommenderAdapter implements LocationRecommender {
+public class GeminiPlaceRecommenderAdapter implements PlaceRecommender {
 
     private final KakaoMapClient kakaoMapClient;
     private final GoogleGeminiClient geminiClient;
     private final GptClient gptClient;
-
-    private final PlaceFinder placeFinder;
-
-    @Retryable(
-            retryFor = RetryableApiException.class,
-            maxAttempts = 2,
-            recover = "recoverRecommendedLocations"
-    )
-    @Override
-    public RecommendedLocationResponse getRecommendedLocations(
-            final List<String> startPlaceNames,
-            final String condition
-    ) {
-        return geminiClient.generateResponse(
-                startPlaceNames,
-                condition
-        );
-    }
-
-    @Recover
-    public RecommendedLocationResponse recoverRecommendedLocations(
-            final List<String> startPlaceNames,
-            final String condition
-    ) {
-        return gptClient.generateResponse(
-                startPlaceNames,
-                condition
-        );
-    }
-
-    @Override
-    public Map<Place, String> recommendLocations(RecommendedLocationResponse recommendedLocationResponse) {
-        return recommendedLocationResponse.recommendations().stream()
-                .collect(Collectors.toMap(recommendation ->
-                        placeFinder.findPlaceByName(recommendation.locationName()), LocationNameAndReason::reason
-                ));
-    }
 
     @Override
     public Map<Place, List<RecommendedPlace>> recommendPlaces(final List<Place> targets, final String requirement) {
@@ -180,33 +135,6 @@ public class GeminiLocationRecommenderAdapter implements LocationRecommender {
 
         log.info("log = {}" , sb.toString());
         return sb.toString();
-    }
-
-    /**
-     * 역명 매칭을 유연하게 처리하는 메서드
-     * AI 응답에서 "역"이 붙은 형태로 나오므로 이에 맞춰 매칭
-     */
-
-    /**
-     * 두 좌표 간의 거리를 미터 단위로 계산 (Haversine formula)
-     */
-    private double calculateDistance(Point point1, Point point2) {
-        double lat1 = Math.toRadians(point1.getY());
-        double lon1 = Math.toRadians(point1.getX());
-        double lat2 = Math.toRadians(point2.getY());
-        double lon2 = Math.toRadians(point2.getX());
-
-        double dlat = lat2 - lat1;
-        double dlon = lon2 - lon1;
-
-        double a = Math.sin(dlat/2) * Math.sin(dlat/2) +
-                Math.cos(lat1) * Math.cos(lat2) *
-                        Math.sin(dlon/2) * Math.sin(dlon/2);
-
-        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-        double earthRadius = 6371000; // 지구 반지름 (미터)
-
-        return earthRadius * c;
     }
 
 }

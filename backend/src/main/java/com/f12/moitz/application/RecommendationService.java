@@ -1,7 +1,9 @@
 package com.f12.moitz.application;
 
 import com.f12.moitz.application.dto.RecommendationRequest;
-import com.f12.moitz.application.port.Recommender;
+import com.f12.moitz.application.port.LocationRecommender;
+import com.f12.moitz.application.port.PlaceFinder;
+import com.f12.moitz.application.port.PlaceRecommender;
 import com.f12.moitz.application.dto.RecommendationsResponse;
 import com.f12.moitz.application.port.RouteFinder;
 import com.f12.moitz.application.port.dto.StartEndPair;
@@ -28,18 +30,23 @@ import org.springframework.stereotype.Service;
 @Slf4j
 @Service
 public class RecommendationService {
-
-    private final Recommender recommender;
+    private final PlaceFinder placeFinder;
+    private final PlaceRecommender placeRecommender;
+    private final LocationRecommender locationRecommender;
     private final RouteFinder routeFinder;
 
     private final RecommendationMapper recommendationMapper;
 
     public RecommendationService(
-            @Autowired final Recommender recommender,
+            @Autowired final PlaceFinder placeFinder,
+            @Qualifier("placeRecommenderAsyncAdapter") final PlaceRecommender placeRecommender,
+            @Autowired final LocationRecommender locationRecommender,
             @Qualifier("routeFinderAsyncAdapter") final RouteFinder routeFinder,
             @Autowired final RecommendationMapper recommendationMapper
     ) {
-        this.recommender = recommender;
+        this.placeFinder = placeFinder;
+        this.placeRecommender = placeRecommender;
+        this.locationRecommender = locationRecommender;
         this.routeFinder = routeFinder;
         this.recommendationMapper = recommendationMapper;
     }
@@ -47,21 +54,21 @@ public class RecommendationService {
     public RecommendationsResponse recommendLocation(final RecommendationRequest request) {
         final String requirement = RecommendCondition.fromTitle(request.requirement()).getCategoryNames();
 
-        final List<Place> startingPlaces = recommender.findPlacesByNames(request.startingPlaceNames());
+        final List<Place> startingPlaces = placeFinder.findPlacesByNames(request.startingPlaceNames());
 
-        final RecommendedLocationResponse recommendedLocationResponse = recommender.getRecommendedLocations(
+        final RecommendedLocationResponse recommendedLocationResponse = locationRecommender.getRecommendedLocations(
                 request.startingPlaceNames(),
                 requirement
         );
 
-        final Map<Place, String> generatedPlacesWithReason = recommender.recommendLocations(recommendedLocationResponse);
+        final Map<Place, String> generatedPlacesWithReason = locationRecommender.recommendLocations(recommendedLocationResponse);
 
         final List<Place> generatedPlaces = generatedPlacesWithReason.keySet().stream().toList();
 
         final Map<Place, Routes> placeRoutes = findRoutesForAllAsync(startingPlaces, generatedPlaces);
         removePlacesBeyondRange(placeRoutes, generatedPlacesWithReason);
 
-        final Map<Place, List<RecommendedPlace>> recommendedPlaces = recommender.recommendPlaces(
+        final Map<Place, List<RecommendedPlace>> recommendedPlaces = placeRecommender.recommendPlaces(
                 generatedPlaces,
                 requirement
         );
