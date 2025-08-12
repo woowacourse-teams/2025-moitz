@@ -14,7 +14,9 @@ import com.f12.moitz.common.error.exception.RetryableApiException;
 import com.f12.moitz.infrastructure.PromptGenerator;
 import com.f12.moitz.infrastructure.gemini.dto.LocationNameAndReason;
 import com.f12.moitz.infrastructure.gemini.dto.RecommendedLocationResponse;
+import com.f12.moitz.infrastructure.gemini.dto.RecommendedPlaceResponses;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.genai.errors.ClientException;
 import com.google.genai.errors.ServerException;
@@ -23,12 +25,16 @@ import com.google.genai.types.Content;
 import com.google.genai.types.GenerateContentConfig;
 import com.google.genai.types.GenerateContentResponse;
 import com.google.genai.types.Part;
+
+import java.io.IOException;
+import java.io.Reader;
 import java.util.ArrayList;
 import java.util.List;
 import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
@@ -190,18 +196,38 @@ class GoogleGeminiClientTest {
                 .isEqualTo(ExternalApiErrorCode.GEMINI_API_SERVER_UNAVAILABLE);
     }
 
-    @DisplayName("Gemini API 응답이 정상적으로 파싱되지 않을 경우 RetryableApiException(INVALID_GEMINI_RESPONSE_FORMAT)을 던진다")
+    @DisplayName("Gemini API 응답이 유효하지 않은 JSON이면 RetryableApiException을 던진다")
     @Test
-    void parsingErrorTest() throws JsonProcessingException {
+    void extractResponseInvalidJsonTest() throws IOException {
         // Given
-        String response = "잘못된 형식의 응답";
+        String invalidJson = "유효하지 않은 JSON";
         GenerateContentResponse fakeResponse = GenerateContentResponse.builder()
-                .candidates(List.of(Candidate.builder().content(Content.fromParts(Part.fromText(response))).build()))
+                .candidates(List.of(
+                        Candidate.builder()
+                                .content(Content.fromParts(Part.fromText(invalidJson)))
+                                .build()
+                ))
                 .build();
 
-        JsonProcessingException mockException = mock(JsonProcessingException.class);
+        // When & Then
+        assertThatThrownBy(() -> googleGeminiClient.extractResponse(fakeResponse))
+                .isInstanceOf(RetryableApiException.class)
+                .extracting("errorCode")
+                .isEqualTo(ExternalApiErrorCode.INVALID_GEMINI_RESPONSE_FORMAT);
+    }
 
-        doThrow(mockException).when(objectMapper).readValue(anyString(), (Class<Object>) any());
+    @DisplayName("Gemini API 응답이 비어있으면 RetryableApiException을 던진다")
+    @Test
+    void extractResponseEmptyResponseTest() {
+        // Given
+        String emptyResponse = "   ";
+        GenerateContentResponse fakeResponse = GenerateContentResponse.builder()
+                .candidates(List.of(
+                        Candidate.builder()
+                                .content(Content.fromParts(Part.fromText(emptyResponse)))
+                                .build()
+                ))
+                .build();
 
         // When & Then
         assertThatThrownBy(() -> googleGeminiClient.extractResponse(fakeResponse))
