@@ -4,17 +4,17 @@ import StartingSpotWrapper from '@shared/components/startingSpotWrapper/Starting
 
 import SpotItemList from '../spotItemList/SpotItemList';
 
-interface ListProps {
+interface BottomSheetListProps {
   startingPlaces: StartingPlace[];
   recommendedLocations: RecommendedLocation[];
   onSpotClick: (spot: RecommendedLocation) => void;
 }
 
-function List({
+function BottomSheetList({
   startingPlaces,
   recommendedLocations,
   onSpotClick,
-}: ListProps) {
+}: BottomSheetListProps) {
   return (
     <>
       <StartingSpotWrapper startingPlaces={startingPlaces} />
@@ -26,4 +26,4 @@ function List({
   );
 }
 
-export default List;
+export default BottomSheetList;

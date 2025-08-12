@@ -7,14 +7,17 @@ import DetailSection from '../detailSection/DetailSection';
 import PlaceCard from '../placeCard/PlaceCard';
 import RouteCard from '../routeCard/RouteCard';
 
-import * as detail from './detail.styled';
+import * as bottomSheetDetail from './bottomSheetDetail.styled';
 
-interface DetailProps {
+interface BottomSheetDetailProps {
   startingPlaces: StartingPlace[];
   selectedLocation: RecommendedLocation;
 }
 
-function Detail({ startingPlaces, selectedLocation }: DetailProps) {
+function BottomSheetDetail({
+  startingPlaces,
+  selectedLocation,
+}: BottomSheetDetailProps) {
   return (
     <div css={flex({ direction: 'column', gap: 30 })}>
       <DetailSection
@@ -22,8 +25,8 @@ function Detail({ startingPlaces, selectedLocation }: DetailProps) {
         title={selectedLocation.name}
         isBestBadge={selectedLocation.isBest}
       >
-        <div css={detail.reason()}>
-          <p css={[typography.b2, detail.reasonText()]}>
+        <div css={bottomSheetDetail.reason()}>
+          <p css={[typography.b2, bottomSheetDetail.reasonText()]}>
             {selectedLocation.reason}
           </p>
         </div>
@@ -51,7 +54,7 @@ function Detail({ startingPlaces, selectedLocation }: DetailProps) {
       </DetailSection>
 
       <DetailSection isHeader={false} title={'추천 장소'} isBestBadge={false}>
-        <div css={[flex(), scroll, detail.placeList()]}>
+        <div css={[flex(), scroll, bottomSheetDetail.placeList()]}>
           {selectedLocation.places.map((place) => (
             <PlaceCard key={place.index} place={place} />
           ))}
@@ -61,4 +64,4 @@ function Detail({ startingPlaces, selectedLocation }: DetailProps) {
   );
 }
 
-export default Detail;
+export default BottomSheetDetail;
