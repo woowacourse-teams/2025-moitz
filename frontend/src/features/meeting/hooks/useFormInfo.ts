@@ -7,6 +7,8 @@ import {
   validateForm,
 } from '@features/meeting/utils/formValidation';
 
+import { getMeetingStorage } from '@entities/model/meetingStorage';
+
 import { ValidationError } from '@shared/types/validationError';
 
 type UseFormInfoReturn = {
@@ -19,8 +21,13 @@ type UseFormInfoReturn = {
 };
 
 export function useFormInfo(): UseFormInfoReturn {
-  const [departureList, setDepartureList] = useState<string[]>([]);
-  const [conditionID, setConditionID] = useState<string>('');
+  const storage = getMeetingStorage();
+  const [departureList, setDepartureList] = useState<string[]>(
+    storage.departureList || [],
+  );
+  const [conditionID, setConditionID] = useState<string>(
+    storage.conditionID || '',
+  );
 
   const addDepartureWithValidation = (departure: string): ValidationError => {
     const stationNameValidation = validateStationName(departure);

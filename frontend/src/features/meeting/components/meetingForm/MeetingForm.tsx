@@ -4,6 +4,8 @@ import { useFormInfo } from '@features/meeting/hooks/useFormInfo';
 import Toast from '@features/toast/components/Toast';
 import { useToast } from '@features/toast/hooks/useToast';
 
+import { setMeetingStorage } from '@entities/model/meetingStorage';
+
 import BottomButton from '@shared/components/bottomButton/BottomButton';
 import { flex } from '@shared/styles/default.styled';
 
@@ -50,6 +52,8 @@ function MeetingForm() {
       showValidationError(formValidation);
       return;
     }
+
+    setMeetingStorage({ departureList, conditionID });
   };
 
   return (
