@@ -53,17 +53,19 @@ function Map({
     <div css={map.container()}>
       <div ref={mapRef} css={map.base()} />
       <div css={[flex({ justify: 'space-between' }), map.top_overlay()]}>
-        {currentView === 'list' ? (
+        {currentView === 'list' && (
           <Link to="/">
             <MapButton src={IconBack} alt="back" />
           </Link>
-        ) : (
+        )}
+        {currentView === 'detail' && (
           <MapButton
             src={IconBack}
             alt="back"
             onClick={handleBackButtonClick}
           />
         )}
+
         <Link to="/">
           <MapButton src={IconShare} alt="share" />
         </Link>
