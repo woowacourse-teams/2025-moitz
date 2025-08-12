@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
-public interface AsyncPlaceRecommender extends PlaceRecommender {
+public interface AsyncPlaceRecommender {
 
     CompletableFuture<Map<Place, List<RecommendedPlace>>> recommendPlacesAsync (List<Place> targets, String requirement);
 

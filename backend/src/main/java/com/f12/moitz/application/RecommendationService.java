@@ -39,9 +39,9 @@ public class RecommendationService {
 
     public RecommendationService(
             @Autowired final PlaceFinder placeFinder,
-            @Qualifier("placeRecommenderAsyncAdapter") final PlaceRecommender placeRecommender,
+            @Qualifier("geminiPlaceRecommenderAdapter") final PlaceRecommender placeRecommender,
             @Autowired final LocationRecommender locationRecommender,
-            @Qualifier("routeFinderAsyncAdapter") final RouteFinder routeFinder,
+            @Qualifier("routeFinderAdapter") final RouteFinder routeFinder,
             @Autowired final RecommendationMapper recommendationMapper
     ) {
         this.placeFinder = placeFinder;

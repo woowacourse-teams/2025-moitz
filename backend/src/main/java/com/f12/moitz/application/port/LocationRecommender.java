@@ -12,6 +12,4 @@ public interface LocationRecommender {
 
     Map<Place, String> recommendLocations(RecommendedLocationResponse recommendedLocationResponse);
 
-    Map<Place, List<RecommendedPlace>> recommendPlaces(List<Place> targetPlaces, String requirement);
-
 }
