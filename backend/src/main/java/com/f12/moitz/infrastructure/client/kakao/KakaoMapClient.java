@@ -74,8 +74,6 @@ public class KakaoMapClient {
                 )
                 .body(KakaoApiResponse.class);
 
-        log.debug("카카오맵 장소 조회 API 응답 성공 : {}개", response.size());
-
         return response;
     }
 

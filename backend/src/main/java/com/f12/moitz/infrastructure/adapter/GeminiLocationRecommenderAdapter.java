@@ -3,6 +3,7 @@ package com.f12.moitz.infrastructure.adapter;
 import com.f12.moitz.application.dto.PlaceRecommendResponse;
 import com.f12.moitz.application.port.LocationRecommender;
 import com.f12.moitz.application.port.PlaceFinder;
+import com.f12.moitz.common.error.exception.ExternalApiErrorCode;
 import com.f12.moitz.common.error.exception.RetryableApiException;
 import com.f12.moitz.domain.Place;
 import com.f12.moitz.domain.Point;
@@ -18,14 +19,15 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.retry.annotation.Recover;
 import org.springframework.retry.annotation.Retryable;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
-import static com.f12.moitz.infrastructure.PromptGenerator.PLACE_RECOMMENDATION_COUNT;
-import static com.f12.moitz.infrastructure.PromptGenerator.PLACE_RECOMMEND_PROMPT;
+import static com.f12.moitz.infrastructure.PromptGenerator.*;
 
 @Slf4j
 @Component
@@ -35,8 +37,9 @@ public class GeminiLocationRecommenderAdapter implements LocationRecommender {
     private final KakaoMapClient kakaoMapClient;
     private final GoogleGeminiClient geminiClient;
     private final GptClient gptClient;
-
     private final PlaceFinder placeFinder;
+    private List<CompletableFuture<Map.Entry<Place, List<RecommendedPlace>>>> futures;
+
 
     @Retryable(
             retryFor = RetryableApiException.class,
@@ -75,55 +78,61 @@ public class GeminiLocationRecommenderAdapter implements LocationRecommender {
 
     @Override
     public Map<Place, List<RecommendedPlace>> recommendPlaces(final List<Place> targets, final String requirement) {
-        String targetPlaces = targets.stream()
-                .map(place -> String.format(
-                        "%s(x=%f, y=%f)", place.getName(), place.getPoint().getX(), place.getPoint().getY()
-                ))
-                .collect(Collectors.joining(", "));
-
-        // 1. 카카오 맵에서 장소 검색
         Map<Place, List<KakaoApiResponse>> searchedAllPlaces = searchPlacesWithRequirement(targets, requirement);
 
-        // 2. 프롬프트용 데이터 포맷팅
-        String formattedKakaoData = formatKakaoDataForPrompt(searchedAllPlaces);
+        List<CompletableFuture<Map.Entry<Place, List<RecommendedPlace>>>> futures = searchedAllPlaces.entrySet()
+                .stream()
+                .map(entry -> processPlaceFilteringAsync(entry.getKey(), entry.getValue(), requirement))
+                .toList();
 
-        // 3. 프롬프트 생성
-        String prompt = String.format(
-                PLACE_RECOMMEND_PROMPT,
-                PLACE_RECOMMENDATION_COUNT,
-                targetPlaces,
-                formattedKakaoData
-        );
-
-        log.debug("Generated prompt with Kakao data for requirement: {}", requirement);
-        log.debug("Formatted Kakao data: {}", formattedKakaoData);
-
-        Map<String, List<PlaceRecommendResponse>> responses = geminiClient.generateWith(prompt);
-        log.debug("AI response: {}", responses);
-
-        return targets.stream()
-                .map(place -> {
-                    String placeName = place.getName();
-                    List<PlaceRecommendResponse> placeResponses = responses.get(placeName);
-
-                    if (placeResponses == null) {
-                        log.warn("No recommendations found for place: {}. Available keys: {}",
-                                placeName, responses.keySet());
-                        placeResponses = List.of();
-                    }
-
-                    return Map.entry(
-                            place,
-                            placeResponses.stream()
-                                    .map(response -> new RecommendedPlace(
-                                            response.name(),
-                                            response.category(),
-                                            response.walkingTime(),
-                                            response.url()
-                                    )).toList()
-                    );
-                })
+        return futures.stream()
+                .map(CompletableFuture::join)
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+    }
+
+    /**
+     * 개별 장소의 카카오맵 응답을 Gemini로 필터링하는 비동기 처리
+     */
+    @Async("asyncTaskExecutor")
+    public CompletableFuture<Map.Entry<Place, List<RecommendedPlace>>> processPlaceFilteringAsync(
+            final Place place,
+            final List<KakaoApiResponse> kakaoResponses,
+            final String requirement) {
+
+        try {
+            String formattedKakaoData = FORMAT_SINGLE_PLACE_TO_PROMPT(place, kakaoResponses);
+
+            // 2. Gemini 필터링 프롬프트 생성 (기존 스타일 적용)
+            String prompt = String.format(
+                    PLACE_FILTER_PROMPT,
+                    place.getName(),
+                    PLACE_RECOMMENDATION_COUNT,
+                    place.getName(),
+                    place.getPoint().getX(),
+                    place.getPoint().getY(),
+                    requirement,
+                    formattedKakaoData,
+                    PLACE_RECOMMENDATION_COUNT
+            );
+
+            // 3. Gemini에게 필터링 요청
+            List<PlaceRecommendResponse> filteredResponses = geminiClient.generateWith(prompt);
+
+            // 4. RecommendedPlace 객체로 변환
+            List<RecommendedPlace> recommendedPlaces = filteredResponses.stream()
+                    .map(response -> new RecommendedPlace(
+                            response.name(),
+                            response.category(),
+                            response.walkingTime(),
+                            response.url()
+                    ))
+                    .toList();
+
+            return CompletableFuture.completedFuture(Map.entry(place, recommendedPlaces));
+        } catch (Exception e) {
+            log.error("Error filtering places for: {}", place.getName(), e);
+            throw new RetryableApiException(ExternalApiErrorCode.INVALID_ODSAY_API_RESPONSE);
+        }
     }
 
     private Map<Place, List<KakaoApiResponse>> searchPlacesWithRequirement(final List<Place> targets, final String requirement) {
