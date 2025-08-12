@@ -1,6 +1,6 @@
 package com.f12.moitz.infrastructure.adapter;
 
-import com.f12.moitz.application.port.RouteFinder;
+import com.f12.moitz.application.port.AsyncRouteFinder;
 import com.f12.moitz.application.port.dto.StartEndPair;
 import com.f12.moitz.domain.Path;
 import com.f12.moitz.domain.Place;
@@ -15,8 +15,10 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -24,7 +26,7 @@ import reactor.core.publisher.Mono;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class RouteFinderAsyncAdapter implements RouteFinder {
+public class RouteFinderAsyncAdapter implements AsyncRouteFinder {
 
     private final OdsayMultiClient odsayMultiClient;
 
@@ -38,6 +40,12 @@ public class RouteFinderAsyncAdapter implements RouteFinder {
                 .map(Route::new)
                 .collectList()
                 .block();
+    }
+
+    @Async("asyncTaskExecutor")
+    @Override
+    public CompletableFuture<List<Route>> findRoutesAsync(final List<StartEndPair> placePairs) {
+        return CompletableFuture.completedFuture(findRoutes(placePairs));
     }
 
     // 해당 로직은 OdsayClient로 옮기는 게 좋을까?

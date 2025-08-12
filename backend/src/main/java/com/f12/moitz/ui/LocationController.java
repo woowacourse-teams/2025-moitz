@@ -1,5 +1,6 @@
 package com.f12.moitz.ui;
 
+import com.f12.moitz.application.RecommendationParallelTaskService;
 import com.f12.moitz.application.RecommendationService;
 import com.f12.moitz.application.dto.PathResponse;
 import com.f12.moitz.application.dto.PlaceRecommendResponse;
@@ -22,8 +23,14 @@ import org.springframework.web.bind.annotation.RestController;
 public class LocationController implements SwaggerLocationController {
 
     private final RecommendationService recommendationService;
+    private final RecommendationParallelTaskService recommendationParallelTaskService;
 
     @PostMapping
+    public ResponseEntity<RecommendationsResponse> recommendLocationsAsync(@RequestBody RecommendationRequest request) {
+        return ResponseEntity.ok(recommendationParallelTaskService.recommendLocation(request));
+    }
+
+    @PostMapping("/sync")
     public ResponseEntity<RecommendationsResponse> recommendLocations(@RequestBody RecommendationRequest request) {
         return ResponseEntity.ok(recommendationService.recommendLocation(request));
     }
