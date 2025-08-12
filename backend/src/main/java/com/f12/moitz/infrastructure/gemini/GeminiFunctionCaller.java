@@ -99,7 +99,7 @@ public class GeminiFunctionCaller {
         return functionCalls != null && !functionCalls.isEmpty();
     }
 
-    public List<Part> execute(List<FunctionCall> functionCalls) {
+    private List<Part> execute(List<FunctionCall> functionCalls) {
         List<Part> parts = new ArrayList<>();
 
         functionCalls.forEach(functionCall -> parts.add(execute(functionCall)));
@@ -107,7 +107,7 @@ public class GeminiFunctionCaller {
         return parts;
     }
 
-    public Part execute(final FunctionCall functionCall) {
+    private Part execute(final FunctionCall functionCall) {
         String functionName = functionCall.name()
                 .orElseThrow(() -> new IllegalStateException("함수 호출 요청이 존재하지 않습니다."));
 
