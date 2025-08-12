@@ -1,8 +1,6 @@
 package com.f12.moitz.infrastructure.gemini;
 
-import static com.f12.moitz.infrastructure.PromptGenerator.ADDITIONAL_PROMPT;
-import static com.f12.moitz.infrastructure.PromptGenerator.RECOMMENDATION_COUNT;
-
+import com.f12.moitz.application.dto.PlaceRecommendResponse;
 import com.f12.moitz.common.error.exception.ExternalApiErrorCode;
 import com.f12.moitz.common.error.exception.ExternalApiException;
 import com.f12.moitz.common.error.exception.RetryableApiException;
@@ -18,13 +16,16 @@ import com.google.genai.types.Content;
 import com.google.genai.types.GenerateContentConfig;
 import com.google.genai.types.GenerateContentResponse;
 import com.google.genai.types.Part;
-import java.util.List;
-import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
+
+import java.util.List;
+import java.util.Map;
+
+import static com.f12.moitz.infrastructure.PromptGenerator.ADDITIONAL_PROMPT;
+import static com.f12.moitz.infrastructure.PromptGenerator.RECOMMENDATION_COUNT;
 
 @Component
 @RequiredArgsConstructor
@@ -64,6 +65,20 @@ public class GoogleGeminiClient {
         return generateWith(prompt, config);
     }
 
+    public Map<String, List<PlaceRecommendResponse>> generateWith(String prompt) {
+        final GenerateContentConfig config = GenerateContentConfig.builder()
+                .temperature(0.0F)
+                .responseMimeType("application/json")
+                .maxOutputTokens(5000)
+                .build();
+        log.info("prompt = {}", prompt);
+
+        GenerateContentResponse response = generateWith(prompt, config);
+        log.info("GenerateContentResponse = {}", response.toString());
+
+        return extractResponse(response).getPlacesByStationName();
+    }
+
     public GenerateContentResponse generateWith(final String prompt, final GenerateContentConfig config) {
         return generateWith(List.of(Content.fromParts(Part.fromText(prompt))), config);
     }
@@ -98,21 +113,164 @@ public class GoogleGeminiClient {
     }
 
     public RecommendedPlaceResponses extractResponse(final GenerateContentResponse generateContentResponse) {
-        final String originalText = generateContentResponse.text()
-                .replaceAll("```json\\s*", "")
-                .replaceAll("```\\s*$", "")
-                .replaceAll("^```\\s*", "")
-                .trim();
-
-        return readValue(originalText, RecommendedPlaceResponses.class);
-    }
-
-    private <T> T readValue(final String content, final Class<T> valueType) {
         try {
-            return objectMapper.readValue(content, valueType);
-        } catch (JsonProcessingException e) {
+            String originalText = generateContentResponse.candidates()
+                    .map(candidates -> candidates.get(0))
+                    .map(candidate -> candidate.content().orElse(null))
+                    .map(content -> content.parts().orElse(null))
+                    .map(parts -> parts.get(0))
+                    .map(part -> part.text().orElse(null))
+                    .orElse(null);
+
+            if (originalText == null || originalText.trim().isEmpty()) {
+                log.error("Gemini API 응답이 비어있습니다.");
+                throw new RetryableApiException(ExternalApiErrorCode.INVALID_GEMINI_RESPONSE_FORMAT);
+            }
+
+            // 더 안전한 JSON 마크다운 제거 로직
+            String cleanedText = cleanJsonResponse(originalText);
+
+            log.debug("원본 응답: {}", originalText);
+            log.debug("정제된 응답: {}", cleanedText);
+
+            // JSON 유효성 검사
+            if (!isValidJson(cleanedText)) {
+                log.error("유효하지 않은 JSON 형식: {}", cleanedText);
+                throw new RetryableApiException(ExternalApiErrorCode.INVALID_GEMINI_RESPONSE_FORMAT);
+            }
+
+            return readValue(cleanedText, RecommendedPlaceResponses.class);
+
+        } catch (Exception e) {
+            log.error("Gemini 응답 파싱 중 오류 발생", e);
             throw new RetryableApiException(ExternalApiErrorCode.INVALID_GEMINI_RESPONSE_FORMAT);
         }
     }
 
+    /**
+     * JSON 응답에서 마크다운 코드 블록과 불필요한 문자 제거
+     */
+    private String cleanJsonResponse(String text) {
+        if (text == null) {
+            return "";
+        }
+
+        // 1. 마크다운 코드 블록 제거 (```json, ```, ``` 등)
+        String cleaned = text.replaceAll("```json\\s*", "")
+                .replaceAll("```\\s*$", "")
+                .replaceAll("^```\\s*", "")
+                .trim();
+
+        // 2. 앞뒤 공백 및 개행 문자 정리
+        cleaned = cleaned.trim();
+
+        // 3. JSON이 아닌 텍스트가 앞에 있는 경우 처리
+        int jsonStart = findJsonStart(cleaned);
+        if (jsonStart > 0) {
+            cleaned = cleaned.substring(jsonStart);
+        }
+
+        // 4. JSON이 아닌 텍스트가 뒤에 있는 경우 처리
+        int jsonEnd = findJsonEnd(cleaned);
+        if (jsonEnd > 0 && jsonEnd < cleaned.length()) {
+            cleaned = cleaned.substring(0, jsonEnd + 1);
+        }
+
+        return cleaned.trim();
+    }
+
+    /**
+     * JSON 시작 위치 찾기 ({ 또는 [)
+     */
+    private int findJsonStart(String text) {
+        for (int i = 0; i < text.length(); i++) {
+            char c = text.charAt(i);
+            if (c == '{' || c == '[') {
+                return i;
+            }
+        }
+        return 0;
+    }
+
+    /**
+     * JSON 끝 위치 찾기 (} 또는 ])
+     */
+    private int findJsonEnd(String text) {
+        int braceCount = 0;
+        int bracketCount = 0;
+        boolean inString = false;
+        boolean escaped = false;
+
+        for (int i = 0; i < text.length(); i++) {
+            char c = text.charAt(i);
+
+            if (escaped) {
+                escaped = false;
+                continue;
+            }
+
+            if (c == '\\') {
+                escaped = true;
+                continue;
+            }
+
+            if (c == '"' && !escaped) {
+                inString = !inString;
+                continue;
+            }
+
+            if (inString) {
+                continue;
+            }
+
+            switch (c) {
+                case '{':
+                    braceCount++;
+                    break;
+                case '}':
+                    braceCount--;
+                    if (braceCount == 0 && bracketCount == 0) {
+                        return i;
+                    }
+                    break;
+                case '[':
+                    bracketCount++;
+                    break;
+                case ']':
+                    bracketCount--;
+                    if (braceCount == 0 && bracketCount == 0) {
+                        return i;
+                    }
+                    break;
+            }
+        }
+        return text.length() - 1;
+    }
+
+    /**
+     * 기본적인 JSON 유효성 검사
+     */
+    private boolean isValidJson(String text) {
+        if (text == null || text.trim().isEmpty()) {
+            return false;
+        }
+
+        String trimmed = text.trim();
+        return (trimmed.startsWith("{") && trimmed.endsWith("}")) ||
+                (trimmed.startsWith("[") && trimmed.endsWith("]"));
+    }
+
+    private <T> T readValue(final String content, final Class<T> valueType) {
+        try {
+            if (content == null || content.trim().isEmpty()) {
+                throw new RetryableApiException(ExternalApiErrorCode.INVALID_GEMINI_RESPONSE_FORMAT);
+            }
+
+            return objectMapper.readValue(content, valueType);
+        } catch (JsonProcessingException e) {
+            log.error("JSON 파싱 실패. 내용: {}", content);
+            log.error("파싱 오류 상세:", e);
+            throw new RetryableApiException(ExternalApiErrorCode.INVALID_GEMINI_RESPONSE_FORMAT);
+        }
+    }
 }
