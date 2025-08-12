@@ -12,19 +12,19 @@
     <!-- 개발 환경용 설정 -->
     <springProfile name="dev">
         <!-- INFO 전용 Appender -->
-        <appender name="FILE_DEBUG" class="ch.qos.logback.core.ConsoleAppender">
-<!--            <encoder class="net.logstash.logback.encoder.LogstashEncoder"/>-->
-            <encoder>
+        <appender name="FILE_DEBUG" class="ch.qos.logback.core.rolling.RollingFileAppender">
+            <encoder class="net.logstash.logback.encoder.LogstashEncoder"/>
+<!--            <encoder>
                 <pattern>${CONSOLE_PATTERN}</pattern>
-            </encoder>
+            </encoder>-->
 
-   <!--         <file>${LOG_PATH}/${DEBUG_PATH}/application.log</file>
+            <file>${LOG_PATH}/${DEBUG_PATH}/application.log</file>
             <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
                 <fileNamePattern>${DEBUG_LOG_PATH}/application-info-%d{yyyy-MM-dd}.%i.log.zip</fileNamePattern>
                 <maxHistory>${MAX_HISTORY}</maxHistory>
                 <maxFileSize>${MAX_FILE_SIZE}</maxFileSize>
                 <totalSizeCap>${TOTAL_SIZE}</totalSizeCap>
-            </rollingPolicy>-->
+            </rollingPolicy>
         </appender>
 
         <root level="DEBUG">
