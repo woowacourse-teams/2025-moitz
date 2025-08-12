@@ -256,7 +256,7 @@ class GoogleGeminiClientTest {
 
     private List<Content> getBasicContents() {
         List<Content> contents = new ArrayList<>();
-        contents.add(Content.fromParts(Part.fromText(PromptGenerator.PLACE_RECOMMEND_PROMPT)));
+        contents.add(Content.fromParts(Part.fromText(PromptGenerator.ADDITIONAL_PROMPT)));
         return contents;
     }
 

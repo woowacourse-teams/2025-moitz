@@ -1,5 +1,8 @@
 package com.f12.moitz.infrastructure;
 
+import com.f12.moitz.domain.Place;
+import com.f12.moitz.infrastructure.kakao.dto.KakaoApiResponse;
+
 import java.util.List;
 import java.util.Map;
 
@@ -63,47 +66,73 @@ public class PromptGenerator {
                     Provide the response in the structured JSON format defined by the provided schemas.
             """;
 
-    public static final int PLACE_RECOMMENDATION_COUNT = 3;
+    public static final String PLACE_FILTER_PROMPT = """
+    You are an AI assistant that analyzes Kakao Map search results and recommends the best places.
+    
+    TASK: From the provided Kakao Map data for %s, select the top %d places that best match the user requirements.
+    
+    STATION: %s
+    STATION COORDINATES: (%.6f, %.6f)
+    USER REQUIREMENTS: %s
+    
+    KAKAO MAP SEARCH RESULTS:
+    %s
+    
+    RESPONSE FORMAT (JSON ONLY, NO EXPLANATIONS):
+    {
+        "places": [
+            {
+                "index": 1,
+                "name": "exact_place_name_from_kakao_data",
+                "category": "exact_category_from_kakao_data",
+                "distance": distance,
+                "url": "exact_place_url_from_kakao_data"
+            }
+        ]
+    }
+    
+    IMPORTANT RULES:
+    1. Analyze the Kakao Map search results for the station
+    2. Extract exact place names, categories, and URLs from the provided data
+    4. Return exactly %d places (or fewer if not enough suitable places exist)
+    6. distance field should contain only numeric values (e.g., 2, 5, 8)
+    7. Focus on places that match the user requirements
+    8. Prioritize places based on proximity to the station coordinates and relevance
+    9. Use the exact place information from the search results provided above
+    """;
 
-    public static final String PLACE_RECOMMEND_PROMPT = """
-        You are an AI assistant that analyzes Kakao Map search results and recommends the best places.
-        
-        TASK: From the provided Kakao Map data, select the top %d places per station that best match the user requirements.
-        
-        TARGET STATIONS WITH COORDINATES: %s
-        
-        KAKAO MAP SEARCH RESULTS:
-        %s
-        
-        RESPONSE FORMAT (JSON ONLY, NO EXPLANATIONS):
-        {
-            "responses": [
-                {
-                    "stationName": "station_name_with_역_suffix",
-                    "places": [
-                        {
-                            "index": "1",
-                            "name": "exact_place_name_from_kakao_data",
-                            "category": "exact_category_from_kakao_data",
-                            "distance": "distance_in_meters_only_numbers",
-                            "url": "exact_place_url_from_kakao_data"
-                        }
-                    ]
-                }
-            ]
+    /**
+     * 단일 장소의 카카오맵 응답을 프롬프트용으로 포맷팅 (기존 FORMAT_KAKAO_TO_PROMPT 스타일 적용)
+     */
+    public static String FORMAT_SINGLE_PLACE_TO_PROMPT(Place place, List<KakaoApiResponse> kakaoResponses) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("KAKAO MAP SEARCH RESULTS:\n");
+        sb.append("========================\n\n");
+
+        String stationName = place.getName();
+        sb.append(String.format("=== %s ===\n", stationName));
+        sb.append(String.format("Station Coordinates: (%.6f, %.6f)\n",
+                place.getPoint().getX(), place.getPoint().getY()));
+        sb.append("Search Results:\n");
+
+        for (int i = 0; i < kakaoResponses.size(); i++) {
+            KakaoApiResponse response = kakaoResponses.get(i);
+            sb.append(String.format("Response %d: %s\n", i + 1, response.toString()));
         }
-        
-        IMPORTANT RULES:
-        1. Analyze the Kakao Map search results for each station
-        2. Extract exact place names, categories, and URLs from the provided data
-        3. Calculate walking distance in meters using the station coordinates provided
-        4. Return the specified number of places per station (or fewer if not enough suitable places exist)
-        5. Use station names with '역' suffix (e.g., "강남역", "교대역", "서울역")
-        6. Only include places that are NOT subway stations (지하철역)
-        7. Distance field should contain only numeric values (e.g., "150", "280")
-        8. Focus on places that are relevant to user requirements
-        9. Prioritize places based on proximity to the station coordinates
-        """;
+
+        sb.append("\n========================\n");
+        sb.append("RECOMMENDATION CRITERIA:\n");
+        sb.append("Please analyze the above Kakao Map data and recommend the BEST places based on the following priority:\n\n");
+        sb.append("RESPONSE FORMAT:\n");
+        sb.append("- IMPORTANT: Use the exact station name shown above (with '역' suffix if applicable) in your response.\n");
+        sb.append("- For each recommendation, include: exact place name, category, distance, and URL from the data.\n");
+        sb.append("- Rank recommendations by their proximity to the station (closest first).\n");
+        sb.append("- The recommendation should be based **only** on the data provided above.\n\n");
+
+        return sb.toString();
+    }
+
+    public static final int PLACE_RECOMMENDATION_COUNT = 3;
 
 
     public static Map<String, Object> getSchema() {
@@ -134,5 +163,7 @@ public class PromptGenerator {
                 "required", List.of("recommendations")
         );
     }
+
+
 
 }

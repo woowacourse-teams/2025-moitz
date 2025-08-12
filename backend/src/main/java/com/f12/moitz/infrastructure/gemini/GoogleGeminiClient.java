@@ -65,17 +65,14 @@ public class GoogleGeminiClient {
         return generateWith(prompt, config);
     }
 
-    public Map<String, List<PlaceRecommendResponse>> generateWith(String prompt) {
+    public List<PlaceRecommendResponse> generateWith(String prompt) {
         final GenerateContentConfig config = GenerateContentConfig.builder()
-                .temperature(0.0F)
+                .temperature(0.4F)
                 .responseMimeType("application/json")
                 .maxOutputTokens(5000)
                 .build();
-        log.info("prompt = {}", prompt);
 
         GenerateContentResponse response = generateWith(prompt, config);
-        log.info("GenerateContentResponse = {}", response.toString());
-
         return extractResponse(response).getPlacesByStationName();
     }
 
@@ -127,18 +124,11 @@ public class GoogleGeminiClient {
                 throw new RetryableApiException(ExternalApiErrorCode.INVALID_GEMINI_RESPONSE_FORMAT);
             }
 
-            // 더 안전한 JSON 마크다운 제거 로직
             String cleanedText = cleanJsonResponse(originalText);
-
-            log.debug("원본 응답: {}", originalText);
-            log.debug("정제된 응답: {}", cleanedText);
-
-            // JSON 유효성 검사
             if (!isValidJson(cleanedText)) {
                 log.error("유효하지 않은 JSON 형식: {}", cleanedText);
                 throw new RetryableApiException(ExternalApiErrorCode.INVALID_GEMINI_RESPONSE_FORMAT);
             }
-
             return readValue(cleanedText, RecommendedPlaceResponses.class);
 
         } catch (Exception e) {
@@ -273,4 +263,6 @@ public class GoogleGeminiClient {
             throw new RetryableApiException(ExternalApiErrorCode.INVALID_GEMINI_RESPONSE_FORMAT);
         }
     }
+
+
 }

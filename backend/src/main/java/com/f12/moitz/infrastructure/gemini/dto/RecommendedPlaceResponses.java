@@ -2,29 +2,18 @@ package com.f12.moitz.infrastructure.gemini.dto;
 
 import com.f12.moitz.application.dto.PlaceRecommendResponse;
 import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 public record RecommendedPlaceResponses(
-        List<RecommendedPlaceResponse> responses
+        @JsonProperty("places") List<RecommendedSpecificPlace> places
 ) {
 
-    public Map<String, List<PlaceRecommendResponse>> getPlacesByStationName() {
-        return responses.stream()
-                .map(response -> Map.entry(
-                        response.stationName(),
-                        response.toPlaceRecommendResponses()
-                ))
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
-    }
-}
+    public List<PlaceRecommendResponse> getPlacesByStationName() {
+        if (places == null) {
+            return List.of();
+        }
 
-record RecommendedPlaceResponse(
-        String stationName,
-        List<RecommendedSpecificPlace> places
-) {
-    List<PlaceRecommendResponse> toPlaceRecommendResponses() {
         return places.stream()
                 .map(RecommendedSpecificPlace::toPlaceRecommendResponse)
                 .toList();
