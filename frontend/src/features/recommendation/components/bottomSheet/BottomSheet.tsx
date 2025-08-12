@@ -39,15 +39,14 @@ function BottomSheet({
           bottomSheet.content(),
         ]}
       >
-        {currentView === 'list' ? (
-          <>
-            <List
-              startingPlaces={startingLocations}
-              recommendedLocations={recommendedLocations}
-              onSpotClick={handleSpotClick}
-            />
-          </>
-        ) : (
+        {currentView === 'list' && (
+          <List
+            startingPlaces={startingLocations}
+            recommendedLocations={recommendedLocations}
+            onSpotClick={handleSpotClick}
+          />
+        )}
+        {currentView === 'detail' && (
           <Detail
             startingPlaces={startingLocations}
             selectedLocation={selectedLocation}
