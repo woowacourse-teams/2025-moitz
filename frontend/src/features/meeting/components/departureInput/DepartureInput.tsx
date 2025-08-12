@@ -46,7 +46,7 @@ function DepartureInput({
       if (e.nativeEvent.isComposing) return;
 
       const trimmedValue = inputValue.trim();
-      if (trimmedValue !== '') {
+      if (trimmedValue) {
         handleStationSelect(trimmedValue);
       }
     }
