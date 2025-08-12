@@ -66,66 +66,45 @@ public class PromptGenerator {
     public static final int PLACE_RECOMMENDATION_COUNT = 3;
 
     public static final String PLACE_RECOMMEND_PROMPT = """
-            You're an AI assistant that recommends {{Recommendation_Count}} specific places within 800m of each given subway station.
-            
-            TASK OVERVIEW:
-            You must complete this task in 2 phases:
-            Phase 1: Data Collection (using function calls)
-            Phase 2: Final Recommendation (generating JSON response)
-            
-            PHASE 1 - DATA COLLECTION:
-            1. From the user requirements, extract search keywords that represent the types of places the user is looking for.
-               - Each keyword must be in Korean and consist of only one word.
-               - These keywords will be used with the getPlacesByKeyword function.
-               - Among the search results, identify the top places based on their star ratings, as shown on the place URLs, and include their rankings using index values (e.g., 1 for the highest-rated place).
-            
-            2. For each (station, keyword) pair, create one getPlacesByKeyword function call. Do not send them one by one. Instead, batch all function calls together in a single request.
-            
-            PHASE 2 - FINAL RECOMMENDATION:
-            After collecting all the data from function calls, you MUST generate the final recommendation.
-            
-            IMPORTANT: Even after receiving function call responses, you must continue to:
-            1. Analyze all the collected place data
-            2. For each station, select the top {{Recommendation_Count}} places based on:
-                - Highest Star ratings
-                - Most Reviews
-                -Relevance to user requirements
-            3. Assign index rankings (1 = best, 2 = second best, etc.)
-            4. Generate the final JSON response
-            
-            CRITICAL OUTPUT FORMAT - READ CAREFULLY:
-            Your FINAL response (after all function calls are complete) must be ONLY the JSON data with NO formatting whatsoever.
-            
-            Each recommendation must be returned strictly as raw JSON, with no surrounding text, explanation, or formatting
-            
-            
-            Structure for your final response:
-            {
-                "responses": [
-                    {
-                        "stationName": "",
-                        "places": [
-                            {
-                              "index": "",
-                              "name": "",
-                              "category": "",
-                              "distance": "",
-                              "url": ""
-                            }
-                        ]
-                    }
-                ]
-            }
-            
-            Recommendation_Count: %d
-            Stations (지하철역): %s
-            User Requirements (사용자 조건): %s
-            
-            EXECUTION INSTRUCTION:
-            1. Start by calling the necessary functions to collect data
-            2. After receiving all function responses, analyze the data and generate the final JSON recommendation
-            3. Do NOT stop after function calls - you must provide the final recommendation JSON
-            """;
+        You are an AI assistant that analyzes Kakao Map search results and recommends the best places.
+        
+        TASK: From the provided Kakao Map data, select the top %d places per station that best match the user requirements.
+        
+        TARGET STATIONS WITH COORDINATES: %s
+        
+        KAKAO MAP SEARCH RESULTS:
+        %s
+        
+        RESPONSE FORMAT (JSON ONLY, NO EXPLANATIONS):
+        {
+            "responses": [
+                {
+                    "stationName": "station_name_with_역_suffix",
+                    "places": [
+                        {
+                            "index": "1",
+                            "name": "exact_place_name_from_kakao_data",
+                            "category": "exact_category_from_kakao_data",
+                            "distance": "distance_in_meters_only_numbers",
+                            "url": "exact_place_url_from_kakao_data"
+                        }
+                    ]
+                }
+            ]
+        }
+        
+        IMPORTANT RULES:
+        1. Analyze the Kakao Map search results for each station
+        2. Extract exact place names, categories, and URLs from the provided data
+        3. Calculate walking distance in meters using the station coordinates provided
+        4. Return the specified number of places per station (or fewer if not enough suitable places exist)
+        5. Use station names with '역' suffix (e.g., "강남역", "교대역", "서울역")
+        6. Only include places that are NOT subway stations (지하철역)
+        7. Distance field should contain only numeric values (e.g., "150", "280")
+        8. Focus on places that are relevant to user requirements
+        9. Prioritize places based on proximity to the station coordinates
+        """;
+
 
     public static Map<String, Object> getSchema() {
         return Map.of(
