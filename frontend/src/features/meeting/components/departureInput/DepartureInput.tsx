@@ -6,7 +6,9 @@ import { INPUT_FORM_TEXT } from '@features/meeting/constant/inputForm';
 
 import Input from '@shared/components/input/Input';
 import Tag from '@shared/components/tag/Tag';
-import { flex, typography } from '@shared/styles/default.styled';
+import { flex } from '@shared/styles/default.styled';
+
+import Dropdown from '../dropdown/Dropdown';
 
 import * as input from './departureInput.styled';
 
@@ -64,24 +66,11 @@ function DepartureInput({
           onChange={handleInputValue}
           onKeyDown={handleKeyDown}
         />
-        {isDropdownOpen && inputValue.trim() && (
-          <ul css={input.dropdown()}>
-            {filteredStations.length > 0 ? (
-              filteredStations.map((station) => (
-                <li
-                  key={station}
-                  css={[typography.b1, input.item()]}
-                  onClick={() => handleStationSelect(station)}
-                >
-                  {station}
-                </li>
-              ))
-            ) : (
-              <li css={[typography.b1, input.blank_item()]}>
-                해당하는 역이름이 없습니다.
-              </li>
-            )}
-          </ul>
+        {isDropdownOpen && (
+          <Dropdown
+            stations={filteredStations}
+            handleStationSelect={handleStationSelect}
+          />
         )}
       </div>
 
