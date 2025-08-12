@@ -27,7 +27,7 @@ export function useFormInfo(): UseFormInfoReturn {
     storage.departureList || [],
   );
   const [conditionID, setConditionID] = useState<LocationRequirement>(
-    (storage.conditionID as LocationRequirement) || 'NOT_SELECTED',
+    storage.conditionID as LocationRequirement,
   );
 
   const addDepartureWithValidation = (departure: string): ValidationError => {
