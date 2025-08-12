@@ -1,19 +1,16 @@
-package com.f12.moitz;
+package com.f12.moitz.infrastructure.gemini;
 
 import static com.f12.moitz.infrastructure.PromptGenerator.PLACE_RECOMMENDATION_COUNT;
 import static com.f12.moitz.infrastructure.PromptGenerator.PLACE_RECOMMEND_PROMPT;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertAll;
 
 import com.f12.moitz.application.dto.PlaceRecommendResponse;
 import com.f12.moitz.domain.Place;
 import com.f12.moitz.domain.Point;
-import com.f12.moitz.infrastructure.gemini.GeminiFunctionCaller;
-import com.f12.moitz.infrastructure.gemini.GoogleGeminiClient;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -21,7 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class GeminiFunctionCallerTest {
+public class GeminiFunctionCallerIntTest {
 
     @Autowired
     private GeminiFunctionCaller functionCaller;
@@ -32,7 +29,7 @@ public class GeminiFunctionCallerTest {
     @DisplayName("장소 추천 테스트")
     @Test
     void recommendPlaces() {
-        //given
+        // Given
         Set<Place> places = Set.of(
                 new Place("잠실역", new Point(127.10023101886318, 37.51331105877401)),
                 new Place("삼성역", new Point(127.06302321147605, 37.508822740225305)),
@@ -49,16 +46,16 @@ public class GeminiFunctionCallerTest {
 
         String prompt = String.format(PLACE_RECOMMEND_PROMPT, PLACE_RECOMMENDATION_COUNT, targetPlaces, requirement);
 
-        //when
+        // When
         Map<String, List<PlaceRecommendResponse>> recommendedPlaces = functionCaller.generateWith(prompt, geminiClient);
 
-        //then
-        assertAll(
-                () -> assertThat(recommendedPlaces).hasSize(places.size()),
-                () -> assertThat(recommendedPlaces.get("잠실역")).hasSize(PLACE_RECOMMENDATION_COUNT),
-                () -> assertThat(recommendedPlaces.get("삼성역")).hasSize(PLACE_RECOMMENDATION_COUNT),
-                () -> assertThat(recommendedPlaces.get("잠실새내역")).hasSize(PLACE_RECOMMENDATION_COUNT)
-        );
+        // Then
+        SoftAssertions.assertSoftly(softAssertions -> {
+            softAssertions.assertThat(recommendedPlaces).hasSize(places.size());
+            softAssertions.assertThat(recommendedPlaces.get("잠실역")).hasSize(PLACE_RECOMMENDATION_COUNT);
+            softAssertions.assertThat(recommendedPlaces.get("삼성역")).hasSize(PLACE_RECOMMENDATION_COUNT);
+            softAssertions.assertThat(recommendedPlaces.get("잠실새내역")).hasSize(PLACE_RECOMMENDATION_COUNT);
+        });
     }
 
 }

@@ -14,12 +14,19 @@ const meta = {
     layout: 'centered',
   },
   tags: ['autodocs'],
-  argTypes: {},
+  argTypes: {
+    onSpotClick: {
+      action: 'onSpotClick',
+    },
+  },
 } satisfies Meta<typeof SpotItemList>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {
-  args: { recommendedLocations: RecommendedLocationsMock },
+  args: {
+    recommendedLocations: RecommendedLocationsMock,
+    onSpotClick: () => {},
+  },
 };
