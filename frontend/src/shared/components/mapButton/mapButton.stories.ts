@@ -21,6 +21,9 @@ const meta = {
       control: { type: 'text' },
       description: '이미지 설명',
     },
+    onClick: {
+      action: 'onClick',
+    },
   },
 } satisfies Meta<typeof MapButton>;
 
@@ -28,9 +31,9 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const Back: Story = {
-  args: { src: IconBack, alt: '뒤로가기' },
+  args: { src: IconBack, alt: '뒤로가기', onClick: () => {} },
 };
 
 export const Share: Story = {
-  args: { src: IconShare, alt: '공유하기' },
+  args: { src: IconShare, alt: '공유하기', onClick: () => {} },
 };

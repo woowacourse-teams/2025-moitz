@@ -25,6 +25,10 @@ export const typography = {
     font-size: ${typoToken.subHeaders.sh2};
     font-weight: ${typoToken.weight.semiBold};
   `,
+  sh3: css`
+    font-size: ${typoToken.subHeaders.sh3};
+    font-weight: ${typoToken.weight.semiBold};
+  `,
   // Body
   b1: css`
     font-size: ${typoToken.body.b1};
