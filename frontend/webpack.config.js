@@ -58,6 +58,7 @@ const config = {
         use: ['style-loader', 'css-loader'],
       },
     ],
+
   },
   resolve: {
     extensions: ['.tsx', '.ts', '.jsx', '.js', '...'],
@@ -74,6 +75,7 @@ const config = {
       '@icons': path.resolve(__dirname, 'assets/icon'),
       '@mocks': path.resolve(__dirname, 'src/mocks'),
       '@config': path.resolve(__dirname, 'src/config'),
+      '@sb': path.resolve(__dirname, '.storybook'),
     },
   },
   mode: isProduction ? 'production' : 'development',

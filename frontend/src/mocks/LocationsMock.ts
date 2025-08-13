@@ -5,9 +5,9 @@ import {
 } from '@entities/types/Location';
 
 export const StartingPlacesMock: StartingPlace[] = [
-  { id: 1, x: 126.9784, y: 37.5665, index: 0, name: '서울' },
-  { id: 2, x: 127.0276, y: 37.4979, index: 1, name: '강남' },
-  { id: 3, x: 127.0364, y: 37.5006, index: 2, name: '역삼' },
+  { id: 1, x: 126.9784, y: 37.5665, index: 0, name: '서울역' },
+  { id: 2, x: 127.0276, y: 37.4979, index: 1, name: '강남역' },
+  { id: 3, x: 127.0364, y: 37.5006, index: 2, name: '역삼역' },
 ];
 
 export const RecommendedLocationsMock: RecommendedLocation[] = [
