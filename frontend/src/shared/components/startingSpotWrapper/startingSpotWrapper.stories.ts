@@ -1,6 +1,6 @@
 import { StartingPlacesMock } from '@mocks/LocationsMock';
 
-import { withContainer } from '../../../../.storybook/decorators/withContainer';
+import { withContainer } from '@sb/decorators/withContainer';
 
 import StartingSpotWrapper from './StartingSpotWrapper';
 

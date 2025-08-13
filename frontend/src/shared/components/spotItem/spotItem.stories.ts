@@ -1,4 +1,4 @@
-import { withContainer } from '../../../../.storybook/decorators/withContainer';
+import { withContainer } from '@sb/decorators/withContainer';
 
 import SpotItem from './SpotItem';
 
