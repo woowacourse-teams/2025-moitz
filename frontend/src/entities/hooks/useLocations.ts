@@ -1,45 +1,45 @@
-import { useEffect, useState } from 'react';
+import { useState, useCallback } from 'react';
 
 import fetchLocations from '@entities/apis/fetchLocations';
 import { Location } from '@entities/types/Location';
 import { LocationRequestBody } from '@entities/types/LocationRequestBody';
 
-type useLocationsReturn = {
+export type useLocationsReturn = {
   data: Location;
   isLoading: boolean;
   isError: boolean;
   errorMessage: string;
+  trigger: (requestBody: LocationRequestBody) => Promise<void>;
 };
 
-const initialData = {
+const initialData: Location = {
   startingPlaces: [],
   recommendedLocations: [],
 };
 
-const useLocations = (requestBody: LocationRequestBody): useLocationsReturn => {
+const useLocations = (): useLocationsReturn => {
   const [data, setData] = useState<Location>(initialData);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   const [isError, setIsError] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        setIsLoading(true);
-        const locations = await fetchLocations(requestBody);
-        setData(locations);
-      } catch (error) {
-        setIsError(true);
-        setErrorMessage(error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
+  const trigger = useCallback(async (requestBody: LocationRequestBody) => {
+    setIsLoading(true);
+    setIsError(false);
+    setErrorMessage('');
 
-    fetchData();
+    try {
+      const locations = await fetchLocations(requestBody);
+      setData(locations);
+    } catch (error) {
+      setIsError(true);
+      setErrorMessage(error instanceof Error ? error.message : String(error));
+    } finally {
+      setIsLoading(false);
+    }
   }, []);
 
-  return { data, isLoading, isError, errorMessage };
+  return { data, isLoading, isError, errorMessage, trigger };
 };
 
 export default useLocations;
