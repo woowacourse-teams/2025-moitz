@@ -5,7 +5,6 @@ import BaseLoading from './BaseLoading';
 import type { Meta, StoryObj } from '@storybook/react-webpack5';
 
 const meta = {
-  title: 'features/loading/BaseLoading',
   component: BaseLoading,
   decorators: [withLayout],
   parameters: {

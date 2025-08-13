@@ -7,7 +7,6 @@ import RouteCardDetail from './RouteCardDetail';
 import type { Meta, StoryObj } from '@storybook/react-webpack5';
 
 const meta = {
-  title: 'features/detail/RouteCardDetail',
   component: RouteCardDetail,
   decorators: [withContainer],
   parameters: {

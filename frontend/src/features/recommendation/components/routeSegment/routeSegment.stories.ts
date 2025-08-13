@@ -5,7 +5,6 @@ import RouteSegment from './RouteSegment';
 import type { Meta, StoryObj } from '@storybook/react-webpack5';
 
 const meta = {
-  title: 'features/detail/RouteSegment',
   component: RouteSegment,
   decorators: [withContainer],
   parameters: {

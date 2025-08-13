@@ -5,7 +5,6 @@ import ProgressText from './ProgressText';
 import type { Meta, StoryObj } from '@storybook/react-webpack5';
 
 const meta = {
-  title: 'features/loading/ProgressText',
   component: ProgressText,
   decorators: [withContainer],
   parameters: {

@@ -5,7 +5,6 @@ import ProgressLoading from './ProgressLoading';
 import type { Meta, StoryObj } from '@storybook/react-webpack5';
 
 const meta = {
-  title: 'features/loading/ProgressLoading',
   component: ProgressLoading,
   decorators: [withLayout],
   parameters: {
