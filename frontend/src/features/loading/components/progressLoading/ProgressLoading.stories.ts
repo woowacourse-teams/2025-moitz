@@ -1,4 +1,4 @@
-import { withLayout } from '../../../../../.storybook/decorators/withLayout'; // TODO: 추후 경로 별칭으로 수정
+import { withLayout } from '@sb/decorators/withLayout';
 
 import ProgressLoading from './ProgressLoading';
 

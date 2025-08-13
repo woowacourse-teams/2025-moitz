@@ -1,6 +1,6 @@
 import { routeCardMock } from '@mocks/routeCardMock';
 
-import { withContainer } from '../../../../../.storybook/decorators/withContainer';
+import { withContainer } from '@sb/decorators/withContainer';
 
 import RouteCardDetail from './RouteCardDetail';
 
