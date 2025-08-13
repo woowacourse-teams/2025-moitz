@@ -4,6 +4,7 @@ import Badge from '@shared/components/badge/Badge';
 import MarkerIndex from '@shared/components/markerIndex/MarkerIndex';
 import { flex, typography } from '@shared/styles/default.styled';
 
+import RouteCardBar from '../RouteCardBar/RouteCardBar';
 import RouteCardDetail from '../routeCardDetail/RouteCardDetail';
 
 import * as card from './routeCard.styled';
@@ -19,6 +20,14 @@ function RouteCard({
   startingPlaceName,
   route,
 }: RouteCardProps) {
+  const barPaths = route.paths.map((path) => {
+    return {
+      index: path.index,
+      lineCode: path.lineCode,
+      travelTime: path.travelTime,
+    };
+  });
+
   return (
     <div css={[flex({ direction: 'column', gap: 10 }), card.container()]}>
       <div css={flex({ justify: 'space-between', align: 'center' })}>
@@ -35,7 +44,7 @@ function RouteCard({
           <Badge type="transfer" text={`🕐 ${route.totalTravelTime}분`} />
         </div>
       </div>
-      <div css={card.bar()}></div>
+      <RouteCardBar paths={barPaths} />
       <RouteCardDetail paths={route.paths} />
     </div>
   );
