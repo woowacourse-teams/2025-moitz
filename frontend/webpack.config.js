@@ -33,7 +33,7 @@ const config = {
     new HtmlWebpackPlugin({
       template: 'index.html',
       templateParameters: envVars,
-      favicon: './assets/icon/logo-icon.svg'
+      favicon: './assets/icon/logo-icon.svg',
     }),
     new webpack.DefinePlugin(defineEnv),
   ],
