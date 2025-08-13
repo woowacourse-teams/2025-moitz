@@ -20,10 +20,6 @@ function ResultPage() {
     changeSelectedLocation(location);
   };
 
-  const handleBackButtonClick = () => {
-    changeSelectedLocation(null);
-  };
-
   if (isLoading) return <ProgressLoading />;
   if (isError) return <p>에러 발생!</p>;
   if (!location || location.recommendedLocations.length === 0)
@@ -43,7 +39,6 @@ function ResultPage() {
         recommendedLocations={recommendedLocations}
         selectedLocation={selectedLocation}
         changeSelectedLocation={changeSelectedLocation}
-        handleBackButtonClick={handleBackButtonClick}
       />
       <BottomSheet
         startingLocations={location.startingPlaces}

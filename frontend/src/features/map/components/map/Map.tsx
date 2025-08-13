@@ -20,7 +20,6 @@ interface MapProps {
   recommendedLocations: RecommendedLocation[];
   selectedLocation: RecommendedLocation;
   changeSelectedLocation: (location: RecommendedLocation) => void;
-  handleBackButtonClick: () => void;
 }
 
 function Map({
@@ -28,13 +27,16 @@ function Map({
   recommendedLocations,
   selectedLocation,
   changeSelectedLocation,
-  handleBackButtonClick,
 }: MapProps) {
   const mapRef = useCustomOverlays({
     startingLocations,
     recommendedLocations,
     changeSelectedLocation,
   });
+
+  const handleBackButtonClick = () => {
+    changeSelectedLocation(null);
+  };
 
   return (
     <div css={map.container()}>
