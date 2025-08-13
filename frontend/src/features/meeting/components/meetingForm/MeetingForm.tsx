@@ -6,6 +6,7 @@ import Toast from '@features/toast/components/Toast';
 import { useToast } from '@features/toast/hooks/useToast';
 
 import { useLocationsContext } from '@entities/contexts/useLocationsContext';
+import { setMeetingStorage } from '@entities/model/meetingStorage';
 
 import BottomButton from '@shared/components/bottomButton/BottomButton';
 import { flex } from '@shared/styles/default.styled';
@@ -64,6 +65,8 @@ function MeetingForm() {
       startingPlaceNames: departureList,
       requirement: conditionID,
     });
+    
+    setMeetingStorage({ departureList, conditionID });
   };
 
   return (

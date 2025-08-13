@@ -7,6 +7,7 @@ import {
   validateForm,
 } from '@features/meeting/utils/formValidation';
 
+import { getMeetingStorage } from '@entities/model/meetingStorage';
 import { LocationRequirement } from '@entities/types/LocationRequestBody';
 
 import { ValidationError } from '@shared/types/validationError';
@@ -16,13 +17,18 @@ type UseFormInfoReturn = {
   conditionID: LocationRequirement;
   addDepartureWithValidation: (departure: string) => ValidationError;
   removeDepartureAtIndex: (index: number) => void;
-  updateConditionID: (condition: string) => void;
+  updateConditionID: (condition: LocationRequirement) => void;
   validateFormSubmit: () => ValidationError;
 };
 
 export function useFormInfo(): UseFormInfoReturn {
-  const [departureList, setDepartureList] = useState<string[]>([]);
-  const [conditionID, setConditionID] = useState<LocationRequirement>();
+  const storage = getMeetingStorage();
+  const [departureList, setDepartureList] = useState<string[]>(
+    storage.departureList || [],
+  );
+  const [conditionID, setConditionID] = useState<LocationRequirement>(
+    storage.conditionID as LocationRequirement,
+  );
 
   const addDepartureWithValidation = (departure: string): ValidationError => {
     const stationNameValidation = validateStationName(departure);

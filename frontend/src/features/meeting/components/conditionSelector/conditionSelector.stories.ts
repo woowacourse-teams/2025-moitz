@@ -3,7 +3,6 @@ import ConditionSelector from './ConditionSelector';
 import type { Meta, StoryObj } from '@storybook/react-webpack5';
 
 const meta = {
-  title: 'features/meeting/ConditionSelector',
   component: ConditionSelector,
   parameters: {
     layout: 'centered',

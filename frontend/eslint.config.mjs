@@ -132,6 +132,12 @@ export default [
               group: 'internal',
               position: 'before',
             },
+            // 8. storybook
+            {
+              pattern: '@sb/**',
+              group: 'internal',
+              position: 'before'
+            },
           ],
           pathGroupsExcludedImportTypes: ['react'],
           'newlines-between': 'always',
