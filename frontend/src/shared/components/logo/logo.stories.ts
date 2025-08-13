@@ -3,7 +3,6 @@ import Logo from './Logo';
 import type { Meta, StoryObj } from '@storybook/react-webpack5';
 
 const meta = {
-  title: 'shared/Logo/Logo',
   component: Logo,
   parameters: {
     layout: 'centered',

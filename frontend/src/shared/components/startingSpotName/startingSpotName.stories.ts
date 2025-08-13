@@ -5,7 +5,6 @@ import StartingSpotName from './StartingSpotName';
 import type { Meta, StoryObj } from '@storybook/react-webpack5';
 
 const meta = {
-  title: 'shared/StartingSpotName',
   component: StartingSpotName,
   parameters: {
     layout: 'centered',

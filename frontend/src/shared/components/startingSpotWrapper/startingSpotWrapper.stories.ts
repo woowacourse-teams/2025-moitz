@@ -7,7 +7,6 @@ import StartingSpotWrapper from './StartingSpotWrapper';
 import type { Meta, StoryObj } from '@storybook/react-webpack5';
 
 const meta = {
-  title: 'shared/StartingSpotWrapper',
   component: StartingSpotWrapper,
   decorators: [withContainer],
   parameters: {

@@ -5,7 +5,6 @@ import SpotItem from './SpotItem';
 import type { Meta, StoryObj } from '@storybook/react-webpack5';
 
 const meta = {
-  title: 'shared/SpotItem',
   component: SpotItem,
   decorators: [withContainer],
   parameters: {

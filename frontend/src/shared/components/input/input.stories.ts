@@ -3,7 +3,6 @@ import Input from './Input';
 import type { Meta, StoryObj } from '@storybook/react-webpack5';
 
 const meta = {
-  title: 'shared/Input',
   component: Input,
   parameters: {
     layout: 'centered',
