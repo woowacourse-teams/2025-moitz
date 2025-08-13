@@ -1,29 +1,23 @@
-/** @jsxImportSource @emotion/react */
+import { StartingPlace } from '@entities/types/Location';
 
 import StartingSpotName from '@shared/components/startingSpotName/StartingSpotName';
 import { flex, typography } from '@shared/styles/default.styled';
 
-import { startingLocation } from '@shared/types/startingLocation';
-
 import * as startSpotWrapper from './startingSpotWrapper.styled';
 
 interface StaringSpotWrapperProps {
-  startingLocations: startingLocation[];
+  startingPlaces: StartingPlace[];
 }
 
-function StartingSpotWrapper({ startingLocations }: StaringSpotWrapperProps) {
+function StartingSpotWrapper({ startingPlaces }: StaringSpotWrapperProps) {
   return (
     <div css={[flex({ align: 'center', gap: 10 }), startSpotWrapper.base()]}>
       <span css={[typography.sh1, startSpotWrapper.title()]}>출발지</span>
       <div css={[flex({ wrap: 'wrap', gap: 5 })]}>
-        {startingLocations.map((location, index) => {
-          const isLast = startingLocations.length - 1 === index;
+        {startingPlaces.map((place, index) => {
+          const isLast = startingPlaces.length - 1 === index;
           return (
-            <StartingSpotName
-              key={location.index}
-              location={location}
-              isLast={isLast}
-            />
+            <StartingSpotName key={place.index} place={place} isLast={isLast} />
           );
         })}
       </div>

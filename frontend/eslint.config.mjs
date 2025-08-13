@@ -17,7 +17,11 @@ export default [
       react: pluginReact,
     },
     languageOptions: {
-      globals: {...globals.browser, ...globals.node},
+      globals: {
+        ...globals.browser,
+        ...globals.node,
+        ...globals.jest,
+      },
       parser: tsParser,
       parserOptions: {
         ecmaVersion: 'latest',
@@ -52,6 +56,8 @@ export default [
         'error',
         { argsIgnorePattern: '^_' },
       ],
+      // Jest 권장 규칙들
+      'no-undef': 'warn',
 
       // emotion css prop를 쓰기 위한 규칙
       'react/no-unknown-property': ['error', { ignore: ['css'] }],
@@ -91,6 +97,11 @@ export default [
               group: 'internal',
               position: 'before',
             },
+            {
+              pattern: '@entities/**',
+              group: 'internal',
+              position: 'before',
+            },
             // 3. shared 하위 모듈들 (components, styles, types 제외)
             {
               pattern: '@shared/!(types)/**',
@@ -120,6 +131,12 @@ export default [
               pattern: '@mocks/**',
               group: 'internal',
               position: 'before',
+            },
+            // 8. storybook
+            {
+              pattern: '@sb/**',
+              group: 'internal',
+              position: 'before'
             },
           ],
           pathGroupsExcludedImportTypes: ['react'],

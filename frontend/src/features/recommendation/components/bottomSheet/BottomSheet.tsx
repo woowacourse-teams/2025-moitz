@@ -1,33 +1,29 @@
-import { useState } from 'react';
+import { View } from '@features/recommendation/types/bottomSheetView';
+
+import { RecommendedLocation, StartingPlace } from '@entities/types/Location';
 
 import { flex, scroll, shadow } from '@shared/styles/default.styled';
 
-import { recommendedLocation } from '@shared/types/recommendedLocation';
-import { startingLocation } from '@shared/types/startingLocation';
-
-import Detail from '../detail/Detail';
-import List from '../list/List';
+import BottomSheetDetail from '../bottomSheetDetail/BottomSheetDetail';
+import BottomSheetList from '../bottomSheetList/BottomSheetList';
 
 import * as bottomSheet from './bottomSheet.styled';
-type View = 'list' | 'detail';
+
 interface BottomSheetProps {
-  startingLocations: startingLocation[];
-  recommendedLocations: recommendedLocation[];
+  startingLocations: StartingPlace[];
+  recommendedLocations: RecommendedLocation[];
+  currentView: View;
+  selectedLocation: RecommendedLocation | null;
+  handleSpotClick: (spot: RecommendedLocation) => void;
 }
 
 function BottomSheet({
   startingLocations,
   recommendedLocations,
+  currentView,
+  selectedLocation,
+  handleSpotClick,
 }: BottomSheetProps) {
-  const [currentView, setCurrentView] = useState<View>('list');
-  const [selectedLocation, setSelectedLocation] =
-    useState<recommendedLocation | null>(null);
-
-  const handleSpotClick = (spot: recommendedLocation) => {
-    setSelectedLocation(spot);
-    setCurrentView('detail');
-  };
-
   return (
     <div
       css={[
@@ -43,16 +39,18 @@ function BottomSheet({
           bottomSheet.content(),
         ]}
       >
-        {currentView === 'list' ? (
-          <>
-            <List
-              startingLocations={startingLocations}
-              recommendedLocations={recommendedLocations}
-              onSpotClick={handleSpotClick}
-            />
-          </>
-        ) : (
-          <Detail selectedLocation={selectedLocation} />
+        {currentView === 'list' && (
+          <BottomSheetList
+            startingPlaces={startingLocations}
+            recommendedLocations={recommendedLocations}
+            onSpotClick={handleSpotClick}
+          />
+        )}
+        {currentView === 'detail' && (
+          <BottomSheetDetail
+            startingPlaces={startingLocations}
+            selectedLocation={selectedLocation}
+          />
         )}
       </div>
     </div>

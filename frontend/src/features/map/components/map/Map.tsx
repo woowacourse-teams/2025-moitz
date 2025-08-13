@@ -1,56 +1,52 @@
-/** @jsxImportSource @emotion/react */
-
-import { useEffect, useRef } from 'react';
 import { Link } from 'react-router';
+
+import { useCustomOverlays } from '@features/map/hooks/useCustomOverlays';
+import { View } from '@features/recommendation/types/bottomSheetView';
+
+import { RecommendedLocation, StartingPlace } from '@entities/types/Location';
 
 import MapButton from '@shared/components/mapButton/MapButton';
 import MapPoint from '@shared/components/mapPoint/MapPoint';
 import { flex } from '@shared/styles/default.styled';
-
-import { recommendedLocation } from '@shared/types/recommendedLocation';
-import { startingLocation } from '@shared/types/startingLocation';
 
 import IconBack from '@icons/icon-back.svg';
 
 import * as map from './map.styled';
 
 interface MapProps {
-  startingLocations: startingLocation[];
-  recommendedLocations: recommendedLocation[];
+  startingLocations: StartingPlace[];
+  recommendedLocations: RecommendedLocation[];
+  currentView: View;
+  handleBackButtonClick: () => void;
 }
 
-function Map({ startingLocations }: MapProps) {
-  const mapRef = useRef<HTMLDivElement | null>(null);
-
-  useEffect(() => {
-    const { naver } = window;
-
-    if (!naver || !mapRef.current) return;
-
-    const locations = startingLocations.map(
-      (location) => new naver.maps.LatLng(location.y, location.x),
-    );
-
-    const map = new naver.maps.Map(mapRef.current, {
-      center: locations[0],
-      zoom: 11,
-    });
-
-    locations.forEach((location) => {
-      new naver.maps.Marker({
-        map,
-        position: location,
-      });
-    });
-  }, []);
+function Map({
+  startingLocations,
+  recommendedLocations,
+  currentView,
+  handleBackButtonClick,
+}: MapProps) {
+  const mapRef = useCustomOverlays({
+    startingLocations,
+    recommendedLocations,
+  });
 
   return (
     <div css={map.container()}>
       <div ref={mapRef} css={map.base()} />
       <div css={[flex({ justify: 'space-between' }), map.top_overlay()]}>
-        <Link to="/">
-          <MapButton src={IconBack} alt="back" />
-        </Link>
+        {currentView === 'list' && (
+          <Link to="/">
+            <MapButton src={IconBack} alt="back" />
+          </Link>
+        )}
+        {currentView === 'detail' && (
+          <MapButton
+            src={IconBack}
+            alt="back"
+            onClick={handleBackButtonClick}
+          />
+        )}
       </div>
       <div css={[flex({ justify: 'space-between' }), map.bottom_overlay()]}>
         <MapPoint text="전체 추첨 지점" />

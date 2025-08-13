@@ -1,11 +1,12 @@
-import { flex, typography } from '@shared/styles/default.styled';
+import { RecommendedPlace } from '@entities/types/Location';
 
-import { recommendedLocation } from '@shared/types/recommendedLocation';
+import Badge from '@shared/components/badge/Badge';
+import { flex, typography } from '@shared/styles/default.styled';
 
 import * as card from './placeCard.styled';
 
 interface PlaceCardProps {
-  place: recommendedLocation['places'][number];
+  place: RecommendedPlace;
 }
 
 function PlaceCard({ place }: PlaceCardProps) {
@@ -19,7 +20,11 @@ function PlaceCard({ place }: PlaceCardProps) {
       onClick={handleClick}
       aria-label={`${place.name} 장소 정보 보기`}
     >
-      <div css={card.image()}></div>
+      <div css={card.image()}>
+        <div css={card.badge()}>
+          <Badge type="category" text={place.category} />
+        </div>
+      </div>
       <div
         css={[
           flex({ direction: 'column', justify: 'flex-start', gap: 7 }),

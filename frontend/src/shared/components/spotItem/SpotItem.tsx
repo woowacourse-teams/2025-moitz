@@ -1,5 +1,3 @@
-/** @jsxImportSource @emotion/react */
-
 import Badge from '@shared/components/badge/Badge';
 import MarkerIndex from '@shared/components/markerIndex/MarkerIndex';
 import { flex, typography } from '@shared/styles/default.styled';
@@ -41,7 +39,7 @@ function SpotItem({
         <div css={flex({ justify: 'space-between', align: 'center' })}>
           <div css={flex({ align: 'center', gap: 14 })}>
             <span css={typography.h3}>{name}</span>
-            {isBest && <Badge text="best" />}
+            {isBest && <Badge type="best" text="best" />}
           </div>
           <span css={typography.c1}>평균 {avgMinutes}분</span>
         </div>

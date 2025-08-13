@@ -5,9 +5,10 @@ import * as mapButton from './mapButton.styled';
 interface MapButtonProps {
   src: string;
   alt: string;
+  onClick?: () => void;
 }
 
-function MapButton({ src, alt }: MapButtonProps) {
+function MapButton({ src, alt, onClick }: MapButtonProps) {
   return (
     <button
       css={[
@@ -15,6 +16,7 @@ function MapButton({ src, alt }: MapButtonProps) {
         shadow.map,
         mapButton.base(),
       ]}
+      onClick={onClick}
     >
       <img src={src} alt={alt} />
     </button>

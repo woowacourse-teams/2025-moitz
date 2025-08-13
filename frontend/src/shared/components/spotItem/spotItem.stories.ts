@@ -1,11 +1,10 @@
-import { withContainer } from '../../../../.storybook/decorators/withContainer';
+import { withContainer } from '@sb/decorators/withContainer';
 
 import SpotItem from './SpotItem';
 
 import type { Meta, StoryObj } from '@storybook/react-webpack5';
 
 const meta = {
-  title: 'shared/SpotItem',
   component: SpotItem,
   decorators: [withContainer],
   parameters: {

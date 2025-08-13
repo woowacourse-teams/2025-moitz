@@ -1,5 +1,3 @@
-/** @jsxImportSource @emotion/react */
-
 import { css } from '@emotion/react';
 import { Decorator } from '@storybook/react-webpack5';
 

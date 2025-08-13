@@ -27,6 +27,9 @@
       "@features/*": [
         "src/features/*"
       ],
+      "@entities/*": [
+        "src/entities/*"
+      ],
       "@shared/*": [
         "src/shared/*"
       ],
@@ -44,11 +47,17 @@
       ],
       "@mocks/*": [
         "src/mocks/*"
-      ]
+      ],
+      "@config/*": [
+        "src/config/*"
+      ],
+      "@sb/*": [
+        ".storybook/*"
+      ],
     }
   },
   "include": [
     "src",
     "main.tsx",
- ]
+  ]
 }

@@ -1,13 +1,12 @@
-import startSpotNameListMock from '@mocks/startingLocationsMock';
+import { StartingPlacesMock } from '@mocks/LocationsMock';
 
-import { withContainer } from '../../../../.storybook/decorators/withContainer';
+import { withContainer } from '@sb/decorators/withContainer';
 
 import StartingSpotWrapper from './StartingSpotWrapper';
 
 import type { Meta, StoryObj } from '@storybook/react-webpack5';
 
 const meta = {
-  title: 'shared/StartingSpotWrapper',
   component: StartingSpotWrapper,
   decorators: [withContainer],
   parameters: {
@@ -15,7 +14,7 @@ const meta = {
   },
   tags: ['autodocs'],
   argTypes: {
-    startingLocations: {
+    startingPlaces: {
       control: { type: 'object' },
       description: '출발지 이름 목록',
     },
@@ -27,13 +26,13 @@ type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {
   args: {
-    startingLocations: startSpotNameListMock,
+    startingPlaces: StartingPlacesMock,
   },
 };
 
 export const Long: Story = {
   args: {
-    startingLocations: [
+    startingPlaces: [
       { index: 0, name: '서울역', id: 0, x: 0, y: 0 },
       { index: 1, name: '강남역', id: 1, x: 1, y: 1 },
       { index: 2, name: '역삼역', id: 2, x: 2, y: 2 },

@@ -1,14 +1,15 @@
-import recommendedLocationsMock from '@mocks/recommendedLocationsMock';
-import startingLocationsMock from '@mocks/startingLocationsMock';
+import {
+  StartingPlacesMock,
+  RecommendedLocationsMock,
+} from '@mocks/LocationsMock';
 
-import { withContainer } from '../../../../../.storybook/decorators/withContainer';
+import { withContainer } from '@sb/decorators/withContainer';
 
 import BottomSheet from './BottomSheet';
 
 import type { Meta, StoryObj } from '@storybook/react-webpack5';
 
 const meta = {
-  title: 'features/BottomSheet',
   component: BottomSheet,
   decorators: [withContainer],
   parameters: {
@@ -24,6 +25,17 @@ const meta = {
       control: { type: 'object' },
       description: '추천 장소 리스트',
     },
+    currentView: {
+      control: { type: 'select' },
+      options: ['list', 'detail'],
+    },
+    selectedLocation: {
+      control: { type: 'object' },
+      description: '선택된 장소',
+    },
+    handleSpotClick: {
+      action: 'handleSpotClick',
+    },
   },
 } satisfies Meta<typeof BottomSheet>;
 
@@ -32,14 +44,20 @@ type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {
   args: {
-    startingLocations: startingLocationsMock,
-    recommendedLocations: recommendedLocationsMock,
+    startingLocations: StartingPlacesMock,
+    recommendedLocations: RecommendedLocationsMock,
+    currentView: 'list',
+    selectedLocation: null,
+    handleSpotClick: () => {},
   },
 };
 
 export const Short: Story = {
   args: {
-    startingLocations: startingLocationsMock,
-    recommendedLocations: recommendedLocationsMock.slice(0, 2),
+    startingLocations: StartingPlacesMock,
+    recommendedLocations: RecommendedLocationsMock.slice(0, 2),
+    currentView: 'list',
+    selectedLocation: null,
+    handleSpotClick: () => {},
   },
 };
