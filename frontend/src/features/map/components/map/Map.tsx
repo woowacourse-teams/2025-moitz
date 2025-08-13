@@ -1,7 +1,6 @@
 import { Link } from 'react-router';
 
 import { useCustomOverlays } from '@features/map/hooks/useCustomOverlays';
-import { View } from '@features/recommendation/types/bottomSheetView';
 
 import { RecommendedLocation, StartingPlace } from '@entities/types/Location';
 
@@ -19,7 +18,6 @@ const DEFAULT_CURRENT_RECOMMEND_LOCATION = '전체 추첨 지점';
 interface MapProps {
   startingLocations: StartingPlace[];
   recommendedLocations: RecommendedLocation[];
-  currentView: View;
   selectedLocation: RecommendedLocation;
   changeSelectedLocation: (location: RecommendedLocation) => void;
   handleBackButtonClick: () => void;
@@ -30,7 +28,6 @@ function Map({
   recommendedLocations,
   selectedLocation,
   changeSelectedLocation,
-  currentView,
   handleBackButtonClick,
 }: MapProps) {
   const mapRef = useCustomOverlays({
@@ -43,12 +40,12 @@ function Map({
     <div css={map.container()}>
       <div ref={mapRef} css={map.base()} />
       <div css={[flex({ justify: 'space-between' }), map.top_overlay()]}>
-        {currentView === 'list' && (
+        {!selectedLocation && (
           <Link to="/">
             <MapButton src={IconBack} alt="back" />
           </Link>
         )}
-        {currentView === 'detail' && (
+        {selectedLocation && (
           <MapButton
             src={IconBack}
             alt="back"

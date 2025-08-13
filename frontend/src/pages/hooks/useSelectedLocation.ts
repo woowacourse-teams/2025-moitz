@@ -9,7 +9,7 @@ type useSelectedLocationReturn = {
 
 const useSelectedLocation = (): useSelectedLocationReturn => {
   const [selectedLocation, setSelectedLocation] =
-    useState<RecommendedLocation>();
+    useState<RecommendedLocation>(null);
 
   const changeSelectedLocation = (location: RecommendedLocation) => {
     setSelectedLocation(location);

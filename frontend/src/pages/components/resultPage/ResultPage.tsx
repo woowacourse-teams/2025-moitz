@@ -1,11 +1,8 @@
-import { useState } from 'react';
-
 import useSelectedRecommendedLocation from '@pages/hooks/useSelectedLocation';
 
 import ProgressLoading from '@features/loading/components/progressLoading/ProgressLoading';
 import Map from '@features/map/components/map/Map';
 import BottomSheet from '@features/recommendation/components/bottomSheet/BottomSheet';
-import { View } from '@features/recommendation/types/bottomSheetView';
 
 import { useLocationsContext } from '@entities/contexts/useLocationsContext';
 import { RecommendedLocation } from '@entities/types/Location';
@@ -19,16 +16,12 @@ function ResultPage() {
   const { selectedLocation, changeSelectedLocation } =
     useSelectedRecommendedLocation();
 
-  const [currentView, setCurrentView] = useState<View>('list');
-
   const handleSpotClick = (location: RecommendedLocation) => {
     changeSelectedLocation(location);
-    setCurrentView('detail');
   };
 
   const handleBackButtonClick = () => {
     changeSelectedLocation(null);
-    setCurrentView('list');
   };
 
   if (isLoading) return <ProgressLoading />;
@@ -48,7 +41,6 @@ function ResultPage() {
       <Map
         startingLocations={startingPlaces}
         recommendedLocations={recommendedLocations}
-        currentView={currentView}
         selectedLocation={selectedLocation}
         changeSelectedLocation={changeSelectedLocation}
         handleBackButtonClick={handleBackButtonClick}
@@ -56,7 +48,6 @@ function ResultPage() {
       <BottomSheet
         startingLocations={location.startingPlaces}
         recommendedLocations={location.recommendedLocations}
-        currentView={currentView}
         selectedLocation={selectedLocation}
         handleSpotClick={handleSpotClick}
       />
