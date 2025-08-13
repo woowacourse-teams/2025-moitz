@@ -27,11 +27,15 @@ function BottomSheet({
   return (
     <div
       css={[
-        flex({ direction: 'column', gap: 20 }),
+        flex({ direction: 'column' }),
         shadow.bottom_sheet,
         bottomSheet.container(),
       ]}
     >
+      <div css={[bottomSheet.header()]}>
+        <button css={[bottomSheet.handle()]}></button>
+      </div>
+
       <div
         css={[
           flex({ direction: 'column', gap: 20 }),
