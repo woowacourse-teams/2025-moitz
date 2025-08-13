@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import React, { useEffect, useRef } from 'react';
 
 import type {
   RecommendedLocation,
@@ -9,18 +9,20 @@ import MarkerIndex from '@shared/components/markerIndex/MarkerIndex';
 
 import { CustomOverlay } from '../lib/CustomOverlay';
 
-interface useCustomOverlaysProps {
-  startingLocations: StartingPlace[];
-  recommendedLocations: RecommendedLocation[];
-}
-
 const stringToCharCode = (number: number) => {
   return String.fromCharCode(number + 64);
 };
 
+interface useCustomOverlaysProps {
+  startingLocations: StartingPlace[];
+  recommendedLocations: RecommendedLocation[];
+  changeSelectedLocation: (location: RecommendedLocation) => void;
+}
+
 export const useCustomOverlays = ({
   startingLocations,
   recommendedLocations,
+  changeSelectedLocation,
 }: useCustomOverlaysProps) => {
   const mapRef = useRef<HTMLDivElement | null>(null);
 
@@ -64,13 +66,19 @@ export const useCustomOverlays = ({
         naverMap,
         position,
         content: (
-          <MarkerIndex
-            index={index + 1}
-            type="recommended"
-            label={location.name}
-            hasStroke
-            hasShadow
-          />
+          <MarkerButton
+            onClick={() => {
+              changeSelectedLocation(location);
+            }}
+          >
+            <MarkerIndex
+              index={index + 1}
+              type="recommended"
+              label={location.name}
+              hasStroke
+              hasShadow
+            />
+          </MarkerButton>
         ),
       });
     });
@@ -78,3 +86,12 @@ export const useCustomOverlays = ({
 
   return mapRef;
 };
+
+interface MarkerButtonProps {
+  children: React.ReactNode;
+  onClick: () => void;
+}
+
+function MarkerButton({ children, onClick }: MarkerButtonProps) {
+  return <button onClick={onClick}>{children}</button>;
+}

@@ -14,22 +14,29 @@ import IconShare from '@icons/icon-share.svg';
 
 import * as map from './map.styled';
 
+const DEFAULT_CURRENT_RECOMMEND_LOCATION = '전체 추첨 지점';
+
 interface MapProps {
   startingLocations: StartingPlace[];
   recommendedLocations: RecommendedLocation[];
   currentView: View;
+  selectedLocation: RecommendedLocation;
+  changeSelectedLocation: (location: RecommendedLocation) => void;
   handleBackButtonClick: () => void;
 }
 
 function Map({
   startingLocations,
   recommendedLocations,
+  selectedLocation,
+  changeSelectedLocation,
   currentView,
   handleBackButtonClick,
 }: MapProps) {
   const mapRef = useCustomOverlays({
     startingLocations,
     recommendedLocations,
+    changeSelectedLocation,
   });
 
   return (
@@ -53,7 +60,13 @@ function Map({
         </Link>
       </div>
       <div css={[flex({ justify: 'space-between' }), map.bottom_overlay()]}>
-        <MapPoint text="전체 추첨 지점" />
+        <MapPoint
+          text={
+            selectedLocation
+              ? selectedLocation.name
+              : DEFAULT_CURRENT_RECOMMEND_LOCATION
+          }
+        />
       </div>
     </div>
   );

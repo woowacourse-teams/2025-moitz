@@ -1,5 +1,7 @@
 import { useState } from 'react';
 
+import useSelectedRecommendedLocation from '@pages/hooks/useSelectedLocation';
+
 import ProgressLoading from '@features/loading/components/progressLoading/ProgressLoading';
 import Map from '@features/map/components/map/Map';
 import BottomSheet from '@features/recommendation/components/bottomSheet/BottomSheet';
@@ -14,17 +16,18 @@ import * as resultPage from './resultPage.styled';
 
 function ResultPage() {
   const { data: location, isLoading, isError } = useLocationsContext();
-  const [currentView, setCurrentView] = useState<View>('list');
-  const [selectedLocation, setSelectedLocation] =
-    useState<RecommendedLocation | null>(null);
+  const { selectedLocation, changeSelectedLocation } =
+    useSelectedRecommendedLocation();
 
-  const handleSpotClick = (spot: RecommendedLocation) => {
-    setSelectedLocation(spot);
+  const [currentView, setCurrentView] = useState<View>('list');
+
+  const handleSpotClick = (location: RecommendedLocation) => {
+    changeSelectedLocation(location);
     setCurrentView('detail');
   };
 
   const handleBackButtonClick = () => {
-    setSelectedLocation(null);
+    changeSelectedLocation(null);
     setCurrentView('list');
   };
 
@@ -46,6 +49,8 @@ function ResultPage() {
         startingLocations={startingPlaces}
         recommendedLocations={recommendedLocations}
         currentView={currentView}
+        selectedLocation={selectedLocation}
+        changeSelectedLocation={changeSelectedLocation}
         handleBackButtonClick={handleBackButtonClick}
       />
       <BottomSheet
