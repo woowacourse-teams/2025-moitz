@@ -1,5 +1,6 @@
 /* eslint-disable no-undef */
 import React, { useEffect, useRef } from 'react';
+import { createRoot, type Root } from 'react-dom/client';
 
 import type {
   RecommendedLocation,
@@ -9,16 +10,13 @@ import type {
 import MarkerIndex from '@shared/components/markerIndex/MarkerIndex';
 import { colorToken } from '@shared/styles/tokens';
 
-import { CustomOverlay } from '../lib/CustomOverlay';
-
 /** 인덱스를 A, B, C...로 변환 (출발지 마커 라벨용) */
 const stringToCharCode = (n: number) => String.fromCharCode(n + 64);
 
-/** ----------------------------------------------------------------
- *  LatLng 타입 편차 흡수 헬퍼
- *  - 일부 선언(env)에선 lat()/lng()가 없고 x/y만 있는 경우가 있어
- *    안전하게 값을 읽도록 헬퍼로 통일
- * ---------------------------------------------------------------- */
+/* -----------------------------
+ * LatLng 타입 편차 흡수 헬퍼
+ * - lat()/lng() 또는 x/y 모두 대응
+ * ----------------------------- */
 type LatLngLike =
   | naver.maps.LatLng
   | { lat: () => number; lng: () => number }
@@ -38,42 +36,117 @@ function isSameLatLng(a: LatLngLike, b: LatLngLike) {
   return getLat(a) === getLat(b) && getLng(a) === getLng(b);
 }
 
-/** 훅 외부에서 주입받는 프로퍼티 타입 */
-interface UseCustomOverlaysProps {
-  startingLocations: StartingPlace[]; // 출발지 목록
-  recommendedLocations: RecommendedLocation[]; // 추천지 목록
-  selectedLocation: RecommendedLocation | null; // 선택된 추천지 (없으면 null)
-  changeSelectedLocation: (loc: RecommendedLocation) => void; // 추천지 선택 변경
+/* ===========================================
+ * React용 CustomOverlay (zIndex 지원)
+ *  - content: React 노드를 그대로 붙여 렌더
+ *  - zIndex: 옵션, 기본 100
+ * =========================================== */
+
+type CustomOverlayProps = {
+  position: naver.maps.LatLng;
+  naverMap: naver.maps.Map;
+  content: React.ReactNode;
+  zIndex?: number;
+  className?: string;
+  pointerEvents?: 'auto' | 'none';
+};
+
+class CustomOverlay extends window.naver.maps.OverlayView {
+  private position: naver.maps.LatLng;
+  private container: HTMLDivElement;
+  private reactRoot: Root;
+  private zIndex: number;
+
+  constructor({
+    position,
+    naverMap,
+    content,
+    zIndex = 100,
+    className,
+    pointerEvents = 'auto',
+  }: CustomOverlayProps) {
+    super();
+
+    this.position = position;
+    this.zIndex = zIndex;
+
+    this.container = document.createElement('div');
+    this.container.style.position = 'absolute';
+    this.container.style.pointerEvents = pointerEvents;
+    this.container.style.zIndex = String(zIndex);
+    if (className) this.container.className = className;
+
+    this.reactRoot = createRoot(this.container);
+    this.reactRoot.render(content);
+
+    this.setMap(naverMap);
+  }
+
+  onAdd() {
+    const { overlayLayer } = this.getPanes();
+    overlayLayer.appendChild(this.container);
+  }
+
+  draw() {
+    const projection = this.getProjection();
+    const pixel = projection.fromCoordToOffset(
+      this.position as unknown as naver.maps.Coord,
+    );
+    this.container.style.left = `${pixel.x}px`;
+    this.container.style.top = `${pixel.y}px`;
+  }
+
+  onRemove() {
+    this.reactRoot.unmount();
+    this.container.remove();
+  }
+
+  setPosition(position: naver.maps.LatLng) {
+    this.position = position;
+    this.draw();
+  }
+
+  getPosition() {
+    return this.position;
+  }
+
+  setZIndex(z: number) {
+    this.zIndex = z;
+    this.container.style.zIndex = String(z);
+  }
+
+  setMap(map: naver.maps.Map | null) {
+    super.setMap(map);
+  }
 }
 
-/** ======================================================================================
- *  useCustomOverlays
- *  - 지도는 최초 1회 생성
- *  - 마커 렌더링 정책
- *      · 선택 전(null): 시작점 + 모든 추천지
- *      · 선택 후      : 시작점 + 선택된 추천지 1개만
- *  - 라인 렌더링 정책
- *      · 선택된 추천지의 routes 내 paths를 폴리라인으로 그린다
- *  - 변경 시 기존 오버레이/폴리라인은 모두 정리 (메모리/중복 방지)
- * ====================================================================================== */
+/* ===========================================
+ * useCustomOverlays
+ *  - 선택 전: 시작점 + 모든 추천지
+ *  - 선택 후: 시작점 + 선택된 추천지 1개만
+ *  - 선택된 추천지 경로만 폴리라인으로 렌더
+ *  - 마커(zIndex=300/200) > 라인(zIndex=1)
+ * =========================================== */
+interface UseCustomOverlaysProps {
+  startingLocations: StartingPlace[];
+  recommendedLocations: RecommendedLocation[];
+  selectedLocation: RecommendedLocation | null;
+  changeSelectedLocation: (loc: RecommendedLocation) => void;
+}
+
 export const useCustomOverlays = ({
   startingLocations,
   recommendedLocations,
   selectedLocation,
   changeSelectedLocation,
 }: UseCustomOverlaysProps) => {
-  /** 지도 컨테이너 & 지도 인스턴스 참조 */
   const mapRef = useRef<HTMLDivElement | null>(null);
   const naverMapRef = useRef<naver.maps.Map | null>(null);
 
-  /** 생성된 오버레이/폴리라인을 추적해서 의존성 변경 시 정리 */
   const overlayInstancesRef = useRef<naver.maps.OverlayView[]>([]);
   const polylineInstancesRef = useRef<naver.maps.Polyline[]>([]);
 
-  /** ----------------------------------------------
-   *  지도 & 마커 렌더링
-   *  - 선택 상태에 따라 추천지 마커를 필터링
-   * ---------------------------------------------- */
+  // 지도 & 마커 렌더링
   useEffect(() => {
     const { naver } = window;
     if (!naver || !mapRef.current) return;
@@ -81,7 +154,7 @@ export const useCustomOverlays = ({
     const all = [...startingLocations, ...recommendedLocations];
     if (all.length === 0) return;
 
-    // 지도 최초 1회 생성 (재사용)
+    // 지도 최초 1회 생성
     if (!naverMapRef.current) {
       const center = new naver.maps.LatLng(all[0].y, all[0].x);
       naverMapRef.current = new naver.maps.Map(mapRef.current, {
@@ -91,15 +164,16 @@ export const useCustomOverlays = ({
     }
     const map = naverMapRef.current!;
 
-    // 이전 오버레이 정리
+    // 기존 오버레이 제거
     overlayInstancesRef.current.forEach((ov) => ov.setMap(null));
     overlayInstancesRef.current = [];
 
-    // 1) 출발지 마커
+    // 1) 출발지 마커 (항상 표시) — 가장 위로
     startingLocations.forEach((loc, i) => {
       const overlay = new CustomOverlay({
         naverMap: map,
         position: new naver.maps.LatLng(loc.y, loc.x),
+        zIndex: 300, // ✅ 최상단
         content: (
           <MarkerIndex
             index={stringToCharCode(i + 1)}
@@ -110,20 +184,21 @@ export const useCustomOverlays = ({
           />
         ),
       });
-      // CustomOverlay가 OverlayView와 호환된다고 가정
       overlayInstancesRef.current.push(
         overlay as unknown as naver.maps.OverlayView,
       );
     });
 
     // 2) 추천지 마커
-    //    선택 전: 전체 표시 / 선택 후: 선택된 추천지만 표시
+    //    - 선택 전(null): 모두 표시
+    //    - 선택 후: 선택된 추천지만 표시 (라인 위로 오도록 zIndex 200)
     recommendedLocations.forEach((loc, i) => {
       if (selectedLocation && loc.id !== selectedLocation.id) return;
 
       const overlay = new CustomOverlay({
         naverMap: map,
         position: new naver.maps.LatLng(loc.y, loc.x),
+        zIndex: 200, // ✅ 라인보다 위, 출발지보단 아래
         content: (
           <MarkerButton onClick={() => changeSelectedLocation(loc)}>
             <MarkerIndex
@@ -141,7 +216,6 @@ export const useCustomOverlays = ({
       );
     });
 
-    // 클린업: 의존성 변경/언마운트 시 오버레이 제거
     return () => {
       overlayInstancesRef.current.forEach((ov) => ov.setMap(null));
       overlayInstancesRef.current = [];
@@ -153,22 +227,18 @@ export const useCustomOverlays = ({
     changeSelectedLocation,
   ]);
 
-  /** ----------------------------------------------
-   *  선택된 추천지의 경로(폴리라인) 렌더링
-   *  - selectedLocation 변경에만 반응
-   * ---------------------------------------------- */
+  // 선택된 추천지의 경로(폴리라인) 렌더링
   useEffect(() => {
     const { naver } = window;
     const map = naverMapRef.current;
     if (!naver || !map) return;
 
-    // 이전 라인 정리
+    // 기존 라인 제거
     polylineInstancesRef.current.forEach((pl) => pl.setMap(null));
     polylineInstancesRef.current = [];
 
     if (!selectedLocation) return;
 
-    // 선택된 추천지의 모든 route → path 구간들을 좌표 배열로 변환
     (selectedLocation.routes ?? []).forEach((route) => {
       const raw: naver.maps.LatLng[] = (route.paths ?? []).flatMap((seg) => [
         new naver.maps.LatLng(seg.startingY, seg.startingX),
@@ -186,25 +256,25 @@ export const useCustomOverlays = ({
           map,
           path,
           strokeWeight: 5,
-          strokeColor: colorToken.orange[1], // 선택 라인 강조 색
+          strokeColor: colorToken.main[1], // ✅ 팔레트 적용 (시원한 청록)
           strokeOpacity: 0.95,
+          zIndex: 1, // ✅ 라인을 가장 아래로
         });
         polylineInstancesRef.current.push(polyline);
       }
     });
 
-    // 클린업: selectedLocation 변경/언마운트 시 라인 제거
     return () => {
       polylineInstancesRef.current.forEach((pl) => pl.setMap(null));
       polylineInstancesRef.current = [];
     };
   }, [selectedLocation]);
 
-  /** 이 훅이 반환하는 것은 "지도 컨테이너 ref" 하나 */
+  // 지도 컨테이너 ref만 반환
   return mapRef;
 };
 
-/** 버튼 클릭 영역을 명시적으로 분리 (키보드 포커스/클릭 가능) */
+/** 버튼 클릭 영역 (접근성 고려해 명시적 버튼 사용) */
 interface MarkerButtonProps {
   children: React.ReactNode;
   onClick: () => void;
