@@ -9,6 +9,7 @@ declare global {
   namespace naver.maps {
     class LatLng {
       constructor(lat: number, lng: number);
+      equals(lat: LatLng): boolean;
     }
 
     class Map {
