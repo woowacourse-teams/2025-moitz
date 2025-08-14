@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable no-undef */
 import React, { useEffect, useRef } from 'react';
 import { createRoot, type Root } from 'react-dom/client';
