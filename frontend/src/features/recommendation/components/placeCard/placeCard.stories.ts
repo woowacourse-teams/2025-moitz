@@ -5,7 +5,6 @@ import PlaceCard from './PlaceCard';
 import type { Meta, StoryObj } from '@storybook/react-webpack5';
 
 const meta = {
-  title: 'features/detail/PlaceCard',
   component: PlaceCard,
   parameters: {
     layout: 'centered',

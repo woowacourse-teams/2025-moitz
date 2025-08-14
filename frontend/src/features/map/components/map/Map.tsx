@@ -1,7 +1,6 @@
 import { Link } from 'react-router';
 
 import { useCustomOverlays } from '@features/map/hooks/useCustomOverlays';
-import { View } from '@features/recommendation/types/bottomSheetView';
 
 import { RecommendedLocation, StartingPlace } from '@entities/types/Location';
 
@@ -14,34 +13,41 @@ import IconShare from '@icons/icon-share.svg';
 
 import * as map from './map.styled';
 
+const DEFAULT_CURRENT_RECOMMEND_LOCATION = '전체 추첨 지점';
+
 interface MapProps {
   startingLocations: StartingPlace[];
   recommendedLocations: RecommendedLocation[];
-  currentView: View;
-  handleBackButtonClick: () => void;
+  selectedLocation: RecommendedLocation;
+  changeSelectedLocation: (location: RecommendedLocation) => void;
 }
 
 function Map({
   startingLocations,
   recommendedLocations,
-  currentView,
-  handleBackButtonClick,
+  selectedLocation,
+  changeSelectedLocation,
 }: MapProps) {
   const mapRef = useCustomOverlays({
     startingLocations,
     recommendedLocations,
+    changeSelectedLocation,
   });
+
+  const handleBackButtonClick = () => {
+    changeSelectedLocation(null);
+  };
 
   return (
     <div css={map.container()}>
       <div ref={mapRef} css={map.base()} />
       <div css={[flex({ justify: 'space-between' }), map.top_overlay()]}>
-        {currentView === 'list' && (
+        {!selectedLocation && (
           <Link to="/">
             <MapButton src={IconBack} alt="back" />
           </Link>
         )}
-        {currentView === 'detail' && (
+        {selectedLocation && (
           <MapButton
             src={IconBack}
             alt="back"
@@ -53,7 +59,13 @@ function Map({
         </Link>
       </div>
       <div css={[flex({ justify: 'space-between' }), map.bottom_overlay()]}>
-        <MapPoint text="전체 추첨 지점" />
+        <MapPoint
+          text={
+            selectedLocation
+              ? selectedLocation.name
+              : DEFAULT_CURRENT_RECOMMEND_LOCATION
+          }
+        />
       </div>
     </div>
   );
