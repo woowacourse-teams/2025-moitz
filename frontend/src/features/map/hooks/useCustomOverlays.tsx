@@ -173,7 +173,7 @@ export const useCustomOverlays = ({
       const overlay = new CustomOverlay({
         naverMap: map,
         position: new naver.maps.LatLng(loc.y, loc.x),
-        zIndex: 300, // ✅ 최상단
+        zIndex: 300,
         content: (
           <MarkerIndex
             index={stringToCharCode(i + 1)}
@@ -198,7 +198,7 @@ export const useCustomOverlays = ({
       const overlay = new CustomOverlay({
         naverMap: map,
         position: new naver.maps.LatLng(loc.y, loc.x),
-        zIndex: 200, // ✅ 라인보다 위, 출발지보단 아래
+        zIndex: 200,
         content: (
           <MarkerButton onClick={() => changeSelectedLocation(loc)}>
             <MarkerIndex
@@ -256,9 +256,9 @@ export const useCustomOverlays = ({
           map,
           path,
           strokeWeight: 5,
-          strokeColor: colorToken.main[1], // ✅ 팔레트 적용 (시원한 청록)
+          strokeColor: colorToken.main[1],
           strokeOpacity: 0.95,
-          zIndex: 1, // ✅ 라인을 가장 아래로
+          zIndex: 1,
         });
         polylineInstancesRef.current.push(polyline);
       }
