@@ -42,6 +42,5 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
         </BrowserRouter>
       </LocationsProvider>
     </React.StrictMode>
-    ,
   </ErrorBoundary>,
 );
