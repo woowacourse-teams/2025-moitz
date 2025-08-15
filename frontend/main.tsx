@@ -3,11 +3,15 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { BrowserRouter } from 'react-router';
 
+import App from '@app/App';
+
+import FallBackPage from '@pages/fallBackPage/FallBackPage';
+
 import { LocationsProvider } from '@entities/contexts/LocationsProvider';
 
-import App from './src/app/App';
-import Layout from './src/shared/components/layout/Layout';
-import GlobalStyle from './src/shared/styles/GlobalStyle';
+import Layout from '@shared/components/layout/Layout';
+import { ErrorBoundary } from '@shared/errors/ErrorBoundary';
+import GlobalStyle from '@shared/styles/GlobalStyle';
 
 if (process.env.NODE_ENV === 'production') {
   Sentry.init({
@@ -24,14 +28,20 @@ if (process.env.NODE_ENV === 'production') {
 }
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
-  <React.StrictMode>
-    <GlobalStyle />
-    <LocationsProvider>
-      <BrowserRouter>
-        <Layout>
-          <App />
-        </Layout>
-      </BrowserRouter>
-    </LocationsProvider>
-  </React.StrictMode>,
+  <ErrorBoundary
+    fallbackRender={({ reset }) => <FallBackPage reset={reset} />}
+    onReset={() => window.location.reload()}
+  >
+    <React.StrictMode>
+      <GlobalStyle />
+      <LocationsProvider>
+        <BrowserRouter>
+          <Layout>
+            <App />
+          </Layout>
+        </BrowserRouter>
+      </LocationsProvider>
+    </React.StrictMode>
+    ,
+  </ErrorBoundary>,
 );
