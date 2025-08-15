@@ -74,4 +74,7 @@
   --radius-button: 14px;
   --radius-global: 20px;
   --radius-round: 100px;
+
+  /* 공통 너비 */
+  --layout-max-width: 400px;
 }

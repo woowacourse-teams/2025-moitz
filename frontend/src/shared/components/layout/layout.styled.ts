@@ -1,6 +1,6 @@
 import { css } from '@emotion/react';
 
-import { colorToken } from '@shared/styles/tokens';
+import { colorToken, layout } from '@shared/styles/tokens';
 
 export const container = () => css`
   display: flex;
@@ -16,7 +16,7 @@ export const content = () => css`
   background-color: ${colorToken.gray[8]};
 
   @media (min-width: 400px) {
-    flex: 0 0 400px;
+    flex: 0 0 ${layout.maxWidth};
   }
 `;
 

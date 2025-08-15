@@ -90,4 +90,8 @@ const borderRadiusToken = {
   round: 'var(--radius-round)',
 };
 
-export { colorToken, typoToken, borderRadiusToken };
+const layout = {
+  maxWidth: 'var(--layout-max-width)',
+};
+
+export { colorToken, typoToken, borderRadiusToken, layout };
