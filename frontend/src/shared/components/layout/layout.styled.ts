@@ -12,6 +12,7 @@ export const container = () => css`
 export const content = () => css`
   width: 100%;
   min-height: 100dvh;
+  overflow-x: hidden;
   background-color: ${colorToken.gray[8]};
 
   @media (min-width: 400px) {
