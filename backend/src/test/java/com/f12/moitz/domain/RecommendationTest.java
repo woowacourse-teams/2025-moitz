@@ -47,8 +47,8 @@ class RecommendationTest {
     @DisplayName("후보지들을 평균 소요 시간 순으로 정렬한다")
     void sortCandidates() {
         // Given
-        final Candidate candidate1 = createCandidate(25, 10);
-        final Candidate candidate2 = createCandidate(20, 10);
+        final Candidate candidate1 = createCandidate(1500, 600);
+        final Candidate candidate2 = createCandidate(1200, 600);
         final List<Candidate> candidates = List.of(candidate1, candidate2);
 
         // When
@@ -63,8 +63,8 @@ class RecommendationTest {
     @DisplayName("최적의 추천 시간을 올바르게 반환한다")
     void getBestRecommendationTime() {
         // Given
-        final Candidate candidate1 = createCandidate(20, 10);
-        final Candidate candidate2 = createCandidate(30, 10);
+        final Candidate candidate1 = createCandidate(1200, 600);
+        final Candidate candidate2 = createCandidate(1800, 600);
         final List<Candidate> candidates = List.of(candidate1, candidate2);
         final Recommendation recommendation = new Recommendation(candidates);
 

@@ -56,8 +56,8 @@ class RouteTest {
         final Place endPlace = new Place("강남역", new Point(127.2, 37.2));
         final String subwayLineName = "2호선";
 
-        final Path path1 = new Path(startPlace, intermediatePlace, TravelMethod.SUBWAY, 10, subwayLineName);
-        final Path path2 = new Path(intermediatePlace, endPlace, TravelMethod.SUBWAY, 20, subwayLineName);
+        final Path path1 = new Path(startPlace, intermediatePlace, TravelMethod.SUBWAY, 600, subwayLineName);
+        final Path path2 = new Path(intermediatePlace, endPlace, TravelMethod.SUBWAY, 1200, subwayLineName);
 
         final List<Path> paths = List.of(path1, path2);
         final Route route = new Route(paths);
