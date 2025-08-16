@@ -17,7 +17,6 @@
 <!--            <encoder>
                 <pattern>${CONSOLE_PATTERN}</pattern>
             </encoder>-->
-
             <file>${LOG_PATH}/${DEBUG_PATH}/application.log</file>
             <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
                 <fileNamePattern>${DEBUG_LOG_PATH}/application-info-%d{yyyy-MM-dd}.%i.log.zip</fileNamePattern>
@@ -26,9 +25,16 @@
                 <totalSizeCap>${TOTAL_SIZE}</totalSizeCap>
             </rollingPolicy>
         </appender>
-
+        <appender name="CONSOLE_DEBUG" class="ch.qos.logback.core.ConsoleAppender">
+                        <encoder>
+                            <pattern>${CONSOLE_PATTERN}</pattern>
+                        </encoder>
+        </appender>
         <root level="DEBUG">
             <appender-ref ref="FILE_DEBUG"/>
+        </root>
+        <root level="DEBUG">
+            <appender-ref ref="CONSOLE_DEBUG"/>
         </root>
         <!-- 프레임워크 기본 로거 수준 설정 -->
         <logger name="org.springframework" level="INFO"/>
