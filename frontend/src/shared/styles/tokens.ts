@@ -84,10 +84,10 @@ const typoToken = {
 };
 
 const borderRadiusToken = {
-  input: 'var(--radius-10)',
-  button: 'var(--radius-14)',
-  global: 'var(--radius-20)',
-  round: 'var(--radius-100)',
+  10: 'var(--radius-10)',
+  14: 'var(--radius-14)',
+  20: 'var(--radius-20)',
+  100: 'var(--radius-100)',
 };
 
 export { colorToken, typoToken, borderRadiusToken };

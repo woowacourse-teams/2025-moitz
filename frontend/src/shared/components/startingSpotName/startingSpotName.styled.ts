@@ -10,6 +10,6 @@ export const dot = () => css`
   width: 3px;
   min-width: 3px;
   height: 3px;
-  border-radius: ${borderRadiusToken.round};
+  border-radius: ${borderRadiusToken[100]};
   background-color: ${colorToken.main[1]};
 `;

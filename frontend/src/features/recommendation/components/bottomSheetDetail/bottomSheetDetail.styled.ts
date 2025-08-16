@@ -10,7 +10,7 @@ export const container = () => css`
 export const reason = () => css`
   padding: 10px;
   background-color: ${colorToken.bg[2]};
-  border-radius: ${borderRadiusToken.input};
+  border-radius: ${borderRadiusToken[10]};
 `;
 
 export const reasonText = () => css`
