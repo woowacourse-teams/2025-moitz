@@ -70,8 +70,8 @@
   --font-weight-regular: 400;
 
   /* Border Radius */
-  --radius-input: 10px;
-  --radius-button: 14px;
-  --radius-global: 20px;
-  --radius-round: 100px;
+  --radius-10: 10px;
+  --radius-14: 14px;
+  --radius-20: 20px;
+  --radius-100: 100px;
 }
