@@ -1,11 +1,10 @@
-import { withContainer } from '../../../../../.storybook/decorators/withContainer';
+import { withContainer } from '@sb/decorators/withContainer';
 
 import Progressbar from './Progressbar';
 
 import type { Meta, StoryObj } from '@storybook/react-webpack5';
 
 const meta = {
-  title: 'Features/Progressbar/Progressbar',
   component: Progressbar,
   decorators: [withContainer],
   parameters: {
