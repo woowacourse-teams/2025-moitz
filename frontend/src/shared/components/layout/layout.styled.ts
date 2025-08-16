@@ -12,7 +12,6 @@ export const container = () => css`
 export const content = () => css`
   width: 100%;
   min-height: 100vh;
-  overflow-y: auto;
   background-color: ${colorToken.gray[8]};
 
   @media (min-width: 400px) {
