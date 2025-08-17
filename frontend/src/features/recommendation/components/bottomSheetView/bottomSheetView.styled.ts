@@ -60,5 +60,10 @@ export const content = () => css`
 `;
 
 export const animate = () => css`
-  transition: height 220ms cubic-bezier(,2,.8,.2,1)
+  transition: height 220ms cubic-bezier(0.2, 0.8, 0.2, 1);
+
+  // 사용자가 '애니메이션 줄이기'를 켜둔 경우에 맞춰 애니메이션/트랜지션을 꺼 주는 접근성 설정
+  @media (prefers-reduced-motion: reduce) {
+    transition: none;
+  }
 `;
