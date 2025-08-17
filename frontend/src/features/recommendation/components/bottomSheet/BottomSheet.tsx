@@ -30,16 +30,24 @@ function BottomSheet({
   const startPercentRef = useRef(positionPercent);
   const viewportRef = useRef<number>(getViewportHeight());
 
+  const activePointerIdRef = useRef<number | null>(null);
+
   useSyncViewportHeight(viewportRef);
 
   /**
    * onPointerDown
    * - 드래그가 '시작'되는 순간에 단 한 번 호출됨
-   *   여기서 '기준점'을 캡쳐해 둔다
+   *   여기서 '기준점'을 캡쳐해둔다
    **/
   const onPointerDown = (e: React.PointerEvent<HTMLButtonElement>) => {
     // 이미 드래그 중이면 무시한다 (안전성)
     if (isDraggingRef.current) return;
+
+    //  드래그를 시작한 '그 손가락'을 내 버튼에 묶어두고 캡처함
+    // 매 이벤트마다 정말 그 손가락이 맞는지(ID) 확인해서,
+    // 중간에 영역을 벗어나도/다른 손가락이 닿아도 드래그가 안 끊기게 함.
+    e.currentTarget.setPointerCapture(e.pointerId);
+    activePointerIdRef.current = e.pointerId;
 
     isDraggingRef.current = true;
 
@@ -48,8 +56,49 @@ function BottomSheet({
     // 드래그 시작 당시의 퍼센트 위치를 기록한다. (기준점 2)
     startPercentRef.current = positionPercent;
   };
-  const onPointerMove = () => {};
-  const onPointerUp = () => {};
+
+  /**
+   * onPointerMove
+   * - 드래그 '중'에 호출되어 바텀시트 위치(%)를 실시간으로 갱신함
+   *   쉽게 말하자면, 눌렀던 순간의 기준점에서,
+   *   햔재 포인터가 Y축으로 얼마나 움직였는지(px)를 화면 높이로 나눠 퍼센트로 바꾸고,
+   *   그만큼 시트 위치를 업데이트한다.
+   */
+  const onPointerMove = (e: React.PointerEvent<HTMLButtonElement>) => {
+    // 내 손가락만 반영
+    if (activePointerIdRef.current !== e.pointerId) return;
+
+    // // 드래그 중이 아닐 때 들어오는 move 이벤트는 무시 (안전성)
+    if (!isDraggingRef.current) return;
+
+    console.log(e.clientY, positionPercent);
+    // 1) 드래그 이동량(px). 아래로 끌면 양수, 위로 끌면 음수
+    const dragDistanceInPx = e.clientY - startYRef.current;
+
+    // 2) 현재 보이는 뷰포트 높이(px). 0일 가능성에 대비해 최소 1로 가드
+    const viewportHeightInPx = viewportRef.current || 1;
+
+    // 3) 이동량을 0 ~ 100  퍼센트로 환산
+    const dragDistanceInPercent = (dragDistanceInPx / viewportHeightInPx) * 100;
+
+    // 4) 새 위치 퍼센트 계산
+    //  - 시작 퍼센트에서 이동 퍼센트를 뺀다.
+    //  - 위로 드래그하면 dragDistanceInPercent가 음수 → 결과적으로 위치 퍼센트가 증가(시트가 더 올라옴)
+    const tentativePositionPercent =
+      startPercentRef.current - dragDistanceInPercent;
+
+    // 5) 상태 반영
+    setPositionPercent(tentativePositionPercent);
+  };
+
+  /**
+   * onPointerUp
+   * - 드래그 종료만 처리
+   */
+  const onPointerUp = (e: React.PointerEvent<HTMLButtonElement>) => {
+    if (activePointerIdRef.current !== e.pointerId) return;
+    activePointerIdRef.current = null; // 내 손가락(ID) 반납
+  };
 
   return (
     <BottomSheetView
