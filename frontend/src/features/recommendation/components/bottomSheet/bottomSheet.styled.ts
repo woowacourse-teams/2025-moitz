@@ -12,6 +12,14 @@ export const container = () => css`
   border-top-right-radius: ${borderRadiusToken.input};
 `;
 
+export const wrapper = (positionPercent: number) => css`
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  transform: translateY(${100 - positionPercent}%);
+`;
+
 export const header = () => css`
   padding: 10px 0px 20px 0px;
   cursor: grab;

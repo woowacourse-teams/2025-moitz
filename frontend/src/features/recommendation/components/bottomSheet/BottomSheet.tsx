@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 import { View } from '@features/recommendation/types/bottomSheetView';
 
@@ -13,29 +13,31 @@ import * as bottomSheet from './bottomSheet.styled';
 
 interface BottomSheetViewProps {
   children: React.ReactNode;
+  positionPercent: number;
 }
 
-function BottomSheetView({ children }: BottomSheetViewProps) {
+function BottomSheetView({ children, positionPercent }: BottomSheetViewProps) {
   return (
     <div
       css={[
+        bottomSheet.wrapper(positionPercent),
         flex({ direction: 'column' }),
-        shadow.bottom_sheet,
-        bottomSheet.container(),
       ]}
     >
-      <div css={[bottomSheet.header()]}>
-        <button css={[bottomSheet.handle()]} aria-label="시트 끌기 핸들" />
-      </div>
+      <div css={[shadow.bottom_sheet, bottomSheet.container()]}>
+        <div css={[bottomSheet.header()]}>
+          <button css={[bottomSheet.handle()]} aria-label="시트 끌기 핸들" />
+        </div>
 
-      <div
-        css={[
-          flex({ direction: 'column', gap: 20 }),
-          scroll,
-          bottomSheet.content(),
-        ]}
-      >
-        {children}
+        <div
+          css={[
+            flex({ direction: 'column', gap: 20 }),
+            scroll,
+            bottomSheet.content(),
+          ]}
+        >
+          {children}
+        </div>
       </div>
     </div>
   );
@@ -56,8 +58,10 @@ function BottomSheet({
   selectedLocation,
   handleSpotClick,
 }: BottomSheetProps) {
+  const [positionPercent, setPositionPercent] = useState(50);
+
   return (
-    <BottomSheetView>
+    <BottomSheetView positionPercent={positionPercent}>
       {currentView === 'list' && (
         <BottomSheetList
           startingPlaces={startingLocations}
