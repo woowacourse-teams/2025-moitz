@@ -39,7 +39,7 @@ function BottomSheet({
    * - 드래그가 '시작'되는 순간에 단 한 번 호출됨
    *   여기서 '기준점'을 캡쳐해둔다
    **/
-  const onPointerDown = (e: React.PointerEvent<HTMLButtonElement>) => {
+  const onPointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
     // 이미 드래그 중이면 무시한다 (안전성)
     if (isDraggingRef.current) return;
 
@@ -64,7 +64,7 @@ function BottomSheet({
    *   햔재 포인터가 Y축으로 얼마나 움직였는지(px)를 화면 높이로 나눠 퍼센트로 바꾸고,
    *   그만큼 시트 위치를 업데이트한다.
    */
-  const onPointerMove = (e: React.PointerEvent<HTMLButtonElement>) => {
+  const onPointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
     // 내 손가락만 반영
     if (activePointerIdRef.current !== e.pointerId) return;
 
@@ -95,7 +95,7 @@ function BottomSheet({
    * onPointerUp
    * - 드래그 종료만 처리
    */
-  const onPointerUp = (e: React.PointerEvent<HTMLButtonElement>) => {
+  const onPointerUp = (e: React.PointerEvent<HTMLDivElement>) => {
     if (activePointerIdRef.current !== e.pointerId) return;
     activePointerIdRef.current = null; // 내 손가락(ID) 반납
   };

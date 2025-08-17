@@ -7,7 +7,7 @@ import * as bottomSheetView from './bottomSheetView.styled';
 interface BottomSheetViewProps {
   children: React.ReactNode;
   positionPercent: number;
-  handleProps: React.HTMLAttributes<HTMLButtonElement>;
+  handleProps: React.HTMLAttributes<HTMLDivElement>;
 }
 
 function BottomSheetView({
@@ -23,12 +23,8 @@ function BottomSheetView({
       ]}
     >
       <div css={[shadow.bottom_sheet, bottomSheetView.container()]}>
-        <div css={[bottomSheetView.header()]}>
-          <button
-            css={[bottomSheetView.handle()]}
-            aria-label="시트 끌기 핸들"
-            {...handleProps}
-          />
+        <div css={[bottomSheetView.header()]} {...handleProps}>
+          <span css={[bottomSheetView.handle()]} aria-hidden />
         </div>
 
         <div
