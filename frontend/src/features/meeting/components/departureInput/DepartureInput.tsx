@@ -6,7 +6,9 @@ import { INPUT_FORM_TEXT } from '@features/meeting/constant/inputForm';
 
 import Input from '@shared/components/input/Input';
 import Tag from '@shared/components/tag/Tag';
-import { flex, typography } from '@shared/styles/default.styled';
+import { flex } from '@shared/styles/default.styled';
+
+import Dropdown from '../dropdown/Dropdown';
 
 import * as input from './departureInput.styled';
 
@@ -24,13 +26,14 @@ function DepartureInput({
   const [inputValue, setInputValue] = useState<string>('');
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
-  const filteredStations = !inputValue.trim()
-    ? []
-    : STATION_LIST.filter((station) => station.includes(inputValue.trim()));
+  const filteredStations = STATION_LIST.filter((station) =>
+    station.includes(inputValue.trim()),
+  );
 
   const handleInputValue = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setInputValue(e.target.value);
-    setIsDropdownOpen(true);
+    const newValue = e.target.value;
+    setInputValue(newValue);
+    setIsDropdownOpen(newValue.trim() !== '');
   };
 
   const handleStationSelect = (station: string) => {
@@ -45,7 +48,7 @@ function DepartureInput({
       if (e.nativeEvent.isComposing) return;
 
       const trimmedValue = inputValue.trim();
-      if (trimmedValue !== '') {
+      if (trimmedValue) {
         handleStationSelect(trimmedValue);
       }
     }
@@ -63,38 +66,23 @@ function DepartureInput({
           onChange={handleInputValue}
           onKeyDown={handleKeyDown}
         />
-        {isDropdownOpen && inputValue.trim() && (
-          <ul css={input.dropdown()}>
-            {filteredStations.length > 0 ? (
-              filteredStations.map((station) => (
-                <li
-                  key={station}
-                  css={[typography.b1, input.item()]}
-                  onClick={() => handleStationSelect(station)}
-                >
-                  {station}
-                </li>
-              ))
-            ) : (
-              <li css={[typography.b1, input.blank_item()]}>
-                해당하는 역이름이 없습니다.
-              </li>
-            )}
-          </ul>
+        {isDropdownOpen && (
+          <Dropdown
+            stations={filteredStations}
+            handleStationSelect={handleStationSelect}
+          />
         )}
       </div>
 
-      {departureList.length > 0 && (
-        <div css={[flex({ gap: 5, wrap: 'wrap' })]}>
-          {departureList.map((name, index) => (
-            <Tag
-              key={index}
-              text={name}
-              onClick={() => onRemoveDeparture(index)}
-            />
-          ))}
-        </div>
-      )}
+      <div css={[flex({ gap: 5, wrap: 'wrap' })]}>
+        {departureList.map((name, index) => (
+          <Tag
+            key={index}
+            text={name}
+            onClick={() => onRemoveDeparture(index)}
+          />
+        ))}
+      </div>
     </InputFormSection>
   );
 }

@@ -10,6 +10,7 @@ interface SpotItemProps {
   description: string;
   avgMinutes: number;
   isBest: boolean;
+  onClick: () => void;
 }
 
 function SpotItem({
@@ -18,6 +19,7 @@ function SpotItem({
   description,
   avgMinutes,
   isBest = false,
+  onClick,
 }: SpotItemProps) {
   return (
     <div
@@ -25,8 +27,9 @@ function SpotItem({
         flex({ justify: 'center', align: 'center', gap: 15 }),
         spotItem.base(),
       ]}
+      onClick={onClick}
     >
-      <MarkerIndex index={index} />
+      <MarkerIndex index={index} type="recommended" />
       <div
         css={[
           flex({ direction: 'column', gap: 10 }),
@@ -36,11 +39,11 @@ function SpotItem({
         <div css={flex({ justify: 'space-between', align: 'center' })}>
           <div css={flex({ align: 'center', gap: 14 })}>
             <span css={typography.h3}>{name}</span>
-            {isBest && <Badge text="best" />}
+            {isBest && <Badge type="best" text="best" />}
           </div>
           <span css={typography.c1}>평균 {avgMinutes}분</span>
         </div>
-        <p css={typography.c1}>{description}</p>
+        <p css={[typography.c1, spotItem.description()]}>{description}</p>
       </div>
     </div>
   );

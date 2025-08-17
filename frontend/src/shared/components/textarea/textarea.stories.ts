@@ -3,7 +3,6 @@ import Textarea from './Textarea';
 import type { Meta, StoryObj } from '@storybook/react-webpack5';
 
 const meta = {
-  title: 'shared/Textarea',
   component: Textarea,
   parameters: {
     layout: 'centered',
