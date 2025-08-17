@@ -31,7 +31,6 @@ function BottomSheetView({
     >
       <div css={[shadow.bottom_sheet, bottomSheet.container()]}>
         <div css={[bottomSheet.header()]}>
-          <button css={[bottomSheet.handle()]} aria-label="시트 끌기 핸들" />
           <button
             css={[bottomSheet.handle()]}
             aria-label="시트 끌기 핸들"
