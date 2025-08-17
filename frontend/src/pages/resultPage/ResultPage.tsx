@@ -28,10 +28,10 @@ function ResultPage() {
     setCurrentView('list');
   };
 
-  // if (isLoading) return <ProgressLoading />;
-  // if (isError) return <p>에러 발생!</p>;
-  // if (!location || location.recommendedLocations.length === 0)
-  //   return <p>추천 결과가 없습니다.</p>;
+  if (isLoading) return <ProgressLoading />;
+  if (isError) return <p>에러 발생!</p>;
+  if (!location || location.recommendedLocations.length === 0)
+    return <p>추천 결과가 없습니다.</p>;
 
   const { startingPlaces, recommendedLocations } = location;
 

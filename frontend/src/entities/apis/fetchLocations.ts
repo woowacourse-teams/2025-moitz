@@ -3,7 +3,7 @@ import { LocationRequestBody } from '@entities/types/LocationRequestBody';
 const BASE_URL = process.env.API_BASE_URL;
 
 const fetchLocations = async (requestBody: LocationRequestBody) => {
-  const response = await fetch(`${BASE_URL}/locations/test`, {
+  const response = await fetch(`${BASE_URL}/locations`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
