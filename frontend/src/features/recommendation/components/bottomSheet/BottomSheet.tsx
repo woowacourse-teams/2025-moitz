@@ -52,9 +52,6 @@ function BottomSheetView({
   );
 }
 
-// 유틸: 퍼센트 클램프
-const clampPct = (p: number) => Math.max(0, Math.min(100, p));
-
 interface BottomSheetProps {
   startingLocations: StartingPlace[];
   recommendedLocations: RecommendedLocation[];
@@ -72,7 +69,27 @@ function BottomSheet({
 }: BottomSheetProps) {
   const [positionPercent, setPositionPercent] = useState(50);
 
-  const onPointerDown = () => {};
+  const isDraggingRef = useRef(false);
+  const startYRef = useRef(0);
+  const startPercentRef = useRef(positionPercent);
+
+  /**
+   * onPointerDown
+   * - 드래그가 '시작'되는 수간에 단 한 번 호출됨
+   * 여기서 '기준점'을 갭쳐해 둔다
+   **/
+  const onPointerDown = (e: React.PointerEvent<HTMLButtonElement>) => {
+    console.log('down');
+    // 이미 드래그 중이면 무시한다 (안전성)
+    if (isDraggingRef.current) return;
+
+    isDraggingRef.current = true;
+
+    // 화면상의 현재 포인터 Y좌표(px)를 기록한다
+    startYRef.current = e.clientY;
+    // 드래그 시작 당시의 퍼센트 위치를 기록한다.
+    startPercentRef.current = positionPercent;
+  };
   const onPointerMove = () => {};
   const onPointerUp = () => {};
 
