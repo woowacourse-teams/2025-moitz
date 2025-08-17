@@ -106,7 +106,7 @@ describe('MeetingForm 통합 테스트', () => {
       await userEvent.click(conditionButton);
 
       // Then: 제출 버튼이 활성화된다
-      const submitButton = screen.getByText('중간지점 찾기');
+      const submitButton = screen.getByText('모임 지역 찾기');
       expect(submitButton).not.toBeDisabled();
     });
 
@@ -120,7 +120,7 @@ describe('MeetingForm 통합 테스트', () => {
       await userEvent.keyboard('{Enter}');
 
       // Then: 제출 버튼이 비활성화된다
-      const submitButton = screen.getByText('중간지점 찾기');
+      const submitButton = screen.getByText('모임 지역 찾기');
       expect(submitButton).toBeEnabled();
     });
 
@@ -138,7 +138,7 @@ describe('MeetingForm 통합 테스트', () => {
       }
 
       // Then: 제출 버튼이 비활성화된다
-      const submitButton = screen.getByText('중간지점 찾기');
+      const submitButton = screen.getByText('모임 지역 찾기');
       expect(submitButton).toBeEnabled();
     });
   });
