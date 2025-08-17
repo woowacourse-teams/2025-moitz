@@ -14,11 +14,16 @@ export const base = () => css`
 
 export const container = (positionPercent: number) => css`
   width: 100%;
+  @media (min-width: 400px) {
+    width: 400px;
+    margin: auto;
+  }
+
   height: ${MIN_VH + (MAX_VH - MIN_VH) * (positionPercent / 100)}vh;
   min-height: ${MIN_VH}vh;
   max-height: ${MAX_VH}vh;
 
-  padding: 0px 20px 0px 20px;
+  padding: 0px 20px;
   background-color: ${colorToken.gray[8]};
   border-top-left-radius: ${borderRadiusToken.input};
   border-top-right-radius: ${borderRadiusToken.input};
