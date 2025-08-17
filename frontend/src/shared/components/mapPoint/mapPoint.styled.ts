@@ -16,3 +16,10 @@ export const dot = () => css`
   border-radius: ${borderRadiusToken.round};
   background-color: ${colorToken.main[1]};
 `;
+
+export const floating = () => css`
+  position: fixed;
+  top: 30px;
+  left: 50%;
+  transform: translateX(-50%);
+`;

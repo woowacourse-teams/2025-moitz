@@ -12,6 +12,7 @@ function MapPoint({ text }: MapPointProps) {
       css={[
         inline_flex({ justify: 'center', align: 'center', gap: 10 }),
         mapPoint.base(),
+        mapPoint.floating(),
       ]}
     >
       <div css={mapPoint.dot()}></div>
