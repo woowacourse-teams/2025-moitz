@@ -4,53 +4,9 @@ import { View } from '@features/recommendation/types/bottomSheetView';
 
 import { RecommendedLocation, StartingPlace } from '@entities/types/Location';
 
-import { flex, scroll, shadow } from '@shared/styles/default.styled';
-
 import BottomSheetDetail from '../bottomSheetDetail/BottomSheetDetail';
 import BottomSheetList from '../bottomSheetList/BottomSheetList';
-
-import * as bottomSheet from './bottomSheet.styled';
-
-interface BottomSheetViewProps {
-  children: React.ReactNode;
-  positionPercent: number;
-  handleProps: React.HTMLAttributes<HTMLButtonElement>;
-}
-
-function BottomSheetView({
-  children,
-  positionPercent,
-  handleProps,
-}: BottomSheetViewProps) {
-  return (
-    <div
-      css={[
-        bottomSheet.wrapper(positionPercent),
-        flex({ direction: 'column' }),
-      ]}
-    >
-      <div css={[shadow.bottom_sheet, bottomSheet.container()]}>
-        <div css={[bottomSheet.header()]}>
-          <button
-            css={[bottomSheet.handle()]}
-            aria-label="시트 끌기 핸들"
-            {...handleProps}
-          />
-        </div>
-
-        <div
-          css={[
-            flex({ direction: 'column', gap: 20 }),
-            scroll,
-            bottomSheet.content(),
-          ]}
-        >
-          {children}
-        </div>
-      </div>
-    </div>
-  );
-}
+import BottomSheetView from '../bottomSheetView/bottomSheetView';
 
 interface BottomSheetProps {
   startingLocations: StartingPlace[];
