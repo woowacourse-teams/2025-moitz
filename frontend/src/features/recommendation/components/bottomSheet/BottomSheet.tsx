@@ -25,6 +25,10 @@ function BottomSheet({
 }: BottomSheetProps) {
   const [positionPercent, setPositionPercent] = useState(60);
 
+  useEffect(() => {
+    console.log('[positionPercent]', positionPercent);
+  }, [positionPercent]);
+
   const isDraggingRef = useRef(false);
   const startYRef = useRef(0);
   const startPercentRef = useRef(positionPercent);
@@ -88,7 +92,7 @@ function BottomSheet({
       startPercentRef.current - dragDistanceInPercent;
 
     // 5) 상태 반영
-    setPositionPercent(tentativePositionPercent);
+    setPositionPercent(clampPositionPercent(tentativePositionPercent));
   };
 
   /**
@@ -97,7 +101,9 @@ function BottomSheet({
    */
   const onPointerUp = (e: React.PointerEvent<HTMLDivElement>) => {
     if (activePointerIdRef.current !== e.pointerId) return;
-    activePointerIdRef.current = null; // 내 손가락(ID) 반납
+
+    isDraggingRef.current = false; // 드래그 종료
+    activePointerIdRef.current = null; // 포인터 ID 해제
   };
 
   return (
@@ -127,6 +133,13 @@ function BottomSheet({
 }
 
 export default BottomSheet;
+
+/**
+ *  clampPositionPercent
+ * 0 ~ 100으로 자르기
+ **/
+const clampPositionPercent = (value: number) =>
+  Math.max(0, Math.min(100, value));
 
 /**
  * useSyncViewportHeight
