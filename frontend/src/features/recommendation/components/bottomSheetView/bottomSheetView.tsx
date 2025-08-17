@@ -16,13 +16,14 @@ function BottomSheetView({
   handleProps,
 }: BottomSheetViewProps) {
   return (
-    <div
-      css={[
-        bottomSheetView.base(positionPercent),
-        flex({ direction: 'column' }),
-      ]}
-    >
-      <div css={[shadow.bottom_sheet, bottomSheetView.container()]}>
+    <div css={[bottomSheetView.base()]}>
+      <div
+        css={[
+          flex({ direction: 'column' }),
+          shadow.bottom_sheet,
+          bottomSheetView.container(positionPercent),
+        ]}
+      >
         <div css={[bottomSheetView.header()]} {...handleProps}>
           <span css={[bottomSheetView.handle()]} aria-hidden />
         </div>

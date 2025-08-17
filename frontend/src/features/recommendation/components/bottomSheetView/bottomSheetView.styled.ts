@@ -2,18 +2,22 @@ import { css } from '@emotion/react';
 
 import { colorToken, borderRadiusToken } from '@shared/styles/tokens';
 
-export const base = (positionPercent: number) => css`
+const MIN_VH = 12; // 최소 높이
+const MAX_VH = 90; // 최대 높이
+
+export const base = () => css`
   position: fixed;
   left: 0;
   right: 0;
   bottom: 0;
-  transform: translateY(${100 - positionPercent}%);
 `;
 
-export const container = () => css`
+export const container = (positionPercent: number) => css`
   width: 100%;
-  height: 50vh;
-  min-height: 50vh;
+  height: ${MIN_VH + (MAX_VH - MIN_VH) * (positionPercent / 100)}vh;
+  min-height: ${MIN_VH}vh;
+  max-height: ${MAX_VH}vh;
+
   padding: 0px 20px 0px 20px;
   background-color: ${colorToken.gray[8]};
   border-top-left-radius: ${borderRadiusToken.input};
@@ -24,14 +28,14 @@ export const header = () => css`
   padding: 10px 0px 20px 0px;
   cursor: grab;
 
+  /* 브라우저의 기본 터치 제스처(스크롤, 스와이프, 더블탭 확대, 핀치줌 등)를 전부 끄겠다는 CSS 설정 */
+  /* 핸들을 끌 때 페이지가 스크롤돼서 드래그가 끊기는 걸 방지 */
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+
   &:active {
     cursor: grabbing;
-
-    /* 브라우저의 기본 터치 제스처(스크롤, 스와이프, 더블탭 확대, 핀치줌 등)를 전부 끄겠다는 CSS 설정 */
-    /* 핸들을 끌 때 페이지가 스크롤돼서 드래그가 끊기는 걸 방지 */
-    touch-action: none;
-    user-select: none;
-    -webkit-user-select: none;
   }
 `;
 
@@ -50,4 +54,7 @@ export const handle = () => css`
 
 export const content = () => css`
   padding-bottom: 20px;
+  min-height: 0;
+  overflow: auto; //  /콘텐츠 많을 때 내부 스크롤
+  overscroll-behavior: contain; // 바디로 스크롤 전파 방지
 `;
