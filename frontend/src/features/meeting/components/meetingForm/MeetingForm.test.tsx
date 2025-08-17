@@ -1,11 +1,20 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { BrowserRouter } from 'react-router';
+
+import { LocationsProvider } from '@entities/contexts/LocationsProvider';
 
 import MeetingForm from './MeetingForm';
 
 describe('MeetingForm 통합 테스트', () => {
   const renderMeetingForm = () => {
-    return render(<MeetingForm />);
+    return render(
+      <BrowserRouter>
+        <LocationsProvider>
+          <MeetingForm />
+        </LocationsProvider>
+      </BrowserRouter>,
+    );
   };
 
   describe('DepartureInput 입력', () => {
