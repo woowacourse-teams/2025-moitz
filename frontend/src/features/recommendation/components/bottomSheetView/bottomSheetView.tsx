@@ -8,13 +8,19 @@ interface BottomSheetViewProps {
   children: React.ReactNode;
   positionPercent: number;
   handleProps: React.HTMLAttributes<HTMLDivElement>;
+  isAnimating: boolean;
+  onContainerTransitionEnd: React.TransitionEventHandler<HTMLDivElement>;
 }
 
 function BottomSheetView({
   children,
   positionPercent,
   handleProps,
+  isAnimating,
+  onContainerTransitionEnd,
 }: BottomSheetViewProps) {
+  console.log(window.navigator.onLine);
+
   return (
     <div css={[bottomSheetView.base()]}>
       <div
@@ -22,7 +28,10 @@ function BottomSheetView({
           flex({ direction: 'column' }),
           shadow.bottom_sheet,
           bottomSheetView.container(positionPercent),
+          isAnimating && bottomSheetView.animate(),
         ]}
+        // CSS transition이 끝났을 때 호출되는 이벤트 핸들러
+        onTransitionEnd={onContainerTransitionEnd}
       >
         <div css={[bottomSheetView.header()]} {...handleProps}>
           <span css={[bottomSheetView.handle()]} aria-hidden />

@@ -8,6 +8,9 @@ import BottomSheetDetail from '../bottomSheetDetail/BottomSheetDetail';
 import BottomSheetList from '../bottomSheetList/BottomSheetList';
 import BottomSheetView from '../bottomSheetView/bottomSheetView';
 
+// 스냅 포인트
+const SNAP_POINTS = [15, 60, 95];
+
 interface BottomSheetProps {
   startingLocations: StartingPlace[];
   recommendedLocations: RecommendedLocation[];
@@ -24,10 +27,7 @@ function BottomSheet({
   handleSpotClick,
 }: BottomSheetProps) {
   const [positionPercent, setPositionPercent] = useState(60);
-
-  useEffect(() => {
-    console.log('[positionPercent]', positionPercent);
-  }, [positionPercent]);
+  const [isAnimating, setIsAnimating] = useState(false);
 
   const isDraggingRef = useRef(false);
   const startYRef = useRef(0);
@@ -37,6 +37,13 @@ function BottomSheet({
   const activePointerIdRef = useRef<number | null>(null);
 
   useSyncViewportHeight(viewportRef);
+
+  // 애니메이션이 끝나면 다시 OFF
+  const handleTransitionEnd: React.TransitionEventHandler<
+    HTMLDivElement
+  > = () => {
+    setIsAnimating(false);
+  };
 
   /**
    * onPointerDown
@@ -54,6 +61,9 @@ function BottomSheet({
     activePointerIdRef.current = e.pointerId;
 
     isDraggingRef.current = true;
+
+    // 드래그 중에는 애니메이션 X
+    setIsAnimating(false);
 
     // 화면상의 현재 포인터 Y좌표(px)를 기록한다 (기준점 1)
     startYRef.current = e.clientY;
@@ -97,13 +107,23 @@ function BottomSheet({
 
   /**
    * onPointerUp
-   * - 드래그 종료만 처리
+   * - 드래그 '종료' 시 처리
    */
   const onPointerUp = (e: React.PointerEvent<HTMLDivElement>) => {
     if (activePointerIdRef.current !== e.pointerId) return;
 
     isDraggingRef.current = false; // 드래그 종료
     activePointerIdRef.current = null; // 포인터 ID 해제
+
+    const start = startPercentRef.current; // 출발점
+    const current = clampPositionPercent(positionPercent); // 현재 시트 위치(%)
+
+    // 방향 기반 스냅 결정 (2%를 살짝의 기준으로 사용)
+    const target = decideDirectionalSnapTarget(start, current, SNAP_POINTS, 2);
+
+    // 스냅 이동 시에만 애니메이션 적용
+    setIsAnimating(true);
+    setPositionPercent(target);
   };
 
   return (
@@ -114,6 +134,8 @@ function BottomSheet({
         onPointerMove,
         onPointerUp,
       }}
+      isAnimating={isAnimating}
+      onContainerTransitionEnd={handleTransitionEnd}
     >
       {currentView === 'list' && (
         <BottomSheetList
@@ -135,8 +157,18 @@ function BottomSheet({
 export default BottomSheet;
 
 /**
- *  clampPositionPercent
- * 0 ~ 100으로 자르기
+ * findNearestSnap
+ *  - 가장 가까운 스냅을 참음 -> decideDirectionalSnapTarget 함수 생성하면서 안 쓰게 됨
+ */
+// const findNearestSnap = (current: number) =>
+//   SNAP_POINTS.reduce(
+//     (best, p) => (Math.abs(p - current) < Math.abs(best - current) ? p : best),
+//     SNAP_POINTS[0],
+//   );
+
+/**
+ * clampPositionPercent
+ *  - 0 ~ 100으로 자르기
  **/
 const clampPositionPercent = (value: number) =>
   Math.max(0, Math.min(100, value));
@@ -198,3 +230,69 @@ const getViewportHeight = () => {
 
   return window.innerHeight;
 };
+
+/**
+ * decideDirectionalSnapTarget
+ *  - 방향 기반 스냅 결정 함수
+ *
+ *  - 드래그 시작 위치(startPercent) 기준으로 '조금이라도' 위/아래로 넘겼다면
+ *   그 방향의 다음/이전 스냅 포인트로 스냅합니다.
+ *  - 거의 안 움직였으면 현재 위치(currentPercent)에서 가장 가까운 스냅에 붙입니다.
+ *
+ * @param startPercent 드래그 시작 시점의 위치 퍼센트(0~100)
+ * @param currentPercent 드래그 해제 직전의 현재 위치 퍼센트(0~100)
+ * @param snapPoints 스냅 포인트 리스트(예: [20, 60, 90])
+ * @param directionalThresholdPercent 방향 결정을 위한 최소 이동 임계치(퍼센트). 기본 2
+ * @returns 스냅해야 할 목표 퍼센트(0~100)
+ */
+export function decideDirectionalSnapTarget(
+  startPercent: number,
+  currentPercent: number,
+  snapPoints: number[],
+  directionalThresholdPercent: number = 2,
+): number {
+  // 스냅 포인트가 없으면 현재 위치(보정) 그대로 반환
+  if (!Array.isArray(snapPoints) || snapPoints.length === 0) {
+    return clampPositionPercent(currentPercent);
+  }
+
+  // 스냅 포인트를 오름차순으로 정렬(이후 탐색 편의)
+  const sortedSnapPoints = [...snapPoints].sort((a, b) => a - b);
+
+  // 입력값 보정(0~100)
+  const start = clampPositionPercent(startPercent);
+  const current = clampPositionPercent(currentPercent);
+
+  // 시작 대비 얼마나 움직였는지(%) — 위로(+), 아래로(−)
+  const deltaFromStart = current - start;
+
+  // start 기준 '다음(더 큰)' 스냅 포인트
+  const getNextSnapFrom = (from: number) =>
+    sortedSnapPoints.find((p) => p > from) ??
+    sortedSnapPoints[sortedSnapPoints.length - 1];
+
+  // start 기준 '이전(더 작은)' 스냅 포인트
+  const getPrevSnapFrom = (from: number) =>
+    [...sortedSnapPoints].reverse().find((p) => p < from) ??
+    sortedSnapPoints[0];
+
+  // 현재 위치에서 가장 가까운 스냅 포인트
+  const findNearestSnap = (value: number) =>
+    sortedSnapPoints.reduce(
+      (best, p) => (Math.abs(p - value) < Math.abs(best - value) ? p : best),
+      sortedSnapPoints[0],
+    );
+
+  // 방향 임계치 초과 시: 그 방향의 다음/이전 스냅으로 이동
+  if (deltaFromStart > directionalThresholdPercent) {
+    // 위로 살짝이라도 넘김 → 더 큰 스냅으로
+    return getNextSnapFrom(start);
+  }
+  if (deltaFromStart < -directionalThresholdPercent) {
+    // 아래로 살짝이라도 넘김 → 더 작은 스냅으로
+    return getPrevSnapFrom(start);
+  }
+
+  // 거의 안 움직였으면 현재 위치 기준 "가장 가까운" 스냅으로
+  return findNearestSnap(current);
+}

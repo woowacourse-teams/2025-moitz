@@ -58,3 +58,7 @@ export const content = () => css`
   overflow: auto; //  /콘텐츠 많을 때 내부 스크롤
   overscroll-behavior: contain; // 바디로 스크롤 전파 방지
 `;
+
+export const animate = () => css`
+  transition: height 220ms cubic-bezier(,2,.8,.2,1)
+`;
