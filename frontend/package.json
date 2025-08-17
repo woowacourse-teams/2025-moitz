@@ -49,6 +49,7 @@
     "html-loader": "^5.1.0",
     "html-webpack-plugin": "^5.6.3",
     "husky": "^9.1.7",
+    "identity-obj-proxy": "^3.0.0",
     "jest": "^29.7.0",
     "jest-environment-jsdom": "^29.7.0",
     "lint-staged": "^16.1.2",
@@ -69,8 +70,8 @@
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",
-    "@sentry/react": "^10.1.0",
     "@microsoft/clarity": "^1.0.0",
+    "@sentry/react": "^10.1.0",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "react-router": "^7.7.0"
