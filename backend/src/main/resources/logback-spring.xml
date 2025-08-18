@@ -11,13 +11,15 @@
 
     <!-- 개발 환경용 설정 -->
     <springProfile name="dev">
-        <!-- INFO 전용 Appender -->
+        <!-- 콘솔 전용 Appender -->
+        <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+            <encoder>
+                <pattern>${CONSOLE_PATTERN}</pattern>
+            </encoder>
+        </appender>
+        <!-- DEBUG 전용 Appender -->
         <appender name="FILE_DEBUG" class="ch.qos.logback.core.rolling.RollingFileAppender">
             <encoder class="net.logstash.logback.encoder.LogstashEncoder"/>
-<!--            <encoder>
-                <pattern>${CONSOLE_PATTERN}</pattern>
-            </encoder>-->
-
             <file>${LOG_PATH}/${DEBUG_PATH}/application.log</file>
             <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
                 <fileNamePattern>${DEBUG_LOG_PATH}/application-info-%d{yyyy-MM-dd}.%i.log.zip</fileNamePattern>
@@ -28,6 +30,7 @@
         </appender>
 
         <root level="DEBUG">
+            <appender-ref ref="CONSOLE"/>
             <appender-ref ref="FILE_DEBUG"/>
         </root>
         <!-- 프레임워크 기본 로거 수준 설정 -->
