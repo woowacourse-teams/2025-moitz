@@ -66,7 +66,7 @@ export const useCustomOverlays = ({
         naverMap,
         position,
         content: (
-          <MarkerButton
+          <button
             onClick={() => {
               changeSelectedLocation(location);
             }}
@@ -78,7 +78,7 @@ export const useCustomOverlays = ({
               hasStroke
               hasShadow
             />
-          </MarkerButton>
+          </button>
         ),
       });
     });
@@ -86,12 +86,3 @@ export const useCustomOverlays = ({
 
   return mapRef;
 };
-
-interface MarkerButtonProps {
-  children: React.ReactNode;
-  onClick: () => void;
-}
-
-function MarkerButton({ children, onClick }: MarkerButtonProps) {
-  return <button onClick={onClick}>{children}</button>;
-}
