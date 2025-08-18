@@ -1,42 +1,40 @@
+import { useState } from 'react';
+
+import ProgressLoading from '@features/loading/components/progressLoading/ProgressLoading';
 import Map from '@features/map/components/map/Map';
 import BottomSheet from '@features/recommendation/components/bottomSheet/BottomSheet';
+import { View } from '@features/recommendation/types/bottomSheetView';
 
-import useLocations from '@entities/hooks/useLocations';
+import { useLocationsContext } from '@entities/contexts/useLocationsContext';
 import { RecommendedLocation } from '@entities/types/Location';
 
 import { flex } from '@shared/styles/default.styled';
 
-import { StartingPlacesMock } from '@mocks/LocationsMock';
-import { LocationsRequestBodyMock } from '@mocks/LocationsRequestBodyMock';
-
 import * as resultPage from './resultPage.styled';
 
 function ResultPage() {
-  const {
-    data: location,
-    isLoading,
-    isError,
-  } = useLocations(LocationsRequestBodyMock);
+  const { data: location, isLoading, isError } = useLocationsContext();
+  const [currentView, setCurrentView] = useState<View>('list');
+  const [selectedLocation, setSelectedLocation] =
+    useState<RecommendedLocation | null>(null);
 
-  if (isLoading) return <p>로딩중...</p>;
+  const handleSpotClick = (spot: RecommendedLocation) => {
+    setSelectedLocation(spot);
+    setCurrentView('detail');
+  };
+
+  const handleBackButtonClick = () => {
+    setSelectedLocation(null);
+    setCurrentView('list');
+  };
+
+  if (isLoading) return <ProgressLoading />;
   if (isError) return <p>에러 발생!</p>;
   if (!location || location.recommendedLocations.length === 0)
     return <p>추천 결과가 없습니다.</p>;
 
-  const recommendedLocations: RecommendedLocation[] =
-    location.recommendedLocations.map((location) => {
-      return {
-        id: location.id,
-        index: location.index,
-        x: location.x,
-        y: location.y,
-        name: location.name,
-        avgMinutes: location.avgMinutes,
-        isBest: location.isBest,
-        description: location.description,
-        reason: location.reason,
-      };
-    });
+  const { startingPlaces, recommendedLocations } = location;
+
   return (
     <div
       css={[
@@ -45,12 +43,17 @@ function ResultPage() {
       ]}
     >
       <Map
-        startingLocations={StartingPlacesMock}
+        startingLocations={startingPlaces}
         recommendedLocations={recommendedLocations}
+        currentView={currentView}
+        handleBackButtonClick={handleBackButtonClick}
       />
       <BottomSheet
-        startingLocations={StartingPlacesMock}
-        recommendedLocations={recommendedLocations}
+        startingLocations={location.startingPlaces}
+        recommendedLocations={location.recommendedLocations}
+        currentView={currentView}
+        selectedLocation={selectedLocation}
+        handleSpotClick={handleSpotClick}
       />
     </div>
   );

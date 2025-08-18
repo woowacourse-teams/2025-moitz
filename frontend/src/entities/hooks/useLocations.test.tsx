@@ -1,4 +1,4 @@
-import { renderHook, waitFor } from '@testing-library/react';
+import { renderHook, waitFor, act } from '@testing-library/react';
 import { http, HttpResponse } from 'msw';
 
 import { LocationsRequestBodyMock } from '@mocks/LocationsRequestBodyMock';
@@ -11,10 +11,13 @@ const BASE_URL = process.env.API_BASE_URL;
 describe('useLocations', () => {
   it('정상적으로 추천 장소를 받아온다', async () => {
     // when: 훅을 실행하면
-    const { result } = renderHook(() => useLocations(LocationsRequestBodyMock));
+    const { result } = renderHook(() => useLocations());
+    result.current.trigger(LocationsRequestBodyMock);
 
     // then: 초기에는 로딩 중이어야 한다
-    expect(result.current.isLoading).toBe(true);
+    await act(async () => {
+      result.current.trigger(LocationsRequestBodyMock);
+    });
 
     // then: 데이터가 정상적으로 로드되어야 한다
     await waitFor(() => {
@@ -38,16 +41,25 @@ describe('useLocations', () => {
     );
 
     // when: 훅을 실행하면
-    const { result } = renderHook(() => useLocations(LocationsRequestBodyMock));
+    const { result } = renderHook(() => useLocations());
+    result.current.trigger(LocationsRequestBodyMock);
 
     // then: 초기에는 로딩 중이어야 한다
-    expect(result.current.isLoading).toBe(true);
+    await act(async () => {
+      result.current.trigger(LocationsRequestBodyMock);
+    });
 
     // then: 요청 실패 후 error는 true, data는 비어 있어야 한다
     await waitFor(() => {
       expect(result.current.isLoading).toBe(false);
       expect(result.current.isError).toBe(true);
-      expect(result.current.data.recommendedLocations.length).toBe(0);
+      expect(result.current.data).toEqual({
+        startingPlaces: [],
+        recommendedLocations: [],
+      });
+      expect(result.current.errorMessage).toContain(
+        '이동 경로를 찾을 수 없습니다.',
+      );
     });
   });
 });

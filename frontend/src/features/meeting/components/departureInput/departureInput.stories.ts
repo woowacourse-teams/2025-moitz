@@ -3,7 +3,6 @@ import DepartureInput from './DepartureInput';
 import type { Meta, StoryObj } from '@storybook/react-webpack5';
 
 const meta = {
-  title: 'features/meeting/DepartureInput',
   component: DepartureInput,
   parameters: {
     layout: 'centered',
