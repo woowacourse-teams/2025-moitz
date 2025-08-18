@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-import { RecommendedLocation } from '../../entities/types/Location';
+import { RecommendedLocation } from '@entities/types/Location';
 
 type useSelectedLocationReturn = {
   selectedLocation: RecommendedLocation | null;
