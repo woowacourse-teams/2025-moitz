@@ -35,6 +35,14 @@ public class ClientConfig {
                 .build();
     }
 
+    @Bean
+    public RestClient openRestClient() {
+        return restClientBuilder()
+                .baseUrl("https://apis.data.go.kr/B553766/path")
+                .requestFactory(simpleClientHttpRequestFactory())
+                .build();
+    }
+
     private SimpleClientHttpRequestFactory simpleClientHttpRequestFactory() {
         SimpleClientHttpRequestFactory requestFactory = new SimpleClientHttpRequestFactory();
         requestFactory.setConnectTimeout(Duration.ofSeconds(3));
