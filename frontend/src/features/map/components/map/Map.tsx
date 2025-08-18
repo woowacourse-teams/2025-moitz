@@ -1,6 +1,7 @@
 import { Link } from 'react-router';
 
 import { useCustomOverlays } from '@features/map/hooks/useCustomOverlays';
+import { SelectedLocation } from '@features/recommendation/types/SelectedLocation';
 
 import { RecommendedLocation, StartingPlace } from '@entities/types/Location';
 
@@ -18,8 +19,8 @@ const DEFAULT_CURRENT_RECOMMEND_LOCATION = '전체 추첨 지점';
 interface MapProps {
   startingLocations: StartingPlace[];
   recommendedLocations: RecommendedLocation[];
-  selectedLocation: RecommendedLocation | null;
-  changeSelectedLocation: (location: RecommendedLocation | null) => void;
+  selectedLocation: SelectedLocation;
+  changeSelectedLocation: (location: SelectedLocation) => void;
 }
 
 function Map({

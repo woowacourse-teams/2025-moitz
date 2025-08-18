@@ -1,4 +1,6 @@
-import { RecommendedLocation, StartingPlace } from '@entities/types/Location';
+import { SelectedLocation } from '@features/recommendation/types/SelectedLocation';
+
+import { StartingPlace } from '@entities/types/Location';
 
 import { flex, scroll, typography } from '@shared/styles/default.styled';
 import { getAlphabetIndex } from '@shared/utils/getAlphabet';
@@ -11,7 +13,7 @@ import * as bottomSheetDetail from './bottomSheetDetail.styled';
 
 interface BottomSheetDetailProps {
   startingPlaces: StartingPlace[];
-  selectedLocation: RecommendedLocation | null;
+  selectedLocation: SelectedLocation;
 }
 
 function BottomSheetDetail({
