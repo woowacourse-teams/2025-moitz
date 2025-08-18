@@ -50,7 +50,10 @@
       ],
       "@config/*": [
         "src/config/*"
-      ]
+      ],
+      "@sb/*": [
+        ".storybook/*"
+      ],
     }
   },
   "include": [
