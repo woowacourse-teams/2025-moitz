@@ -14,7 +14,7 @@ import com.f12.moitz.domain.RecommendCondition;
 import com.f12.moitz.domain.Recommendation;
 import com.f12.moitz.domain.RecommendedPlace;
 import com.f12.moitz.domain.Routes;
-import com.f12.moitz.infrastructure.client.gemini.dto.RecommendedLocationResponse;
+import com.f12.moitz.application.dto.RecommendedLocationResponse;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;

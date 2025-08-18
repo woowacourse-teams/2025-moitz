@@ -21,7 +21,7 @@ import java.util.Map.Entry;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import com.f12.moitz.infrastructure.client.gemini.dto.RecommendedLocationResponse;
+import com.f12.moitz.application.dto.RecommendedLocationResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;

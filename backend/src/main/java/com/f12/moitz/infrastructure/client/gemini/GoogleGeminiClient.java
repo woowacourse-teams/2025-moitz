@@ -5,7 +5,7 @@ import com.f12.moitz.common.error.exception.ExternalApiErrorCode;
 import com.f12.moitz.common.error.exception.ExternalApiException;
 import com.f12.moitz.common.error.exception.RetryableApiException;
 import com.f12.moitz.infrastructure.PromptGenerator;
-import com.f12.moitz.infrastructure.client.gemini.dto.RecommendedLocationResponse;
+import com.f12.moitz.application.dto.RecommendedLocationResponse;
 import com.f12.moitz.infrastructure.client.gemini.dto.RecommendedPlaceResponses;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -88,7 +88,7 @@ public class GoogleGeminiClient {
             if (e.code() == HttpStatus.FORBIDDEN.value() || message.contains("API key not valid")) {
                 throw new ExternalApiException(ExternalApiErrorCode.INVALID_GEMINI_API_KEY, e.getMessage());
             }
-            if (e.code() == HttpStatus.TOO_MANY_REQUESTS.value()) {
+            if (e.code() == HttpStatus.TOO_MANY_REQUESTS.value() || message.contains("exceeded your current quota")) {
                 throw new ExternalApiException(ExternalApiErrorCode.EXCEEDED_GEMINI_API_TOKEN_QUOTA, e.getMessage());
             }
             if (e.code() == HttpStatus.SERVICE_UNAVAILABLE.value()) {

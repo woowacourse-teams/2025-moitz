@@ -13,7 +13,7 @@ import com.f12.moitz.common.error.exception.ExternalApiException;
 import com.f12.moitz.common.error.exception.RetryableApiException;
 import com.f12.moitz.infrastructure.PromptGenerator;
 import com.f12.moitz.infrastructure.client.gemini.dto.LocationNameAndReason;
-import com.f12.moitz.infrastructure.client.gemini.dto.RecommendedLocationResponse;
+import com.f12.moitz.application.dto.RecommendedLocationResponse;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.genai.errors.ClientException;
