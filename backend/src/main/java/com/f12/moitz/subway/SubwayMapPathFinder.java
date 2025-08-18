@@ -177,7 +177,7 @@ public class SubwayMapPathFinder {
         return fullPath;
     }
 
-    public List<Path> groupByLine(List<StationWithEdge> fullPath) {
+    private List<Path> groupByLine(List<StationWithEdge> fullPath) {
         List<Path> paths = new ArrayList<>();
 
         if (fullPath.isEmpty()) {
