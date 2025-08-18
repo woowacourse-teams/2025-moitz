@@ -22,13 +22,13 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StopWatch;
 
 @Slf4j
 @Service
-@RequiredArgsConstructor
 public class RecommendationParallelTaskService {
 
     private final AsyncPlaceRecommender placeRecommender;
@@ -38,22 +38,46 @@ public class RecommendationParallelTaskService {
     private final PlaceFinder placeFinder;
     private final RecommendationMapper recommendationMapper;
 
+    public RecommendationParallelTaskService(
+            final AsyncPlaceRecommender placeRecommender,
+            @Qualifier("subwayRouteFinderAsyncAdapter") final AsyncRouteFinder routeFinder,
+            final LocationRecommender locationRecommender,
+            final PlaceFinder placeFinder,
+            final RecommendationMapper recommendationMapper
+    ) {
+        this.placeRecommender = placeRecommender;
+        this.routeFinder = routeFinder;
+        this.locationRecommender = locationRecommender;
+        this.placeFinder = placeFinder;
+        this.recommendationMapper = recommendationMapper;
+    }
+
     public RecommendationsResponse recommendLocation(final RecommendationRequest request) {
+        StopWatch stopWatch = new StopWatch("추천 서비스 전체");
+        stopWatch.start("지역 추천");
         final String requirement = RecommendCondition.fromTitle(request.requirement()).getCategoryNames();
         final List<Place> startingPlaces = placeFinder.findPlacesByNames(request.startingPlaceNames());
         final RecommendedLocationResponse recommendedLocationResponse = locationRecommender.getRecommendedLocations(
                 request.startingPlaceNames(),
                 requirement
         );
-        final Map<Place, String> generatedPlacesWithReason = locationRecommender.recommendLocations(recommendedLocationResponse);
+        final Map<Place, String> generatedPlacesWithReason = locationRecommender.recommendLocations(
+                recommendedLocationResponse);
+        stopWatch.stop();
         final List<Place> generatedPlaces = generatedPlacesWithReason.keySet().stream().toList();
 
+        stopWatch.start("모든 경로 찾기");
         CompletableFuture<Map<Place, Routes>> routesFuture = findRoutesForAllAsync(startingPlaces, generatedPlaces);
+        stopWatch.stop();
+
+        stopWatch.start("장소 추천 비동기");
         CompletableFuture<Map<Place, List<RecommendedPlace>>> recommendedPlacesFuture = placeRecommender.recommendPlacesAsync(
                 generatedPlaces,
                 requirement
         );
+        stopWatch.stop();
 
+        stopWatch.start("Recommendation 변환");
         CompletableFuture.allOf(routesFuture, recommendedPlacesFuture).join();
 
         try {
@@ -68,6 +92,9 @@ public class RecommendationParallelTaskService {
                     placeRoutes
             );
 
+            stopWatch.stop();
+            System.out.println(stopWatch.prettyPrint());
+
             return recommendationMapper.toResponse(startingPlaces, recommendation, generatedPlacesWithReason);
 
         } catch (InterruptedException | ExecutionException e) {
@@ -76,7 +103,10 @@ public class RecommendationParallelTaskService {
         }
     }
 
-    public CompletableFuture<Map<Place, Routes>> findRoutesForAllAsync(final List<Place> startingPlaces, final List<Place> generatedPlaces) {
+    public CompletableFuture<Map<Place, Routes>> findRoutesForAllAsync(
+            final List<Place> startingPlaces,
+            final List<Place> generatedPlaces
+    ) {
         final List<StartEndPair> allPairs = generatedPlaces.stream()
                 .flatMap(endPlace -> startingPlaces.stream()
                         .map(startPlace -> new StartEndPair(startPlace, endPlace)))
