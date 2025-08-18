@@ -1,4 +1,4 @@
-package com.f12.moitz.subway;
+package com.f12.moitz.domain.subway;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;

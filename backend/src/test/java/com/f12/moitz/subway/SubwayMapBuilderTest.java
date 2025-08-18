@@ -2,6 +2,8 @@ package com.f12.moitz.subway;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.f12.moitz.domain.subway.SubwayStation;
+import com.f12.moitz.infrastructure.SubwayMapBuilder;
 import com.f12.moitz.infrastructure.client.open.OpenApiClient;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Map;

@@ -1,7 +1,7 @@
 package com.f12.moitz.common.config;
 
-import com.f12.moitz.subway.SubwayMapPathFinder;
-import com.f12.moitz.subway.SubwayStation;
+import com.f12.moitz.domain.subway.SubwayMapPathFinder;
+import com.f12.moitz.domain.subway.SubwayStation;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.genai.Client;

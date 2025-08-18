@@ -1,4 +1,4 @@
-package com.f12.moitz.subway;
+package com.f12.moitz.domain.subway;
 
 import com.f12.moitz.domain.Path;
 import com.f12.moitz.domain.Place;

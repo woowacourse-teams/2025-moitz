@@ -1,8 +1,10 @@
-package com.f12.moitz.subway;
+package com.f12.moitz.infrastructure;
 
 import com.f12.moitz.infrastructure.client.open.OpenApiClient;
 import com.f12.moitz.infrastructure.client.open.dto.PathResponse;
 import com.f12.moitz.infrastructure.client.open.dto.SubwayRouteResponse;
+import com.f12.moitz.domain.subway.Edge;
+import com.f12.moitz.domain.subway.SubwayStation;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.BufferedReader;
 import java.io.FileReader;

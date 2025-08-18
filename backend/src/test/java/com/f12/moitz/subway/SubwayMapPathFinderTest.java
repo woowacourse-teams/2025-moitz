@@ -1,6 +1,10 @@
 package com.f12.moitz.subway;
 
 import com.f12.moitz.domain.Path;
+import com.f12.moitz.domain.subway.Edge;
+import com.f12.moitz.domain.subway.SubwayMapPathFinder;
+import com.f12.moitz.domain.subway.SubwayStation;
+import com.f12.moitz.infrastructure.SubwayMapBuilder;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
