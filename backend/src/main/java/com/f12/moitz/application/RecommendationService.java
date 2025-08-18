@@ -1,10 +1,10 @@
 package com.f12.moitz.application;
 
 import com.f12.moitz.application.dto.RecommendationRequest;
-import com.f12.moitz.application.dto.RecommendationsResponse;
 import com.f12.moitz.application.port.LocationRecommender;
 import com.f12.moitz.application.port.PlaceFinder;
 import com.f12.moitz.application.port.PlaceRecommender;
+import com.f12.moitz.application.dto.RecommendationsResponse;
 import com.f12.moitz.application.port.RouteFinder;
 import com.f12.moitz.application.port.dto.StartEndPair;
 import com.f12.moitz.application.utils.RecommendationMapper;
@@ -15,12 +15,13 @@ import com.f12.moitz.domain.Recommendation;
 import com.f12.moitz.domain.RecommendedPlace;
 import com.f12.moitz.domain.Route;
 import com.f12.moitz.domain.Routes;
-import com.f12.moitz.infrastructure.client.gemini.dto.RecommendedLocationResponse;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+
+import com.f12.moitz.application.dto.RecommendedLocationResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
