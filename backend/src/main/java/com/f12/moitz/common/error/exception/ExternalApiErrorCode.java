@@ -11,9 +11,9 @@ public enum ExternalApiErrorCode implements ErrorCode {
     GEMINI_API_SERVER_UNRESPONSIVE("E0006", "GEMINI API 서버가 응답하지 않습니다.", false),
 
     // ODSAY API 예외 E001
-    INVALID_ODSAY_API_RESPONSE("E0012", "ODSAY API 응답이 정상적으로 생성되지 않았습니다.", false),
-    ODSAY_API_SERVER_UNRESPONSIVE("E0014", "ODSAY API 서버가 응답하지 않습니다.", false),
-    ODSAY_API_BLOCKED("E0015", "ODDAY API에서 요청을 차단했습니다. 잠시 후 다시 시도해주세요.", true),
+    INVALID_ODSAY_API_RESPONSE("E0011", "ODSAY API 응답이 정상적으로 생성되지 않았습니다.", false),
+    ODSAY_API_SERVER_UNRESPONSIVE("E0012", "ODSAY API 서버가 응답하지 않습니다.", false),
+    ODSAY_API_BLOCKED("E0013", "ODDAY API에서 요청을 차단했습니다. 잠시 후 다시 시도해주세요.", true),
 
     // KAKAO MAP API 예외 E002
     INVALID_KAKAO_MAP_API_RESPONSE("E0021", "KAKAO MAP API 응답 처리 중 문제가 발생했습니다.", false),
@@ -49,7 +49,6 @@ public enum ExternalApiErrorCode implements ErrorCode {
     public String getMessage() {
         return message;
     }
-
 
     @Override
     public String getClientMessage() {
