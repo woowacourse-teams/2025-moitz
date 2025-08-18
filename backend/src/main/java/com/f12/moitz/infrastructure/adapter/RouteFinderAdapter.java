@@ -1,21 +1,24 @@
 package com.f12.moitz.infrastructure.adapter;
 
 import com.f12.moitz.application.port.RouteFinder;
+import com.f12.moitz.application.port.dto.StartEndPair;
 import com.f12.moitz.domain.Path;
 import com.f12.moitz.domain.Place;
 import com.f12.moitz.domain.Point;
 import com.f12.moitz.domain.Route;
 import com.f12.moitz.domain.TravelMethod;
-import com.f12.moitz.infrastructure.odsay.OdsayClient;
-import com.f12.moitz.infrastructure.odsay.SubwayCode;
-import com.f12.moitz.infrastructure.odsay.dto.SubPathResponse;
-import com.f12.moitz.infrastructure.odsay.dto.SubwayRouteSearchResponse;
+import com.f12.moitz.infrastructure.client.odsay.OdsayClient;
+import com.f12.moitz.infrastructure.client.odsay.SubwayCode;
+import com.f12.moitz.infrastructure.client.odsay.dto.SubPathResponse;
+import com.f12.moitz.infrastructure.client.odsay.dto.SubwayRouteSearchResponse;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class RouteFinderAdapter implements RouteFinder {
@@ -23,10 +26,16 @@ public class RouteFinderAdapter implements RouteFinder {
     private final OdsayClient odsayClient;
 
     @Override
-    public Route findRoute(final Place startPlace, final Place endPlace) {
-        return new Route(
-                convertPaths(odsayClient.getRoute(startPlace.getPoint(), endPlace.getPoint()))
-        );
+    public List<Route> findRoutes(final List<StartEndPair> placePairs) {
+        return placePairs.stream()
+                .map(pair -> {
+                    final Place startPlace = pair.start();
+                    final Place endPlace = pair.end();
+                    return new Route(
+                            convertPaths(odsayClient.getRoute(startPlace.getPoint(), endPlace.getPoint()))
+                    );
+                })
+                .toList();
     }
 
     // 해당 로직은 OdsayClient로 옮기는 게 좋을까?
@@ -59,7 +68,7 @@ public class RouteFinderAdapter implements RouteFinder {
                             transferPlace,
                             TravelMethod.TRANSFER,
                             // TODO: 환승 이동 시간 계산 고려
-                            3,
+                            180,
                             null
                     ));
                 }
@@ -77,7 +86,7 @@ public class RouteFinderAdapter implements RouteFinder {
                         startPlace,
                         endPlace,
                         TravelMethod.from(subPath.trafficType()),
-                        subPath.sectionTime(),
+                        subPath.sectionTime() * 60,
                         SubwayCode.fromCode(subPath.lane().getFirst().subwayCode()).getTitle()
                 ));
 
