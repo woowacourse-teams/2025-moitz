@@ -200,6 +200,7 @@ public class SubwayMapPathFinder {
             if (current.isTransfer() || fullPath.getLast().equals(current)) {
                 String endStation = current.stationName;
 
+                // TODO: 정확한 좌표 조회해서 Point 생성하기
                 Place fromPlace = new Place(startStation, new Point(125.0, 37.0));
                 Place toPlace = new Place(endStation, new Point(125.0, 37.0));
 
@@ -214,6 +215,7 @@ public class SubwayMapPathFinder {
 
                 // 환승 처리: 같은 역에서 다른 호선으로 환승 (마지막 역이 아닌 경우에만)
                 if (current.isTransfer() && i < fullPath.size() - 1) {
+                    // TODO: 정확한 좌표 조회해서 Point 생성하기
                     Place transferFrom = new Place(endStation, new Point(125.0, 37.0));
 
                     // 환승 시간 계산: 환승 Edge의 시간 직접 활용
