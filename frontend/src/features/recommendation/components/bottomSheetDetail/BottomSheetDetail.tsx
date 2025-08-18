@@ -11,7 +11,7 @@ import * as bottomSheetDetail from './bottomSheetDetail.styled';
 
 interface BottomSheetDetailProps {
   startingPlaces: StartingPlace[];
-  selectedLocation: RecommendedLocation;
+  selectedLocation: RecommendedLocation | null;
 }
 
 function BottomSheetDetail({

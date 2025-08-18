@@ -1,9 +1,11 @@
+import { LocationRequirement } from '@entities/types/LocationRequestBody';
+
 const MEETING_DEPARTURE_LIST = 'meeting:departures';
 const MEETING_CONDITION_ID = 'meeting:conditionId';
 
 export function setMeetingStorage(params: {
   departureList: string[];
-  conditionID: string;
+  conditionID: LocationRequirement;
 }) {
   localStorage.setItem(
     MEETING_DEPARTURE_LIST,
@@ -17,12 +19,14 @@ export function setMeetingStorage(params: {
 
 export function getMeetingStorage(): {
   departureList: string[];
-  conditionID: string;
+  conditionID: LocationRequirement;
   } {
   const departureList = JSON.parse(
-    localStorage.getItem(MEETING_DEPARTURE_LIST),
+    localStorage.getItem(MEETING_DEPARTURE_LIST) ?? '[]',
   );
-  const conditionID = JSON.parse(localStorage.getItem(MEETING_CONDITION_ID));
+  const conditionID = JSON.parse(
+    localStorage.getItem(MEETING_CONDITION_ID) ?? '',
+  );
 
   return { departureList, conditionID };
 }

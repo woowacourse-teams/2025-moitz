@@ -24,10 +24,10 @@ type UseFormInfoReturn = {
 export function useFormInfo(): UseFormInfoReturn {
   const storage = getMeetingStorage();
   const [departureList, setDepartureList] = useState<string[]>(
-    storage.departureList || [],
+    storage.departureList,
   );
   const [conditionID, setConditionID] = useState<LocationRequirement>(
-    storage.conditionID as LocationRequirement,
+    storage.conditionID,
   );
 
   const addDepartureWithValidation = (departure: string): ValidationError => {

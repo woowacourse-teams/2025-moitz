@@ -18,8 +18,8 @@ const DEFAULT_CURRENT_RECOMMEND_LOCATION = '전체 추첨 지점';
 interface MapProps {
   startingLocations: StartingPlace[];
   recommendedLocations: RecommendedLocation[];
-  selectedLocation: RecommendedLocation;
-  changeSelectedLocation: (location: RecommendedLocation) => void;
+  selectedLocation: RecommendedLocation | null;
+  changeSelectedLocation: (location: RecommendedLocation | null) => void;
 }
 
 function Map({
