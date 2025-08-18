@@ -1,10 +1,6 @@
 package com.f12.moitz.domain.subway;
 
 import com.f12.moitz.domain.Path;
-import com.f12.moitz.domain.subway.Edge;
-import com.f12.moitz.domain.subway.SubwayMapPathFinder;
-import com.f12.moitz.domain.subway.SubwayStation;
-import com.f12.moitz.infrastructure.SubwayMapBuilder;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -12,19 +8,9 @@ import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.mockito.junit.jupiter.MockitoExtension;
 
-@ExtendWith(MockitoExtension.class)
 class SubwayMapPathFinderTest {
 
-    @Mock
-    private SubwayMapBuilder subwayMapBuilder;
-
-    @InjectMocks
     private SubwayMapPathFinder pathFinder;
 
     @BeforeEach
@@ -60,7 +46,7 @@ class SubwayMapPathFinderTest {
         station4.addEdge(new Edge("중랑", 120, 0, "경의선"));
         station4.addEdge(new Edge("중랑", 150, 0, "경춘선"));
 
-        Mockito.when(subwayMapBuilder.build()).thenReturn(map);
+        pathFinder = new SubwayMapPathFinder(map);
     }
 
     @DisplayName("청량리-회기 최단경로를 찾는다.")

@@ -18,7 +18,7 @@ public class SubwayRouteFinderAdapter implements RouteFinder {
 
     @Override
     public List<Route> findRoutes(final List<StartEndPair> placePairs) {
-        List<Route> routes = placePairs.stream()
+        final List<Route> routes = placePairs.stream()
                 .map(pair -> {
                     final String startPlaceName = getStationName(pair.start().getName());
                     final String endPlaceName = getStationName(pair.end().getName());

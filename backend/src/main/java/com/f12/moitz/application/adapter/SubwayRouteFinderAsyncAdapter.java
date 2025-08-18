@@ -29,7 +29,7 @@ public class SubwayRouteFinderAsyncAdapter implements AsyncRouteFinder {
 
     @Override
     public List<Route> findRoutes(final List<StartEndPair> placePairs) {
-        List<Route> routes = Flux.fromIterable(placePairs)
+        final List<Route> routes = Flux.fromIterable(placePairs)
                 .flatMapSequential(pair -> {
                             final String startPlaceName = getStationName(pair.start().getName());
                             final String endPlaceName = getStationName(pair.end().getName());

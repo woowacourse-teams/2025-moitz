@@ -37,11 +37,11 @@ public class SubwayMapPathFinder {
             throw new IllegalStateException("출발역과 도착역은 동일할 수 없습니다.");
         }
 
-        Map<String, Integer> times = new HashMap<>();
-        Map<String, String> prev = new HashMap<>();
-        Map<String, String> edgeLines = new HashMap<>(); // 각 역에 도달할 때 사용한 호선 저장
-        PriorityQueue<Node> pq = new PriorityQueue<>(Comparator.comparingInt(n -> n.time));
-        Set<String> visited = new HashSet<>();
+        final Map<String, Integer> times = new HashMap<>();
+        final Map<String, String> prev = new HashMap<>();
+        final Map<String, String> edgeLines = new HashMap<>(); // 각 역에 도달할 때 사용한 호선 저장
+        final PriorityQueue<Node> pq = new PriorityQueue<>(Comparator.comparingInt(n -> n.time));
+        final Set<String> visited = new HashSet<>();
 
         // 초기화
         for (String stationName : stationMap.keySet()) {
@@ -51,7 +51,7 @@ public class SubwayMapPathFinder {
         pq.add(new Node(startName, 0));
 
         while (!pq.isEmpty()) {
-            Node current = pq.poll();
+            final Node current = pq.poll();
 
             if (!visited.add(current.name)) {
                 continue;
@@ -61,13 +61,13 @@ public class SubwayMapPathFinder {
                 break;
             }
 
-            SubwayStation currentStation = stationMap.get(current.name);
+            final SubwayStation currentStation = stationMap.get(current.name);
             if (currentStation == null) {
                 continue;
             }
 
             for (Edge edge : currentStation.getPossibleEdges()) {
-                String neighborName = edge.getDestination();
+                final String neighborName = edge.getDestination();
 
                 if (visited.contains(neighborName)) {
                     continue;
@@ -105,13 +105,18 @@ public class SubwayMapPathFinder {
             }
         }
 
-        List<StationWithEdge> fullPath = reconstructPaths(prev, edgeLines, startName, endName);
+        final List<StationWithEdge> fullPath = reconstructPaths(prev, edgeLines, startName, endName);
+
         return groupByLine(fullPath);
     }
 
-    private List<StationWithEdge> reconstructPaths(final Map<String, String> prev, final Map<String, String> edgeLines,
-                                                   final String startName, final String endName) {
-        List<StationWithEdge> fullPath = new ArrayList<>();
+    private List<StationWithEdge> reconstructPaths(
+            final Map<String, String> prev,
+            final Map<String, String> edgeLines,
+            final String startName,
+            final String endName
+    ) {
+        final List<StationWithEdge> fullPath = new ArrayList<>();
         String currentName = endName;
 
         // 먼저 도착역을 추가 (마지막 역이므로 Edge는 null)
@@ -123,13 +128,13 @@ public class SubwayMapPathFinder {
             String nextName = currentName; // 현재 추적 중인 역이 다음 역이 됨
             currentName = previousName;
 
-            SubwayStation currentStation = stationMap.get(currentName);
+            final SubwayStation currentStation = stationMap.get(currentName);
             if (currentStation == null) {
                 throw new IllegalStateException("찾으려는 이름과 일치하는 역이 노선도에 존재하지 않습니다.");
             }
 
             // edgeLines에서 다음 역(nextName)에 도달할 때 사용한 호선 정보를 가져옴
-            String targetLineName = edgeLines.get(nextName);
+            final String targetLineName = edgeLines.get(nextName);
 
             // 현재 역에서 다음 역으로 가는 Edge 중에서 호선명이 일치하는 Edge 찾기
             Edge movementEdge = null;
@@ -151,7 +156,7 @@ public class SubwayMapPathFinder {
                 break;
             }
 
-            String currentLineName = edgeLines.get(currentName);
+            final String currentLineName = edgeLines.get(currentName);
             if (!currentLineName.equals(targetLineName)) {
                 Edge transferEdge = null;
                 for (Edge edge : currentStation.getPossibleEdges()) {
@@ -177,8 +182,8 @@ public class SubwayMapPathFinder {
         return fullPath;
     }
 
-    private List<Path> groupByLine(List<StationWithEdge> fullPath) {
-        List<Path> paths = new ArrayList<>();
+    private List<Path> groupByLine(final List<StationWithEdge> fullPath) {
+        final List<Path> paths = new ArrayList<>();
 
         if (fullPath.isEmpty()) {
             throw new IllegalStateException("경로가 존재하지 않습니다.");
@@ -189,22 +194,22 @@ public class SubwayMapPathFinder {
         int totalTime = 0;
 
         for (int i = 1; i < fullPath.size(); i++) {
-            StationWithEdge current = fullPath.get(i);
+            final StationWithEdge current = fullPath.get(i);
 
             // 이전 구간의 실제 이동 시간 계산 (Edge에서 직접 가져오기)
-            StationWithEdge previous = fullPath.get(i - 1);
-            int segmentTime = previous.edge != null ? previous.getTimeInSeconds() : 120;
+            final StationWithEdge previous = fullPath.get(i - 1);
+            final int segmentTime = previous.edge != null ? previous.getTimeInSeconds() : 120;
             totalTime += segmentTime;
 
             // 환승 경로이거나 마지막 역인 경우
             if (current.isTransfer() || fullPath.getLast().equals(current)) {
-                String endStation = current.stationName;
+                final String endStation = current.stationName;
 
                 // TODO: 정확한 좌표 조회해서 Point 생성하기
-                Place fromPlace = new Place(startStation, new Point(125.0, 37.0));
-                Place toPlace = new Place(endStation, new Point(125.0, 37.0));
+                final Place fromPlace = new Place(startStation, new Point(125.0, 37.0));
+                final Place toPlace = new Place(endStation, new Point(125.0, 37.0));
 
-                Path path = new Path(
+                final Path path = new Path(
                         fromPlace,
                         toPlace,
                         TravelMethod.SUBWAY,
@@ -216,12 +221,12 @@ public class SubwayMapPathFinder {
                 // 환승 처리: 같은 역에서 다른 호선으로 환승 (마지막 역이 아닌 경우에만)
                 if (current.isTransfer() && i < fullPath.size() - 1) {
                     // TODO: 정확한 좌표 조회해서 Point 생성하기
-                    Place transferFrom = new Place(endStation, new Point(125.0, 37.0));
+                    final Place transferFrom = new Place(endStation, new Point(125.0, 37.0));
 
                     // 환승 시간 계산: 환승 Edge의 시간 직접 활용
-                    int transferTime = current.getTimeInSeconds();
+                    final int transferTime = current.getTimeInSeconds();
 
-                    Path transferPath = new Path(
+                    final Path transferPath = new Path(
                             transferFrom,
                             transferFrom,
                             TravelMethod.TRANSFER,
@@ -232,7 +237,7 @@ public class SubwayMapPathFinder {
 
                     // 다음 구간 초기화
                     i++;
-                    StationWithEdge next = fullPath.get(i);
+                    final StationWithEdge next = fullPath.get(i);
                     currentLine = next.getLineName();
                     startStation = current.stationName;
                     totalTime = 0;
@@ -247,7 +252,7 @@ public class SubwayMapPathFinder {
         final String stationName;
         final Edge edge;
 
-        StationWithEdge(String stationName, Edge edge) {
+        StationWithEdge(final String stationName, final Edge edge) {
             this.stationName = stationName;
             this.edge = edge;
         }
@@ -272,7 +277,7 @@ public class SubwayMapPathFinder {
         String name;
         int time;
 
-        Node(String name, int time) {
+        Node(final String name, final int time) {
             this.name = name;
             this.time = time;
         }

@@ -13,7 +13,7 @@ public class SubwayStation {
     private final String name;
     private final List<Edge> possibleEdges;
 
-    public SubwayStation(String name) {
+    public SubwayStation(final String name) {
         this.name = name;
         this.possibleEdges = new ArrayList<>();
     }
@@ -27,8 +27,8 @@ public class SubwayStation {
         this.possibleEdges = possibleEdges != null ? possibleEdges : new ArrayList<>();
     }
 
-    public void addEdge(Edge newEdge) {
-        Optional<Edge> existingEdge = possibleEdges.stream()
+    public void addEdge(final Edge newEdge) {
+        final Optional<Edge> existingEdge = possibleEdges.stream()
                 .filter(edge -> edge.isEqualTo(newEdge))
                 .findFirst();
 
