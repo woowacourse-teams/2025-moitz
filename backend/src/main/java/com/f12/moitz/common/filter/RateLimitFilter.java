@@ -47,7 +47,11 @@ public class RateLimitFilter implements Filter {
                 log.warn("Rate limit exceeded for user: {} | {}", clientIp, userAgent);
                 handleRateLimitExceeded(httpServletRequest, httpServletResponse, probe.getNanosToWaitForRefill());
             } else {
-                log.debug("Request allowed for IP: {}, remaining tokens: {}", clientIp, probe.getRemainingTokens());
+                log.debug("Request allowed for user: {} | {}, remaining tokens: {}",
+                        clientIp,
+                        userAgent,
+                        probe.getRemainingTokens()
+                );
             }
 
             final ContentCachingRequestWrapper wrappedRequest = new ContentCachingRequestWrapper(httpServletRequest);
