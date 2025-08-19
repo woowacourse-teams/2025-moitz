@@ -6,14 +6,14 @@ import '@shared/styles/tokens.css';
 export const container = () => css`
   display: flex;
   width: 100%;
-  min-height: 100vh;
+  min-height: 100dvh;
   background-color: ${colorToken.main[4]};
 `;
 
 export const content = () => css`
   width: 100%;
-  min-height: 100vh;
-  overflow-y: auto;
+  min-height: 100dvh;
+  overflow-x: hidden;
   background-color: ${colorToken.gray[8]};
 
   @media (min-width: ${layout.media_maxWidth}) {
