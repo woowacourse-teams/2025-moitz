@@ -3,7 +3,7 @@ import { SelectedLocation } from '@features/recommendation/types/SelectedLocatio
 import { StartingPlace } from '@entities/types/Location';
 
 import { flex, scroll, typography } from '@shared/styles/default.styled';
-import { getAlphabetIndex } from '@shared/utils/getAlphabet';
+import { numberToCharCode } from '@shared/utils/numberToCharCode';
 
 import DetailSection from '../detailSection/DetailSection';
 import PlaceCard from '../placeCard/PlaceCard';
@@ -48,7 +48,7 @@ function BottomSheetDetail({
           {selectedLocation.routes.map((route) => (
             <RouteCard
               key={route.startingPlaceId}
-              startingPlaceIndex={getAlphabetIndex(route.startingPlaceId)}
+              startingPlaceIndex={numberToCharCode(route.startingPlaceId)}
               startingPlaceName={
                 startingPlaces.find(
                   (place) => place.id === route.startingPlaceId,
