@@ -1,7 +1,10 @@
 package com.f12.moitz.common.config;
 
+import com.f12.moitz.domain.repository.SubwayStationRepository;
 import com.f12.moitz.domain.subway.SubwayMapPathFinder;
 import com.f12.moitz.domain.subway.SubwayStation;
+import com.f12.moitz.infrastructure.MongoSubwayMapBuilder;
+import com.f12.moitz.infrastructure.SubwayMapBuilder;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.genai.Client;
@@ -10,7 +13,12 @@ import io.netty.handler.timeout.WriteTimeoutHandler;
 import java.io.IOException;
 import java.io.InputStream;
 import java.time.Duration;
+import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -21,6 +29,7 @@ import org.springframework.web.client.RestClient;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.netty.http.client.HttpClient;
 
+@Slf4j
 @Configuration
 public class ClientConfig {
 
@@ -86,27 +95,33 @@ public class ClientConfig {
     }
 
     @Bean
-    public SubwayMapPathFinder subwayMapPathFinder(@Autowired ObjectMapper objectMapper) {
+    public SubwayMapPathFinder subwayMapPathFinder(
+            @Autowired SubwayStationRepository stationRepository,
+            @Autowired MongoSubwayMapBuilder subwayMapBuilder) {
+
+        log.info("SubwayMapPathFinder 초기화 시작");
+
         try {
-            InputStream resource = this.getClass().getClassLoader().getResourceAsStream("station-map.json");
-            if (resource == null || resource.available() == 0) {
-                throw new RuntimeException("station-map.json 파일을 찾을 수 없습니다. 먼저 SubwayMapBuilder.build()를 실행하여 JSON 파일을 생성해주세요.");
+            List<SubwayStation> stations = stationRepository.findAll();
+
+            // 데이터가 없으면 자동 빌드
+            if (stations.isEmpty()) {
+                log.info("MongoDB에 데이터가 없습니다. CSV에서 자동 빌드를 시작합니다...");
+                subwayMapBuilder.buildAndSaveToMongo();
+                stations = stationRepository.findAll();
+                log.info("자동 빌드 완료. {}개 역 저장됨", stations.size());
             }
-            
-            // Java 8 시간 타입 지원을 위한 모듈 등록
-            objectMapper.findAndRegisterModules();
-            
-            TypeReference<Map<String, SubwayStation>> typeReference = new TypeReference<>() {};
-            Map<String, SubwayStation> stationMap = objectMapper.readValue(resource, typeReference);
-            
-            if (stationMap.isEmpty()) {
-                throw new RuntimeException("station-map.json에서 읽어온 데이터가 비어있습니다. JSON 파일을 다시 생성해주세요.");
-            }
-            
+
+            Map<String, SubwayStation> stationMap = stations.stream()
+                    .collect(Collectors.toMap(SubwayStation::getName, Function.identity()));
+
+            log.info("SubwayMapPathFinder 초기화 완료. 총 {}개 역", stationMap.size());
             return new SubwayMapPathFinder(stationMap);
-        } catch (IOException e) {
-            throw new RuntimeException("station-map.json 파일 읽기에 실패했습니다.", e);
+
+        } catch (Exception e) {
+            log.error("SubwayMapPathFinder 초기화 실패", e);
+            throw new RuntimeException("SubwayMapPathFinder 초기화 실패: " + e.getMessage(), e);
         }
     }
-
 }
+
