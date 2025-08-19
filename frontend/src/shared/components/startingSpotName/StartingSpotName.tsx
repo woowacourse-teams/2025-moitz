@@ -2,6 +2,8 @@ import { StartingPlace } from '@entities/types/Location';
 
 import { flex, typography } from '@shared/styles/default.styled';
 
+import Dot from '../dot/Dot';
+
 import * as startingSpotNameStyled from './startingSpotName.styled';
 
 interface StartSpotNameProps {
@@ -22,7 +24,7 @@ function StartingSpotName({ place, isLast }: StartSpotNameProps) {
       <span css={[typography.b2, startingSpotNameStyled.nameList()]}>
         {place.name}
       </span>
-      <div css={!isLast && startingSpotNameStyled.dot()}></div>
+      {!isLast && <Dot size={3} colorType="main" colorTokenIndex={1} />}
     </div>
   );
 }
