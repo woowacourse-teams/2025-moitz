@@ -1,11 +1,10 @@
 package com.f12.moitz.infrastructure.client.kakao.dto;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.List;
 
 public record KakaoApiResponse(
-        List<Document> documents,
-        Meta meta
+        List<DocumentResponse> documents,
+        MetaResponse meta
 ) {
 
     public double findStationX() {
@@ -16,7 +15,7 @@ public record KakaoApiResponse(
         return Double.parseDouble(findStation().y());
     }
 
-    private Document findStation() {
+    private DocumentResponse findStation() {
         return documents.stream()
                 .filter(document -> "지하철역".equals(document.categoryGroupName()))
                 .findFirst()
@@ -29,26 +28,5 @@ public record KakaoApiResponse(
         }
         return documents.size();
     }
-
-}
-
-record Document(
-        @JsonProperty("category_group_name") String categoryGroupName,
-        @JsonProperty("category_name") String categoryName,
-        String distance,
-        @JsonProperty("place_name") String placeName,
-        @JsonProperty("place_url") String placeUrl,
-        String x,
-        String y
-) {
-
-}
-
-record Meta(
-        @JsonProperty("is_end") boolean isEnd,
-        @JsonProperty("pageable_count") int pageableCount,
-        @JsonProperty("total_count") int totalCount,
-        @JsonProperty("same_name") Object sameName
-) {
 
 }

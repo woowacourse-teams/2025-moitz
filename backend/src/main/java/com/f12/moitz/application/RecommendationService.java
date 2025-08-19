@@ -39,7 +39,7 @@ public class RecommendationService {
 
     public RecommendationService(
             @Autowired final PlaceFinder placeFinder,
-            @Qualifier("geminiPlaceRecommenderAdapter") final PlaceRecommender placeRecommender,
+            @Qualifier("placeRecommenderAdapter") final PlaceRecommender placeRecommender,
             @Autowired final LocationRecommender locationRecommender,
             @Qualifier("subwayRouteFinderAdapter") final RouteFinder routeFinder,
             @Autowired final RecommendationMapper recommendationMapper
