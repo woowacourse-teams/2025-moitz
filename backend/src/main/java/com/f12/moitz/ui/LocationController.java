@@ -41,6 +41,7 @@ public class LocationController implements SwaggerLocationController {
     }
 
     private RecommendationsResponse mock() {
+
         return new RecommendationsResponse(
                 List.of(
                         new StartingPlaceResponse(1L, 1, 127.094741101863, 37.5351180385975, "강변역"),

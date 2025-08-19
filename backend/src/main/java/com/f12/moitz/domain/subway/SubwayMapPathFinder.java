@@ -174,6 +174,8 @@ public class SubwayMapPathFinder {
 
             previousName = prev.get(currentName);
         }
+        log.info("startName : {}",startName );
+        log.info("currentName : {}",currentName );
 
         if (!startName.equals(currentName)) {
             throw new IllegalStateException("경로가 출발역까지 이어지지 않습니다.");

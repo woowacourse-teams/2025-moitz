@@ -1,19 +1,19 @@
 package com.f12.moitz.infrastructure;
 
+import com.f12.moitz.domain.repository.SubwayStationRepository;
 import com.f12.moitz.domain.subway.Edge;
 import com.f12.moitz.domain.subway.SubwayStation;
 import com.f12.moitz.infrastructure.client.open.OpenApiClient;
 import com.f12.moitz.infrastructure.client.open.dto.PathResponse;
 import com.f12.moitz.infrastructure.client.open.dto.SubwayRouteResponse;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
+import org.springframework.util.StopWatch;
+
 import java.io.BufferedReader;
 import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 import java.time.DateTimeException;
 import java.time.Duration;
 import java.time.LocalTime;
@@ -21,26 +21,26 @@ import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.util.StopWatch;
 
 @Slf4j
+@Component
 @RequiredArgsConstructor
-public class SubwayMapBuilder {
-
+public class MongoSubwayMapBuilder {
     public static final String CSV_PATH = "src/main/resources/route-for-station-map.csv";
     private static final DateTimeFormatter TIME_FORMATTER = DateTimeFormatter.ofPattern("HH:mm:ss");
 
+    private final SubwayStationRepository subwayStationRepository;
     private final OpenApiClient openApiClient;
-    private final ObjectMapper objectMapper;
 
-    public Map<String, SubwayStation> build() {
+    public Map<String, SubwayStation> buildAndSaveToMongo() {
         final StopWatch stopWatch = new StopWatch();
-        stopWatch.start("노선도 만들기");
+        stopWatch.start("MongoDB 노선 만들기");
+
+        log.info("MongoDB 기반 지하철 노선도 빌드 시작");
+
         final Map<String, SubwayStation> stationMap = new HashMap<>();
 
-        try (BufferedReader br = new BufferedReader(new FileReader(CSV_PATH))) {
+        try(BufferedReader br = new BufferedReader(new FileReader(CSV_PATH))) {
             String line = br.readLine();
             while ((line = br.readLine()) != null) {
                 line = line.trim();
@@ -61,52 +61,47 @@ public class SubwayMapBuilder {
             }
 
             addMissingData(stationMap);
-
         } catch (IOException e) {
             throw new RuntimeException("CSV 파일 읽기를 실패했습니다.", e);
+
         }
         stopWatch.stop();
-        log.debug(stopWatch.prettyPrint());
+        log.info("노선도 빌드 완료. 소요시간: {}ms, 총 {}개 역",
+                stopWatch.getTotalTimeMillis(), stationMap.size());
 
-        final String filePath = "src/main/resources/station-map.json";
-
-        // 기존 파일 백업
-        final Path sourceFile = Paths.get(filePath);
-        if (Files.exists(sourceFile)) {
-            final String backupFilePath = "src/main/resources/station-map-backup.json";
-            final Path backupFile = Paths.get(backupFilePath);
-            try {
-                Files.copy(sourceFile, backupFile, StandardCopyOption.REPLACE_EXISTING);
-                log.debug("기존 station-map.json 파일을 station-map-backup.json으로 백업했습니다.");
-            } catch (IOException e) {
-                log.warn("백업 파일 생성에 실패했습니다: {}", e.getMessage());
-            }
-        }
-
-        try (FileWriter fileWriter = new FileWriter(filePath)) {
-            // Java 8 시간 타입 지원을 위한 모듈 등록
-            objectMapper.findAndRegisterModules();
-            final String jsonString = objectMapper.writeValueAsString(stationMap);
-            fileWriter.write(jsonString);
-            log.debug("JSON 파일 생성 완료");
-        } catch (IOException e) {
-            throw new RuntimeException("지하철 노선도 JSON 파싱에 실패했습니다.", e);
-        }
-
+        saveToMongoDB(stationMap);
         return stationMap;
     }
 
+
+    private void saveToMongoDB(Map<String, SubwayStation> stationMap) {
+        try {
+            log.info("MongoDB에 {}개 역 저장 시작", stationMap.size());
+
+            // 기존 데이터 삭제 후 새로 저장
+            subwayStationRepository.deleteAll();
+            subwayStationRepository.saveAll(stationMap.values());
+
+            log.info("MongoDB 저장 완료 - 총 {}개 역", stationMap.size());
+
+        } catch (Exception e) {
+            log.error("MongoDB 저장 실패", e);
+            throw new RuntimeException("MongoDB 저장에 실패했습니다.", e);
+        }
+    }
+
+
     private void buildSubwayStations(final SubwayRouteResponse response, final Map<String, SubwayStation> stationMap) {
+        if (response == null || response.body() == null || response.body().paths() == null) {
+            log.warn("SubwayRouteResponse 또는 경로 정보가 null입니다.");
+            return;
+        }
         final List<PathResponse> paths = response.body().paths();
 
         for (int i = 0; i < paths.size(); i++) {
             final PathResponse currentPath = paths.get(i);
-
             final String fromName = getStationName(currentPath.dptreStn().stnNm());
             final String toName = getStationName(currentPath.arvlStn().stnNm());
-
-            final String fromLine = getStationLine(currentPath.dptreStn().lineNm());
-            final String toLine = getStationLine(currentPath.arvlStn().lineNm());
 
             final SubwayStation fromStation = stationMap.computeIfAbsent(fromName, SubwayStation::new);
             final SubwayStation toStation = stationMap.computeIfAbsent(toName, SubwayStation::new);
@@ -114,12 +109,17 @@ public class SubwayMapBuilder {
             final int distance = currentPath.stnSctnDstc();
             final int travelTimeInSeconds = calculateTravelTime(currentPath, paths, i);
 
-            fromStation.addEdge(new Edge(toName, travelTimeInSeconds, distance, fromLine));
+            fromStation.addEdge(new Edge(toName, travelTimeInSeconds, distance, currentPath.dptreStn().lineNm()));
 
             if (currentPath.isTransfer()) {
-                fromStation.addEdge(new Edge(toName, travelTimeInSeconds, distance, toLine));
+                fromStation.addEdge(new Edge(toName, travelTimeInSeconds, distance, currentPath.arvlStn().lineNm()));
             } else {
-                final Edge reverseEdge = new Edge(fromName, travelTimeInSeconds, distance, fromLine);
+                final Edge reverseEdge = new Edge(
+                        fromName,
+                        travelTimeInSeconds,
+                        distance,
+                        currentPath.dptreStn().lineNm()
+                );
                 toStation.addEdge(reverseEdge);
             }
         }
@@ -172,13 +172,6 @@ public class SubwayMapBuilder {
         return name;
     }
 
-    private String getStationLine(final String line) {
-        if ("경의선".equals(line)) {
-            return "경의중앙선";
-        }
-        return line;
-    }
-
     private void addMissingData(final Map<String, SubwayStation> stationMap) {
         final SubwayStation joongrang = stationMap.get("중랑");
         joongrang.addEdge(new Edge("중랑", 1200, 0, "경의선"));
@@ -219,5 +212,4 @@ public class SubwayMapBuilder {
         jungang.addEdge(new Edge("중앙", 500, 0, "4호선"));
         jungang.addEdge(new Edge("중앙", 500, 0, "수인분당선"));
     }
-
 }
