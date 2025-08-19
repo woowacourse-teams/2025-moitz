@@ -1,5 +1,8 @@
 package com.f12.moitz.infrastructure;
 
+import com.f12.moitz.domain.Place;
+import com.f12.moitz.infrastructure.client.kakao.dto.KakaoApiResponse;
+
 import java.util.List;
 import java.util.Map;
 
@@ -25,107 +28,76 @@ public class PromptGenerator {
             위 조건에 맞춰 장소를 추천해주세요.
             """;
 
-    private static final String ADDITIONAL_PROMPT2 = """
-                    Given a list of Seoul Metro subway stations as input, recommend 3 meeting places (e.g. restaurant, coffee shop, shopping center) that satisfy the user condition for each subway station.
-                    If the user condition is not specified, recommend 3 meeting places that are the most popular or well known and easily accessible from the subway stations.
+    public static final String PLACE_FILTER_PROMPT = """
+            You are an AI assistant that analyzes Kakao Map search results and recommends the best places.
             
-                    Input:
-                    Stations: %s (List of subway station names)
-                    Additional User Condition: %s (e.g., "PC방, 코인노래방")
+            TASK: From the provided Kakao Map data for %s, select the top %d places that best match the user requirements.
             
-                    Output:
-                    Provide the response in the structured JSON format defined by the provided schemas.
-            """;
-
-    private static final String ADDITIONAL_PROMPT3 = """
-                    You're an AI assistant recommending optimal meeting locations in Seoul. Your main goal is to first suggest subway stations where subway travel times from all starting points are similar, and then recommend 3 places or facilities near those stations.
+            STATION: %s
+            STATION COORDINATES: (%.6f, %.6f)
+            USER REQUIREMENTS: %s
             
-                    Core Conditions:
-                    Subway Travel Only: Travel time calculations must be limited to public transportation (subway).
-                    Subway Station Scope: Destination points must be limited to Seoul Metro subway stations.
-                    Similar Travel Times: The travel time from each starting point to the recommended destination must be within a 15-minute margin of error (max_time - min_time <= 15 minutes) across all starting points.
-                    Facility Sufficiency: Recommended areas must be near subway stations, have ample dining/cafes/convenience facilities, and specifically meet any additional user conditions.
-                    Exclusion: The recommended locations must NOT be any of the provided Starting Points.
+            KAKAO MAP SEARCH RESULTS:
+            %s
             
-                    Recommendation Requirements:
-                    Recommend a total of %d subway stations and 3 places near those stations.
-                    For each subway station, provide the following detailed format per starting point: travelMethod, travelRoute, totalTimeInMinutes, travelCost, and numberOfTransfers.
-                    Additionally, for each subway station, you must provide a concise, one-line summary reason (e.g., '접근성 좋고 맛집이 많아요! 😋') explaining why this specific location is recommended, highlighting its key advantages based on the user's conditions and travel similarities.
-                    This reason MUST be very brief, strictly under 50 characters (including spaces and punctuation). Use emojis SPARINGLY, for example, 1-3 emojis at most, to enhance expressiveness, but do NOT include excessive or repetitive emojis.
-                    Finally, recommend 3 places or facilities near each subway station that meet the user's additional conditions. These can be restaurants, cafes, or other relevant places.
-                    Do NOT recommend stations or places that fail to meet the Additional User Condition.
-            
-                    Input:
-                    Starting Points: %s (List of subway station names)
-                    Additional User Condition: %s (e.g., "PC방, 코인노래방")
-            
-                    Output:
-                    Provide the response in the structured JSON format defined by the provided schemas.
-            """;
-
-    public static final int PLACE_RECOMMENDATION_COUNT = 3;
-
-    public static final String PLACE_RECOMMEND_PROMPT = """
-            You're an AI assistant that recommends {{Recommendation_Count}} specific places within 800m of each given subway station.
-            
-            TASK OVERVIEW:
-            You must complete this task in 2 phases:
-            Phase 1: Data Collection (using function calls)
-            Phase 2: Final Recommendation (generating JSON response)
-            
-            PHASE 1 - DATA COLLECTION:
-            1. From the user requirements, extract search keywords that represent the types of places the user is looking for.
-               - Each keyword must be in Korean and consist of only one word.
-               - These keywords will be used with the getPlacesByKeyword function.
-               - Among the search results, identify the top places based on their star ratings, as shown on the place URLs, and include their rankings using index values (e.g., 1 for the highest-rated place).
-            
-            2. For each (station, keyword) pair, create one getPlacesByKeyword function call. Do not send them one by one. Instead, batch all function calls together in a single request.
-            
-            PHASE 2 - FINAL RECOMMENDATION:
-            After collecting all the data from function calls, you MUST generate the final recommendation.
-            
-            IMPORTANT: Even after receiving function call responses, you must continue to:
-            1. Analyze all the collected place data
-            2. For each station, select the top {{Recommendation_Count}} places based on:
-                - Highest Star ratings
-                - Most Reviews
-                -Relevance to user requirements
-            3. Assign index rankings (1 = best, 2 = second best, etc.)
-            4. Generate the final JSON response
-            
-            CRITICAL OUTPUT FORMAT - READ CAREFULLY:
-            Your FINAL response (after all function calls are complete) must be ONLY the JSON data with NO formatting whatsoever.
-            
-            Each recommendation must be returned strictly as raw JSON, with no surrounding text, explanation, or formatting
-            
-            
-            Structure for your final response:
+            RESPONSE FORMAT (JSON ONLY, NO EXPLANATIONS):
             {
-                "responses": [
+                "places": [
                     {
-                        "stationName": "",
-                        "places": [
-                            {
-                              "index": "",
-                              "name": "",
-                              "category": "",
-                              "distance": "",
-                              "url": ""
-                            }
-                        ]
+                        "index": 1,
+                        "name": "exact_place_name_from_kakao_data",
+                        "category": "exact_category_from_kakao_data",
+                        "distance": distance,
+                        "url": "exact_place_url_from_kakao_data"
                     }
                 ]
             }
             
-            Recommendation_Count: %d
-            Stations (지하철역): %s
-            User Requirements (사용자 조건): %s
-            
-            EXECUTION INSTRUCTION:
-            1. Start by calling the necessary functions to collect data
-            2. After receiving all function responses, analyze the data and generate the final JSON recommendation
-            3. Do NOT stop after function calls - you must provide the final recommendation JSON
+            IMPORTANT RULES:
+            1. Analyze the Kakao Map search results for the station
+            2. Extract exact place names, categories, and URLs from the provided data
+            4. Return exactly %d places (or fewer if not enough suitable places exist)
+            6. distance field should contain only numeric values (e.g., 2, 5, 8)
+            7. Focus on places that match the user requirements
+            8. Prioritize places based on proximity to the station coordinates and relevance
+            9. Use the exact place information from the search results provided above
             """;
+
+    /**
+     * 단일 장소의 카카오맵 응답을 프롬프트용으로 포맷팅 (기존 FORMAT_KAKAO_TO_PROMPT 스타일 적용)
+     */
+    public static String FORMAT_SINGLE_PLACE_TO_PROMPT(Place place, List<KakaoApiResponse> kakaoResponses) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("KAKAO MAP SEARCH RESULTS:\n");
+        sb.append("========================\n\n");
+
+        String stationName = place.getName();
+        sb.append(String.format("=== %s ===\n", stationName));
+        sb.append(String.format("Station Coordinates: (%.6f, %.6f)\n",
+                place.getPoint().getX(), place.getPoint().getY()));
+        sb.append("Search Results:\n");
+
+        for (int i = 0; i < kakaoResponses.size(); i++) {
+            KakaoApiResponse response = kakaoResponses.get(i);
+            sb.append(String.format("Response %d: %s\n", i + 1, response.toString()));
+        }
+
+        sb.append("\n========================\n");
+        sb.append("RECOMMENDATION CRITERIA:\n");
+        sb.append(
+                "Please analyze the above Kakao Map data and recommend the BEST places based on the following priority:\n\n");
+        sb.append("RESPONSE FORMAT:\n");
+        sb.append(
+                "- IMPORTANT: Use the exact station name shown above (with '역' suffix if applicable) in your response.\n");
+        sb.append("- For each recommendation, include: exact place name, category, distance, and URL from the data.\n");
+        sb.append("- Rank recommendations by their proximity to the station (closest first).\n");
+        sb.append("- The recommendation should be based **only** on the data provided above.\n\n");
+
+        return sb.toString();
+    }
+
+    public static final int PLACE_RECOMMENDATION_COUNT = 3;
+
 
     public static Map<String, Object> getSchema() {
         return Map.of(

@@ -1,4 +1,4 @@
-import { flex } from '@shared/styles/default.styled';
+import { flex, shadow } from '@shared/styles/default.styled';
 
 import * as mapButton from './mapButton.styled';
 
@@ -11,7 +11,11 @@ interface MapButtonProps {
 function MapButton({ src, alt, onClick }: MapButtonProps) {
   return (
     <button
-      css={[flex({ justify: 'center', align: 'center' }), mapButton.base()]}
+      css={[
+        flex({ justify: 'center', align: 'center' }),
+        shadow.map,
+        mapButton.base(),
+      ]}
       onClick={onClick}
     >
       <img src={src} alt={alt} />
