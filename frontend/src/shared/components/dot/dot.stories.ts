@@ -3,7 +3,6 @@ import Dot from './Dot';
 import type { Meta, StoryObj } from '@storybook/react-webpack5';
 
 const meta = {
-  title: 'shared/Dot',
   component: Dot,
   parameters: {
     layout: 'centered',

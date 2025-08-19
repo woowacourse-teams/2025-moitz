@@ -1,5 +1,7 @@
 import { inline_flex, typography, shadow } from '@shared/styles/default.styled';
 
+import Dot from '../dot/Dot';
+
 import * as mapPoint from './mapPoint.styled';
 
 interface MapPointProps {
@@ -15,7 +17,7 @@ function MapPoint({ text }: MapPointProps) {
         mapPoint.base(),
       ]}
     >
-      <div css={mapPoint.dot()}></div>
+      <Dot size={8} colorType="main" colorTokenIndex={1} />
       <span css={typography.sh2}>{text}</span>
     </div>
   );

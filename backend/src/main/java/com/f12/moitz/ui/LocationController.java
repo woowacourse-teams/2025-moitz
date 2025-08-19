@@ -1,5 +1,6 @@
 package com.f12.moitz.ui;
 
+import com.f12.moitz.application.RecommendationParallelTaskService;
 import com.f12.moitz.application.RecommendationService;
 import com.f12.moitz.application.dto.PathResponse;
 import com.f12.moitz.application.dto.PlaceRecommendResponse;
@@ -22,8 +23,14 @@ import org.springframework.web.bind.annotation.RestController;
 public class LocationController implements SwaggerLocationController {
 
     private final RecommendationService recommendationService;
+    private final RecommendationParallelTaskService recommendationParallelTaskService;
 
     @PostMapping
+    public ResponseEntity<RecommendationsResponse> recommendLocationsAsync(@RequestBody RecommendationRequest request) {
+        return ResponseEntity.ok(recommendationParallelTaskService.recommendLocation(request));
+    }
+
+    @PostMapping("/sync")
     public ResponseEntity<RecommendationsResponse> recommendLocations(@RequestBody RecommendationRequest request) {
         return ResponseEntity.ok(recommendationService.recommendLocation(request));
     }
@@ -50,15 +57,17 @@ public class LocationController implements SwaggerLocationController {
                                 ),
                                 List.of(
                                         new RouteResponse(1, 0, 4, List.of(
-                                                new PathResponse(1, "강변", 127.094687, 37.535092, "건대입구", 127.069276, 37.540364, "2호선", 4)
+                                                new PathResponse(1, "강변", 127.094741101863, 37.5351180385975, "건대입구", 127.06920291650829
+                                                        , 37.54040751726388
+                                                        , "2호선", 4)
                                         )),
                                         new RouteResponse(2, 1, 18, List.of(
-                                                new PathResponse(1, "동대문", 127.009111, 37.571132, "동대문역사문화공원", 127.007821, 37.565147, "4호선", 2),
+                                                new PathResponse(1, "동대문", 127.01063381083677, 37.571669405802616, "동대문역사문화공원", 127.007821, 37.565147, "4호선", 2),
                                                 new PathResponse(2, "동대문역사문화공원", 127.007821, 37.565147, "동대문역사문화공원", 127.007821, 37.565147, null, 3),
-                                                new PathResponse(3, "동대문역사문화공원", 127.008912, 37.56567, "건대입구", 127.069276, 37.540364, "2호선", 13)
+                                                new PathResponse(3, "동대문역사문화공원", 127.007821, 37.565147, "건대입구", 127.06920291650829, 37.54040751726388, "2호선", 13)
                                         )),
                                         new RouteResponse(3, 0, 33, List.of(
-                                                new PathResponse(1, "서울대입구", 126.952725, 37.481199, "건대입구", 127.069276, 37.540364, "2호선", 33)
+                                                new PathResponse(1, "서울대입구", 126.952713197762, 37.4812845080678, "건대입구", 127.06920291650829, 37.54040751726388, "2호선", 33)
                                         ))
                                 )
                         ),
@@ -71,13 +80,13 @@ public class LocationController implements SwaggerLocationController {
                                 ),
                                 List.of(
                                         new RouteResponse(1, 0, 25, List.of(
-                                                new PathResponse(1, "강변", 127.094687, 37.535092, "사당", 126.981359, 37.476575, "2호선", 25)
+                                                new PathResponse(1, "강변", 127.094741101863, 37.5351180385975, "사당", 126.98155858357366, 37.47656223234824, "2호선", 25)
                                         )),
                                         new RouteResponse(2, 0, 25, List.of(
-                                                new PathResponse(1, "동대문", 127.009111, 37.571132, "사당", 126.981662, 37.476793, "4호선", 25)
+                                                new PathResponse(1, "동대문", 127.01063381083677, 37.571669405802616, "사당", 126.98155858357366, 37.47656223234824, "4호선", 25)
                                         )),
                                         new RouteResponse(3, 0, 4, List.of(
-                                                new PathResponse(1, "서울대입구", 126.952725, 37.481199, "사당", 126.981359, 37.476575, "2호선", 4)
+                                                new PathResponse(1, "서울대입구", 126.952713197762, 37.4812845080678, "사당", 126.98155858357366, 37.47656223234824, "2호선", 4)
                                         ))
                                 )
                         ),
@@ -90,17 +99,17 @@ public class LocationController implements SwaggerLocationController {
                                 ),
                                 List.of(
                                         new RouteResponse(1, 0, 11, List.of(
-                                                new PathResponse(1, "강변", 127.094687, 37.535092, "왕십리", 127.037245, 37.561219, "2호선", 11)
+                                                new PathResponse(1, "강변", 127.094741101863, 37.5351180385975, "왕십리", 127.03710337610202, 37.561268363317176, "2호선", 11)
                                         )),
                                         new RouteResponse(2, 1, 11, List.of(
-                                                new PathResponse(1, "동대문", 127.009111, 37.571132, "동대문역사문화공원", 127.007821, 37.565147, "4호선", 2),
+                                                new PathResponse(1, "동대문", 127.01063381083677, 37.571669405802616, "동대문역사문화공원", 127.007821, 37.565147, "4호선", 2),
                                                 new PathResponse(2, "동대문역사문화공원", 127.007821, 37.565147, "동대문역사문화공원", 127.007821, 37.565147, null, 3),
-                                                new PathResponse(3, "동대문역사문화공원", 127.008912, 37.56567, "왕십리", 127.037245, 37.561219, "2호선", 6)
+                                                new PathResponse(3, "동대문역사문화공원", 127.007821, 37.565147, "왕십리", 127.03710337610202, 37.561268363317176, "2호선", 6)
                                         )),
                                         new RouteResponse(3, 1, 32, List.of(
-                                                new PathResponse(1, "서울대입구", 126.952725, 37.481199, "선릉", 127.049271, 37.504577, "2호선", 16),
+                                                new PathResponse(1, "서울대입구", 126.952713197762, 37.4812845080678, "선릉", 127.049271, 37.504577, "2호선", 16),
                                                 new PathResponse(2, "선릉", 127.049271, 37.504577, "선릉", 127.049271, 37.504577, null, 3),
-                                                new PathResponse(3, "선릉", 127.048606, 37.505274, "왕십리", 127.038702, 37.561501, "수인분당선", 13)
+                                                new PathResponse(3, "선릉", 127.049271, 37.504577, "왕십리", 127.03710337610202, 37.561268363317176, "수인분당선", 13)
                                         ))
                                 )
                         ),
@@ -113,21 +122,21 @@ public class LocationController implements SwaggerLocationController {
                                 ),
                                 List.of(
                                         new RouteResponse(1, 2, 32, List.of(
-                                                new PathResponse(1, "강변", 127.094687, 37.535092, "을지로3가", 126.991041, 37.566285, "2호선", 19),
+                                                new PathResponse(1, "강변", 127.094741101863, 37.5351180385975, "을지로3가", 126.991041, 37.566285, "2호선", 19),
                                                 new PathResponse(2, "을지로3가", 126.991041, 37.566285, "을지로3가", 126.991041, 37.566285, null, 3),
-                                                new PathResponse(3, "을지로3가", 126.992625, 37.566379, "종로3가", 126.991841, 37.571653, "3호선", 4),
+                                                new PathResponse(3, "을지로3가", 126.991041, 37.566285, "종로3가", 126.991841, 37.571653, "3호선", 4),
                                                 new PathResponse(4, "종로3가", 126.991841, 37.571653, "종로3가", 126.991841, 37.571653, null, 3),
-                                                new PathResponse(5, "종로3가", 126.99214, 37.57043, "종각", 126.983189, 37.570173, "1호선", 3)
+                                                new PathResponse(5, "종로3가", 126.991841, 37.571653, "종각", 126.98315081716676, 37.570227990912244, "1호선", 3)
                                         )),
                                         new RouteResponse(2, 0, 5, List.of(
-                                                new PathResponse(1, "동대문", 127.010666, 37.571686, "종각", 126.983189, 37.570173, "1호선", 5)
+                                                new PathResponse(1, "동대문", 127.01063381083677, 37.571669405802616, "종각", 126.98315081716676, 37.570227990912244, "1호선", 5)
                                         )),
                                         new RouteResponse(3, 2, 36, List.of(
-                                                new PathResponse(1, "서울대입구", 126.952725, 37.481199, "사당", 126.981359, 37.476575, "2호선", 4),
-                                                new PathResponse(2, "사당", 126.981359, 37.476575, "사당", 126.981359, 37.476575, null, 3),
-                                                new PathResponse(3, "사당", 126.981662, 37.476793, "서울역", 126.972709, 37.553512, "4호선", 18),
+                                                new PathResponse(1, "서울대입구", 126.952713197762, 37.4812845080678, "사당", 126.98155858357366, 37.47656223234824, "2호선", 4),
+                                                new PathResponse(2, "사당", 126.98155858357366, 37.47656223234824, "사당", 126.98155858357366, 37.47656223234824, null, 3),
+                                                new PathResponse(3, "사당", 126.98155858357366, 37.47656223234824, "서울역", 126.972709, 37.553512, "4호선", 18),
                                                 new PathResponse(4, "서울역", 126.972709, 37.553512, "서울역", 126.972709, 37.553512, null, 3),
-                                                new PathResponse(5, "서울역", 126.972314, 37.555942, "종각", 126.983189, 37.570173, "1호선", 8)
+                                                new PathResponse(5, "서울역", 126.972709, 37.553512, "종각", 126.98315081716676, 37.570227990912244, "1호선", 8)
                                         ))
                                 )
                         ),
@@ -140,15 +149,15 @@ public class LocationController implements SwaggerLocationController {
                                 ),
                                 List.of(
                                         new RouteResponse(1, 0, 34, List.of(
-                                                new PathResponse(1, "강변", 127.094687, 37.535092, "홍대입구", 126.924016, 37.557008, "2호선", 34)
+                                                new PathResponse(1, "강변", 127.094741101863, 37.5351180385975, "홍대입구", 126.923778562273, 37.5568707448873, "2호선", 34)
                                         )),
                                         new RouteResponse(2, 1, 24, List.of(
-                                                new PathResponse(1, "동대문", 127.009111, 37.571132, "동대문역사문화공원", 127.007821, 37.565147, "4호선", 2),
+                                                new PathResponse(1, "동대문", 127.01063381083677, 37.571669405802616, "동대문역사문화공원", 127.007821, 37.565147, "4호선", 2),
                                                 new PathResponse(2, "동대문역사문화공원", 127.007821, 37.565147, "동대문역사문화공원", 127.007821, 37.565147, null, 3),
-                                                new PathResponse(3, "동대문역사문화공원", 127.008912, 37.56567, "홍대입구", 126.924016, 37.557008, "2호선", 19)
+                                                new PathResponse(3, "동대문역사문화공원", 127.007821, 37.565147, "홍대입구", 126.923778562273, 37.5568707448873, "2호선", 19)
                                         )),
                                         new RouteResponse(3, 0, 25, List.of(
-                                                new PathResponse(1, "서울대입구", 126.952725, 37.481199, "홍대입구", 126.924016, 37.557008, "2호선", 25)
+                                                new PathResponse(1, "서울대입구", 126.952713197762, 37.4812845080678, "홍대입구", 126.923778562273, 37.5568707448873, "2호선", 25)
                                         ))
                                 )
                         )
