@@ -20,9 +20,11 @@
         <!-- DEBUG 전용 Appender -->
         <appender name="FILE_DEBUG" class="ch.qos.logback.core.rolling.RollingFileAppender">
             <encoder class="net.logstash.logback.encoder.LogstashEncoder"/>
-<!--            <encoder>
+            <!--
+            <encoder>
                 <pattern>${CONSOLE_PATTERN}</pattern>
-            </encoder>-->
+            </encoder>
+            -->
 
             <file>${LOG_PATH}/${DEBUG_PATH}/application.log</file>
             <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
@@ -43,9 +45,13 @@
         <logger name="org.hibernate" level="WARN"/>
         <logger name="org.apache.catalina" level="INFO"/>
         <logger name="com.zaxxer.hikari" level="WARN"/>
-        <logger name="io.netty" level="WARN"/>
+
+        <!--mongoDB-->
+        <logger name="data.mongodb" level="WARN"/>
+        <logger name="org.mongodb.driver" level="WARN"/>
 
         <!--Web Flux-->
+        <logger name="io.netty" level="WARN"/>
         <logger name="reactor.netty" level="WARN"/>
 
         <!-- CloudWatch 메트릭 관련 로거 비활성화 -->

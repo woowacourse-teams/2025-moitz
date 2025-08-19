@@ -3,20 +3,10 @@ package com.f12.moitz.common.config;
 import com.f12.moitz.domain.repository.SubwayStationRepository;
 import com.f12.moitz.domain.subway.SubwayMapPathFinder;
 import com.f12.moitz.domain.subway.SubwayStation;
-import com.f12.moitz.infrastructure.MongoSubwayMapBuilder;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.f12.moitz.infrastructure.SubwayMapBuilder;
 import com.google.genai.Client;
 import io.netty.handler.timeout.ReadTimeoutHandler;
 import io.netty.handler.timeout.WriteTimeoutHandler;
-import java.io.IOException;
-import java.io.InputStream;
-import java.time.Duration;
-import java.util.List;
-import java.util.Map;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -29,6 +19,9 @@ import org.springframework.http.client.reactive.ReactorClientHttpConnector;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.netty.http.client.HttpClient;
+
+import java.time.Duration;
+import java.util.Map;
 
 @Slf4j
 @Configuration
@@ -103,23 +96,18 @@ public class ClientConfig {
     @Bean
     public SubwayMapPathFinder subwayMapPathFinder(
             @Autowired SubwayStationRepository stationRepository,
-            @Autowired MongoSubwayMapBuilder subwayMapBuilder) {
+            @Autowired SubwayMapBuilder subwayMapBuilder
+    ) {
 
         log.info("SubwayMapPathFinder 초기화 시작");
-
         try {
-            List<SubwayStation> stations = stationRepository.findAll();
+            Map<String, SubwayStation> stationMap = stationRepository.findStationMap().orElse(null);
 
-            // 데이터가 없으면 자동 빌드
-            if (stations.isEmpty()) {
+            if (stationMap == null || stationMap.isEmpty()) {
                 log.info("MongoDB에 데이터가 없습니다. CSV에서 자동 빌드를 시작합니다...");
-                subwayMapBuilder.buildAndSaveToMongo();
-                stations = stationRepository.findAll();
-                log.info("자동 빌드 완료. {}개 역 저장됨", stations.size());
+                stationMap = subwayMapBuilder.buildAndSaveToMongo();
+                log.info("자동 빌드 완료. {}개 역 저장됨", stationMap.size());
             }
-
-            Map<String, SubwayStation> stationMap = stations.stream()
-                    .collect(Collectors.toMap(SubwayStation::getName, Function.identity()));
 
             log.info("SubwayMapPathFinder 초기화 완료. 총 {}개 역", stationMap.size());
             return new SubwayMapPathFinder(stationMap);
@@ -129,6 +117,7 @@ public class ClientConfig {
             throw new RuntimeException("SubwayMapPathFinder 초기화 실패: " + e.getMessage(), e);
         }
     }
+
 
     @Bean
     public WebClient perplexityWebClient() {
