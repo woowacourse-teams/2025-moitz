@@ -3,6 +3,10 @@ import { css } from '@emotion/react';
 import { borderRadiusToken } from '@shared/styles/tokens';
 import { colorToken } from '@shared/styles/tokens';
 
+export const container = () => css`
+  margin-bottom: 30px;
+`;
+
 export const reason = () => css`
   padding: 10px;
   background-color: ${colorToken.bg[2]};

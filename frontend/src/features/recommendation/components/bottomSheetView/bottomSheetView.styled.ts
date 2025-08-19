@@ -58,7 +58,7 @@ export const handle = () => css`
 `;
 
 export const content = () => css`
-  padding-bottom: 50px;
+  padding-bottom: 20px;
   min-height: 0;
   overflow: auto; //  /콘텐츠 많을 때 내부 스크롤
   overscroll-behavior: contain; // 바디로 스크롤 전파 방지
