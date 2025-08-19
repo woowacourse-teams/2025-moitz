@@ -187,7 +187,7 @@ class GoogleGeminiClientTest {
 
         // When & Then
         assertThatThrownBy(() -> googleGeminiClient.generateWith(contents, config))
-                .isInstanceOf(ExternalApiException.class)
+                .isInstanceOf(RetryableApiException.class)
                 .extracting("errorCode")
                 .isEqualTo(ExternalApiErrorCode.GEMINI_API_SERVER_UNAVAILABLE);
     }
@@ -245,9 +245,9 @@ class GoogleGeminiClientTest {
 
         // When & Then
         assertThatThrownBy(() -> googleGeminiClient.generateWith(contents, config))
-                .isInstanceOf(ExternalApiException.class)
+                .isInstanceOf(RetryableApiException.class)
                 .extracting("errorCode")
-                .isEqualTo(ExternalApiErrorCode.INVALID_GEMINI_API_RESPONSE);
+                .isEqualTo(ExternalApiErrorCode.GEMINI_API_SERVER_UNAVAILABLE);
     }
 
     private List<Content> getBasicContents() {
