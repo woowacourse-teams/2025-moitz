@@ -10,7 +10,7 @@ import FallBackPage from '@pages/fallBackPage/FallBackPage';
 import { LocationsProvider } from '@entities/contexts/LocationsProvider';
 
 import Layout from '@shared/components/layout/Layout';
-import { ErrorBoundary } from '@shared/errors-handling/ErrorBoundary';
+import { ErrorBoundary } from '@shared/error/ErrorBoundary';
 import GlobalStyle from '@shared/styles/GlobalStyle';
 
 if (process.env.NODE_ENV === 'production') {
