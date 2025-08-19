@@ -8,7 +8,7 @@ export const container = () => css`
   width: 100%;
   height: 15px;
   background-color: ${colorToken.gray[7]};
-  border-radius: ${borderRadiusToken.input};
+  border-radius: ${borderRadiusToken[10]};
 `;
 
 export const base = () => css`
@@ -29,7 +29,7 @@ export const path = (
   background-color: ${lineCode
     ? colorToken.subway[getLineInfo(lineCode).code]
     : colorToken.gray[7]};
-  border-radius: ${borderRadiusToken.input};
+  border-radius: ${borderRadiusToken[10]};
 `;
 
 export const text = (lineCode: string) => css`
