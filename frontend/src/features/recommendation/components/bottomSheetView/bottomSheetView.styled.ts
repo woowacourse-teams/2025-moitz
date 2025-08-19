@@ -25,8 +25,8 @@ export const container = (positionPercent: number) => css`
 
   padding: 0px 20px;
   background-color: ${colorToken.gray[8]};
-  border-top-left-radius: ${borderRadiusToken.input};
-  border-top-right-radius: ${borderRadiusToken.input};
+  border-top-left-radius: ${borderRadiusToken[10]};
+  border-top-right-radius: ${borderRadiusToken[10]};
 `;
 
 export const header = () => css`
