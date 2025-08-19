@@ -12,10 +12,10 @@ export const container = () => css`
 `;
 
 export const base = () => css`
+  width: 100%;
   position: absolute;
   top: 0;
   left: 0;
-  width: 100%;
 `;
 
 export const path = (
