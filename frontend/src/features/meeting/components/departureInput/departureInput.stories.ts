@@ -1,9 +1,12 @@
+import { withLayout } from '@sb/decorators/withLayout';
+
 import DepartureInput from './DepartureInput';
 
 import type { Meta, StoryObj } from '@storybook/react-webpack5';
 
 const meta = {
   component: DepartureInput,
+  decorators: [withLayout],
   parameters: {
     layout: 'centered',
   },
@@ -20,7 +23,6 @@ const meta = {
       description: '출발지 삭제 시 실행될 함수',
     },
   },
-  // TODO : decorator로 withLayout 추가 예정
 } satisfies Meta<typeof DepartureInput>;
 
 export default meta;
