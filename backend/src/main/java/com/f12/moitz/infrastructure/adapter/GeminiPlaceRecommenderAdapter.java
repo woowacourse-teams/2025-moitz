@@ -49,7 +49,7 @@ public class GeminiPlaceRecommenderAdapter implements PlaceRecommender {
                                             requirement,
                                             place.getPoint().getX(),
                                             place.getPoint().getY(),
-                                            800
+                                            1000
                                     )
                             );
                             return List.of(response);
