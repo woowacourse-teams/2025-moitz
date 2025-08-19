@@ -98,11 +98,9 @@ public class ClientConfig {
             @Autowired SubwayStationRepository stationRepository,
             @Autowired SubwayMapBuilder subwayMapBuilder
     ) {
-
         log.info("SubwayMapPathFinder 초기화 시작");
         try {
-            Map<String, SubwayStation> stationMap = stationRepository.findStationMap().orElse(null);
-
+            Map<String, SubwayStation> stationMap = stationRepository.findAllAsMap();
             if (stationMap == null || stationMap.isEmpty()) {
                 log.info("MongoDB에 데이터가 없습니다. CSV에서 자동 빌드를 시작합니다...");
                 stationMap = subwayMapBuilder.buildAndSaveToMongo();

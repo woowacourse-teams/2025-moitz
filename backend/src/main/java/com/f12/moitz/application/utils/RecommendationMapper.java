@@ -6,13 +6,8 @@ import com.f12.moitz.application.dto.PlaceRecommendResponse;
 import com.f12.moitz.application.dto.RecommendationsResponse;
 import com.f12.moitz.application.dto.RouteResponse;
 import com.f12.moitz.application.dto.StartingPlaceResponse;
-import com.f12.moitz.domain.Candidate;
-import com.f12.moitz.domain.Recommendation;
-import com.f12.moitz.domain.Path;
-import com.f12.moitz.domain.Place;
-import com.f12.moitz.domain.RecommendedPlace;
-import com.f12.moitz.domain.Route;
-import com.f12.moitz.domain.Routes;
+import com.f12.moitz.domain.*;
+import com.f12.moitz.domain.entity.Result;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -40,6 +35,27 @@ public class RecommendationMapper {
                     return toLocationRecommendResponse(currentCandidate, index, minTime, reason);
                 })
                 .toList()
+        );
+    }
+
+    public Result toResult(
+            final List<Place> startingPlaces,
+            final Recommendation recommendation,
+            final Map<Place, String> generatedPlaces
+    ) {
+        final int minTime = recommendation.getBestRecommendationTime();
+
+        return new Result(
+                IntStream.range(0, startingPlaces.size())
+                        .mapToObj(index -> toStartingPlaceResponse(index, startingPlaces.get(index)))
+                        .toList(),
+                IntStream.range(0, recommendation.size())
+                        .mapToObj(index -> {
+                            Candidate currentCandidate = recommendation.get(index);
+                            String reason = generatedPlaces.get(currentCandidate.getDestination());
+                            return toLocationRecommendResponse(currentCandidate, index, minTime, reason);
+                        })
+                        .toList()
         );
     }
 

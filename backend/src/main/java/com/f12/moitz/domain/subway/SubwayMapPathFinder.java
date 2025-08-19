@@ -13,9 +13,11 @@ import java.util.Map;
 import java.util.PriorityQueue;
 import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.mongodb.core.mapping.Document;
 import reactor.core.publisher.Mono;
 
 @Slf4j
+@Document(collection = "subway_station")
 public class SubwayMapPathFinder {
 
     private final Map<String, SubwayStation> stationMap;
@@ -52,7 +54,6 @@ public class SubwayMapPathFinder {
 
         while (!pq.isEmpty()) {
             final Node current = pq.poll();
-
             if (!visited.add(current.name)) {
                 continue;
             }
@@ -68,7 +69,6 @@ public class SubwayMapPathFinder {
 
             for (Edge edge : currentStation.getPossibleEdges()) {
                 final String neighborName = edge.getDestination();
-
                 if (visited.contains(neighborName)) {
                     continue;
                 }
@@ -119,13 +119,11 @@ public class SubwayMapPathFinder {
         final List<StationWithEdge> fullPath = new ArrayList<>();
         String currentName = endName;
 
-        // 먼저 도착역을 추가 (마지막 역이므로 Edge는 null)
         fullPath.addFirst(new StationWithEdge(currentName, null));
 
-        // 역방향으로 경로 추적
         String previousName = prev.get(currentName);
         while (previousName != null) {
-            String nextName = currentName; // 현재 추적 중인 역이 다음 역이 됨
+            String nextName = currentName;
             currentName = previousName;
 
             final SubwayStation currentStation = stationMap.get(currentName);
@@ -174,9 +172,6 @@ public class SubwayMapPathFinder {
 
             previousName = prev.get(currentName);
         }
-        log.info("startName : {}",startName );
-        log.info("currentName : {}",currentName );
-
         if (!startName.equals(currentName)) {
             throw new IllegalStateException("경로가 출발역까지 이어지지 않습니다.");
         }
