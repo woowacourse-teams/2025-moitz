@@ -54,7 +54,7 @@ public class RecommendationService {
     public RecommendationsResponse recommendLocation(final RecommendationRequest request) {
         StopWatch stopWatch = new StopWatch("추천 서비스 전체");
         stopWatch.start("지역 추천");
-        final String requirement = RecommendCondition.fromTitle(request.requirement()).getCategoryNames();
+        final String requirement = RecommendCondition.fromTitle(request.requirement()).getKeyword();
 
         final List<Place> startingPlaces = placeFinder.findPlacesByNames(request.startingPlaceNames());
 
