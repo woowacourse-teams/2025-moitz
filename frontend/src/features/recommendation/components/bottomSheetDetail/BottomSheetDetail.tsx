@@ -19,12 +19,7 @@ function BottomSheetDetail({
   selectedLocation,
 }: BottomSheetDetailProps) {
   return (
-    <div
-      css={[
-        flex({ direction: 'column', gap: 30 }),
-        bottomSheetDetail.container(),
-      ]}
-    >
+    <div css={[flex({ direction: 'column', gap: 30 })]}>
       <DetailSection
         isHeader={true}
         title={selectedLocation.name}
