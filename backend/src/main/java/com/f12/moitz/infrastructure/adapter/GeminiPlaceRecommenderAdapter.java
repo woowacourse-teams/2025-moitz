@@ -32,7 +32,7 @@ public class GeminiPlaceRecommenderAdapter implements PlaceRecommender {
 
     @Override
     public Map<Place, List<RecommendedPlace>> recommendPlaces(final List<Place> targets, final String requirement) {
-        Map<Place, List<KakaoApiResponse>> searchedAllPlaces = searchPlacesWithRequirement(targets, requirement);
+        final Map<Place, List<KakaoApiResponse>> searchedAllPlaces = searchPlacesWithRequirement(targets, requirement);
 
         return searchedAllPlaces.entrySet().stream()
                 .map(entry -> processPlaceFiltering(entry.getKey(), entry.getValue(), requirement))
@@ -63,9 +63,9 @@ public class GeminiPlaceRecommenderAdapter implements PlaceRecommender {
             final String requirement
     ) {
         try {
-            String formattedKakaoData = FORMAT_SINGLE_PLACE_TO_PROMPT(place, kakaoResponses);
+            final String formattedKakaoData = FORMAT_SINGLE_PLACE_TO_PROMPT(place, kakaoResponses);
 
-            String prompt = String.format(
+            final String prompt = String.format(
                     PLACE_FILTER_PROMPT,
                     place.getName(),
                     PLACE_RECOMMENDATION_COUNT,
@@ -77,9 +77,9 @@ public class GeminiPlaceRecommenderAdapter implements PlaceRecommender {
                     PLACE_RECOMMENDATION_COUNT
             );
 
-            List<PlaceRecommendResponse> filteredResponses = geminiClient.generateWith(prompt);
+            final List<PlaceRecommendResponse> filteredResponses = geminiClient.generateWith(prompt);
 
-            List<RecommendedPlace> recommendedPlaces = filteredResponses.stream()
+            final List<RecommendedPlace> recommendedPlaces = filteredResponses.stream()
                     .map(response -> new RecommendedPlace(
                             response.name(),
                             response.category(),
