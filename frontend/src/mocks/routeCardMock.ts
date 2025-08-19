@@ -65,7 +65,7 @@ export const routeCardMock: RecommendedRoute = {
       endStation: '강남',
       endingX: 127.028351,
       endingY: 37.49637,
-      lineCode: '신분당',
+      lineCode: '신분당선',
       travelTime: 7,
     },
   ],
