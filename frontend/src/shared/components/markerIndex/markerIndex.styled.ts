@@ -6,7 +6,7 @@ export const base = () => css`
   width: 40px;
   min-width: 40px;
   height: 40px;
-  border-radius: ${borderRadiusToken.round};
+  border-radius: ${borderRadiusToken[100]};
   color: ${colorToken.gray[8]};
   background-color: ${colorToken.main[1]};
 `;
@@ -16,7 +16,7 @@ export const stroke = () => css`
 `;
 
 export const circle_base = () => css`
-  border-radius: ${borderRadiusToken.round};
+  border-radius: ${borderRadiusToken[100]};
 `;
 
 export const circle_font = () => css`

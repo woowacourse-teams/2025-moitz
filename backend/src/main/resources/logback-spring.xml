@@ -11,15 +11,15 @@
 
     <!-- 개발 환경용 설정 -->
     <springProfile name="dev">
-        <!-- INFO 전용 Appender -->
-        <appender name="FILE_DEBUG" class="ch.qos.logback.core.rolling.RollingFileAppender">
-            <encoder class="net.logstash.logback.encoder.LogstashEncoder"/>
-            <!--
+        <!-- 콘솔 전용 Appender -->
+        <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
             <encoder>
                 <pattern>${CONSOLE_PATTERN}</pattern>
             </encoder>
-            -->
-
+        </appender>
+        <!-- DEBUG 전용 Appender -->
+        <appender name="FILE_DEBUG" class="ch.qos.logback.core.rolling.RollingFileAppender">
+            <encoder class="net.logstash.logback.encoder.LogstashEncoder"/>
             <file>${LOG_PATH}/${DEBUG_PATH}/application.log</file>
             <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
                 <fileNamePattern>${DEBUG_LOG_PATH}/application-info-%d{yyyy-MM-dd}.%i.log.zip</fileNamePattern>
@@ -30,6 +30,7 @@
         </appender>
 
         <root level="DEBUG">
+            <appender-ref ref="CONSOLE"/>
             <appender-ref ref="FILE_DEBUG"/>
         </root>
         <!-- 프레임워크 기본 로거 수준 설정 -->
@@ -38,6 +39,23 @@
         <logger name="org.hibernate" level="WARN"/>
         <logger name="org.apache.catalina" level="INFO"/>
         <logger name="com.zaxxer.hikari" level="WARN"/>
+        <logger name="io.netty" level="WARN"/>
+
+        <!--Web Flux-->
+        <logger name="reactor.netty" level="WARN"/>
+
+        <!-- CloudWatch 메트릭 관련 로거 비활성화 -->
+        <logger name="io.micrometer.cloudwatch2" level="OFF"/>
+        <logger name="software.amazon.awssdk" level="OFF"/>
+        <logger name="io.micrometer.core.instrument.push.PushMeterRegistry" level="OFF"/>
+
+        <!-- AWS SDK 관련 로거 비활성화 -->
+        <logger name="software.amazon.awssdk.auth.credentials" level="OFF"/>
+        <logger name="software.amazon.awssdk.core.interceptor" level="OFF"/>
+        <logger name="software.amazon.awssdk.services.cloudwatch" level="OFF"/>
+        <logger name="software.amazon.awssdk.utils.cache" level="OFF"/>
+        <logger name="software.amazon.awssdk.core.internal" level="OFF"/>
+
     </springProfile>
 
 <!-- ========================================================= -->

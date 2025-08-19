@@ -1,78 +1,126 @@
 package com.f12.moitz.application;
 
 import com.f12.moitz.application.dto.RecommendationRequest;
-import com.f12.moitz.application.port.Recommender;
 import com.f12.moitz.application.dto.RecommendationsResponse;
+import com.f12.moitz.application.dto.RecommendedLocationResponse;
+import com.f12.moitz.application.port.LocationRecommender;
+import com.f12.moitz.application.port.PlaceFinder;
+import com.f12.moitz.application.port.PlaceRecommender;
 import com.f12.moitz.application.port.RouteFinder;
+import com.f12.moitz.application.port.dto.StartEndPair;
 import com.f12.moitz.application.utils.RecommendationMapper;
 import com.f12.moitz.domain.Candidate;
+import com.f12.moitz.domain.Place;
 import com.f12.moitz.domain.RecommendCondition;
 import com.f12.moitz.domain.Recommendation;
-import com.f12.moitz.domain.Place;
 import com.f12.moitz.domain.RecommendedPlace;
 import com.f12.moitz.domain.Route;
 import com.f12.moitz.domain.Routes;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import com.f12.moitz.infrastructure.gemini.dto.RecommendedLocationResponse;
-import lombok.RequiredArgsConstructor;
+import java.util.Map.Entry;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StopWatch;
 
 @Slf4j
 @Service
-@RequiredArgsConstructor
 public class RecommendationService {
-
-    private final Recommender recommender;
+    private final PlaceFinder placeFinder;
+    private final PlaceRecommender placeRecommender;
+    private final LocationRecommender locationRecommender;
     private final RouteFinder routeFinder;
 
     private final RecommendationMapper recommendationMapper;
 
+    public RecommendationService(
+            @Autowired final PlaceFinder placeFinder,
+            @Qualifier("geminiPlaceRecommenderAdapter") final PlaceRecommender placeRecommender,
+            @Autowired final LocationRecommender locationRecommender,
+            @Qualifier("subwayRouteFinderAdapter") final RouteFinder routeFinder,
+            @Autowired final RecommendationMapper recommendationMapper
+    ) {
+        this.placeFinder = placeFinder;
+        this.placeRecommender = placeRecommender;
+        this.locationRecommender = locationRecommender;
+        this.routeFinder = routeFinder;
+        this.recommendationMapper = recommendationMapper;
+    }
+
     public RecommendationsResponse recommendLocation(final RecommendationRequest request) {
+        StopWatch stopWatch = new StopWatch("추천 서비스 전체");
+        stopWatch.start("지역 추천");
         final String requirement = RecommendCondition.fromTitle(request.requirement()).getCategoryNames();
 
-        final List<Place> startingPlaces = recommender.findPlacesByNames(request.startingPlaceNames());
+        final List<Place> startingPlaces = placeFinder.findPlacesByNames(request.startingPlaceNames());
 
-        final RecommendedLocationResponse recommendedLocationResponse = recommender.getRecommendedLocations(
+        final RecommendedLocationResponse recommendedLocationResponse = locationRecommender.getRecommendedLocations(
                 request.startingPlaceNames(),
                 requirement
         );
 
-        final Map<Place, String> generatedPlacesWithReason = recommender.recommendLocations(recommendedLocationResponse);
+        final Map<Place, String> generatedPlacesWithReason = locationRecommender.recommendLocations(
+                recommendedLocationResponse);
+        stopWatch.stop();
 
         final List<Place> generatedPlaces = generatedPlacesWithReason.keySet().stream().toList();
 
-        final Map<Place, Routes> placeRoutes = findRoutesForAll(startingPlaces, generatedPlaces);
-        removePlacesBeyondRange(placeRoutes, generatedPlacesWithReason);
+        stopWatch.start("모든 경로 찾기");
+        final Map<Place, Routes> placeRoutes = findRoutesForAllAsync(startingPlaces, generatedPlaces);
+        stopWatch.stop();
 
-        final Map<Place, List<RecommendedPlace>> recommendedPlaces = recommender.recommendPlaces(
+        stopWatch.start("기준 미달 경로 제거");
+        removePlacesBeyondRange(placeRoutes, generatedPlacesWithReason);
+        stopWatch.stop();
+
+        stopWatch.start("장소 추천");
+        final Map<Place, List<RecommendedPlace>> recommendedPlaces = placeRecommender.recommendPlaces(
                 generatedPlaces,
                 requirement
         );
+        stopWatch.stop();
 
+        stopWatch.start("Recommendation으로 변환");
         final Recommendation recommendation = toRecommendation(
                 generatedPlacesWithReason,
                 recommendedPlaces,
                 placeRoutes
         );
+        stopWatch.stop();
+        System.out.println(stopWatch.prettyPrint());
 
         return recommendationMapper.toResponse(startingPlaces, recommendation, generatedPlacesWithReason);
     }
 
-    private Map<Place, Routes> findRoutesForAll(final List<Place> startingPlaces, final List<Place> generatedPlaces) {
-        final Map<Place, Routes> placeRoutes = new HashMap<>();
-        for (Place generatedPlace : generatedPlaces) {
-            final List<Route> routes = new ArrayList<>();
-            for (Place startingPlace : startingPlaces) {
-                routes.add(routeFinder.findRoute(startingPlace, generatedPlace));
-            }
-            placeRoutes.put(generatedPlace, new Routes(routes));
-        }
-        return placeRoutes;
+    public Map<Place, Routes> findRoutesForAllAsync(
+            final List<Place> startingPlaces,
+            final List<Place> generatedPlaces
+    ) {
+        final List<StartEndPair> allPairs = generatedPlaces.stream()
+                .flatMap(endPlace -> startingPlaces.stream()
+                        .map(startPlace -> new StartEndPair(startPlace, endPlace)))
+                .collect(Collectors.toList());
+
+        final List<Route> allRoutes = routeFinder.findRoutes(allPairs);
+
+        return IntStream.range(0, allPairs.size())
+                .boxed()
+                .collect(Collectors.groupingBy(
+                        i -> allPairs.get(i).end(),
+                        Collectors.mapping(
+                                allRoutes::get,
+                                Collectors.toList()
+                        )
+                ))
+                .entrySet().stream()
+                .collect(Collectors.toMap(
+                        Entry::getKey,
+                        entry -> new Routes(entry.getValue())
+                ));
     }
 
     private void removePlacesBeyondRange(
@@ -82,7 +130,7 @@ public class RecommendationService {
         placeRoutes.forEach((key, value) -> {
             if (!value.isAcceptable()) {
                 generatedPlaces.remove(key);
-                log.warn("장소 제거 {}", key.getName());
+                log.debug("장소 제거 {}", key.getName());
             }
         });
     }
