@@ -1,11 +1,10 @@
-import { withLayout } from '../../../../../.storybook/decorators/withLayout'; // TODO: 추후 경로 별칭으로 수정
+import { withLayout } from '@sb/decorators/withLayout';
 
 import BaseLoading from './BaseLoading';
 
 import type { Meta, StoryObj } from '@storybook/react-webpack5';
 
 const meta = {
-  title: 'features/loading/BaseLoading',
   component: BaseLoading,
   decorators: [withLayout],
   parameters: {

@@ -60,6 +60,9 @@ export const shadow = {
   bottom_sheet: css`
     box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
   `,
+  dropdown: css`
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  `,
 };
 
 export const scroll = css`

@@ -1,35 +1,32 @@
+import { routeCardMock } from '@mocks/routeCardMock';
+
 import { withContainer } from '@sb/decorators/withContainer';
 
-import Progressbar from './Progressbar';
+import RouteCardBar from './RouteCardBar';
 
 import type { Meta, StoryObj } from '@storybook/react-webpack5';
 
 const meta = {
-  component: Progressbar,
+  title: 'features/detail/RouteCardBar',
+  component: RouteCardBar,
   decorators: [withContainer],
   parameters: {
     layout: 'centered',
   },
   tags: ['autodocs'],
-} satisfies Meta<typeof Progressbar>;
+  argTypes: {
+    paths: {
+      control: { type: 'object' },
+      description: '경로 정보',
+    },
+  },
+} satisfies Meta<typeof RouteCardBar>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {
   args: {
-    progress: 50,
-  },
-};
-
-export const Start: Story = {
-  args: {
-    progress: 0,
-  },
-};
-
-export const Complete: Story = {
-  args: {
-    progress: 100,
+    paths: routeCardMock.paths,
   },
 };
