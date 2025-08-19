@@ -5,6 +5,7 @@ import com.f12.moitz.common.error.exception.ExternalApiException;
 import com.f12.moitz.domain.Point;
 import com.f12.moitz.infrastructure.client.kakao.dto.KakaoApiResponse;
 import com.f12.moitz.infrastructure.client.kakao.dto.KakaoMapErrorResponse;
+import com.f12.moitz.infrastructure.client.kakao.dto.SearchPlacesLimitQuantityRequest;
 import com.f12.moitz.infrastructure.client.kakao.dto.SearchPlacesRequest;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
@@ -23,6 +24,7 @@ import java.util.List;
 public class KakaoMapClient {
 
     private static final String SEARCH_PLACE_URL = "/keyword.json?query=%s&x=%s&y=%s&radius=%d";
+    private static final String SEARCH_PLACE_WITH_SIZE_URL = "/keyword.json?query=%s&x=%s&y=%s&radius=%d&size=%d";
     private static final String SEARCH_POINT_URL = "/keyword.json?query=%s";
     private static final List<String> ERROR_CODE_CAN_RETRY = List.of("-1", "-7", "-603");
 
@@ -47,6 +49,16 @@ public class KakaoMapClient {
         );
     }
 
+    public KakaoApiResponse searchPlacesBy(final SearchPlacesLimitQuantityRequest request) {
+        return searchPlacesBy(
+                request.query(),
+                String.valueOf(request.longitude()),
+                String.valueOf(request.latitude()),
+                request.radius(),
+                request.size()
+        );
+    }
+
     private KakaoApiResponse searchPlacesBy(
             final String keyword,
             final String longitude,
@@ -63,8 +75,26 @@ public class KakaoMapClient {
         return getData(url);
     }
 
+    private KakaoApiResponse searchPlacesBy(
+            final String keyword,
+            final String longitude,
+            final String latitude,
+            final int radius,
+            final int size
+    ) {
+        final String url = String.format(
+                SEARCH_PLACE_WITH_SIZE_URL,
+                keyword,
+                longitude,
+                latitude,
+                radius,
+                size
+        );
+        return getData(url);
+    }
+
     private KakaoApiResponse getData(final String url) {
-        final KakaoApiResponse response = kakaoRestClient.get()
+        return kakaoRestClient.get()
                 .uri(url)
                 .header("Authorization", "KakaoAK " + kakaoApiKey)
                 .retrieve()
@@ -73,8 +103,6 @@ public class KakaoMapClient {
                         (req, res) -> handleError(res)
                 )
                 .body(KakaoApiResponse.class);
-
-        return response;
     }
 
     private void handleError(ClientHttpResponse res) {

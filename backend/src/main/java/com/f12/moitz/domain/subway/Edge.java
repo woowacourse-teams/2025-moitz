@@ -21,7 +21,7 @@ public class Edge {
     @Field("lineName")
     private final String lineName;
 
-    public Edge(String destination, int timeInSeconds, int distance, String lineName) {
+    public Edge(final String destination, final int timeInSeconds, final int distance, final String lineName) {
         this.destination = destination;
         this.travelTime = Duration.ofSeconds(timeInSeconds);
         this.distance = distance;
