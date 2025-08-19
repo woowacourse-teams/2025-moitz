@@ -8,7 +8,7 @@ public class JsonParser {
     /**
      * JSON 응답에서 마크다운 코드 블록과 불필요한 문자 제거
      */
-    public String cleanJsonResponse(String text) {
+    public String cleanJsonResponse(final String text) {
         if (text == null) {
             return "";
         }
@@ -23,13 +23,13 @@ public class JsonParser {
         cleaned = cleaned.trim();
 
         // 3. JSON이 아닌 텍스트가 앞에 있는 경우 처리
-        int jsonStart = findJsonStart(cleaned);
+        final int jsonStart = findJsonStart(cleaned);
         if (jsonStart > 0) {
             cleaned = cleaned.substring(jsonStart);
         }
 
         // 4. JSON이 아닌 텍스트가 뒤에 있는 경우 처리
-        int jsonEnd = findJsonEnd(cleaned);
+        final int jsonEnd = findJsonEnd(cleaned);
         if (jsonEnd > 0 && jsonEnd < cleaned.length()) {
             cleaned = cleaned.substring(0, jsonEnd + 1);
         }
@@ -40,9 +40,9 @@ public class JsonParser {
     /**
      * JSON 시작 위치 찾기 ({ 또는 [)
      */
-    private int findJsonStart(String text) {
+    private int findJsonStart(final String text) {
         for (int i = 0; i < text.length(); i++) {
-            char c = text.charAt(i);
+            final char c = text.charAt(i);
             if (c == '{' || c == '[') {
                 return i;
             }
@@ -53,7 +53,7 @@ public class JsonParser {
     /**
      * JSON 끝 위치 찾기 (} 또는 ])
      */
-    private int findJsonEnd(String text) {
+    private int findJsonEnd(final String text) {
         int braceCount = 0;
         int bracketCount = 0;
         boolean inString = false;
@@ -108,12 +108,12 @@ public class JsonParser {
     /**
      * 기본적인 JSON 유효성 검사
      */
-    public boolean isValidJson(String text) {
+    public boolean isValidJson(final String text) {
         if (text == null || text.trim().isEmpty()) {
             return false;
         }
 
-        String trimmed = text.trim();
+        final String trimmed = text.trim();
         return (trimmed.startsWith("{") && trimmed.endsWith("}")) ||
                 (trimmed.startsWith("[") && trimmed.endsWith("]"));
     }

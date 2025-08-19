@@ -117,7 +117,7 @@ public class PerplexityClient {
                 .block();
     }
 
-    private Mono<? extends Throwable> handleApiError(ClientResponse response) {
+    private Mono<? extends Throwable> handleApiError(final ClientResponse response) {
         return response.bodyToMono(String.class)
                 .defaultIfEmpty("No Error Body")
                 .flatMap(errorBody -> switch (response.statusCode().value()) {

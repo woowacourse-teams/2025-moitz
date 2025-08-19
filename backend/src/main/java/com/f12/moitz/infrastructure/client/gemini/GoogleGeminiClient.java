@@ -1,11 +1,14 @@
 package com.f12.moitz.infrastructure.client.gemini;
 
+import static com.f12.moitz.infrastructure.PromptGenerator.ADDITIONAL_PROMPT;
+import static com.f12.moitz.infrastructure.PromptGenerator.RECOMMENDATION_COUNT;
+
 import com.f12.moitz.application.dto.PlaceRecommendResponse;
+import com.f12.moitz.application.dto.RecommendedLocationResponse;
 import com.f12.moitz.common.error.exception.ExternalApiErrorCode;
 import com.f12.moitz.common.error.exception.ExternalApiException;
 import com.f12.moitz.common.error.exception.RetryableApiException;
 import com.f12.moitz.infrastructure.PromptGenerator;
-import com.f12.moitz.application.dto.RecommendedLocationResponse;
 import com.f12.moitz.infrastructure.client.gemini.dto.RecommendedPlaceResponses;
 import com.f12.moitz.infrastructure.client.gemini.utils.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -17,16 +20,12 @@ import com.google.genai.types.Content;
 import com.google.genai.types.GenerateContentConfig;
 import com.google.genai.types.GenerateContentResponse;
 import com.google.genai.types.Part;
+import java.util.List;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
-
-import java.util.List;
-import java.util.Map;
-
-import static com.f12.moitz.infrastructure.PromptGenerator.ADDITIONAL_PROMPT;
-import static com.f12.moitz.infrastructure.PromptGenerator.RECOMMENDATION_COUNT;
 
 @Component
 @RequiredArgsConstructor
