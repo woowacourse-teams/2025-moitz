@@ -19,7 +19,7 @@ class SubwayMapBuilderTest {
     @Autowired
     private OpenApiClient openApiClient;
 
-    @DisplayName("지하철 노선도 업데이트")
+    @DisplayName("지하철 노선도를 업데이트한다ㄴ")
     @Test
     void updateSubwayMap() {
         // Given

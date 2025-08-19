@@ -2,6 +2,7 @@ package com.f12.moitz.application;
 
 import com.f12.moitz.application.dto.RecommendationRequest;
 import com.f12.moitz.application.dto.RecommendationsResponse;
+import com.f12.moitz.application.dto.RecommendedLocationResponse;
 import com.f12.moitz.application.port.LocationRecommender;
 import com.f12.moitz.application.port.PlaceFinder;
 import com.f12.moitz.application.port.PlaceRecommender;
@@ -15,7 +16,6 @@ import com.f12.moitz.domain.Recommendation;
 import com.f12.moitz.domain.RecommendedPlace;
 import com.f12.moitz.domain.Route;
 import com.f12.moitz.domain.Routes;
-import com.f12.moitz.infrastructure.client.gemini.dto.RecommendedLocationResponse;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;

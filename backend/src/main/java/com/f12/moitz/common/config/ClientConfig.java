@@ -15,6 +15,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.http.client.reactive.ReactorClientHttpConnector;
 import org.springframework.web.client.RestClient;
@@ -25,7 +27,15 @@ import reactor.netty.http.client.HttpClient;
 public class ClientConfig {
 
     @Value("${gemini.api.key}")
-    private String apiKey;
+    private String geminiApiKey;
+
+    @Value("${perplexity.api.key}")
+    private String perplexityApiKey;
+
+    @Bean
+    public Client geminiClient() {
+        return geminiClientBuilder().apiKey(geminiApiKey).build();
+    }
 
     @Bean
     public RestClient kakaoRestClient() {
@@ -68,21 +78,18 @@ public class ClientConfig {
     }
 
     @Bean
-    public Client geminiClient() {
-        return geminiClientBuilder().apiKey(apiKey).build();
-    }
-
-    @Bean
     public WebClient odsayWebClient() {
-        HttpClient httpClient = HttpClient.create()
-                .responseTimeout(Duration.ofSeconds(5))
-                .doOnConnected(conn -> conn.addHandlerLast(new ReadTimeoutHandler(5))
-                        .addHandlerLast(new WriteTimeoutHandler(5)));
-
         return WebClient.builder()
                 .baseUrl("https://api.odsay.com/v1/api")
-                .clientConnector(new ReactorClientHttpConnector(httpClient))
+                .clientConnector(new ReactorClientHttpConnector(httpClient(5)))
                 .build();
+    }
+
+    private HttpClient httpClient(final int seconds) {
+        return HttpClient.create()
+                .responseTimeout(Duration.ofSeconds(seconds))
+                .doOnConnected(conn -> conn.addHandlerLast(new ReadTimeoutHandler(seconds))
+                        .addHandlerLast(new WriteTimeoutHandler(seconds)));
     }
 
     @Bean
@@ -92,21 +99,30 @@ public class ClientConfig {
             if (resource == null || resource.available() == 0) {
                 throw new RuntimeException("station-map.json 파일을 찾을 수 없습니다. 먼저 SubwayMapBuilder.build()를 실행하여 JSON 파일을 생성해주세요.");
             }
-            
-            // Java 8 시간 타입 지원을 위한 모듈 등록
+
             objectMapper.findAndRegisterModules();
-            
+
             TypeReference<Map<String, SubwayStation>> typeReference = new TypeReference<>() {};
             Map<String, SubwayStation> stationMap = objectMapper.readValue(resource, typeReference);
-            
+
             if (stationMap.isEmpty()) {
                 throw new RuntimeException("station-map.json에서 읽어온 데이터가 비어있습니다. JSON 파일을 다시 생성해주세요.");
             }
-            
+
             return new SubwayMapPathFinder(stationMap);
         } catch (IOException e) {
             throw new RuntimeException("station-map.json 파일 읽기에 실패했습니다.", e);
         }
+    }
+
+    @Bean
+    public WebClient perplexityWebClient() {
+        return WebClient.builder()
+                .baseUrl("https://api.perplexity.ai")
+                .clientConnector(new ReactorClientHttpConnector(httpClient(20)))
+                .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                .defaultHeader(HttpHeaders.AUTHORIZATION, "Bearer " + perplexityApiKey)
+                .build();
     }
 
 }
