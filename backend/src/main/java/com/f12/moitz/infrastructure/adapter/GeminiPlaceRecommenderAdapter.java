@@ -11,7 +11,6 @@ import com.f12.moitz.common.error.exception.RetryableApiException;
 import com.f12.moitz.domain.Place;
 import com.f12.moitz.domain.RecommendedPlace;
 import com.f12.moitz.infrastructure.client.gemini.GoogleGeminiClient;
-import com.f12.moitz.infrastructure.client.gpt.GptClient;
 import com.f12.moitz.infrastructure.client.kakao.KakaoMapClient;
 import com.f12.moitz.infrastructure.client.kakao.dto.KakaoApiResponse;
 import com.f12.moitz.infrastructure.client.kakao.dto.SearchPlacesRequest;
@@ -30,11 +29,10 @@ public class GeminiPlaceRecommenderAdapter implements PlaceRecommender {
 
     private final KakaoMapClient kakaoMapClient;
     private final GoogleGeminiClient geminiClient;
-    private final GptClient gptClient;
 
     @Override
     public Map<Place, List<RecommendedPlace>> recommendPlaces(final List<Place> targets, final String requirement) {
-        Map<Place, List<KakaoApiResponse>> searchedAllPlaces = searchPlacesWithRequirement(targets, requirement);
+        final Map<Place, List<KakaoApiResponse>> searchedAllPlaces = searchPlacesWithRequirement(targets, requirement);
 
         return searchedAllPlaces.entrySet().stream()
                 .map(entry -> processPlaceFiltering(entry.getKey(), entry.getValue(), requirement))
@@ -65,9 +63,9 @@ public class GeminiPlaceRecommenderAdapter implements PlaceRecommender {
             final String requirement
     ) {
         try {
-            String formattedKakaoData = FORMAT_SINGLE_PLACE_TO_PROMPT(place, kakaoResponses);
+            final String formattedKakaoData = FORMAT_SINGLE_PLACE_TO_PROMPT(place, kakaoResponses);
 
-            String prompt = String.format(
+            final String prompt = String.format(
                     PLACE_FILTER_PROMPT,
                     place.getName(),
                     PLACE_RECOMMENDATION_COUNT,
@@ -79,9 +77,9 @@ public class GeminiPlaceRecommenderAdapter implements PlaceRecommender {
                     PLACE_RECOMMENDATION_COUNT
             );
 
-            List<PlaceRecommendResponse> filteredResponses = geminiClient.generateWith(prompt);
+            final List<PlaceRecommendResponse> filteredResponses = geminiClient.generateWith(prompt);
 
-            List<RecommendedPlace> recommendedPlaces = filteredResponses.stream()
+            final List<RecommendedPlace> recommendedPlaces = filteredResponses.stream()
                     .map(response -> new RecommendedPlace(
                             response.name(),
                             response.category(),

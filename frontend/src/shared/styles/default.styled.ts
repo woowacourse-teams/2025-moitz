@@ -25,6 +25,10 @@ export const typography = {
     font-size: ${typoToken.subHeaders.sh2};
     font-weight: ${typoToken.weight.semiBold};
   `,
+  sh3: css`
+    font-size: ${typoToken.subHeaders.sh3};
+    font-weight: ${typoToken.weight.semiBold};
+  `,
   // Body
   b1: css`
     font-size: ${typoToken.body.b1};
@@ -39,10 +43,37 @@ export const typography = {
     font-size: ${typoToken.captions.c1};
     font-weight: ${typoToken.weight.regular};
   `,
+  c2: css`
+    font-size: ${typoToken.captions.c2};
+    font-weight: ${typoToken.weight.regular};
+  `,
 };
 
 export const grid_padding = css`
   padding: 0 20px;
+`;
+
+export const shadow = {
+  map: css`
+    box-shadow: 0 2px 2px rgba(0, 0, 0, 0.25);
+  `,
+  bottom_sheet: css`
+    box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
+  `,
+  dropdown: css`
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  `,
+};
+
+export const scroll = css`
+  overflow-y: auto;
+  -ms-overflow-style: none; /* IE, Edge */
+  scrollbar-width: none; /* Firefox */
+  -webkit-overflow-scrolling: touch;
+
+  &::-webkit-scrollbar {
+    display: none; /* Chrome, Safari */
+  }
 `;
 
 // Flex

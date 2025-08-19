@@ -68,7 +68,7 @@ public class RouteFinderAdapter implements RouteFinder {
                             transferPlace,
                             TravelMethod.TRANSFER,
                             // TODO: 환승 이동 시간 계산 고려
-                            3,
+                            180,
                             null
                     ));
                 }
@@ -86,7 +86,7 @@ public class RouteFinderAdapter implements RouteFinder {
                         startPlace,
                         endPlace,
                         TravelMethod.from(subPath.trafficType()),
-                        subPath.sectionTime(),
+                        subPath.sectionTime() * 60,
                         SubwayCode.fromCode(subPath.lane().getFirst().subwayCode()).getTitle()
                 ));
 

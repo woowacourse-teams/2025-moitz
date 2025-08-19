@@ -3,7 +3,6 @@ import Tag from './Tag';
 import type { Meta, StoryObj } from '@storybook/react-webpack5';
 
 const meta = {
-  title: 'shared/Tag',
   component: Tag,
   parameters: {
     layout: 'centered',

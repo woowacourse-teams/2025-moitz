@@ -2,17 +2,19 @@ import { StartingPlace } from '@entities/types/Location';
 
 import { flex, typography } from '@shared/styles/default.styled';
 
+import Dot from '../dot/Dot';
+
 import * as startingSpotNameStyled from './startingSpotName.styled';
 
 interface StartSpotNameProps {
-  location: StartingPlace;
+  place: StartingPlace;
   isLast: boolean;
 }
 
-function StartingSpotName({ location, isLast }: StartSpotNameProps) {
+function StartingSpotName({ place, isLast }: StartSpotNameProps) {
   return (
     <div
-      key={location.index}
+      key={place.index}
       css={flex({
         justify: 'center',
         align: 'center',
@@ -20,9 +22,9 @@ function StartingSpotName({ location, isLast }: StartSpotNameProps) {
       })}
     >
       <span css={[typography.b2, startingSpotNameStyled.nameList()]}>
-        {location.name}
+        {place.name}
       </span>
-      <div css={!isLast && startingSpotNameStyled.dot()}></div>
+      {!isLast && <Dot size={3} colorType="main" colorTokenIndex={1} />}
     </div>
   );
 }

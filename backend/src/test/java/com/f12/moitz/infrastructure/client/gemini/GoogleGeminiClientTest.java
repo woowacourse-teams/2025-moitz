@@ -13,7 +13,7 @@ import com.f12.moitz.common.error.exception.ExternalApiException;
 import com.f12.moitz.common.error.exception.RetryableApiException;
 import com.f12.moitz.infrastructure.PromptGenerator;
 import com.f12.moitz.infrastructure.client.gemini.dto.LocationNameAndReason;
-import com.f12.moitz.infrastructure.client.gemini.dto.RecommendedLocationResponse;
+import com.f12.moitz.application.dto.RecommendedLocationResponse;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.genai.errors.ClientException;
@@ -187,7 +187,7 @@ class GoogleGeminiClientTest {
 
         // When & Then
         assertThatThrownBy(() -> googleGeminiClient.generateWith(contents, config))
-                .isInstanceOf(ExternalApiException.class)
+                .isInstanceOf(RetryableApiException.class)
                 .extracting("errorCode")
                 .isEqualTo(ExternalApiErrorCode.GEMINI_API_SERVER_UNAVAILABLE);
     }
@@ -245,9 +245,9 @@ class GoogleGeminiClientTest {
 
         // When & Then
         assertThatThrownBy(() -> googleGeminiClient.generateWith(contents, config))
-                .isInstanceOf(ExternalApiException.class)
+                .isInstanceOf(RetryableApiException.class)
                 .extracting("errorCode")
-                .isEqualTo(ExternalApiErrorCode.INVALID_GEMINI_API_RESPONSE);
+                .isEqualTo(ExternalApiErrorCode.GEMINI_API_SERVER_UNAVAILABLE);
     }
 
     private List<Content> getBasicContents() {

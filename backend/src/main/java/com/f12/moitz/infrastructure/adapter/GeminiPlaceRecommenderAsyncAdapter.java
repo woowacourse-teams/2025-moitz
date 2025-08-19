@@ -6,18 +6,14 @@ import static com.f12.moitz.infrastructure.PromptGenerator.PLACE_RECOMMENDATION_
 
 import com.f12.moitz.application.dto.PlaceRecommendResponse;
 import com.f12.moitz.application.port.AsyncPlaceRecommender;
-import com.f12.moitz.common.error.exception.ExternalApiErrorCode;
-import com.f12.moitz.common.error.exception.RetryableApiException;
 import com.f12.moitz.domain.Place;
 import com.f12.moitz.domain.RecommendedPlace;
 import com.f12.moitz.infrastructure.client.gemini.GoogleGeminiClient;
-import com.f12.moitz.infrastructure.client.gpt.GptClient;
 import com.f12.moitz.infrastructure.client.kakao.KakaoMapClient;
 import com.f12.moitz.infrastructure.client.kakao.dto.KakaoApiResponse;
 import com.f12.moitz.infrastructure.client.kakao.dto.SearchPlacesRequest;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -31,11 +27,10 @@ import reactor.core.scheduler.Schedulers;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class PlaceRecommenderAsyncAdapter implements AsyncPlaceRecommender {
+public class GeminiPlaceRecommenderAsyncAdapter implements AsyncPlaceRecommender {
 
     private final KakaoMapClient kakaoMapClient;
     private final GoogleGeminiClient geminiClient;
-    private final GptClient gptClient;
 
     @Async("asyncTaskExecutor")
     @Override
@@ -47,7 +42,7 @@ public class PlaceRecommenderAsyncAdapter implements AsyncPlaceRecommender {
     }
 
     private Mono<Map<Place, List<RecommendedPlace>>> recommendPlaces(final List<Place> targets, final String requirement) {
-        Map<Place, List<KakaoApiResponse>> searchedAllPlaces = searchPlacesWithRequirement(targets, requirement);
+        final Map<Place, List<KakaoApiResponse>> searchedAllPlaces = searchPlacesWithRequirement(targets, requirement);
 
         return Flux.fromIterable(searchedAllPlaces.entrySet())
                 .flatMap(entry -> processPlaceFilteringAsync(entry.getKey(), entry.getValue(), requirement), 5)

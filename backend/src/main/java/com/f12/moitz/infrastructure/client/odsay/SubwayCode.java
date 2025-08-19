@@ -20,7 +20,7 @@ public enum SubwayCode {
     GYEONGUI_JOUNGANG("경의중앙선", 104),
     EVERLINE("용인 에버라인", 107),
     GYEONGCHUN("경춘선", 108),
-    SIN_BUNDANG("신분당", 109),
+    SIN_BUNDANG("신분당선", 109),
     UIJEONGBU_LRT("의정부 경전철", 110),
     GYEONGGANG("경강선", 112),
     WOOE_SINSEUL_LRT("우이 신설선", 113),

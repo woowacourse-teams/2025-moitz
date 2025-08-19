@@ -1,4 +1,15 @@
-export const CONDITION_CARD_TEXT = {
+import { LocationRequirement } from '@entities/types/LocationRequestBody';
+
+type ConditionCardText = Record<
+  LocationRequirement,
+  {
+    ID: LocationRequirement;
+    ICON: string;
+    TEXT: string;
+  }
+>;
+
+export const CONDITION_CARD_TEXT: ConditionCardText = {
   CHAT: {
     ID: 'CHAT',
     ICON: '💬',
@@ -24,4 +35,4 @@ export const CONDITION_CARD_TEXT = {
     ICON: '✅',
     TEXT: '선택하지 않음',
   },
-} as const;
+};

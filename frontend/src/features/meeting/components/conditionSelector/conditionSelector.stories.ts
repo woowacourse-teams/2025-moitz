@@ -1,10 +1,12 @@
+import { withLayout } from '@sb/decorators/withLayout';
+
 import ConditionSelector from './ConditionSelector';
 
 import type { Meta, StoryObj } from '@storybook/react-webpack5';
 
 const meta = {
-  title: 'features/meeting/ConditionSelector',
   component: ConditionSelector,
+  decorators: [withLayout],
   parameters: {
     layout: 'centered',
   },
@@ -18,7 +20,6 @@ const meta = {
       description: '조건 ID 업데이트 시 실행될 함수',
     },
   },
-  // TODO : decorator로 withLayout 추가 예정
 } satisfies Meta<typeof ConditionSelector>;
 
 export default meta;

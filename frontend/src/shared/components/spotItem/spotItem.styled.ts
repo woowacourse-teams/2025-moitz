@@ -7,7 +7,7 @@ export const base = () => css`
   padding: 10px 15px 10px 10px;
   color: ${colorToken.gray[1]};
   background-color: ${colorToken.gray[8]};
-  border-radius: ${borderRadiusToken.input};
+  border-radius: ${borderRadiusToken[10]};
   cursor: pointer;
 
   &:hover {
@@ -17,4 +17,11 @@ export const base = () => css`
 
 export const contents_container = () => css`
   width: 100%;
+`;
+
+export const description = () => css`
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 `;

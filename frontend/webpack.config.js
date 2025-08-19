@@ -22,6 +22,7 @@ const config = {
   entry: './main.tsx',
   output: {
     path: path.resolve(__dirname, 'dist'),
+    publicPath: '/',
   },
   devServer: {
     open: true,
@@ -32,6 +33,7 @@ const config = {
     new HtmlWebpackPlugin({
       template: 'index.html',
       templateParameters: envVars,
+      favicon: './assets/icon/logo-icon.svg',
     }),
     new webpack.DefinePlugin(defineEnv),
   ],
@@ -56,6 +58,7 @@ const config = {
         use: ['style-loader', 'css-loader'],
       },
     ],
+
   },
   resolve: {
     extensions: ['.tsx', '.ts', '.jsx', '.js', '...'],
@@ -72,6 +75,7 @@ const config = {
       '@icons': path.resolve(__dirname, 'assets/icon'),
       '@mocks': path.resolve(__dirname, 'src/mocks'),
       '@config': path.resolve(__dirname, 'src/config'),
+      '@sb': path.resolve(__dirname, '.storybook'),
     },
   },
   mode: isProduction ? 'production' : 'development',
