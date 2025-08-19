@@ -101,8 +101,12 @@ public class SubwayMapBuilder {
 
         for (int i = 0; i < paths.size(); i++) {
             final PathResponse currentPath = paths.get(i);
+
             final String fromName = getStationName(currentPath.dptreStn().stnNm());
             final String toName = getStationName(currentPath.arvlStn().stnNm());
+
+            final String fromLine = getStationLine(currentPath.dptreStn().lineNm());
+            final String toLine = getStationLine(currentPath.arvlStn().lineNm());
 
             final SubwayStation fromStation = stationMap.computeIfAbsent(fromName, SubwayStation::new);
             final SubwayStation toStation = stationMap.computeIfAbsent(toName, SubwayStation::new);
@@ -110,17 +114,12 @@ public class SubwayMapBuilder {
             final int distance = currentPath.stnSctnDstc();
             final int travelTimeInSeconds = calculateTravelTime(currentPath, paths, i);
 
-            fromStation.addEdge(new Edge(toName, travelTimeInSeconds, distance, currentPath.dptreStn().lineNm()));
+            fromStation.addEdge(new Edge(toName, travelTimeInSeconds, distance, fromLine));
 
             if (currentPath.isTransfer()) {
-                fromStation.addEdge(new Edge(toName, travelTimeInSeconds, distance, currentPath.arvlStn().lineNm()));
+                fromStation.addEdge(new Edge(toName, travelTimeInSeconds, distance, toLine));
             } else {
-                final Edge reverseEdge = new Edge(
-                        fromName,
-                        travelTimeInSeconds,
-                        distance,
-                        currentPath.dptreStn().lineNm()
-                );
+                final Edge reverseEdge = new Edge(fromName, travelTimeInSeconds, distance, fromLine);
                 toStation.addEdge(reverseEdge);
             }
         }
@@ -171,6 +170,13 @@ public class SubwayMapBuilder {
             return "총신대입구";
         }
         return name;
+    }
+
+    private String getStationLine(final String line) {
+        if ("경의선".equals(line)) {
+            return "경의중앙선";
+        }
+        return line;
     }
 
     private void addMissingData(final Map<String, SubwayStation> stationMap) {
