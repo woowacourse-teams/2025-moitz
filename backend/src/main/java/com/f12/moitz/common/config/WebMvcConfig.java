@@ -15,7 +15,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
     private final RateLimitFilter rateLimitFilter;
 
     @Override
-    public void addCorsMappings(CorsRegistry registry) {
+    public void addCorsMappings(final CorsRegistry registry) {
         registry.addMapping("/**")
                 .allowedOrigins("*")
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
@@ -24,17 +24,13 @@ public class WebMvcConfig implements WebMvcConfigurer {
 
     @Bean
     public FilterRegistrationBean<RateLimitFilter> rateLimitFilterRegistration() {
-        FilterRegistrationBean<RateLimitFilter> registration = new FilterRegistrationBean<>();
+        final FilterRegistrationBean<RateLimitFilter> registration = new FilterRegistrationBean<>();
 
         registration.setFilter(rateLimitFilter);
-
-        registration.addUrlPatterns(
-                "/locations/test"
-        );
-
+        registration.addUrlPatterns("/locations");
         registration.setName("rateLimitFilter");
+
         return registration;
     }
+
 }
-
-
