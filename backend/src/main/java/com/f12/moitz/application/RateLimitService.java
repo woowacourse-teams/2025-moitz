@@ -26,7 +26,7 @@ public class RateLimitService {
 
     private static final String REDIS_KEY_PREFIX = "rate_limit:";
     private static final int BUCKET_CAPACITY = 100;
-    private static final int REFILL_AMOUNT = 50;
+    private static final int REFILL_AMOUNT = 100;
     private static final Duration REFILL_DURATION = Duration.ofHours(1);
 
     private final Supplier<BucketConfiguration> configurationSupplier = () -> {
