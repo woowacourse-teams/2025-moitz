@@ -13,5 +13,5 @@ export const base = () => css`
   z-index: 1000;
   background-color: ${colorToken.gray[8]};
   border: 1px solid ${colorToken.gray[7]};
-  border-radius: ${borderRadiusToken.input};
+  border-radius: ${borderRadiusToken[10]};
 `;

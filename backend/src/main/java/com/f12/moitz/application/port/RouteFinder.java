@@ -1,10 +1,11 @@
 package com.f12.moitz.application.port;
 
-import com.f12.moitz.domain.Place;
+import com.f12.moitz.application.port.dto.StartEndPair;
 import com.f12.moitz.domain.Route;
+import java.util.List;
 
 public interface RouteFinder {
 
-    Route findRoute(Place startPlace, Place endPlace);
+    List<Route> findRoutes(final List<StartEndPair> placePairs);
 
 }

@@ -19,7 +19,7 @@ public class Path {
         this.start = start;
         this.end = end;
         this.travelMethod = travelMethod;
-        this.travelTime = Duration.ofMinutes(travelTime);
+        this.travelTime = Duration.ofSeconds(travelTime);
         this.subwayLineName = subwayLineName;
     }
 

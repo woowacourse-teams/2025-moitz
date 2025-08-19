@@ -35,7 +35,7 @@ export const content = () => css`
   padding: 10px 12px;
   text-align: center;
   background-color: ${colorToken.gray[7]};
-  border-radius: ${borderRadiusToken.round};
+  border-radius: ${borderRadiusToken[100]};
   animation: ${slideDown()} 3s ease-in-out forwards;
 `;
 
