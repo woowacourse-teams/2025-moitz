@@ -97,10 +97,6 @@ public class SubwayMapBuilder {
     }
 
     private void buildSubwayStations(final SubwayRouteResponse response, final Map<String, SubwayStation> stationMap) {
-        if (response == null || response.body() == null || response.body().paths() == null) {
-            log.warn("SubwayRouteResponse 또는 경로 정보가 null입니다.");
-            return;
-        }
         final List<PathResponse> paths = response.body().paths();
 
         for (int i = 0; i < paths.size(); i++) {

@@ -1,13 +1,23 @@
 package com.f12.moitz.infrastructure.client.open;
 
+import com.f12.moitz.common.error.exception.ExternalApiErrorCode;
+import com.f12.moitz.common.error.exception.ExternalApiException;
+import com.f12.moitz.common.error.exception.RetryableApiException;
 import com.f12.moitz.infrastructure.client.open.dto.SubwayRouteResponse;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import java.io.IOException;
+import java.io.StringReader;
 import java.net.URI;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
+import org.springframework.web.client.UnknownContentTypeException;
+import org.w3c.dom.Document;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 
 @Slf4j
 @Component
@@ -20,7 +30,6 @@ public class OpenApiClient {
     private static final String SEARCH_TYPE_TRANSFER = "transfer";
 
     private final RestClient openRestClient;
-    private final ObjectMapper objectMapper;
 
     @Value("${open.api.key}")
     private String openApiKey;
@@ -40,7 +49,7 @@ public class OpenApiClient {
             final String searchType
     ) {
         try {
-            return openRestClient.get()
+            SubwayRouteResponse response = openRestClient.get()
                     .uri(uriBuilder -> {
                                 var uri = uriBuilder
                                         .path(OPEN_BASE_SEARCH)
@@ -61,13 +70,57 @@ public class OpenApiClient {
                     .onStatus(
                             status -> status.is4xxClientError() || status.is5xxServerError(),
                             (req, res) -> {
-                                throw new RuntimeException("공공 API 응답의 상태코드가 400 혹은 500입니다.");
+                                throw new ExternalApiException(ExternalApiErrorCode.INVALID_OPEN_API_RESPONSE);
                             }
                     )
                     .body(SubwayRouteResponse.class);
-        } catch (RuntimeException e) {
-            log.error(e.getMessage(), e);
-            throw new RuntimeException("공공 API 응답이 제대로 생성되지 않았습니다.");
+
+            validateResponse(response);
+
+            return response;
+        } catch (UnknownContentTypeException e) {
+            final String xml = e.getResponseBodyAsString();
+            final Document document = getDocument(xml);
+
+            final String returnAuthMsg = document.getElementsByTagName("returnAuthMsg").item(0).getTextContent();
+            log.error("공공 API 에러: {}", returnAuthMsg);
+
+            final String returnReasonCode = document.getElementsByTagName("returnReasonCode").item(0).getTextContent();
+
+            switch (returnReasonCode) {
+                case "30" -> throw new ExternalApiException(ExternalApiErrorCode.INVALID_OPEN_API_KEY);
+                case "22" -> throw new ExternalApiException(ExternalApiErrorCode.EXCEEDED_OPEN_API_TOKEN_QUOTA);
+                case "23" -> throw new RetryableApiException(ExternalApiErrorCode.OPEN_API_SERVER_UNAVAILABLE);
+                case "12", "20", "31", "32" ->
+                        throw new ExternalApiException(ExternalApiErrorCode.OPEN_API_SERVER_UNRESPONSIVE);
+                default -> throw new ExternalApiException(ExternalApiErrorCode.INVALID_OPEN_API_RESPONSE);
+            }
+        }
+    }
+
+    private void validateResponse(final SubwayRouteResponse response) {
+        if (response == null) {
+            throw new ExternalApiException(ExternalApiErrorCode.INVALID_OPEN_API_RESPONSE);
+        }
+
+        String resultCode = response.header().resultCode();
+
+        if (resultCode.equals("99")) {
+            throw new RetryableApiException(ExternalApiErrorCode.OPEN_API_SERVER_UNAVAILABLE);
+        }
+        if (!resultCode.equals("200") && !resultCode.equals("00")) {
+            log.error("공공 API 에러: {}", response.header().resultMsg());
+            throw new ExternalApiException(ExternalApiErrorCode.INVALID_OPEN_API_RESPONSE);
+        }
+    }
+
+    private Document getDocument(final String xml) {
+        try {
+            return DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(
+                    new InputSource(new StringReader(xml))
+            );
+        } catch (ParserConfigurationException | SAXException | IOException e) {
+            throw new RuntimeException(e);
         }
     }
 
