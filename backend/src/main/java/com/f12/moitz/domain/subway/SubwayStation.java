@@ -11,12 +11,10 @@ import java.util.Optional;
 import lombok.Getter;
 
 @Getter
-
 @Document(collection = "subway-stations")
 public class SubwayStation {
 
     @Id
-    @Field("name")
     private String name;
 
     @Field("possibleEdges")
@@ -25,18 +23,10 @@ public class SubwayStation {
     protected SubwayStation() {
         this.possibleEdges = new ArrayList<>();
     }
+
     public SubwayStation(final String name) {
         this.name = name;
         this.possibleEdges = new ArrayList<>();
-    }
-
-    @JsonCreator
-    public SubwayStation(
-            @JsonProperty("name") String name,
-            @JsonProperty("possibleEdges") List<Edge> possibleEdges
-    ) {
-        this.name = name;
-        this.possibleEdges = possibleEdges != null ? possibleEdges : new ArrayList<>();
     }
 
     public void addEdge(final Edge newEdge) {
@@ -47,11 +37,5 @@ public class SubwayStation {
         if (existingEdge.isEmpty()) {
             possibleEdges.add(newEdge);
         }
-    }
-
-    public Optional<Edge> findEdgeTo(final String destination) {
-        return possibleEdges.stream()
-                .filter(edge -> edge.isTowards(destination))
-                .findFirst();
     }
 }

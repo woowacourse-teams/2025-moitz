@@ -28,12 +28,11 @@ public class Edge {
         this.lineName = lineName;
     }
 
-    @JsonCreator
     public Edge(
-            @JsonProperty("destination") String destination,
-            @JsonProperty("travelTime") Duration duration,
-            @JsonProperty("distance") int distance,
-            @JsonProperty("lineName") String lineName
+            String destination,
+            Duration duration,
+            int distance,
+            String lineName
     ) {
         this.destination = destination;
         this.travelTime = duration;
@@ -55,9 +54,5 @@ public class Edge {
 
     public int getTimeInSeconds() {
         return (int) travelTime.getSeconds();
-    }
-
-    public boolean hasSameDestination(Edge other) {
-        return this.destination.equals(other.destination);
     }
 }
