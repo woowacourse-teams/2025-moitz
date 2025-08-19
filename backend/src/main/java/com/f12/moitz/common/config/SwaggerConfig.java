@@ -4,8 +4,6 @@ import com.f12.moitz.common.error.exception.ErrorCode;
 import com.f12.moitz.common.error.exception.ExternalApiErrorCode;
 import com.f12.moitz.common.error.exception.GeneralErrorCode;
 import io.swagger.v3.oas.models.OpenAPI;
-import io.swagger.v3.oas.models.Operation;
-import io.swagger.v3.oas.models.PathItem;
 import io.swagger.v3.oas.models.examples.Example;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.media.Content;
@@ -13,12 +11,11 @@ import io.swagger.v3.oas.models.media.MediaType;
 import io.swagger.v3.oas.models.responses.ApiResponse;
 import io.swagger.v3.oas.models.responses.ApiResponses;
 import io.swagger.v3.oas.models.servers.Server;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import org.springdoc.core.customizers.OpenApiCustomizer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-
-import java.util.LinkedHashMap;
-import java.util.Map;
 
 @Configuration
 public class SwaggerConfig {
@@ -43,13 +40,17 @@ public class SwaggerConfig {
         return openApi -> {
             if(openApi.getPaths() == null) return;
 
-            for (PathItem pathItem : openApi.getPaths().values()) {
-                for (Operation operation : pathItem.readOperations()) {
-                    ApiResponses responses = operation.getResponses();
-                    injectExamplesForErrorEnum(responses, 400, GeneralErrorCode.values());
-                    injectExamplesForErrorEnum(responses, 500, ExternalApiErrorCode.values());
-                }
-            }
+            openApi.getPaths().forEach((path, pathItem) -> {
+                pathItem.readOperationsMap().forEach((httpMethod, operation) -> {
+                    var responses = operation.getResponses();
+                    if (path.startsWith("/locations")) {
+                        injectExamplesForErrorEnum(responses, 400, GeneralErrorCode.values());
+                        injectExamplesForErrorEnum(responses, 500, ExternalApiErrorCode.values());
+                    } else if (httpMethod.name().equals("POST") && path.startsWith("/recommendations")) {
+                        injectExamplesForErrorEnum(responses, 400, GeneralErrorCode.values());
+                    }
+                });
+            });
         };
     }
 
@@ -97,6 +98,5 @@ public class SwaggerConfig {
                 "timestamp", "2025-08-07T12:00:00"
         );
     }
-
 
 }

@@ -10,7 +10,6 @@ import MapPoint from '@shared/components/mapPoint/MapPoint';
 import { flex } from '@shared/styles/default.styled';
 
 import IconBack from '@icons/icon-back.svg';
-import IconShare from '@icons/icon-share.svg';
 
 import * as map from './map.styled';
 
@@ -55,9 +54,6 @@ function Map({
             onClick={handleBackButtonClick}
           />
         )}
-        <Link to="/">
-          <MapButton src={IconShare} alt="share" />
-        </Link>
       </div>
       <div css={[flex({ justify: 'space-between' }), map.bottom_overlay()]}>
         <MapPoint
