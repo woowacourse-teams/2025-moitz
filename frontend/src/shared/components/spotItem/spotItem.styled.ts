@@ -16,12 +16,14 @@ export const base = () => css`
 `;
 
 export const contents_container = () => css`
+  overflow: hidden;
   width: 100%;
+  padding-top: 1px;
 `;
 
 export const description = () => css`
-  display: -webkit-box;
-  -webkit-line-clamp: 1;
-  -webkit-box-orient: vertical;
   overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  padding-top: 1px;
 `;
