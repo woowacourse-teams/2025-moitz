@@ -7,7 +7,7 @@ export const base = () => css`
   width: 100%;
   border: none;
   cursor: pointer;
-  border-radius: ${borderRadiusToken.button};
+  border-radius: ${borderRadiusToken[14]};
   color: ${colorToken.gray[8]};
   background-color: ${colorToken.main[3]};
 `;

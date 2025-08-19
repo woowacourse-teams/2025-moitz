@@ -9,10 +9,10 @@ import lombok.Getter;
 @Getter
 public enum RecommendCondition {
 
-    CHAT("CHAT", "떠들고 놀기 좋은", List.of("식당", "카페", "PC방", "노래방", "오락시설")),
+    CHAT("CHAT", "떠들고 놀기 좋은", List.of("회식")),
     MEETING("MEETING", "회의하기 좋은", List.of("카페", "공유 오피스")),
-    FOCUS("FOCUS", "집중하기 좋은", List.of("카페", "공유 오피스")),
-    DATE("DATE", "데이트하기 좋은", List.of("식당", "카페", "바", "전시회")),
+    FOCUS("FOCUS", "집중하기 좋은", List.of("카페")),
+    DATE("DATE", "데이트하기 좋은", List.of("양식", "카페")),
     NOT_SELECTED("NOT_SELECTED", "선택하지 않음", List.of()),
     ;
 
