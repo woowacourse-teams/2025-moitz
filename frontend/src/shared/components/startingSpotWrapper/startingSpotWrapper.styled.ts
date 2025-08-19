@@ -6,7 +6,7 @@ export const base = () => css`
   width: 100%;
   padding: 10px 10px 10px 14px;
   background-color: ${colorToken.bg[2]};
-  border-radius: ${borderRadiusToken.input};
+  border-radius: ${borderRadiusToken[10]};
 `;
 
 export const title = () => css`

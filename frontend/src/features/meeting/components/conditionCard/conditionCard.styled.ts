@@ -7,7 +7,7 @@ export const base = () => css`
   border: none;
   cursor: pointer;
   background-color: ${colorToken.gray[8]};
-  border-radius: ${borderRadiusToken.input};
+  border-radius: ${borderRadiusToken[10]};
 
   &:hover {
     background-color: ${colorToken.main[4]};
