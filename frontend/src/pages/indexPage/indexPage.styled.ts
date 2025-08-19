@@ -4,7 +4,7 @@ import { colorToken } from '@shared/styles/tokens';
 
 export const container = () => css`
   width: 100%;
-  height: 100dvh;
+  height: 100%;
   background-color: ${colorToken.bg[1]};
   padding-bottom: 30px;
 `;
