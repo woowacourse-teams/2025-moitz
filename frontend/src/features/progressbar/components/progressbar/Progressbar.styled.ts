@@ -7,7 +7,7 @@ export const container = () => css`
   height: 10px;
   overflow: hidden;
   background-color: ${colorToken.gray[7]};
-  border-radius: ${borderRadiusToken.input};
+  border-radius: ${borderRadiusToken[10]};
 `;
 
 export const bar = (progress: number) => css`
@@ -15,5 +15,5 @@ export const bar = (progress: number) => css`
   height: 100%;
   transition: width 0.3s ease;
   background-color: ${colorToken.main[1]};
-  border-radius: ${borderRadiusToken.input};
+  border-radius: ${borderRadiusToken[10]};
 `;

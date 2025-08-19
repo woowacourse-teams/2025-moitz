@@ -9,6 +9,6 @@ export const base = (
 ) => css`
   width: ${size}px;
   height: ${size}px;
-  border-radius: ${borderRadiusToken.round};
+  border-radius: ${borderRadiusToken[100]};
   background-color: ${colorToken[colorType][colorTokenIndex]};
 `;
