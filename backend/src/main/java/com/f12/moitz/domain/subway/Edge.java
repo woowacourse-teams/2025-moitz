@@ -1,25 +1,21 @@
 package com.f12.moitz.domain.subway;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import org.springframework.data.mongodb.core.mapping.Field;
-import java.time.Duration;
 import lombok.Getter;
+
+import java.time.Duration;
 
 @Getter
 public class Edge {
 
-    @Field("destination")
-    private final String destination;
+    private String destination;
 
-    @Field("travelTime")
-    private final Duration travelTime;
+    private Duration travelTime;
 
-    @Field("distance")
-    private final int distance;
+    private int distance;
 
-    @Field("lineName")
-    private final String lineName;
+    private String lineName;
+
+    protected Edge() {}
 
     public Edge(final String destination, final int timeInSeconds, final int distance, final String lineName) {
         this.destination = destination;

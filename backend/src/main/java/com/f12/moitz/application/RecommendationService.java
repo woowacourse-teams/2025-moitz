@@ -22,6 +22,9 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+
+import com.f12.moitz.domain.entity.Result;
+import com.f12.moitz.domain.repository.RecommendResultRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -37,22 +40,25 @@ public class RecommendationService {
     private final RouteFinder routeFinder;
 
     private final RecommendationMapper recommendationMapper;
+    private final RecommendResultRepository recommendResultRepository;
 
     public RecommendationService(
             @Autowired final PlaceFinder placeFinder,
             @Qualifier("placeRecommenderAdapter") final PlaceRecommender placeRecommender,
             @Autowired final LocationRecommender locationRecommender,
             @Qualifier("subwayRouteFinderAdapter") final RouteFinder routeFinder,
-            @Autowired final RecommendationMapper recommendationMapper
+            @Autowired final RecommendationMapper recommendationMapper,
+            @Autowired RecommendResultRepository recommendResultRepository
     ) {
         this.placeFinder = placeFinder;
         this.placeRecommender = placeRecommender;
         this.locationRecommender = locationRecommender;
         this.routeFinder = routeFinder;
         this.recommendationMapper = recommendationMapper;
+        this.recommendResultRepository = recommendResultRepository;
     }
 
-    public RecommendationsResponse recommendLocation(final RecommendationRequest request) {
+    public String recommendLocation(final RecommendationRequest request) {
         StopWatch stopWatch = new StopWatch("추천 서비스 전체");
         stopWatch.start("지역 추천");
         final String requirement = RecommendCondition.fromTitle(request.requirement()).getKeyword();
@@ -94,7 +100,8 @@ public class RecommendationService {
         stopWatch.stop();
         System.out.println(stopWatch.prettyPrint());
 
-        return recommendationMapper.toResponse(startingPlaces, recommendation, generatedPlacesWithReason);
+        Result result = recommendationMapper.toResult(startingPlaces, recommendation, generatedPlacesWithReason);
+        return recommendResultRepository.saveAndReturnId(result);
     }
 
     public Map<Place, Routes> findRoutesForAllAsync(

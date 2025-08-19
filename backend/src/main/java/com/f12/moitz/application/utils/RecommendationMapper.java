@@ -44,6 +44,27 @@ public class RecommendationMapper {
         );
     }
 
+    public Result toResult(
+            final List<Place> startingPlaces,
+            final Recommendation recommendation,
+            final Map<Place, String> generatedPlaces
+    ) {
+        final int minTime = recommendation.getBestRecommendationTime();
+
+        return new Result(
+                IntStream.range(0, startingPlaces.size())
+                        .mapToObj(index -> toStartingPlaceResponse(index, startingPlaces.get(index)))
+                        .toList(),
+                IntStream.range(0, recommendation.size())
+                        .mapToObj(index -> {
+                            Candidate currentCandidate = recommendation.get(index);
+                            String reason = generatedPlaces.get(currentCandidate.getDestination());
+                            return toLocationRecommendResponse(currentCandidate, index, minTime, reason);
+                        })
+                        .toList()
+        );
+    }
+
     private StartingPlaceResponse toStartingPlaceResponse(final int index, final Place startingPlace) {
         return new StartingPlaceResponse(
                 index + 1,
