@@ -29,7 +29,9 @@ if (process.env.NODE_ENV === 'production') {
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <ErrorBoundary
-    fallbackRender={({ reset }) => <FallBackPage reset={reset} />}
+    fallbackRender={({ reset, error }) => (
+      <FallBackPage reset={reset} error={error} />
+    )}
     onReset={() => window.location.reload()}
   >
     <React.StrictMode>

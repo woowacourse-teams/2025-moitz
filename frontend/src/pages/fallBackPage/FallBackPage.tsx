@@ -4,7 +4,13 @@ import { flex, typography } from '@shared/styles/default.styled';
 
 import * as fallBackPage from './fallBackPage.styled';
 
-function FallBackPage({ reset }: { reset: () => void }) {
+function FallBackPage({
+  reset,
+  error,
+}: {
+  reset: () => void;
+  error: Error | null;
+}) {
   return (
     <Layout>
       <div
@@ -27,6 +33,7 @@ function FallBackPage({ reset }: { reset: () => void }) {
             align: 'center',
           })}
         >
+          {error.message}
           <BottomButton onClick={reset} type="button" text="새로고침" active />
         </div>
       </div>
