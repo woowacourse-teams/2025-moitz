@@ -9,7 +9,11 @@ import com.f12.moitz.application.dto.RecommendationResponse;
 import com.f12.moitz.application.dto.RecommendationsResponse;
 import com.f12.moitz.application.dto.RouteResponse;
 import com.f12.moitz.application.dto.StartingPlaceResponse;
+
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -26,8 +30,11 @@ public class LocationController implements SwaggerLocationController {
     private final RecommendationParallelTaskService recommendationParallelTaskService;
 
     @PostMapping
-    public ResponseEntity<RecommendationsResponse> recommendLocations(@RequestBody RecommendationRequest request) {
-        return ResponseEntity.ok(recommendationService.recommendLocation(request));
+    public ResponseEntity<Map<String,String>> recommendLocations(@RequestBody RecommendationRequest request) {
+        String id = recommendationService.recommendLocation(request);
+        Map<String, String> resultResponse = new HashMap<>();
+        resultResponse.put("id", id);
+        return ResponseEntity.status(201).body(resultResponse);
     }
 
     @PostMapping("/async")

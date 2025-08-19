@@ -13,15 +13,17 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
 
+import java.util.Map;
+
 @Tag(name = "지역 추천", description = "추천 API")
 public interface SwaggerLocationController {
 
     @Operation(summary = "지역 추천 API", description = "만남 지역을 추천합니다.", responses = {
             @ApiResponse(
-                    responseCode = "200",
+                    responseCode = "201",
                     description = "지역 추천 성공",
                     content = @Content(
-                            array = @ArraySchema(schema = @Schema(implementation = RecommendationsResponse.class))
+                            array = @ArraySchema(schema = @Schema(implementation = Map.class))
                     )
             ),
             @ApiResponse(
@@ -39,6 +41,6 @@ public interface SwaggerLocationController {
                     )
             )
     })
-    ResponseEntity<RecommendationsResponse> recommendLocations(@RequestBody RecommendationRequest request);
+    ResponseEntity<Map<String,String>>  recommendLocations(@RequestBody RecommendationRequest request);
 
 }
