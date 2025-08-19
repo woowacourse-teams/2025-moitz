@@ -26,13 +26,13 @@ public class LocationController implements SwaggerLocationController {
     private final RecommendationParallelTaskService recommendationParallelTaskService;
 
     @PostMapping
-    public ResponseEntity<RecommendationsResponse> recommendLocationsAsync(@RequestBody RecommendationRequest request) {
-        return ResponseEntity.ok(recommendationParallelTaskService.recommendLocation(request));
-    }
-
-    @PostMapping("/sync")
     public ResponseEntity<RecommendationsResponse> recommendLocations(@RequestBody RecommendationRequest request) {
         return ResponseEntity.ok(recommendationService.recommendLocation(request));
+    }
+
+    @PostMapping("/async")
+    public ResponseEntity<RecommendationsResponse> recommendLocationsAsync(@RequestBody RecommendationRequest request) {
+        return ResponseEntity.ok(recommendationParallelTaskService.recommendLocation(request));
     }
 
     @PostMapping("/test")
