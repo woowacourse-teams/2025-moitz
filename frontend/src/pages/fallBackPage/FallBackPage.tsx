@@ -1,3 +1,4 @@
+import BottomButton from '@shared/components/bottomButton/BottomButton';
 import Layout from '@shared/components/layout/Layout';
 import { flex, typography } from '@shared/styles/default.styled';
 
@@ -26,9 +27,7 @@ function FallBackPage({ reset }: { reset: () => void }) {
             align: 'center',
           })}
         >
-          <button onClick={reset} css={fallBackPage.button()}>
-            새로고침
-          </button>
+          <BottomButton onClick={reset} type="button" text="새로고침" active />
         </div>
       </div>
     </Layout>
