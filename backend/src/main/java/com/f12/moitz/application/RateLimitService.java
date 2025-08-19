@@ -9,6 +9,9 @@ import io.github.bucket4j.distributed.proxy.ClientSideConfig;
 import io.github.bucket4j.distributed.proxy.ProxyManager;
 import io.github.bucket4j.redis.lettuce.cas.LettuceBasedProxyManager;
 import io.lettuce.core.RedisClient;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.time.Duration;
 import java.util.function.Supplier;
 import lombok.RequiredArgsConstructor;
@@ -27,7 +30,7 @@ public class RateLimitService {
     private static final Duration REFILL_DURATION = Duration.ofHours(1);
 
     private final Supplier<BucketConfiguration> configurationSupplier = () -> {
-        Bandwidth limit = Bandwidth.builder()
+        final Bandwidth limit = Bandwidth.builder()
                 .capacity(BUCKET_CAPACITY)
                 .refillGreedy(REFILL_AMOUNT, REFILL_DURATION)
                 .build();
@@ -51,7 +54,7 @@ public class RateLimitService {
             final ClientSideConfig clientSideConfig = ClientSideConfig.getDefault()
                     .withExpirationAfterWriteStrategy(
                             ExpirationAfterWriteStrategy
-                                    .basedOnTimeForRefillingBucketUpToMax(Duration.ofDays(10))
+                                    .basedOnTimeForRefillingBucketUpToMax(Duration.ofHours(1))
                     );
 
             proxyManager = LettuceBasedProxyManager.builderFor(redisClient)
@@ -62,32 +65,31 @@ public class RateLimitService {
         return proxyManager;
     }
 
-    public boolean tryConsume(String clientIp) {
-        final String key = REDIS_KEY_PREFIX + clientIp;
+    public ConsumptionProbe tryConsume(final String clientIp, final String userAgent) throws NoSuchAlgorithmException {
+        final String hashedString = getHashedString(clientIp, userAgent);
+        final String key = REDIS_KEY_PREFIX + hashedString;
 
         final Bucket bucket = getProxyManager().builder()
                 .build(key.getBytes(), configurationSupplier);
 
-        final ConsumptionProbe probe = bucket.tryConsumeAndReturnRemaining(1);
-        final boolean isConsumed = probe.isConsumed();
-
-        if (!isConsumed) {
-            log.warn("Rate limit exceeded for IP: {}", clientIp);
-        } else {
-            log.debug("Request allowed for IP: {}, remaining tokens: {}",
-                    clientIp, bucket.getAvailableTokens());
-        }
-
-        return isConsumed;
+        return bucket.tryConsumeAndReturnRemaining(1);
     }
 
-    public long getAvailableTokens(String clientIp) {
-        String key = REDIS_KEY_PREFIX + clientIp;
+    private String getHashedString(final String clientIp, final String userAgent) throws NoSuchAlgorithmException {
+        final String ipAndUserAgent = clientIp + userAgent;
+        final MessageDigest digest = MessageDigest.getInstance("SHA-256");
+        final byte[] encodedHash = digest.digest(ipAndUserAgent.getBytes(StandardCharsets.UTF_8));
 
-        Bucket bucket = getProxyManager().builder()
-                .build(key.getBytes(), configurationSupplier);
+        final StringBuilder hexString = new StringBuilder();
+        for (byte b : encodedHash) {
+            final String hex = Integer.toHexString(0xff & b);
+            if (hex.length() == 1) {
+                hexString.append("0");
+            }
+            hexString.append(hex);
+        }
 
-        return bucket.getAvailableTokens();
+        return hexString.toString();
     }
 
 }

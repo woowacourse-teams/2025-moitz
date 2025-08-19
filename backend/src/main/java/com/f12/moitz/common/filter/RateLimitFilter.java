@@ -2,19 +2,26 @@ package com.f12.moitz.common.filter;
 
 import com.f12.moitz.application.RateLimitService;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.servlet.*;
+import io.github.bucket4j.ConsumptionProbe;
+import jakarta.servlet.Filter;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.FilterConfig;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.ServletRequest;
+import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.util.ContentCachingRequestWrapper;
-
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 
 @Slf4j
 @Component
@@ -25,29 +32,33 @@ public class RateLimitFilter implements Filter {
     private final ObjectMapper objectMapper;
 
     @Override
-    public void doFilter(final ServletRequest request, final ServletResponse response, final FilterChain chain) throws IOException, ServletException {
-        HttpServletRequest httpServletRequest = (HttpServletRequest) request;
-        HttpServletResponse httpServletResponse = (HttpServletResponse) response;
+    public void doFilter(final ServletRequest request, final ServletResponse response, final FilterChain chain) {
+        final HttpServletRequest httpServletRequest = (HttpServletRequest) request;
+        final HttpServletResponse httpServletResponse = (HttpServletResponse) response;
 
-        String clientIp = getClientIpAddress(httpServletRequest);
+        final String clientIp = getClientIpAddress(httpServletRequest);
+        final String userAgent = httpServletRequest.getHeader("User-Agent");
         log.debug("Processing request from IP: {} for URI: {}", clientIp, httpServletRequest.getRequestURI());
 
         try {
-            boolean allowed = rateLimitService.tryConsume(clientIp);
-            if (!allowed) {
-                handleRateLimitExceeded(httpServletResponse, clientIp);
+            final ConsumptionProbe probe = rateLimitService.tryConsume(clientIp, userAgent);
+
+            if (!probe.isConsumed()) {
+                log.warn("Rate limit exceeded for user: {} | {}", clientIp, userAgent);
+                handleRateLimitExceeded(httpServletRequest, httpServletResponse, probe.getNanosToWaitForRefill());
+            } else {
+                log.debug("Request allowed for IP: {}, remaining tokens: {}", clientIp, probe.getRemainingTokens());
             }
 
-            ContentCachingRequestWrapper wrappedRequest = new ContentCachingRequestWrapper(httpServletRequest);
-            chain.doFilter(wrappedRequest,response);
+            final ContentCachingRequestWrapper wrappedRequest = new ContentCachingRequestWrapper(httpServletRequest);
+            chain.doFilter(wrappedRequest, response);
         } catch (Exception e) {
             log.error("Error occurred during rate limiting for IP: {}", clientIp, e);
-
         }
     }
 
-    private String getClientIpAddress(HttpServletRequest request) {
-        String[] headerNames = {
+    private String getClientIpAddress(final HttpServletRequest request) {
+        final String[] headerNames = {
                 "X-Forwarded-For",
                 "X-Real-IP",
                 "Proxy-Client-IP",
@@ -73,42 +84,38 @@ public class RateLimitFilter implements Filter {
         return request.getRemoteAddr();
     }
 
-    private void handleRateLimitExceeded(HttpServletResponse response, String clientIp) throws IOException {
+    private void handleRateLimitExceeded(
+            final HttpServletRequest request,
+            final HttpServletResponse response,
+            final long timeToRefill
+    ) throws IOException {
         response.setStatus(HttpStatus.TOO_MANY_REQUESTS.value());
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.setCharacterEncoding("UTF-8");
 
-        long availableTokens = rateLimitService.getAvailableTokens(clientIp);
-
-        Map<String, Object> errorResponse = new HashMap<>();
-        errorResponse.put("error", "Rate limit exceeded");
+        final Map<String, Object> errorResponse = new HashMap<>();
+        errorResponse.put("code", "I0002");
         errorResponse.put("message", "Too many requests. Please try again later.");
+        errorResponse.put("method", request.getMethod());
+        errorResponse.put("path", request.getRequestURI());
         errorResponse.put("status", HttpStatus.TOO_MANY_REQUESTS.value());
-        errorResponse.put("availableTokens", availableTokens);
-        errorResponse.put("clientIp", clientIp);
+        errorResponse.put("timestamp", LocalDateTime.now().toString());
 
-        response.setHeader("Retry-After", "3600");
+        response.setHeader("Retry-After", String.valueOf(TimeUnit.NANOSECONDS.toSeconds(timeToRefill)));
 
-        response.setHeader("X-RateLimit-Limit", "10");
-        response.setHeader("X-RateLimit-Remaining", String.valueOf(availableTokens));
-        response.setHeader("X-RateLimit-Reset", String.valueOf(System.currentTimeMillis() + 3600000)); // 1시간 후
-
-        String jsonResponse = objectMapper.writeValueAsString(errorResponse);
+        final String jsonResponse = objectMapper.writeValueAsString(errorResponse);
         response.getWriter().write(jsonResponse);
         response.getWriter().flush();
-
-        log.warn("Rate limit exceeded for IP: {}. Available tokens: {}", clientIp, availableTokens);
     }
 
     @Override
-    public void init(FilterConfig filterConfig) throws ServletException {
-        log.info("RateLimitFilter initialized");
+    public void init(final FilterConfig filterConfig) throws ServletException {
         Filter.super.init(filterConfig);
     }
 
     @Override
     public void destroy() {
-        log.info("RateLimitFilter destroyed");
         Filter.super.destroy();
     }
+
 }
