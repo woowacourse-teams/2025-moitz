@@ -1,4 +1,4 @@
-import { View } from '@features/recommendation/types/bottomSheetView';
+import { SelectedLocation } from '@features/recommendation/types/SelectedLocation';
 
 import { RecommendedLocation, StartingPlace } from '@entities/types/Location';
 
@@ -12,15 +12,13 @@ import * as bottomSheet from './bottomSheet.styled';
 interface BottomSheetProps {
   startingLocations: StartingPlace[];
   recommendedLocations: RecommendedLocation[];
-  currentView: View;
-  selectedLocation: RecommendedLocation | null;
+  selectedLocation: SelectedLocation;
   handleSpotClick: (spot: RecommendedLocation) => void;
 }
 
 function BottomSheet({
   startingLocations,
   recommendedLocations,
-  currentView,
   selectedLocation,
   handleSpotClick,
 }: BottomSheetProps) {
@@ -39,14 +37,14 @@ function BottomSheet({
           bottomSheet.content(),
         ]}
       >
-        {currentView === 'list' && (
+        {!selectedLocation && (
           <BottomSheetList
             startingPlaces={startingLocations}
             recommendedLocations={recommendedLocations}
             onSpotClick={handleSpotClick}
           />
         )}
-        {currentView === 'detail' && (
+        {selectedLocation && (
           <BottomSheetDetail
             startingPlaces={startingLocations}
             selectedLocation={selectedLocation}
