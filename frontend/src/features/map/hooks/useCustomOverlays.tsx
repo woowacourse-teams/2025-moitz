@@ -82,8 +82,8 @@ export const useCustomOverlays = ({
     });
 
     // 2) 추천지 마커
-    //    - 선택 전(null): 모두 표시
-    //    - 선택 후: 선택된 추천지만 표시
+    // - 선택 전(null): 모두 표시
+    // - 선택 후: 선택된 추천지만 표시
     recommendedLocations.forEach((loc, i) => {
       if (selectedLocation && loc.id !== selectedLocation.id) return;
 
