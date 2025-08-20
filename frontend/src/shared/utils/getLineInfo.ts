@@ -1,4 +1,4 @@
-import { SUBWAY_LINE_INFO } from '@entities/types/LineCode';
+import { SUBWAY_LINE_INFO } from '@shared/types/LineCode';
 
 export const getLineInfo = (lineName: string) => {
   const lineInfo = Object.values(SUBWAY_LINE_INFO).find(
