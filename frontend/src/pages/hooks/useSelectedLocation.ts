@@ -2,7 +2,7 @@ import { useState } from 'react';
 
 import { SelectedLocation } from '@features/recommendation/types/SelectedLocation';
 
-import { RecommendedLocation } from '@entities/types/Location';
+import { RecommendedLocation } from '@entities/location/types/Location';
 
 type useSelectedLocationReturn = {
   selectedLocation: SelectedLocation;

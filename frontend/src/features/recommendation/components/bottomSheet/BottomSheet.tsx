@@ -1,6 +1,9 @@
 import { SelectedLocation } from '@features/recommendation/types/SelectedLocation';
 
-import { RecommendedLocation, StartingPlace } from '@entities/types/Location';
+import {
+  RecommendedLocation,
+  StartingPlace,
+} from '@entities/location/types/Location';
 
 import { flex, scroll, shadow } from '@shared/styles/default.styled';
 

@@ -7,7 +7,7 @@ import App from '@app/App';
 
 import FallBackPage from '@pages/fallBackPage/FallBackPage';
 
-import { LocationsProvider } from '@entities/contexts/LocationsProvider';
+import { LocationsProvider } from '@entities/location/contexts/LocationsProvider';
 
 import Layout from '@shared/components/layout/Layout';
 import { ErrorBoundary } from '@shared/error/ErrorBoundary';

@@ -5,8 +5,8 @@ import { useFormInfo } from '@features/meeting/hooks/useFormInfo';
 import Toast from '@features/toast/components/Toast';
 import { useToast } from '@features/toast/hooks/useToast';
 
-import { useLocationsContext } from '@entities/contexts/useLocationsContext';
-import { setMeetingStorage } from '@entities/model/meetingStorage';
+import { useLocationsContext } from '@entities/location/contexts/useLocationsContext';
+import { setMeetingStorage } from '@entities/location/model/meetingStorage';
 
 import BottomButton from '@shared/components/bottomButton/BottomButton';
 import { flex } from '@shared/styles/default.styled';
@@ -65,7 +65,7 @@ function MeetingForm() {
       startingPlaceNames: departureList,
       requirement: conditionID,
     });
-    
+
     setMeetingStorage({ departureList, conditionID });
   };
 

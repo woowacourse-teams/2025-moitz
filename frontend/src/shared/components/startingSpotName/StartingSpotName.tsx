@@ -1,4 +1,4 @@
-import { StartingPlace } from '@entities/types/Location';
+import { StartingPlace } from '@entities/location/types/Location';
 
 import { flex, typography } from '@shared/styles/default.styled';
 

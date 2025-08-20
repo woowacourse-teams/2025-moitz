@@ -4,8 +4,8 @@ import ProgressLoading from '@features/loading/components/progressLoading/Progre
 import Map from '@features/map/components/map/Map';
 import BottomSheet from '@features/recommendation/components/bottomSheet/BottomSheet';
 
-import { useLocationsContext } from '@entities/contexts/useLocationsContext';
-import { RecommendedLocation } from '@entities/types/Location';
+import { useLocationsContext } from '@entities/location/contexts/useLocationsContext';
+import { RecommendedLocation } from '@entities/location/types/Location';
 
 import { flex } from '@shared/styles/default.styled';
 

@@ -1,4 +1,4 @@
-import { RecommendedPath } from '@entities/types/Location';
+import { RecommendedPath } from '@entities/location/types/Location';
 
 import { flex } from '@shared/styles/default.styled';
 

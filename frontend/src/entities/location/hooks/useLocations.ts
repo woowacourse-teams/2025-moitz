@@ -1,9 +1,9 @@
 import { useState, useCallback } from 'react';
 
-import { fetchRecommendationId } from '@entities/api/fetchRecommendationId';
-import { fetchRecommendationResult } from '@entities/api/fetchRecommendationResult';
-import { RecommendationRequestBody } from '@entities/api/types/RecommendationIdAPITypes';
-import { Location } from '@entities/types/Location';
+import { fetchRecommendationId } from '@entities/location/api/fetchRecommendationId';
+import { fetchRecommendationResult } from '@entities/location/api/fetchRecommendationResult';
+import { RecommendationRequestBody } from '@entities/location/api/types/RecommendationIdAPITypes';
+import { Location } from '@entities/location/types/Location';
 
 export type useLocationsReturn = {
   data: Location;

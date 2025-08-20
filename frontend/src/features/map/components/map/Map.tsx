@@ -3,7 +3,10 @@ import { Link } from 'react-router';
 import { useCustomOverlays } from '@features/map/hooks/useCustomOverlays';
 import { SelectedLocation } from '@features/recommendation/types/SelectedLocation';
 
-import { RecommendedLocation, StartingPlace } from '@entities/types/Location';
+import {
+  RecommendedLocation,
+  StartingPlace,
+} from '@entities/location/types/Location';
 
 import MapButton from '@shared/components/mapButton/MapButton';
 import MapPoint from '@shared/components/mapPoint/MapPoint';

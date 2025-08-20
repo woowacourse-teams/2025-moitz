@@ -1,4 +1,4 @@
-import { LocationRequirement } from '@entities/types/LocationRequirement';
+import { LocationRequirement } from '@entities/location/types/LocationRequirement';
 
 const MEETING_DEPARTURE_LIST = 'meeting:departures';
 const MEETING_CONDITION_ID = 'meeting:conditionId';
@@ -20,7 +20,7 @@ export function setMeetingStorage(params: {
 export function getMeetingStorage(): {
   departureList: string[];
   conditionID: LocationRequirement;
-  } {
+} {
   const departureList = JSON.parse(
     localStorage.getItem(MEETING_DEPARTURE_LIST) ?? '[]',
   );

@@ -2,7 +2,7 @@ import {
   Location,
   RecommendedLocation,
   StartingPlace,
-} from '@entities/types/Location';
+} from '@entities/location/types/Location';
 
 export const StartingPlacesMock: StartingPlace[] = [
   { id: 1, x: 126.9784, y: 37.5665, index: 0, name: '서울역' },

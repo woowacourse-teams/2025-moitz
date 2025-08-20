@@ -1,7 +1,7 @@
 import {
   RecommendationRequestBody,
   RecommendationResponse,
-} from '@entities/api/types/RecommendationIdAPITypes';
+} from '@entities/location/api/types/RecommendationIdAPITypes';
 
 import { apiClient } from '@shared/api/apiClient';
 

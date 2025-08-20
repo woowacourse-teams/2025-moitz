@@ -1,6 +1,6 @@
 import React from 'react';
 
-import useLocations from '@entities/hooks/useLocations';
+import useLocations from '@entities/location/hooks/useLocations';
 
 import LocationsContext from './LocationsContext';
 

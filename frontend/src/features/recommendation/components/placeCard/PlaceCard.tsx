@@ -1,4 +1,4 @@
-import { RecommendedPlace } from '@entities/types/Location';
+import { RecommendedPlace } from '@entities/location/types/Location';
 
 import Badge from '@shared/components/badge/Badge';
 import { flex, typography } from '@shared/styles/default.styled';

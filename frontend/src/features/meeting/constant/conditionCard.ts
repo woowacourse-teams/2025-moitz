@@ -1,4 +1,4 @@
-import { LocationRequirement } from '@entities/types/LocationRequirement';
+import { LocationRequirement } from '@entities/location/types/LocationRequirement';
 
 type ConditionCardText = Record<
   LocationRequirement,

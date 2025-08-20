@@ -1,4 +1,7 @@
-import { RecommendedLocation, StartingPlace } from '@entities/types/Location';
+import {
+  RecommendedLocation,
+  StartingPlace,
+} from '@entities/location/types/Location';
 
 import StartingSpotWrapper from '@shared/components/startingSpotWrapper/StartingSpotWrapper';
 

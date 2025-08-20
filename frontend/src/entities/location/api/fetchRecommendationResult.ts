@@ -1,5 +1,5 @@
-import { LocationResponse } from '@entities/api/types/RecommendationResultAPITypes';
-import { Location } from '@entities/types/Location';
+import { LocationResponse } from '@entities/location/api/types/RecommendationResultAPITypes';
+import { Location } from '@entities/location/types/Location';
 
 import { apiClient } from '@shared/api/apiClient';
 
