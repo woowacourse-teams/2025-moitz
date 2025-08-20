@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 
-import { View } from '@features/recommendation/types/bottomSheetView';
+import { SelectedLocation } from '@features/recommendation/types/SelectedLocation';
 
 import { RecommendedLocation, StartingPlace } from '@entities/types/Location';
 
@@ -14,15 +14,13 @@ const SNAP_POINTS = [15, 60, 95];
 interface BottomSheetProps {
   startingLocations: StartingPlace[];
   recommendedLocations: RecommendedLocation[];
-  currentView: View;
-  selectedLocation: RecommendedLocation | null;
+  selectedLocation: SelectedLocation;
   handleSpotClick: (spot: RecommendedLocation) => void;
 }
 
 function BottomSheet({
   startingLocations,
   recommendedLocations,
-  currentView,
   selectedLocation,
   handleSpotClick,
 }: BottomSheetProps) {
@@ -136,14 +134,14 @@ function BottomSheet({
       isAnimating={isAnimating}
       onContainerTransitionEnd={handleTransitionEnd}
     >
-      {currentView === 'list' && (
+      {!selectedLocation && (
         <BottomSheetList
           startingPlaces={startingLocations}
           recommendedLocations={recommendedLocations}
           onSpotClick={handleSpotClick}
         />
       )}
-      {currentView === 'detail' && (
+      {selectedLocation && (
         <BottomSheetDetail
           startingPlaces={startingLocations}
           selectedLocation={selectedLocation}

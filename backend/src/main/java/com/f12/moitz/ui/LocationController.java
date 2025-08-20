@@ -9,13 +9,14 @@ import com.f12.moitz.application.dto.RecommendationResponse;
 import com.f12.moitz.application.dto.RecommendationsResponse;
 import com.f12.moitz.application.dto.RouteResponse;
 import com.f12.moitz.application.dto.StartingPlaceResponse;
+
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RequiredArgsConstructor
 @RestController
@@ -26,13 +27,22 @@ public class LocationController implements SwaggerLocationController {
     private final RecommendationParallelTaskService recommendationParallelTaskService;
 
     @PostMapping
-    public ResponseEntity<RecommendationsResponse> recommendLocations(@RequestBody RecommendationRequest request) {
-        return ResponseEntity.ok(recommendationService.recommendLocation(request));
+    public ResponseEntity<Map<String,String>> recommendLocations(@RequestBody RecommendationRequest request) {
+        String id = recommendationService.recommendLocation(request);
+        Map<String, String> resultResponse = new HashMap<>();
+        resultResponse.put("id", id);
+        return ResponseEntity.status(201).body(resultResponse);
     }
 
     @PostMapping("/async")
     public ResponseEntity<RecommendationsResponse> recommendLocationsAsync(@RequestBody RecommendationRequest request) {
         return ResponseEntity.ok(recommendationParallelTaskService.recommendLocation(request));
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<RecommendationsResponse> getRecommendationResult(@PathVariable("id") String id){
+        RecommendationsResponse response = recommendationService.findResultById(id);
+        return ResponseEntity.ok().body(response);
     }
 
     @PostMapping("/test")
@@ -41,6 +51,7 @@ public class LocationController implements SwaggerLocationController {
     }
 
     private RecommendationsResponse mock() {
+
         return new RecommendationsResponse(
                 List.of(
                         new StartingPlaceResponse(1L, 1, 127.094741101863, 37.5351180385975, "강변역"),

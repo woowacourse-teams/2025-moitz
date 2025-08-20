@@ -1,17 +1,21 @@
 package com.f12.moitz.domain.subway;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import java.time.Duration;
 import lombok.Getter;
+
+import java.time.Duration;
 
 @Getter
 public class Edge {
 
-    private final String destination;
-    private final Duration travelTime; // seconds
-    private final int distance; // m
-    private final String lineName;
+    private String destination;
+
+    private Duration travelTime;
+
+    private int distance;
+
+    private String lineName;
+
+    protected Edge() {}
 
     public Edge(final String destination, final int timeInSeconds, final int distance, final String lineName) {
         this.destination = destination;
@@ -20,12 +24,11 @@ public class Edge {
         this.lineName = lineName;
     }
 
-    @JsonCreator
     public Edge(
-            @JsonProperty("destination") String destination,
-            @JsonProperty("travelTime") Duration duration,
-            @JsonProperty("distance") int distance,
-            @JsonProperty("lineName") String lineName
+            String destination,
+            Duration duration,
+            int distance,
+            String lineName
     ) {
         this.destination = destination;
         this.travelTime = duration;
@@ -48,9 +51,4 @@ public class Edge {
     public int getTimeInSeconds() {
         return (int) travelTime.getSeconds();
     }
-
-    public boolean hasSameDestination(Edge other) {
-        return this.destination.equals(other.destination);
-    }
-
 }

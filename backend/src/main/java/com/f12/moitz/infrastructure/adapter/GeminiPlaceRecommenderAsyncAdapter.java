@@ -62,7 +62,7 @@ public class GeminiPlaceRecommenderAsyncAdapter implements AsyncPlaceRecommender
                                             requirement,
                                             place.getPoint().getX(),
                                             place.getPoint().getY(),
-                                            800
+                                            1000
                                     )
                             );
                             return List.of(response);
@@ -104,6 +104,5 @@ public class GeminiPlaceRecommenderAsyncAdapter implements AsyncPlaceRecommender
                 .doOnError(e -> log.error("Error filtering places for: {}", place.getName(), e))
                 .onErrorResume(e -> Mono.empty());
     }
-
 
 }
