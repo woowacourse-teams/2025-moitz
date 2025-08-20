@@ -1,5 +1,6 @@
 package com.f12.moitz.common.config;
 
+import com.f12.moitz.application.PlaceService;
 import com.f12.moitz.domain.repository.SubwayStationRepository;
 import com.f12.moitz.domain.subway.SubwayMapPathFinder;
 import com.f12.moitz.domain.subway.SubwayStation;
@@ -8,6 +9,7 @@ import com.google.genai.Client;
 import io.netty.handler.timeout.ReadTimeoutHandler;
 import io.netty.handler.timeout.WriteTimeoutHandler;
 import java.time.Duration;
+import java.util.ArrayList;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -105,21 +107,23 @@ public class ClientConfig {
     @Bean
     public SubwayMapPathFinder subwayMapPathFinder(
             @Autowired SubwayStationRepository stationRepository,
-            @Autowired SubwayMapBuilder subwayMapBuilder
+            @Autowired SubwayMapBuilder subwayMapBuilder,
+            @Autowired PlaceService placeService
     ) {
         log.info("SubwayMapPathFinder 초기화 시작");
-
         try {
             Map<String, SubwayStation> stationMap = stationRepository.findAllAsMap();
             if (stationMap == null || stationMap.isEmpty()) {
                 log.info("MongoDB에 데이터가 없습니다. CSV에서 자동 빌드를 시작합니다...");
                 stationMap = subwayMapBuilder.buildAndSaveToMongo();
                 log.info("자동 빌드 완료. {}개 역 저장됨", stationMap.size());
+
+                int saved = placeService.saveIfAbsent(new ArrayList<>(stationMap.keySet()));
+                log.info("Place 초기화 완료. {}개 추가되었습니다.", saved);
             }
-
             log.info("SubwayMapPathFinder 초기화 완료. 총 {}개 역", stationMap.size());
-            return new SubwayMapPathFinder(stationMap);
 
+            return new SubwayMapPathFinder(stationMap);
         } catch (Exception e) {
             log.error("SubwayMapPathFinder 초기화 실패", e);
             throw new RuntimeException("SubwayMapPathFinder 초기화 실패: " + e.getMessage(), e);
