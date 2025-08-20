@@ -25,7 +25,7 @@ export function getMeetingStorage(): {
     localStorage.getItem(MEETING_DEPARTURE_LIST) ?? '[]',
   );
   const conditionID = JSON.parse(
-    localStorage.getItem(MEETING_CONDITION_ID) ?? 'null',
+    localStorage.getItem(MEETING_CONDITION_ID) ?? '',
   );
 
   return { departureList, conditionID };
