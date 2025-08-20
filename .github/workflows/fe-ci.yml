@@ -51,7 +51,7 @@ jobs:
         run: |
           if [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
             npm run build:prod
-          if [[ "${{ github.ref }}" == "refs/heads/dev" ]]; then
+          elif [[ "${{ github.ref }}" == "refs/heads/dev" ]]; then
             npm run build:dev
           else
             echo "No matching branch for build"
