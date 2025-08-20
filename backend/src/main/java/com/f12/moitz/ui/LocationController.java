@@ -40,7 +40,7 @@ public class LocationController implements SwaggerLocationController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<RecommendationsResponse> getRecommendResult(@PathVariable("id") String id){
+    public ResponseEntity<RecommendationsResponse> getRecommendationResult(@PathVariable("id") String id){
         RecommendationsResponse response = recommendationService.findResultById(id);
         return ResponseEntity.ok().body(response);
     }

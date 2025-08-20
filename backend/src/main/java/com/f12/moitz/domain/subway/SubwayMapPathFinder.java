@@ -13,11 +13,9 @@ import java.util.Map;
 import java.util.PriorityQueue;
 import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.mongodb.core.mapping.Document;
 import reactor.core.publisher.Mono;
 
 @Slf4j
-@Document(collection = "subway_station")
 public class SubwayMapPathFinder {
 
     private final Map<String, SubwayStation> stationMap;
