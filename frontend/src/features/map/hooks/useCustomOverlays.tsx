@@ -6,21 +6,20 @@ import type {
 } from '@entities/types/Location';
 
 import MarkerIndex from '@shared/components/markerIndex/MarkerIndex';
+import { numberToCharCode } from '@shared/utils/numberToCharCode';
 
 import { CustomOverlay } from '../lib/CustomOverlay';
 
 interface useCustomOverlaysProps {
   startingLocations: StartingPlace[];
   recommendedLocations: RecommendedLocation[];
+  changeSelectedLocation: (location: RecommendedLocation) => void;
 }
-
-const stringToCharCode = (number: number) => {
-  return String.fromCharCode(number + 64);
-};
 
 export const useCustomOverlays = ({
   startingLocations,
   recommendedLocations,
+  changeSelectedLocation,
 }: useCustomOverlaysProps) => {
   const mapRef = useRef<HTMLDivElement | null>(null);
 
@@ -47,7 +46,7 @@ export const useCustomOverlays = ({
         position,
         content: (
           <MarkerIndex
-            index={stringToCharCode(index + 1)}
+            index={numberToCharCode(index + 1)}
             type="starting"
             label={location.name}
             hasStroke
@@ -64,13 +63,19 @@ export const useCustomOverlays = ({
         naverMap,
         position,
         content: (
-          <MarkerIndex
-            index={index + 1}
-            type="recommended"
-            label={location.name}
-            hasStroke
-            hasShadow
-          />
+          <button
+            onClick={() => {
+              changeSelectedLocation(location);
+            }}
+          >
+            <MarkerIndex
+              index={index + 1}
+              type="recommended"
+              label={location.name}
+              hasStroke
+              hasShadow
+            />
+          </button>
         ),
       });
     });
