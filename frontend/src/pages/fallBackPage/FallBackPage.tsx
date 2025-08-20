@@ -1,7 +1,8 @@
 import BottomButton from '@shared/components/bottomButton/BottomButton';
 import Layout from '@shared/components/layout/Layout';
-import Logo from '@shared/components/logo/Logo';
 import { flex, typography } from '@shared/styles/default.styled';
+
+import IconError from '@icons/icon-error.svg';
 
 import * as fallBackPage from './fallBackPage.styled';
 
@@ -26,7 +27,6 @@ function FallBackPage({
           fallBackPage.base(),
         ]}
       >
-        <Logo type="black" />
         <div
           css={[
             flex({
@@ -38,6 +38,7 @@ function FallBackPage({
             fallBackPage.content(),
           ]}
         >
+          <img src={IconError} alt="error" css={fallBackPage.errorIcon()} />
           <p css={typography.h1}>일시적인 오류가 발생했어요</p>
           <span css={[typography.b1, fallBackPage.description()]}>
             잠시 후 다시 시도해 주시겠어요?
