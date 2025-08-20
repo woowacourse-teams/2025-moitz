@@ -1,8 +1,7 @@
-import { SUBWAY_LINE_INFO } from '@entities/types/LineCode';
-
 import Dot from '@shared/components/dot/Dot';
 import { flex, typography } from '@shared/styles/default.styled';
 import { colorToken } from '@shared/styles/tokens';
+import { getLineInfo } from '@shared/utils/getLineInfo';
 
 import * as segment from './routeSegment.styled';
 
@@ -17,13 +16,6 @@ function RouteSegment({
   startStation,
   endStation,
 }: RouteSegmentProps) {
-  const getLineInfo = (lineName: string) => {
-    const lineInfo = Object.values(SUBWAY_LINE_INFO).find(
-      (info) => info.name === lineName,
-    );
-    return lineInfo;
-  };
-
   const lineInfo = getLineInfo(lineCode);
   const subwayColor = lineInfo
     ? colorToken.subway[lineInfo.code]

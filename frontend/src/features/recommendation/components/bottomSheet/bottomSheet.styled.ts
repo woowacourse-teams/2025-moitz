@@ -8,8 +8,8 @@ export const container = () => css`
   min-height: 50vh;
   padding: 20px 20px 0px 20px;
   background-color: ${colorToken.gray[8]};
-  border-top-left-radius: ${borderRadiusToken.input};
-  border-top-right-radius: ${borderRadiusToken.input};
+  border-top-left-radius: ${borderRadiusToken[10]};
+  border-top-right-radius: ${borderRadiusToken[10]};
 `;
 
 export const content = () => css`

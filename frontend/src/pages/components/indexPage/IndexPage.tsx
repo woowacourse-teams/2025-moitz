@@ -12,7 +12,7 @@ function IndexPage() {
         flex({ direction: 'column' }),
         grid_padding,
         scroll,
-        indexPage.container(),
+        indexPage.base(),
       ]}
     >
       <div css={indexPage.headerLogo()}>

@@ -1,3 +1,5 @@
+import { shadow } from '@shared/styles/default.styled';
+
 import * as dropdown from './dropdown.styled';
 import DropdownEmpty from './dropdownEmpty/DropdownEmpty';
 import DropdownList from './dropdownList/DropdownList';
@@ -9,7 +11,7 @@ interface DropdownProps {
 
 function Dropdown({ stations, handleStationSelect }: DropdownProps) {
   return (
-    <ul css={dropdown.base()}>
+    <ul css={[dropdown.base(), shadow.dropdown]}>
       {!stations.length ? (
         <DropdownEmpty />
       ) : (
