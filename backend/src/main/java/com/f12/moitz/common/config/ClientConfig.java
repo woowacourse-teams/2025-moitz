@@ -7,6 +7,8 @@ import com.f12.moitz.infrastructure.SubwayMapBuilder;
 import com.google.genai.Client;
 import io.netty.handler.timeout.ReadTimeoutHandler;
 import io.netty.handler.timeout.WriteTimeoutHandler;
+import java.time.Duration;
+import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -20,9 +22,6 @@ import org.springframework.web.client.RestClient;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.netty.http.client.HttpClient;
 
-import java.time.Duration;
-import java.util.Map;
-
 @Slf4j
 @Configuration
 public class ClientConfig {
@@ -32,11 +31,6 @@ public class ClientConfig {
 
     @Value("${perplexity.api.key}")
     private String perplexityApiKey;
-
-    @Bean
-    public Client geminiClient() {
-        return geminiClientBuilder().apiKey(geminiApiKey).build();
-    }
 
     @Bean
     public RestClient kakaoRestClient() {
@@ -79,10 +73,25 @@ public class ClientConfig {
     }
 
     @Bean
+    public Client geminiClient() {
+        return geminiClientBuilder().apiKey(geminiApiKey).build();
+    }
+
+    @Bean
     public WebClient odsayWebClient() {
         return WebClient.builder()
                 .baseUrl("https://api.odsay.com/v1/api")
                 .clientConnector(new ReactorClientHttpConnector(httpClient(5)))
+                .build();
+    }
+
+    @Bean
+    public WebClient perplexityWebClient() {
+        return WebClient.builder()
+                .baseUrl("https://api.perplexity.ai")
+                .clientConnector(new ReactorClientHttpConnector(httpClient(20)))
+                .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                .defaultHeader(HttpHeaders.AUTHORIZATION, "Bearer " + perplexityApiKey)
                 .build();
     }
 
@@ -108,9 +117,6 @@ public class ClientConfig {
                 log.info("자동 빌드 완료. {}개 역 저장됨", stationMap.size());
             }
 
-            Map<String, SubwayStation> stationMap = stations.stream()
-                    .collect(Collectors.toMap(SubwayStation::getName, Function.identity()));
-
             log.info("SubwayMapPathFinder 초기화 완료. 총 {}개 역", stationMap.size());
             return new SubwayMapPathFinder(stationMap);
 
@@ -118,16 +124,6 @@ public class ClientConfig {
             log.error("SubwayMapPathFinder 초기화 실패", e);
             throw new RuntimeException("SubwayMapPathFinder 초기화 실패: " + e.getMessage(), e);
         }
-    }
-
-    @Bean
-    public WebClient perplexityWebClient() {
-        return WebClient.builder()
-                .baseUrl("https://api.perplexity.ai")
-                .clientConnector(new ReactorClientHttpConnector(httpClient(20)))
-                .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-                .defaultHeader(HttpHeaders.AUTHORIZATION, "Bearer " + perplexityApiKey)
-                .build();
     }
 
 }
