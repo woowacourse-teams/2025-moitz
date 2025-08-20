@@ -7,11 +7,12 @@ import { apiClient } from '@shared/api/apiClient';
 
 export const fetchRecommendationId = async (
   requestBody: RecommendationRequestBody,
-): Promise<number> => {
-  // TODO : string 으로 변경
+): Promise<string> => {
   const response = await apiClient.post<RecommendationResponse>(
     '/recommendations/test', // TODO : 추후 실제 api 로 수정
     requestBody,
   );
-  return response.id;
+
+  const id = response.id.toString(); // TODO : 추후 실제 타입을 위해 문자열로 변경함.
+  return id;
 };

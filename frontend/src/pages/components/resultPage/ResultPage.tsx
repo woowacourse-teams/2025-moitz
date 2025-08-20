@@ -1,3 +1,6 @@
+import { useCallback, useEffect } from 'react';
+import { useParams, useNavigate } from 'react-router';
+
 import useSelectedRecommendedLocation from '@pages/hooks/useSelectedLocation';
 
 import ProgressLoading from '@features/loading/components/progressLoading/ProgressLoading';
@@ -12,7 +15,31 @@ import { flex } from '@shared/styles/default.styled';
 import * as resultPage from './resultPage.styled';
 
 function ResultPage() {
-  const { data: location, isLoading, isError } = useLocationsContext();
+  const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
+  const {
+    data: location,
+    isLoading,
+    getRecommendationResult,
+  } = useLocationsContext();
+
+  const fetchResult = useCallback(async () => {
+    try {
+      await getRecommendationResult(id);
+    } catch {
+      navigate('/');
+    }
+  }, [id, navigate, getRecommendationResult]);
+
+  useEffect(() => {
+    if (!id) {
+      navigate('/');
+      return;
+    }
+
+    fetchResult();
+  }, [id, fetchResult]);
+
   const { selectedLocation, changeSelectedLocation } =
     useSelectedRecommendedLocation();
 
@@ -21,7 +48,6 @@ function ResultPage() {
   };
 
   if (isLoading) return <ProgressLoading />;
-  if (isError) return <p>에러 발생!</p>;
   if (!location || location.recommendedLocations.length === 0)
     return <p>추천 결과가 없습니다.</p>;
 

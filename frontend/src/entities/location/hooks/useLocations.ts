@@ -10,7 +10,10 @@ export type useLocationsReturn = {
   isLoading: boolean;
   isError: boolean;
   errorMessage: string;
-  trigger: (requestBody: RecommendationRequestBody) => Promise<void>;
+  getRecommendationId: (
+    requestBody: RecommendationRequestBody,
+  ) => Promise<string>;
+  getRecommendationResult: (id: string) => Promise<void>;
 };
 
 const initialData: Location = {
@@ -24,7 +27,7 @@ const useLocations = (): useLocationsReturn => {
   const [isError, setIsError] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
 
-  const trigger = useCallback(
+  const getRecommendationId = useCallback(
     async (requestBody: RecommendationRequestBody) => {
       setIsLoading(true);
       setIsError(false);
@@ -32,19 +35,41 @@ const useLocations = (): useLocationsReturn => {
 
       try {
         const id = await fetchRecommendationId(requestBody);
-        const locations = await fetchRecommendationResult(id.toString());
-        setData(locations);
+        return id;
       } catch (error) {
         setIsError(true);
         setErrorMessage(error instanceof Error ? error.message : String(error));
-      } finally {
-        setIsLoading(false);
+        throw error;
       }
     },
     [],
   );
 
-  return { data, isLoading, isError, errorMessage, trigger };
+  const getRecommendationResult = useCallback(async (id: string) => {
+    setIsLoading(true);
+    setIsError(false);
+    setErrorMessage('');
+
+    try {
+      const locations = await fetchRecommendationResult(id);
+      setData(locations);
+    } catch (error) {
+      setIsError(true);
+      setErrorMessage(error instanceof Error ? error.message : String(error));
+      throw error;
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+  return {
+    data,
+    isLoading,
+    isError,
+    errorMessage,
+    getRecommendationId,
+    getRecommendationResult,
+  };
 };
 
 export default useLocations;

@@ -29,7 +29,7 @@ function MeetingForm() {
   } = useFormInfo();
   const { isVisible, message, showToast } = useToast();
 
-  const { trigger } = useLocationsContext();
+  const { getRecommendationId } = useLocationsContext();
 
   const showValidationError = (error: ValidationError) => {
     if (!error.isValid) {
@@ -59,12 +59,12 @@ function MeetingForm() {
       return;
     }
 
-    navigate('/result');
-
-    await trigger({
+    const id = await getRecommendationId({
       startingPlaceNames: departureList,
       requirement: conditionID,
     });
+
+    navigate(`/result/${id}`);
 
     setMeetingStorage({ departureList, conditionID });
   };
