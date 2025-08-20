@@ -102,19 +102,19 @@ public class PromptGenerator {
                                         "type", "object",
                                         "properties", Map.of(
                                                 "locationName", Map.of("type", "string", "description", "추천 장소의 이름"),
-                                                "reason", Map.of(
+                                                "summarize_reason", Map.of(
                                                         "type", "string",
                                                         "description",
                                                         "해당 장소를 추천하는 간결한 한 줄 요약 이유 20자 이내, 어울리는 이모지 1개와 함께 (예: '접근성 좋고 맛집이 많아요! 😋') 만약 추천 이유에 사용자 조건이 포함되어 있다면, 이유에 명시할 것",
                                                         "maxLength", 20
                                                 ),
-                                                "description", Map.of(
+                                                "detail_reason", Map.of(
                                                         "type", "string",
-                                                        "description", "추천 장소에 대한 간단한 설명 100자 이내 (예: '강남역은 하루 유동 인구가 많은 번화가로, 다양한 연령층이 많이 이용하며, 주변에는 대형 빌딩, 쇼핑몰, 학원, 음식점 등이 밀집되어 있습니다. ')",
+                                                        "description", "추천 장소에 대한 간단한 설명 100자 이내 (예: '강남역은 하루 유동 인구가 많은 번화가로, 다양한 연령층이 많이 이용하며, 주변에는 대형 빌딩, 쇼핑몰, 학원, 음식점 등이 밀집되어 있습니다.')",
                                                         "maxLength", 100
                                                 )
                                         ),
-                                        "required", List.of("locationName", "reason")
+                                        "required", List.of("locationName", "summarize_reason", "detail_reason")
                                 ),
                                 "minItems", 3,
                                 "maxItems", 5
