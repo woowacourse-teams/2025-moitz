@@ -85,7 +85,6 @@ function BottomSheet({
     // // 드래그 중이 아닐 때 들어오는 move 이벤트는 무시 (안전성)
     if (!isDraggingRef.current) return;
 
-    console.log(e.clientY, positionPercent);
     // 1) 드래그 이동량(px). 아래로 끌면 양수, 위로 끌면 음수
     const dragDistanceInPx = e.clientY - startYRef.current;
 

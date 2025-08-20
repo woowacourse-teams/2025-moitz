@@ -19,8 +19,6 @@ function BottomSheetView({
   isAnimating,
   onContainerTransitionEnd,
 }: BottomSheetViewProps) {
-  console.log(window.navigator.onLine);
-
   return (
     <div css={[bottomSheetView.base()]}>
       <div
