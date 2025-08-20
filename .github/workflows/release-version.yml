@@ -26,6 +26,9 @@ jobs:
     # PR이 머지되었거나 수동 실행일 때 실행
     if: github.event.pull_request.merged == true || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
+    permissions:
+      contents: write # 저장소 컨텐츠 수정 권한 추가
+      pull-requests: write # PR 관련 권한 추가
 
     steps:
       # 코드 체크아웃
