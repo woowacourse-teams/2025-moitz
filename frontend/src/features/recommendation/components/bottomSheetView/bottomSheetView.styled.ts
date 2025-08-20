@@ -30,7 +30,7 @@ export const container = (positionPercent: number) => css`
 `;
 
 export const header = () => css`
-  padding: 10px 0px 20px 0px;
+  padding: 5px 0px;
   cursor: grab;
 
   /* 브라우저의 기본 터치 제스처(스크롤, 스와이프, 더블탭 확대, 핀치줌 등)를 전부 끄겠다는 CSS 설정 */
