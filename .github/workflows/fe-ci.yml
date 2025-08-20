@@ -47,5 +47,12 @@ jobs:
       - name: 테스트 및 커버리지 확인
         run: npx jest --verbose --coverage
 
-      - name: 빌드 실행
-        run: npm run build
+      - name: 빌드 실행 (브랜치에 따라 다르게)
+        run: |
+          if [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
+            npm run build:prod
+          if [[ "${{ github.ref }}" == "refs/heads/dev" ]]; then
+            npm run build:dev
+          else
+            echo "No matching branch for build"
+          fi
