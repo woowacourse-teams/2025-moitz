@@ -47,10 +47,10 @@ export const header = () => css`
 export const handle = () => css`
   width: 40px;
   height: 4px;
-  background-color: ${colorToken.gray[7]};
   border-radius: 2px;
   margin: 8px auto;
   display: block;
+  background-color: ${colorToken.gray[7]};
 
   /* 현재 handle을 장식용 막대로 구현한 상태임 */
   /* 요소 위를 눌러도 클릭/드래그 타깃이 되지 않고, 이벤트가 뒤(혹은 부모)로 통과 */
