@@ -1,8 +1,9 @@
 import { useNavigate } from 'react-router';
 
 import BottomButton from '@shared/components/bottomButton/BottomButton';
-import Logo from '@shared/components/logo/Logo';
 import { flex, typography } from '@shared/styles/default.styled';
+
+import IconError from '@icons/icon-error.svg';
 
 import * as notFoundPage from './notFoundPage.styled';
 
@@ -16,11 +17,11 @@ function NotFoundPage() {
           direction: 'column',
           justify: 'space-between',
           align: 'center',
+          gap: 40,
         }),
         notFoundPage.base(),
       ]}
     >
-      <Logo type="black" />
       <div
         css={[
           flex({
@@ -32,6 +33,7 @@ function NotFoundPage() {
           notFoundPage.content(),
         ]}
       >
+        <img src={IconError} alt="error" css={notFoundPage.errorIcon()} />
         <p css={typography.h1}>앗! 찾으시는 페이지가 없어요</p>
         <span css={[typography.b1, notFoundPage.description()]}>
           주소가 변경되었거나 더는 제공되지 않는 페이지예요.
