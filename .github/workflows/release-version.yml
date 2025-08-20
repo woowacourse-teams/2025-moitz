@@ -6,7 +6,6 @@ on:
     types: [closed]
     branches:
       - main
-      - dev # 임시로 dev도 추가함.
 
   # 수동으로 워크플로우를 실행할 수 있는 트리거 추가
   workflow_dispatch:
