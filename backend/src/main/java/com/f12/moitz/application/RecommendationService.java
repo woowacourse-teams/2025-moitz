@@ -20,6 +20,7 @@ import com.f12.moitz.domain.Routes;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -159,4 +160,9 @@ public class RecommendationService {
         );
     }
 
+    public RecommendationsResponse findResultById(final String id) {
+        Result result = recommendResultRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("아이디에 해당하는 결과를 찾을 수 없습니다."));
+        return new RecommendationsResponse(result.getStartingPlaces(), result.getRecommendedLocations());
+    }
 }
