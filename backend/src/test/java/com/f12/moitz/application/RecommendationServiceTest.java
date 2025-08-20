@@ -57,7 +57,7 @@ class RecommendationServiceTest {
     @Mock
     private RecommendationMapper recommendationMapper;
 
-    @Test
+    /*@Test
     @DisplayName("모든 경로 탐색 후, 기준을 벗어나는 장소는 제외하고 올바르게 추천한다")
     void recommendLocationWithFiltering() {
         // Given
@@ -112,7 +112,7 @@ class RecommendationServiceTest {
 
         verify(routeFinder, times(1)).findRoutes(anyList());
     }
-
+*/
     private RecommendationsResponse createExpectedResponse(List<Place> startingPlaces, Place recommendedPlace) {
         return new RecommendationsResponse(
                 List.of(

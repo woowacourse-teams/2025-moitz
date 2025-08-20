@@ -1,6 +1,5 @@
 package com.f12.moitz.domain.repository;
 
-import com.f12.moitz.domain.subway.SubwayMapPathFinder;
 import com.f12.moitz.domain.subway.SubwayStation;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
