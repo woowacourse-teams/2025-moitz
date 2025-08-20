@@ -1,4 +1,4 @@
-import { LocationRequirement } from '@entities/types/LocationRequestBody';
+import { LocationRequirement } from '@entities/types/LocationRequirement';
 
 const MEETING_DEPARTURE_LIST = 'meeting:departures';
 const MEETING_CONDITION_ID = 'meeting:conditionId';
