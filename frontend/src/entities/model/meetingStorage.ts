@@ -20,7 +20,7 @@ export function setMeetingStorage(params: {
 export function getMeetingStorage(): {
   departureList: string[];
   conditionID: LocationRequirement;
-} {
+  } {
   const departureList = JSON.parse(
     localStorage.getItem(MEETING_DEPARTURE_LIST) ?? '[]',
   );
