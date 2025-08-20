@@ -2,11 +2,12 @@ package com.f12.moitz.application;
 
 import com.f12.moitz.application.dto.RecommendationRequest;
 import com.f12.moitz.application.dto.RecommendationsResponse;
-import com.f12.moitz.application.dto.RecommendedLocationResponse;
+import com.f12.moitz.application.dto.RecommendedLocationsResponse;
 import com.f12.moitz.application.port.AsyncPlaceRecommender;
 import com.f12.moitz.application.port.AsyncRouteFinder;
 import com.f12.moitz.application.port.LocationRecommender;
 import com.f12.moitz.application.port.PlaceFinder;
+import com.f12.moitz.application.port.dto.ReasonAndDescription;
 import com.f12.moitz.application.port.dto.StartEndPair;
 import com.f12.moitz.application.utils.RecommendationMapper;
 import com.f12.moitz.domain.Candidate;
@@ -55,14 +56,14 @@ public class RecommendationParallelTaskService {
     public RecommendationsResponse recommendLocation(final RecommendationRequest request) {
         StopWatch stopWatch = new StopWatch("추천 서비스 전체");
         stopWatch.start("지역 추천");
-        final String requirement = RecommendCondition.fromTitle(request.requirement()).getCategoryNames();
+        final String requirement = RecommendCondition.fromTitle(request.requirement()).getKeyword();
         final List<Place> startingPlaces = placeFinder.findPlacesByNames(request.startingPlaceNames());
-        final RecommendedLocationResponse recommendedLocationResponse = locationRecommender.getRecommendedLocations(
+        final RecommendedLocationsResponse recommendedLocationsResponse = locationRecommender.getRecommendedLocations(
                 request.startingPlaceNames(),
                 requirement
         );
-        final Map<Place, String> generatedPlacesWithReason = locationRecommender.recommendLocations(
-                recommendedLocationResponse);
+        final Map<Place, ReasonAndDescription> generatedPlacesWithReason = locationRecommender.recommendLocations(
+                recommendedLocationsResponse);
         stopWatch.stop();
         final List<Place> generatedPlaces = generatedPlacesWithReason.keySet().stream().toList();
 
@@ -125,7 +126,7 @@ public class RecommendationParallelTaskService {
 
     private void removePlacesBeyondRange(
             final Map<Place, Routes> placeRoutes,
-            final Map<Place, String> generatedPlaces
+            final Map<Place, ReasonAndDescription> generatedPlaces
     ) {
         placeRoutes.forEach((key, value) -> {
             if (!value.isAcceptable()) {
@@ -136,7 +137,7 @@ public class RecommendationParallelTaskService {
     }
 
     private Recommendation toRecommendation(
-            final Map<Place, String> generatedPlaces,
+            final Map<Place, ReasonAndDescription> generatedPlaces,
             final Map<Place, List<RecommendedPlace>> placeListMap,
             final Map<Place, Routes> placeRoutes
     ) {

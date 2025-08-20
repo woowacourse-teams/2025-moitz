@@ -18,15 +18,13 @@ public class SubwayRouteFinderAdapter implements RouteFinder {
 
     @Override
     public List<Route> findRoutes(final List<StartEndPair> placePairs) {
-        final List<Route> routes = placePairs.stream()
+        return placePairs.stream()
                 .map(pair -> {
                     final String startPlaceName = getStationName(pair.start().getName());
                     final String endPlaceName = getStationName(pair.end().getName());
                     return new Route(subwayMapPathFinder.findShortestTimePath(startPlaceName, endPlaceName));
                 })
                 .toList();
-
-        return routes;
     }
 
     private String getStationName(final String stationName) {
