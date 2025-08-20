@@ -4,7 +4,7 @@ import static com.f12.moitz.infrastructure.PromptGenerator.ADDITIONAL_PROMPT;
 import static com.f12.moitz.infrastructure.PromptGenerator.RECOMMENDATION_COUNT;
 
 import com.f12.moitz.application.dto.PlaceRecommendResponse;
-import com.f12.moitz.application.dto.RecommendedLocationResponse;
+import com.f12.moitz.application.dto.RecommendedLocationsResponse;
 import com.f12.moitz.common.error.exception.ExternalApiErrorCode;
 import com.f12.moitz.common.error.exception.ExternalApiException;
 import com.f12.moitz.common.error.exception.RetryableApiException;
@@ -38,13 +38,13 @@ public class GoogleGeminiClient {
     private final Client geminiClient;
     private final ObjectMapper objectMapper;
 
-    public RecommendedLocationResponse generateResponse(
+    public RecommendedLocationsResponse generateResponse(
             final List<String> stationNames,
             final String requirement
     ) {
         return readValue(
                 generateContent(stationNames, requirement, PromptGenerator.getSchema()).text(),
-                RecommendedLocationResponse.class
+                RecommendedLocationsResponse.class
         );
     }
 

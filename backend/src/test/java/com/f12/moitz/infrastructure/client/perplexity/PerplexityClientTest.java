@@ -5,8 +5,8 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.f12.moitz.common.error.exception.ExternalApiErrorCode;
 import com.f12.moitz.common.error.exception.ExternalApiException;
-import com.f12.moitz.infrastructure.client.gemini.dto.LocationNameAndReason;
-import com.f12.moitz.application.dto.RecommendedLocationResponse;
+import com.f12.moitz.infrastructure.client.gemini.dto.RecommendedLocationResponse;
+import com.f12.moitz.application.dto.RecommendedLocationsResponse;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import okhttp3.mockwebserver.MockResponse;
@@ -45,8 +45,8 @@ class PerplexityClientTest {
     @DisplayName("Perplexity API 호출에 성공하고, 추천 장소 응답을 올바르게 파싱한다")
     void generateResponseSuccess() throws JsonProcessingException {
         // Given
-        var recommendedLocationResponse = new RecommendedLocationResponse(
-                List.of(new LocationNameAndReason("강남역", "맛집 많음! 😋"))
+        var recommendedLocationResponse = new RecommendedLocationsResponse(
+                List.of(new RecommendedLocationResponse("강남역", "맛집 많음! 😋", "설명"))
         );
         final String content = objectMapper.writeValueAsString(recommendedLocationResponse);
 
@@ -61,7 +61,7 @@ class PerplexityClientTest {
         );
 
         // When
-        final RecommendedLocationResponse actualResponse = perplexityClient.generateResponse(List.of("이수역"), "맛집");
+        final RecommendedLocationsResponse actualResponse = perplexityClient.generateResponse(List.of("이수역"), "맛집");
 
         // Then
         assertThat(actualResponse).isNotNull();
