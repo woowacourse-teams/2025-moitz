@@ -1,17 +1,19 @@
 import { useState } from 'react';
 
-import { RecommendedLocation } from '../../entities/types/Location';
+import { SelectedLocation } from '@features/recommendation/types/SelectedLocation';
+
+import { RecommendedLocation } from '@entities/types/Location';
 
 type useSelectedLocationReturn = {
-  selectedLocation: RecommendedLocation;
+  selectedLocation: SelectedLocation;
   changeSelectedLocation: (location: RecommendedLocation) => void;
 };
 
 const useSelectedLocation = (): useSelectedLocationReturn => {
   const [selectedLocation, setSelectedLocation] =
-    useState<RecommendedLocation>(null);
+    useState<SelectedLocation>(null);
 
-  const changeSelectedLocation = (location: RecommendedLocation) => {
+  const changeSelectedLocation = (location: SelectedLocation) => {
     setSelectedLocation(location);
   };
 

@@ -1,8 +1,10 @@
 package com.f12.moitz.domain;
 
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 
 @Getter
+@EqualsAndHashCode
 public class Point {
 
     private final double x;

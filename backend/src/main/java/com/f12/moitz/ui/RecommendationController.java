@@ -1,14 +1,13 @@
 package com.f12.moitz.ui;
 
-import com.f12.moitz.application.dto.MockRecommendationResponse;
-import com.f12.moitz.application.dto.PathResponse;
-import com.f12.moitz.application.dto.PlaceRecommendResponse;
-import com.f12.moitz.application.dto.RecommendationCreateResponse;
-import com.f12.moitz.application.dto.RecommendationRequest;
-import com.f12.moitz.application.dto.RecommendationResponse;
-import com.f12.moitz.application.dto.RouteResponse;
-import com.f12.moitz.application.dto.StartingPlaceResponse;
+import com.f12.moitz.application.RecommendationParallelTaskService;
+import com.f12.moitz.application.RecommendationService;
+import com.f12.moitz.application.dto.*;
+
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -22,6 +21,29 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/recommendations")
 public class RecommendationController implements SwaggerRecommendationController {
+
+    private final RecommendationService recommendationService;
+    private final RecommendationParallelTaskService recommendationParallelTaskService;
+
+    @PostMapping
+    public ResponseEntity<Map<String,String>> recommendLocations(@RequestBody RecommendationRequest request) {
+        String id = recommendationService.recommendLocation(request);
+        Map<String, String> resultResponse = new HashMap<>();
+        resultResponse.put("id", id);
+        return ResponseEntity.status(201).body(resultResponse);
+    }
+
+
+    @PostMapping("/async")
+    public ResponseEntity<RecommendationsResponse> recommendLocationsAsync(@RequestBody RecommendationRequest request) {
+        return ResponseEntity.ok(recommendationParallelTaskService.recommendLocation(request));
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<RecommendationsResponse> getRecommendationResult(@PathVariable("id") String id){
+        RecommendationsResponse response = recommendationService.findResultById(id);
+        return ResponseEntity.ok().body(response);
+    }
 
     @PostMapping("/test")
     public ResponseEntity<RecommendationCreateResponse> mockRecommend(@RequestBody RecommendationRequest request) {

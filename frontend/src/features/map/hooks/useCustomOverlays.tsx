@@ -7,10 +7,9 @@ import type {
 } from '@entities/types/Location';
 
 import MarkerIndex from '@shared/components/markerIndex/MarkerIndex';
+import { numberToCharCode } from '@shared/utils/numberToCharCode';
 
 import CustomOverlay from '../lib/CustomOverlay';
-
-const stringToCharCode = (n: number) => String.fromCharCode(n + 64);
 
 interface UseCustomOverlaysProps {
   startingLocations: StartingPlace[];
@@ -69,7 +68,7 @@ export const useCustomOverlays = ({
         content: (
           <div css={{ transform: 'translate(-50%, -50%)' }}>
             <MarkerIndex
-              index={stringToCharCode(i + 1)}
+              index={numberToCharCode(i + 1)}
               type="starting"
               label={loc.name}
               hasStroke

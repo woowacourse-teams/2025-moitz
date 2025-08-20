@@ -1,3 +1,5 @@
+import { SelectedLocation } from '@features/recommendation/types/SelectedLocation';
+
 import { RecommendedLocation, StartingPlace } from '@entities/types/Location';
 
 import { flex, scroll, shadow } from '@shared/styles/default.styled';
@@ -10,7 +12,7 @@ import * as bottomSheet from './bottomSheet.styled';
 interface BottomSheetProps {
   startingLocations: StartingPlace[];
   recommendedLocations: RecommendedLocation[];
-  selectedLocation: RecommendedLocation | null;
+  selectedLocation: SelectedLocation;
   handleSpotClick: (spot: RecommendedLocation) => void;
 }
 
