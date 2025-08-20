@@ -16,8 +16,8 @@ export const base = () => css`
 `;
 
 export const contents_container = () => css`
-  overflow: hidden;
   width: 100%;
+  overflow: hidden;
   padding-top: 1px;
 `;
 
