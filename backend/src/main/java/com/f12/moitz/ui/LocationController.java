@@ -16,10 +16,7 @@ import java.util.Map;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RequiredArgsConstructor
 @RestController
@@ -40,6 +37,12 @@ public class LocationController implements SwaggerLocationController {
     @PostMapping("/async")
     public ResponseEntity<RecommendationsResponse> recommendLocationsAsync(@RequestBody RecommendationRequest request) {
         return ResponseEntity.ok(recommendationParallelTaskService.recommendLocation(request));
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<RecommendationsResponse> getRecommendResult(@PathVariable("id") String id){
+        RecommendationsResponse response = recommendationService.findResultById(id);
+        return ResponseEntity.ok().body(response);
     }
 
     @PostMapping("/test")
