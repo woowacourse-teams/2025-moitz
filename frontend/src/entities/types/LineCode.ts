@@ -18,7 +18,7 @@ export const SUBWAY_LINE_INFO: { [key: string]: SubwayLineInfo } = {
   GYEONGUI_JOUNGANG: { name: '경의중앙선', code: 104 },
   EVERLINE: { name: '용인 에버라인', code: 107 },
   GYEONGCHUN: { name: '경춘선', code: 108 },
-  SIN_BUNDANG: { name: '신분당', code: 109 },
+  SIN_BUNDANG: { name: '신분당선', code: 109 },
   UIJEONGBU_LRT: { name: '의정부 경전철', code: 110 },
   GYEONGGANG: { name: '경강선', code: 112 },
   WOOE_SINSEUL_LRT: { name: '우이 신설선', code: 113 },
