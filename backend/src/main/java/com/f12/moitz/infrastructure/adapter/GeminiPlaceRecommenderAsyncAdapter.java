@@ -105,5 +105,4 @@ public class GeminiPlaceRecommenderAsyncAdapter implements AsyncPlaceRecommender
                 .onErrorResume(e -> Mono.empty());
     }
 
-
 }
