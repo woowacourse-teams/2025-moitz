@@ -49,7 +49,7 @@ function Map({
         )}
       </div>
       <div css={[flex({ justify: 'space-between' }), map.bottom_overlay()]}>
-        <MapPoint text="전체 추첨 지점" />
+        <MapPoint text="전체 추천 지점" />
       </div>
     </div>
   );
