@@ -6,7 +6,6 @@ import common from './webpack.common.js';
 
 const mode = 'development';
 
-// .env.development 로드 (없으면 빈 객체)
 const { parsed: envParsed } = dotenv.config({ path: '.env' }) || {};
 const envVars = envParsed || {};
 
