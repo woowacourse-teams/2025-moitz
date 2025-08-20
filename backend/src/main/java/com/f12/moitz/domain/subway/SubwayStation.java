@@ -1,30 +1,29 @@
 package com.f12.moitz.domain.subway;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Getter;
+import lombok.Setter;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import lombok.Getter;
 
 @Getter
+@Setter
+@Document(collection = "subway-stations")
 public class SubwayStation {
 
-    private final String name;
-    private final List<Edge> possibleEdges;
+    @Id
+    private String name;
+
+    private List<Edge> possibleEdges;
+
+    protected SubwayStation() {}
 
     public SubwayStation(final String name) {
         this.name = name;
         this.possibleEdges = new ArrayList<>();
-    }
-
-    @JsonCreator
-    public SubwayStation(
-            @JsonProperty("name") String name,
-            @JsonProperty("possibleEdges") List<Edge> possibleEdges
-    ) {
-        this.name = name;
-        this.possibleEdges = possibleEdges != null ? possibleEdges : new ArrayList<>();
     }
 
     public void addEdge(final Edge newEdge) {
@@ -36,11 +35,4 @@ public class SubwayStation {
             possibleEdges.add(newEdge);
         }
     }
-
-    public Optional<Edge> findEdgeTo(final String destination) {
-        return possibleEdges.stream()
-                .filter(edge -> edge.isTowards(destination))
-                .findFirst();
-    }
-
 }

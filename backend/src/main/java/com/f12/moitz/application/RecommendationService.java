@@ -4,7 +4,6 @@ import com.f12.moitz.application.dto.RecommendationRequest;
 import com.f12.moitz.application.dto.RecommendationsResponse;
 import com.f12.moitz.application.dto.RecommendedLocationsResponse;
 import com.f12.moitz.application.port.LocationRecommender;
-import com.f12.moitz.application.port.PlaceFinder;
 import com.f12.moitz.application.port.PlaceRecommender;
 import com.f12.moitz.application.port.RouteFinder;
 import com.f12.moitz.application.port.dto.ReasonAndDescription;
@@ -17,6 +16,8 @@ import com.f12.moitz.domain.Recommendation;
 import com.f12.moitz.domain.RecommendedPlace;
 import com.f12.moitz.domain.Route;
 import com.f12.moitz.domain.Routes;
+import com.f12.moitz.domain.entity.Result;
+import com.f12.moitz.domain.repository.RecommendResultRepository;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -31,41 +32,52 @@ import org.springframework.util.StopWatch;
 @Slf4j
 @Service
 public class RecommendationService {
-    private final PlaceFinder placeFinder;
+
+    private final PlaceService placeService;
     private final PlaceRecommender placeRecommender;
     private final LocationRecommender locationRecommender;
     private final RouteFinder routeFinder;
 
     private final RecommendationMapper recommendationMapper;
+    private final RecommendResultRepository recommendResultRepository;
 
     public RecommendationService(
-            @Autowired final PlaceFinder placeFinder,
+            @Autowired final PlaceService placeService,
             @Qualifier("placeRecommenderAdapter") final PlaceRecommender placeRecommender,
             @Autowired final LocationRecommender locationRecommender,
             @Qualifier("subwayRouteFinderAdapter") final RouteFinder routeFinder,
-            @Autowired final RecommendationMapper recommendationMapper
+            @Autowired final RecommendationMapper recommendationMapper,
+            @Autowired RecommendResultRepository recommendResultRepository
     ) {
-        this.placeFinder = placeFinder;
+        this.placeService = placeService;
         this.placeRecommender = placeRecommender;
         this.locationRecommender = locationRecommender;
         this.routeFinder = routeFinder;
         this.recommendationMapper = recommendationMapper;
+        this.recommendResultRepository = recommendResultRepository;
     }
 
-    public RecommendationsResponse recommendLocation(final RecommendationRequest request) {
+    public String recommendLocation(final RecommendationRequest request) {
         StopWatch stopWatch = new StopWatch("추천 서비스 전체");
         stopWatch.start("지역 추천");
         final String requirement = RecommendCondition.fromTitle(request.requirement()).getKeyword();
 
-        final List<Place> startingPlaces = placeFinder.findPlacesByNames(request.startingPlaceNames());
+        final List<Place> startingPlaces = placeService.findByNames(request.startingPlaceNames());
 
-        final RecommendedLocationsResponse recommendedLocationsResponse = locationRecommender.getRecommendedLocations(
+        final RecommendedLocationsResponse recommendedLocationsResponse = locationRecommender.recommendLocations(
                 request.startingPlaceNames(),
                 requirement
         );
 
-        final Map<Place, ReasonAndDescription> generatedPlacesWithReason = locationRecommender.recommendLocations(
-                recommendedLocationsResponse);
+        final Map<Place, ReasonAndDescription> generatedPlacesWithReason = recommendedLocationsResponse.recommendations()
+                .stream()
+                .collect(Collectors.toMap(
+                        recommendation -> placeService.findByName(recommendation.locationName()),
+                        recommendation -> new ReasonAndDescription(
+                                recommendation.reason(),
+                                recommendation.description()
+                        )
+                ));
         stopWatch.stop();
 
         final List<Place> generatedPlaces = generatedPlacesWithReason.keySet().stream().toList();
@@ -94,7 +106,8 @@ public class RecommendationService {
         stopWatch.stop();
         System.out.println(stopWatch.prettyPrint());
 
-        return recommendationMapper.toResponse(startingPlaces, recommendation, generatedPlacesWithReason);
+        final Result result = recommendationMapper.toResult(startingPlaces, recommendation, generatedPlacesWithReason);
+        return recommendResultRepository.saveAndReturnId(result);
     }
 
     public Map<Place, Routes> findRoutesForAllAsync(
@@ -150,6 +163,12 @@ public class RecommendationService {
                         ))
                         .toList()
         );
+    }
+
+    public RecommendationsResponse findResultById(final String id) {
+        final Result result = recommendResultRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("아이디에 해당하는 결과를 찾을 수 없습니다."));
+        return new RecommendationsResponse(result.getStartingPlaces(), result.getRecommendedLocations());
     }
 
 }

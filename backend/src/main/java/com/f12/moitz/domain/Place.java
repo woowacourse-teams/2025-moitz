@@ -1,12 +1,22 @@
 package com.f12.moitz.domain;
 
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 @Getter
+@Document(collection = "place")
+@EqualsAndHashCode
 public class Place {
 
-    private final String name;
-    private final Point point;
+    @Id
+    private String id;
+    private String name;
+    private Point point;
+
+    protected Place() {
+    }
 
     public Place(final String name, final Point point) {
         validate(name, point);
