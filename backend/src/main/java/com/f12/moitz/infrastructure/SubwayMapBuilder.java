@@ -6,11 +6,6 @@ import com.f12.moitz.domain.subway.SubwayStation;
 import com.f12.moitz.infrastructure.client.open.OpenApiClient;
 import com.f12.moitz.infrastructure.client.open.dto.PathResponse;
 import com.f12.moitz.infrastructure.client.open.dto.SubwayRouteResponse;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
-import org.springframework.util.StopWatch;
-
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
@@ -21,11 +16,16 @@ import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
+import org.springframework.util.StopWatch;
 
 @Slf4j
 @Component
 @RequiredArgsConstructor
 public class SubwayMapBuilder {
+
     public static final String CSV_PATH = "src/main/resources/route-for-station-map.csv";
     private static final DateTimeFormatter TIME_FORMATTER = DateTimeFormatter.ofPattern("HH:mm:ss");
 
@@ -40,7 +40,7 @@ public class SubwayMapBuilder {
 
         final Map<String, SubwayStation> stationMap = new HashMap<>();
 
-        try(BufferedReader br = new BufferedReader(new FileReader(CSV_PATH))) {
+        try (BufferedReader br = new BufferedReader(new FileReader(CSV_PATH))) {
             String line = br.readLine();
             while ((line = br.readLine()) != null) {
                 line = line.trim();
@@ -73,7 +73,6 @@ public class SubwayMapBuilder {
         return stationMap;
     }
 
-
     private void saveToMongoDB(Map<String, SubwayStation> stationMap) {
         try {
             log.info("MongoDB에 {}개 역 저장 시작", stationMap.size());
@@ -86,7 +85,6 @@ public class SubwayMapBuilder {
             throw new RuntimeException("MongoDB 저장에 실패했습니다.", e);
         }
     }
-
 
     private void buildSubwayStations(final SubwayRouteResponse response, final Map<String, SubwayStation> stationMap) {
         final List<PathResponse> paths = response.body().paths();
@@ -158,9 +156,12 @@ public class SubwayMapBuilder {
 
     private String getStationName(final String name) {
         if ("이수".equals(name)) {
-            return "총신대입구";
+            return "총신대입구역";
         }
-        return name;
+        if ("서울역".equals(name)) {
+            return name;
+        }
+        return name.concat("역");
     }
 
     private String getStationLine(final String line) {
@@ -171,43 +172,44 @@ public class SubwayMapBuilder {
     }
 
     private void addMissingData(final Map<String, SubwayStation> stationMap) {
-        final SubwayStation joongrang = stationMap.get("중랑");
-        joongrang.addEdge(new Edge("중랑", 1200, 0, "경의선"));
-        joongrang.addEdge(new Edge("중랑", 1200, 0, "경춘선"));
+        final SubwayStation joongrang = stationMap.get("중랑역");
+        joongrang.addEdge(new Edge("중랑역", 1200, 0, "경의중앙선"));
+        joongrang.addEdge(new Edge("중랑역", 1200, 0, "경춘선"));
 
-        final SubwayStation euljiro4ga = stationMap.get("을지로4가");
-        euljiro4ga.addEdge(new Edge("을지로4가", 550, 0, "2호선"));
-        euljiro4ga.addEdge(new Edge("을지로4가", 550, 0, "5호선"));
+        final SubwayStation euljiro4ga = stationMap.get("을지로4가역");
+        euljiro4ga.addEdge(new Edge("을지로4가역", 550, 0, "2호선"));
+        euljiro4ga.addEdge(new Edge("을지로4가역", 550, 0, "5호선"));
 
-        final SubwayStation cheongnyangni = stationMap.get("청량리");
-        cheongnyangni.addEdge(new Edge("청량리", 1000, 0, "경춘선"));
+        final SubwayStation cheongnyangni = stationMap.get("청량리역");
+        cheongnyangni.addEdge(new Edge("청량리역", 1000, 0, "경춘선"));
 
-        final SubwayStation oido = stationMap.get("오이도");
-        oido.addEdge(new Edge("오이도", 500, 0, "4호선"));
-        oido.addEdge(new Edge("오이도", 500, 0, "수인분당선"));
+        final SubwayStation oido = stationMap.get("오이도역");
+        oido.addEdge(new Edge("오이도역", 500, 0, "4호선"));
+        oido.addEdge(new Edge("오이도역", 500, 0, "수인분당선"));
 
-        final SubwayStation jeongwang = stationMap.get("정왕");
-        jeongwang.addEdge(new Edge("정왕", 500, 0, "4호선"));
-        jeongwang.addEdge(new Edge("정왕", 500, 0, "수인분당선"));
+        final SubwayStation jeongwang = stationMap.get("정왕역");
+        jeongwang.addEdge(new Edge("정왕역", 500, 0, "4호선"));
+        jeongwang.addEdge(new Edge("정왕역", 500, 0, "수인분당선"));
 
-        final SubwayStation singiloncheon = stationMap.get("신길온천");
-        singiloncheon.addEdge(new Edge("신길온천", 500, 0, "4호선"));
-        singiloncheon.addEdge(new Edge("신길온천", 500, 0, "수인분당선"));
+        final SubwayStation singiloncheon = stationMap.get("신길온천역");
+        singiloncheon.addEdge(new Edge("신길온천역", 500, 0, "4호선"));
+        singiloncheon.addEdge(new Edge("신길온천역", 500, 0, "수인분당선"));
 
-        final SubwayStation ansan = stationMap.get("안산");
-        ansan.addEdge(new Edge("안산", 500, 0, "4호선"));
-        ansan.addEdge(new Edge("안산", 500, 0, "수인분당선"));
+        final SubwayStation ansan = stationMap.get("안산역");
+        ansan.addEdge(new Edge("안산역", 500, 0, "4호선"));
+        ansan.addEdge(new Edge("안산역", 500, 0, "수인분당선"));
 
-        final SubwayStation choji = stationMap.get("초지");
-        choji.addEdge(new Edge("초지", 500, 0, "4호선"));
-        choji.addEdge(new Edge("초지", 500, 0, "수인분당선"));
+        final SubwayStation choji = stationMap.get("초지역");
+        choji.addEdge(new Edge("초지역", 500, 0, "4호선"));
+        choji.addEdge(new Edge("초지역", 500, 0, "수인분당선"));
 
-        final SubwayStation gojan = stationMap.get("고잔");
-        gojan.addEdge(new Edge("고잔", 500, 0, "4호선"));
-        gojan.addEdge(new Edge("고잔", 500, 0, "수인분당선"));
+        final SubwayStation gojan = stationMap.get("고잔역");
+        gojan.addEdge(new Edge("고잔역", 500, 0, "4호선"));
+        gojan.addEdge(new Edge("고잔역", 500, 0, "수인분당선"));
 
-        final SubwayStation jungang = stationMap.get("중앙");
-        jungang.addEdge(new Edge("중앙", 500, 0, "4호선"));
-        jungang.addEdge(new Edge("중앙", 500, 0, "수인분당선"));
+        final SubwayStation jungang = stationMap.get("중앙역");
+        jungang.addEdge(new Edge("중앙역", 500, 0, "4호선"));
+        jungang.addEdge(new Edge("중앙역", 500, 0, "수인분당선"));
     }
+
 }

@@ -28,16 +28,16 @@ class SubwayRouteFinderAdapterTest {
     void routeFindTest() {
         // Given
         final List<Place> startingPlaces = new ArrayList<>();
-        startingPlaces.add(new Place("별내", new Point(125, 34)));
-        startingPlaces.add(new Place("영등포구청", new Point(125, 34)));
-        startingPlaces.add(new Place("모란", new Point(125, 34)));
+        startingPlaces.add(new Place("별내역", new Point(125, 34)));
+        startingPlaces.add(new Place("영등포구청역", new Point(125, 34)));
+        startingPlaces.add(new Place("모란역", new Point(125, 34)));
 
         final List<Place> generatedPlaces = new ArrayList<>();
-        generatedPlaces.add(new Place("신당", new Point(125, 34)));
-        generatedPlaces.add(new Place("서울대입구", new Point(125, 34)));
-        generatedPlaces.add(new Place("잠실", new Point(125, 34)));
-        generatedPlaces.add(new Place("석촌", new Point(125, 34)));
-        generatedPlaces.add(new Place("합정", new Point(125, 34)));
+        generatedPlaces.add(new Place("신당역", new Point(125, 34)));
+        generatedPlaces.add(new Place("서울대입구역", new Point(125, 34)));
+        generatedPlaces.add(new Place("잠실역", new Point(125, 34)));
+        generatedPlaces.add(new Place("석촌역", new Point(125, 34)));
+        generatedPlaces.add(new Place("합정역", new Point(125, 34)));
 
         final List<StartEndPair> allPairs = generatedPlaces.stream()
                 .flatMap(endPlace -> startingPlaces.stream()
