@@ -16,6 +16,7 @@ import com.f12.moitz.application.port.LocationRecommender;
 import com.f12.moitz.application.port.PlaceFinder;
 import com.f12.moitz.application.port.PlaceRecommender;
 import com.f12.moitz.application.port.RouteFinder;
+import com.f12.moitz.application.port.dto.ReasonAndDescription;
 import com.f12.moitz.application.utils.RecommendationMapper;
 import com.f12.moitz.domain.Path;
 import com.f12.moitz.domain.Place;
@@ -24,8 +25,8 @@ import com.f12.moitz.domain.Recommendation;
 import com.f12.moitz.domain.RecommendedPlace;
 import com.f12.moitz.domain.Route;
 import com.f12.moitz.domain.TravelMethod;
-import com.f12.moitz.infrastructure.client.gemini.dto.LocationNameAndReason;
-import com.f12.moitz.application.dto.RecommendedLocationResponse;
+import com.f12.moitz.infrastructure.client.gemini.dto.RecommendedLocationResponse;
+import com.f12.moitz.application.dto.RecommendedLocationsResponse;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -70,15 +71,15 @@ class RecommendationServiceTest {
         final Place samsung = new Place("삼성역", new Point(127.063, 37.508));
 
         given(placeFinder.findPlacesByNames(anyList())).willReturn(startingPlaces);
-        final RecommendedLocationResponse mockLocationResponse = new RecommendedLocationResponse(List.of(
-                new LocationNameAndReason("선릉역", "이유1"),
-                new LocationNameAndReason("삼성역", "이유2")
+        final RecommendedLocationsResponse mockLocationResponse = new RecommendedLocationsResponse(List.of(
+                new RecommendedLocationResponse("선릉역", "이유1", "설명1"),
+                new RecommendedLocationResponse("삼성역", "이유2", "설명2")
         ));
 
         given(locationRecommender.getRecommendedLocations(anyList(), anyString())).willReturn(mockLocationResponse);
-        final Map<Place, String> generatedPlacesWithReason = Map.of(
-                seolleung, "이유1",
-                samsung, "이유2"
+        final Map<Place, ReasonAndDescription> generatedPlacesWithReason = Map.of(
+                seolleung, new ReasonAndDescription("이유1", "설명1"),
+                samsung, new ReasonAndDescription("이유2", "설명2")
         );
 
         given(locationRecommender.recommendLocations(any())).willReturn(generatedPlacesWithReason);

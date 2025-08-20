@@ -1,12 +1,13 @@
 package com.f12.moitz.infrastructure.adapter;
 
-import com.f12.moitz.application.dto.RecommendedLocationResponse;
+import com.f12.moitz.application.dto.RecommendedLocationsResponse;
 import com.f12.moitz.application.port.LocationRecommender;
 import com.f12.moitz.application.port.PlaceFinder;
+import com.f12.moitz.application.port.dto.ReasonAndDescription;
 import com.f12.moitz.common.error.exception.RetryableApiException;
 import com.f12.moitz.domain.Place;
 import com.f12.moitz.infrastructure.client.gemini.GoogleGeminiClient;
-import com.f12.moitz.infrastructure.client.gemini.dto.LocationNameAndReason;
+import com.f12.moitz.infrastructure.client.gemini.dto.RecommendedLocationResponse;
 import com.f12.moitz.infrastructure.client.perplexity.PerplexityClient;
 import java.util.List;
 import java.util.Map;
@@ -33,7 +34,7 @@ public class LocationRecommenderAdapter implements LocationRecommender {
             recover = "recoverRecommendedLocations"
     )
     @Override
-    public RecommendedLocationResponse getRecommendedLocations(
+    public RecommendedLocationsResponse getRecommendedLocations(
             final List<String> startPlaceNames,
             final String condition
     ) {
@@ -44,7 +45,7 @@ public class LocationRecommenderAdapter implements LocationRecommender {
     }
 
     @Recover
-    public RecommendedLocationResponse recoverRecommendedLocations(
+    public RecommendedLocationsResponse recoverRecommendedLocations(
             final List<String> startPlaceNames,
             final String condition
     ) {
@@ -55,10 +56,14 @@ public class LocationRecommenderAdapter implements LocationRecommender {
     }
 
     @Override
-    public Map<Place, String> recommendLocations(RecommendedLocationResponse recommendedLocationResponse) {
-        return recommendedLocationResponse.recommendations().stream()
+    public Map<Place, ReasonAndDescription> recommendLocations(RecommendedLocationsResponse recommendedLocationsResponse) {
+        return recommendedLocationsResponse.recommendations().stream()
                 .collect(Collectors.toMap(recommendation ->
-                        placeFinder.findPlaceByName(recommendation.locationName()), LocationNameAndReason::reason
+                        placeFinder.findPlaceByName(recommendation.locationName()),
+                        recommendation -> new ReasonAndDescription(
+                                recommendation.reason(),
+                                recommendation.description()
+                        )
                 ));
     }
 

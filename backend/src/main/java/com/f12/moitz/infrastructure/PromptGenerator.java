@@ -11,14 +11,9 @@ public class PromptGenerator {
     public static final int RECOMMENDATION_COUNT = 5;
 
     public static final String ADDITIONAL_PROMPT = """
-            당신은 서울의 최적의 모임 장소를 추천하는 AI 비서입니다. 당신의 목표는 모든 출발지에서 지하철 이동 시간이 비슷하고, 사용자의 추가 조건을 만족하는 장소를 추천하는 것입니다.
-            
-            ## 핵심 임무:
-            1.  **지하철 이동 시간 기준**: 모든 계산은 지하철을 기준으로 합니다.
-            2.  **서울 지하철역 범위**: 출발지와 추천 장소는 모두 서울 지하철역이어야 합니다.
-            3.  **유사한 이동 시간**: 추천 장소까지의 이동 시간 편차(가장 오래 걸리는 시간 - 가장 적게 걸리는 시간)는 15분 이내여야 합니다.
-            4.  **편의 시설**: 추천 장소는 지하철역 근처에 식당/카페가 많아야 하며, 아래의 사용자 추가 조건을 반드시 만족해야 합니다.
-            5.  **출발지 제외**: 추천 장소는 주어진 출발지 중 하나여서는 안 됩니다.
+            당신은 서울의 최적의 모임 장소를 추천하는 AI 비서입니다.
+            당신의 목표는 모든 출발지에서 지하철 이동 시간이 비슷하고, 사용자의 추가 조건을 만족하는 장소를 추천하는 것입니다.
+            단, 추천 장소는 주어진 출발지 중 하나여서는 안 됩니다.
             
             ## 입력 정보:
             - 총 추천 장소 개수: %d개
@@ -63,9 +58,6 @@ public class PromptGenerator {
             9. Use the exact place information from the search results provided above
             """;
 
-    /**
-     * 단일 장소의 카카오맵 응답을 프롬프트용으로 포맷팅 (기존 FORMAT_KAKAO_TO_PROMPT 스타일 적용)
-     */
     public static String FORMAT_SINGLE_PLACE_TO_PROMPT(Place place, List<KakaoApiResponse> kakaoResponses) {
         StringBuilder sb = new StringBuilder();
         sb.append("KAKAO MAP SEARCH RESULTS:\n");
@@ -98,7 +90,6 @@ public class PromptGenerator {
 
     public static final int PLACE_RECOMMENDATION_COUNT = 3;
 
-
     public static Map<String, Object> getSchema() {
         return Map.of(
                 "type", "object",
@@ -116,6 +107,11 @@ public class PromptGenerator {
                                                         "description",
                                                         "해당 장소를 추천하는 간결한 한 줄 요약 이유 20자 이내, 어울리는 이모지 1개와 함께 (예: '접근성 좋고 맛집이 많아요! 😋') 만약 추천 이유에 사용자 조건이 포함되어 있다면, 이유에 명시할 것",
                                                         "maxLength", 20
+                                                ),
+                                                "description", Map.of(
+                                                        "type", "string",
+                                                        "description", "추천 장소에 대한 간단한 설명 100자 이내 (예: '강남역은 하루 유동 인구가 많은 번화가로, 다양한 연령층이 많이 이용하며, 주변에는 대형 빌딩, 쇼핑몰, 학원, 음식점 등이 밀집되어 있습니다. ')",
+                                                        "maxLength", 100
                                                 )
                                         ),
                                         "required", List.of("locationName", "reason")

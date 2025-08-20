@@ -28,7 +28,9 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	implementation 'org.springframework.retry:spring-retry'
 	implementation 'org.springframework.boot:spring-boot-starter-aop'
-
+	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+	implementation 'com.bucket4j:bucket4j-core:8.10.1'
+	implementation 'com.bucket4j:bucket4j-redis:8.10.1'
 
 	compileOnly 'org.projectlombok:lombok'
 	annotationProcessor 'org.projectlombok:lombok'

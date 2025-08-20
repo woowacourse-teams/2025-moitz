@@ -6,6 +6,7 @@ import com.f12.moitz.application.dto.PlaceRecommendResponse;
 import com.f12.moitz.application.dto.RecommendationsResponse;
 import com.f12.moitz.application.dto.RouteResponse;
 import com.f12.moitz.application.dto.StartingPlaceResponse;
+import com.f12.moitz.application.port.dto.ReasonAndDescription;
 import com.f12.moitz.domain.Candidate;
 import com.f12.moitz.domain.Recommendation;
 import com.f12.moitz.domain.Path;
@@ -25,7 +26,7 @@ public class RecommendationMapper {
     public RecommendationsResponse toResponse(
             final List<Place> startingPlaces,
             final Recommendation recommendation,
-            final Map<Place, String> generatedPlaces
+            final Map<Place, ReasonAndDescription> generatedPlaces
     ) {
         final int minTime = recommendation.getBestRecommendationTime();
 
@@ -36,8 +37,8 @@ public class RecommendationMapper {
                 IntStream.range(0, recommendation.size())
                 .mapToObj(index -> {
                     Candidate currentCandidate = recommendation.get(index);
-                    String reason = generatedPlaces.get(currentCandidate.getDestination());
-                    return toLocationRecommendResponse(currentCandidate, index, minTime, reason);
+                    ReasonAndDescription reasonAndDescription = generatedPlaces.get(currentCandidate.getDestination());
+                    return toLocationRecommendResponse(currentCandidate, index, minTime, reasonAndDescription);
                 })
                 .toList()
         );
@@ -57,7 +58,7 @@ public class RecommendationMapper {
             final Candidate candidate,
             final int index,
             final int minTime,
-            final String reason
+            final ReasonAndDescription reasonAndDescription
     ) {
         final Place targetPlace = candidate.getDestination();
         final int totalTime = candidate.calculateAverageTravelTime();
@@ -73,8 +74,8 @@ public class RecommendationMapper {
                 targetPlace.getName(),
                 totalTime,
                 totalTime == minTime,
-                reason,
-                reason,
+                reasonAndDescription.description(),
+                reasonAndDescription.reason(),
                 recommendedPlaces,
                 routes
         );
