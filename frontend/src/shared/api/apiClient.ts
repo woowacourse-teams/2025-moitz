@@ -52,7 +52,7 @@ export const createApiRequest = async <T>({
     if (error instanceof ApiError) {
       throw error;
     }
-    throw new ApiError(500, '서버 연결에 실패했습니다.');
+    throw new ApiError(error.status, error.message);
   }
 };
 
