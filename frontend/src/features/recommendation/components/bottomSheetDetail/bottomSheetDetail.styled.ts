@@ -15,6 +15,7 @@ export const reason = () => css`
 
 export const reasonText = () => css`
   color: ${colorToken.gray[2]};
+  line-height: 1.5;
 `;
 
 export const placeList = () => css`
