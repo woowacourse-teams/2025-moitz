@@ -14,7 +14,7 @@ import com.f12.moitz.domain.Recommendation;
 import com.f12.moitz.domain.RecommendedPlace;
 import com.f12.moitz.domain.Route;
 import com.f12.moitz.domain.Routes;
-import com.f12.moitz.domain.entity.Result;
+import com.f12.moitz.domain.Result;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.IntStream;

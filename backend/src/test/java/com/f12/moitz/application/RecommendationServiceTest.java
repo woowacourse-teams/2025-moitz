@@ -24,7 +24,7 @@ import com.f12.moitz.domain.Recommendation;
 import com.f12.moitz.domain.RecommendedPlace;
 import com.f12.moitz.domain.Route;
 import com.f12.moitz.domain.TravelMethod;
-import com.f12.moitz.domain.entity.Result;
+import com.f12.moitz.domain.Result;
 import com.f12.moitz.domain.repository.RecommendResultRepository;
 import com.f12.moitz.infrastructure.client.gemini.dto.RecommendedLocationResponse;
 import java.util.Collections;

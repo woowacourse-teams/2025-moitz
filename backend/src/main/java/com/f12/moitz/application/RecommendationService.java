@@ -16,7 +16,7 @@ import com.f12.moitz.domain.Recommendation;
 import com.f12.moitz.domain.RecommendedPlace;
 import com.f12.moitz.domain.Route;
 import com.f12.moitz.domain.Routes;
-import com.f12.moitz.domain.entity.Result;
+import com.f12.moitz.domain.Result;
 import com.f12.moitz.domain.repository.RecommendResultRepository;
 import java.util.List;
 import java.util.Map;
@@ -24,6 +24,7 @@ import java.util.Map.Entry;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import lombok.extern.slf4j.Slf4j;
+import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -118,7 +119,7 @@ public class RecommendationService {
         System.out.println(stopWatch.prettyPrint());
 
         final Result result = recommendationMapper.toResult(startingPlaces, recommendation, generatedPlacesWithReason);
-        return recommendResultRepository.saveAndReturnId(result);
+        return recommendResultRepository.saveAndReturnId(result).toHexString();
     }
 
     public Map<Place, Routes> findRoutesForAllAsync(
@@ -177,7 +178,7 @@ public class RecommendationService {
     }
 
     public RecommendationsResponse findResultById(final String id) {
-        final Result result = recommendResultRepository.findById(id)
+        final Result result = recommendResultRepository.findById(new ObjectId(id))
                 .orElseThrow(() -> new IllegalArgumentException("아이디에 해당하는 결과를 찾을 수 없습니다."));
         return new RecommendationsResponse(result.getStartingPlaces(), result.getRecommendedLocations());
     }

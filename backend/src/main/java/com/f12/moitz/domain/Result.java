@@ -1,28 +1,24 @@
-package com.f12.moitz.domain.entity;
+package com.f12.moitz.domain;
 
 import com.f12.moitz.application.dto.RecommendationResponse;
 import com.f12.moitz.application.dto.StartingPlaceResponse;
 import lombok.Getter;
-import lombok.Setter;
+import lombok.NoArgsConstructor;
+import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
-import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.mapping.Document;
 import java.util.List;
 
 @Getter
-@Setter
 @Document(collection = "result")
+@NoArgsConstructor(access = lombok.AccessLevel.PROTECTED)
 public class Result {
 
-    @Transient
-    public static final String SEQUENCE_NAME = "result";
-
     @Id
-    private String id;
+    private ObjectId id;
+
     private List<StartingPlaceResponse> startingPlaces;
     private List<RecommendationResponse> recommendedLocations;
-
-    protected Result() {}
 
     public Result(
             final List<StartingPlaceResponse> startingPlaces,
@@ -31,8 +27,5 @@ public class Result {
         this.startingPlaces = startingPlaces;
         this.recommendedLocations = recommendedLocations;
     }
-
-
-
 
 }
