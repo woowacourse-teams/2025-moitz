@@ -35,13 +35,13 @@ const useLocations = (): useLocationsReturn => {
 
       try {
         const id = await fetchRecommendationId(requestBody);
-        setIsLoading(false);
         return id;
       } catch (error) {
         setIsError(true);
         setErrorMessage(error instanceof Error ? error.message : String(error));
-        setIsLoading(false);
         throw error;
+      } finally {
+        setIsLoading(false);
       }
     },
     [],
@@ -55,12 +55,12 @@ const useLocations = (): useLocationsReturn => {
     try {
       const locations = await fetchRecommendationResult(id);
       setData(locations);
-      setIsLoading(false);
     } catch (error) {
       setIsError(true);
       setErrorMessage(error instanceof Error ? error.message : String(error));
-      setIsLoading(false);
       throw error;
+    } finally {
+      setIsLoading(false);
     }
   }, []);
 
