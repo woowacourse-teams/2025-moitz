@@ -31,8 +31,7 @@ describe('useLocations', () => {
     it('ID 요청이 실패하면 error 상태가 true가 된다', async () => {
       // given: 서버가 500 에러를 응답하도록 설정
       server.use(
-        http.post(`${BASE_URL}/recommendations/test`, () =>
-          // TODO : 추후 실제 api 로 수정
+        http.post(`${BASE_URL}/recommendations`, () =>
           HttpResponse.json(
             { message: 'Internal Server Error' },
             { status: 500 },
@@ -48,6 +47,9 @@ describe('useLocations', () => {
         await expect(
           result.current.getRecommendationId(LocationsRequestBodyMock),
         ).rejects.toBeTruthy();
+      });
+
+      await waitFor(() => {
         expect(result.current.isError).toBe(true);
         expect(result.current.errorMessage).toBeTruthy();
       });
@@ -58,10 +60,13 @@ describe('useLocations', () => {
     it('정상적으로 추천 결과를 받아온다', async () => {
       // when: 훅을 실행하면
       const { result } = renderHook(() => useLocations());
+      const id = await result.current.getRecommendationId(
+        LocationsRequestBodyMock,
+      );
 
       // then: 초기에는 로딩 중이어야 한다
       await act(async () => {
-        await result.current.getRecommendationResult('123');
+        await result.current.getRecommendationResult(id);
       });
 
       // then: 데이터가 정상적으로 로드되어야 한다
@@ -77,8 +82,7 @@ describe('useLocations', () => {
     it('결과 요청이 실패하면 error 상태가 true가 된다', async () => {
       // given: 서버가 500 에러를 응답하도록 설정
       server.use(
-        http.get(`${BASE_URL}/recommendations/123/test`, () =>
-          // TODO : 추후 실제 api 로 수정
+        http.get(`${BASE_URL}/recommendations/JF768D13`, () =>
           HttpResponse.json(
             { message: 'Internal Server Error' },
             { status: 500 },
@@ -92,9 +96,11 @@ describe('useLocations', () => {
       // then: 요청이 실패하면 에러가 발생해야 한다
       await act(async () => {
         await expect(
-          result.current.getRecommendationResult('123'),
+          result.current.getRecommendationResult('JF768D13'),
         ).rejects.toBeTruthy();
+      });
 
+      await waitFor(() => {
         expect(result.current.isLoading).toBe(false);
         expect(result.current.isError).toBe(true);
         expect(result.current.data).toEqual({

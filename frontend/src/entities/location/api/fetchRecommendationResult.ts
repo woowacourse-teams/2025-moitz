@@ -6,9 +6,7 @@ import { apiClient } from '@shared/api/apiClient';
 export const fetchRecommendationResult = async (
   id: string,
 ): Promise<Location> => {
-  const data = await apiClient.get<LocationResponse>(
-    `/recommendations/${id}/test`, // TODO : 추후 실제 api 로 수정
-  );
+  const data = await apiClient.get<LocationResponse>(`/recommendations/${id}`);
   const transformedData: Location = {
     startingPlaces: data.startingPlaces,
     recommendedLocations: data.locations,

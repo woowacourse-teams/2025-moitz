@@ -6,5 +6,5 @@ export type RecommendationRequestBody = {
 };
 
 export type RecommendationResponse = {
-  id: number;
+  id: string;
 };
