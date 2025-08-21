@@ -1,0 +1,78 @@
+name: Backend 운영 서버 CI/CD
+
+on:
+  pull_request:
+    branches:
+      - main
+    types:
+      - closed
+    paths:
+      - "backend/**"
+
+jobs:
+  deploy_prod:
+    if: github.event.pull_request.merged == true
+    runs-on: [ self-hosted, prod ]
+    env:
+      S3_BUCKET: ${{ secrets.S3_BE_BUCKET }}
+
+    defaults:
+      run:
+        working-directory: ./backend
+
+    steps:
+      - name: 최신 커밋 내역으로 checkout 한다
+        uses: actions/checkout@v4
+
+      - name: 애플리케이션을 빌드하고 빌드 파일을 백업한다
+        run: |
+          echo "=== JAR 빌드 ==="
+          ./gradlew --no-build-cache clean build --refresh-dependencies
+
+          if [ $? -ne 0 ]; then
+            echo "빌드 실패"
+            exit 1
+          fi
+
+          if [ ! -f $(ls ./build/libs/*SNAPSHOT.jar | head -n 1) ]; then
+            echo "빌드된 JAR 파일이 없습니다"
+            exit 1
+          fi
+
+          echo "=== 빌드 파일 이름 재정의 ==="
+          cd ./build/libs
+          FILE_PATH=$(ls *SNAPSHOT.jar | head -n 1)
+          echo $FILE_PATH
+          mv $FILE_PATH "$(date +%Y-%m-%d-%H:%M:%S)-$FILE_PATH"
+
+          echo "=== S3에 빌드 파일 백업 ==="
+          FILE_PATH=$(ls *SNAPSHOT.jar | head -n 1)
+          aws s3 cp "${FILE_PATH}" "${S3_BUCKET}/${FILE_PATH}" --only-show-errors
+
+      - name: 빌드 파일을 백업한 후 애플리케이션을 실행한다
+        run: |
+          JAR_PATH=$(ls ./build/libs/*SNAPSHOT.jar | head -n 1)
+
+          # 기존에 실행 중인 애플리케이션을 먼저 종료한다
+          echo "=== 실행 중인 앱 종료 ==="
+          PID=$(pgrep -f SNAPSHOT.jar || true)
+
+          if [ -n "$PID" ]; then
+            kill -15 $PID
+            echo "→ 종료 완료 (PID: $PID)"
+            sleep 5
+          fi
+
+          # 빌드한 JAR 파일을 실행시킨다
+          echo "=== 앱 실행 ==="
+          RUNNER_TRACKING_ID="" && nohup java -jar -Duser.timezone=Asia/Seoul -Dspring.profiles.active=prod "$JAR_PATH" > /dev/null 2>&1 &
+          sleep 3
+
+          NEW_PID=$(pgrep -f "$JAR_PATH" || true)
+
+          if [ -n "$NEW_PID" ]; then
+            echo "앱 실행 성공 (PID: $NEW_PID)"
+          else
+            echo "앱 실행 실패"
+            exit 1
+          fi
