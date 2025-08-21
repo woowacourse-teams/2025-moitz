@@ -67,19 +67,17 @@ function Map({
             onClick={handleBackButtonClick}
           />
         )}
-        <MapButton
-          src={IconShare}
-          alt="share"
-          onClick={handleShareButtonClick}
-        />
-      </div>
-      <div css={[flex({ justify: 'space-between' }), map.bottom_overlay()]}>
         <MapPoint
           text={
             selectedLocation
               ? selectedLocation.name
               : DEFAULT_CURRENT_RECOMMEND_LOCATION
           }
+        />
+        <MapButton
+          src={IconShare}
+          alt="share"
+          onClick={handleShareButtonClick}
         />
       </div>
       <Toast message={message} isVisible={isVisible} />

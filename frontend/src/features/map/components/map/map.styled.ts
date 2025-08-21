@@ -19,11 +19,3 @@ export const top_overlay = () => css`
   padding: 0px 20px;
   z-index: 10;
 `;
-
-export const bottom_overlay = () => css`
-  position: absolute;
-  width: 100%;
-  bottom: 15px;
-  padding: 0px 20px;
-  z-index: 10;
-`;
