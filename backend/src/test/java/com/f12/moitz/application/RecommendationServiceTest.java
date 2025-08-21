@@ -9,39 +9,35 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 import com.f12.moitz.application.dto.RecommendationRequest;
-import com.f12.moitz.application.dto.RecommendationResponse;
-import com.f12.moitz.application.dto.RecommendationsResponse;
 import com.f12.moitz.application.dto.RecommendedLocationsResponse;
-import com.f12.moitz.application.dto.StartingPlaceResponse;
 import com.f12.moitz.application.port.LocationRecommender;
 import com.f12.moitz.application.port.PlaceRecommender;
 import com.f12.moitz.application.port.RouteFinder;
 import com.f12.moitz.application.utils.RecommendationMapper;
-import com.f12.moitz.domain.Path;
 import com.f12.moitz.domain.Place;
 import com.f12.moitz.domain.Point;
-import com.f12.moitz.domain.Recommendation;
 import com.f12.moitz.domain.RecommendedPlace;
 import com.f12.moitz.domain.Route;
 import com.f12.moitz.domain.TravelMethod;
+import com.f12.moitz.domain.Path;
 import com.f12.moitz.domain.Result;
 import com.f12.moitz.domain.repository.RecommendResultRepository;
 import com.f12.moitz.infrastructure.client.gemini.dto.RecommendedLocationResponse;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
+import java.util.stream.Collectors;
+import org.bson.types.ObjectId;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
 class RecommendationServiceTest {
 
-    @InjectMocks
     private RecommendationService recommendationService;
 
     @Mock
@@ -59,13 +55,26 @@ class RecommendationServiceTest {
     @Mock
     private RecommendResultRepository recommendResultRepository;
 
-    @Mock
     private RecommendationMapper recommendationMapper;
 
+    @BeforeEach
+    void setUp() {
+        recommendationMapper = new RecommendationMapper();
+        recommendationService = new RecommendationService(
+                placeService,
+                placeRecommender,
+                locationRecommender,
+                routeFinder,
+                recommendationMapper,
+                recommendResultRepository
+        );
+    }
+
     @Test
-    @DisplayName("모든 경로 탐색 후, 기준을 벗어나는 장소는 제외하고 올바르게 추천한다")
-    void recommendLocationWithFiltering() {
+    @DisplayName("추천 요청 시 올바른 최종 결과를 저장해야 한다")
+    void recommendLocation_Success() {
         // Given
+
         final RecommendationRequest request = new RecommendationRequest(List.of("강남역", "역삼역"), "CHAT");
         final Place gangnam = new Place("강남역", new Point(127.027, 37.497));
         final Place yeoksam = new Place("역삼역", new Point(127.036, 37.501));
@@ -96,40 +105,22 @@ class RecommendationServiceTest {
         );
         given(routeFinder.findRoutes(anyList())).willReturn(mockRoutes);
 
-        Result expectedResult = createExpectedResult(startingPlaces, seolleung);
-        given(recommendationMapper.toResult(anyList(), any(Recommendation.class), any(Map.class)))
-                .willReturn(expectedResult);
-
-        given(recommendResultRepository.saveAndReturnId(any(Result.class))).willReturn(expectedResult.getId());
-        given(recommendResultRepository.findById(expectedResult.getId())).willReturn(Optional.of(expectedResult));
+        given(recommendResultRepository.saveAndReturnId(any(Result.class))).willReturn(new ObjectId());
 
         // When
-        String id = recommendationService.recommendLocation(request);
-        RecommendationsResponse actualResponse = recommendationService.findResultById(id);
+        String resultId = recommendationService.recommendLocation(request);
 
         // Then
-        assertThat(id).isEqualTo(expectedResult.getId());
-        assertThat(actualResponse).isNotNull();
-        assertThat(actualResponse.locations()).hasSize(1);
-        assertThat(actualResponse.locations().getFirst().name()).isEqualTo("선릉역");
+        assertThat(resultId).isNotNull();
 
-        verify(routeFinder, times(1)).findRoutes(anyList());
+        ArgumentCaptor<Result> resultCaptor = ArgumentCaptor.forClass(Result.class);
+        verify(recommendResultRepository, times(1)).saveAndReturnId(resultCaptor.capture());
+
+        Result savedResult = resultCaptor.getValue();
+        assertThat(savedResult.getRecommendedLocationsCount()).isEqualTo(2);
+        assertThat(savedResult.getRecommendedLocations().getCandidates().stream()
+                .map(recommendedLocation -> recommendedLocation.getDestination().getName())
+                .collect(Collectors.toList()))
+                .containsExactlyInAnyOrder("선릉역", "삼성역");
     }
-
-    private Result createExpectedResult(List<Place> startingPlaces, Place recommendedPlace) {
-        return new Result(
-                List.of(
-                        new StartingPlaceResponse(1L, 1, startingPlaces.get(0).getPoint().getX(),
-                                startingPlaces.get(0).getPoint().getY(), startingPlaces.get(0).getName()),
-                        new StartingPlaceResponse(2L, 2, startingPlaces.get(1).getPoint().getX(),
-                                startingPlaces.get(1).getPoint().getY(), startingPlaces.get(1).getName())
-                ),
-                List.of(
-                        new RecommendationResponse(1L, 1, recommendedPlace.getPoint().getY(),
-                                recommendedPlace.getPoint().getX(), recommendedPlace.getName(), 10, true, "설명", "이유1",
-                                Collections.emptyList(), Collections.emptyList())
-                )
-        );
-    }
-
 }

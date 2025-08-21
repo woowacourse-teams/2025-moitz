@@ -9,7 +9,6 @@ import com.f12.moitz.application.port.RouteFinder;
 import com.f12.moitz.application.port.dto.ReasonAndDescription;
 import com.f12.moitz.application.port.dto.StartEndPair;
 import com.f12.moitz.application.utils.RecommendationMapper;
-import com.f12.moitz.domain.Candidate;
 import com.f12.moitz.domain.Place;
 import com.f12.moitz.domain.RecommendCondition;
 import com.f12.moitz.domain.Recommendation;
@@ -71,16 +70,15 @@ public class RecommendationService {
 
     public String recommendLocation(final RecommendationRequest request) {
         StopWatch stopWatch = new StopWatch("추천 서비스 전체");
+
         stopWatch.start("지역 추천");
         final String requirement = RecommendCondition.fromTitle(request.requirement()).getKeyword();
-
         final List<Place> startingPlaces = placeService.findByNames(request.startingPlaceNames());
 
         final RecommendedLocationsResponse recommendedLocationsResponse = locationRecommender.recommendLocations(
                 request.startingPlaceNames(),
                 requirement
         );
-
         final Map<Place, ReasonAndDescription> generatedPlacesWithReason = recommendedLocationsResponse.recommendations()
                 .stream()
                 .collect(Collectors.toMap(
@@ -92,14 +90,14 @@ public class RecommendationService {
                 ));
         stopWatch.stop();
 
-        final List<Place> generatedPlaces = generatedPlacesWithReason.keySet().stream().toList();
-
         stopWatch.start("모든 경로 찾기");
+        List<Place> generatedPlaces = generatedPlacesWithReason.keySet().stream().toList();
         final Map<Place, Routes> placeRoutes = findRoutesForAllAsync(startingPlaces, generatedPlaces);
         stopWatch.stop();
 
         stopWatch.start("기준 미달 경로 제거");
-        removePlacesBeyondRange(placeRoutes, generatedPlacesWithReason);
+        final Map<Place, ReasonAndDescription> filteredPlacesWithReason = removePlacesBeyondRange(placeRoutes, generatedPlacesWithReason);
+        generatedPlaces = filteredPlacesWithReason.keySet().stream().toList();
         stopWatch.stop();
 
         stopWatch.start("장소 추천");
@@ -110,16 +108,20 @@ public class RecommendationService {
         stopWatch.stop();
 
         stopWatch.start("Recommendation으로 변환");
-        final Recommendation recommendation = toRecommendation(
-                generatedPlacesWithReason,
+        final Recommendation recommendation = recommendationMapper.toRecommendation(
+                filteredPlacesWithReason,
                 recommendedPlaces,
                 placeRoutes
         );
         stopWatch.stop();
         System.out.println(stopWatch.prettyPrint());
 
-        final Result result = recommendationMapper.toResult(startingPlaces, recommendation, generatedPlacesWithReason);
-        return recommendResultRepository.saveAndReturnId(result).toHexString();
+        return recommendResultRepository.saveAndReturnId(
+                recommendationMapper.toResult(
+                        startingPlaces,
+                        recommendation
+                )
+        ).toHexString().toUpperCase();
     }
 
     public Map<Place, Routes> findRoutesForAllAsync(
@@ -149,38 +151,22 @@ public class RecommendationService {
                 ));
     }
 
-    private void removePlacesBeyondRange(
+    private Map<Place, ReasonAndDescription> removePlacesBeyondRange(
             final Map<Place, Routes> placeRoutes,
             final Map<Place, ReasonAndDescription> generatedPlaces
     ) {
-        placeRoutes.forEach((key, value) -> {
-            if (!value.isAcceptable()) {
-                generatedPlaces.remove(key);
-                log.debug("장소 제거 {}", key.getName());
-            }
-        });
-    }
-
-    private Recommendation toRecommendation(
-            final Map<Place, ReasonAndDescription> generatedPlaces,
-            final Map<Place, List<RecommendedPlace>> placeListMap,
-            final Map<Place, Routes> placeRoutes
-    ) {
-        return new Recommendation(
-                generatedPlaces.keySet().stream()
-                        .map(place -> new Candidate(
-                                place,
-                                placeRoutes.get(place),
-                                placeListMap.get(place)
-                        ))
-                        .toList()
-        );
+        return generatedPlaces.entrySet().stream()
+                .filter(entry -> {
+                    Place place = entry.getKey();
+                    return placeRoutes.containsKey(place) && placeRoutes.get(place).isAcceptable();
+                })
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 
     public RecommendationsResponse findResultById(final String id) {
         final Result result = recommendResultRepository.findById(new ObjectId(id))
                 .orElseThrow(() -> new IllegalArgumentException("아이디에 해당하는 결과를 찾을 수 없습니다."));
-        return new RecommendationsResponse(result.getStartingPlaces(), result.getRecommendedLocations());
+        return recommendationMapper.toResponse(result);
     }
 
 }

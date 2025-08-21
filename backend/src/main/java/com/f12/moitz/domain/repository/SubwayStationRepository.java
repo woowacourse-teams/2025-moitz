@@ -1,6 +1,5 @@
 package com.f12.moitz.domain.repository;
 
-import com.f12.moitz.domain.subway.SubwayMapPathFinder;
 import com.f12.moitz.domain.subway.SubwayStation;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
@@ -15,8 +14,8 @@ public interface SubwayStationRepository extends MongoRepository<SubwayStation,S
                 .collect(Collectors.toMap(SubwayStation::getName, station -> station));
     }
 
-    default void saveStationMap(Map<String, SubwayStation> stationMap) {
-        List<SubwayStation> stations = stationMap.entrySet().stream()
+    default void saveStationMap(final Map<String, SubwayStation> stationMap) {
+        final List<SubwayStation> stations = stationMap.entrySet().stream()
                 .map(entry -> {
                     SubwayStation station = entry.getValue();
                     if (station.getName() == null || !station.getName().equals(entry.getKey())) {
@@ -28,4 +27,5 @@ public interface SubwayStationRepository extends MongoRepository<SubwayStation,S
 
         saveAll(stations);
     }
+
 }
