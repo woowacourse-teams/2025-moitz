@@ -7,6 +7,7 @@
     <!-- Spring 환경 변수 (application.properties 에서 주입됨) -->
     <springProperty scope="context" name="DEBUG_LOG_PATH" source="logging.file.debug.path"/>
     <springProperty scope="context" name="INFO_LOG_PATH" source="logging.file.info.path"/>
+    <springProperty scope="context" name="WARN_LOG_PATH" source="logging.file.warn.path"/>
     <springProperty scope="context" name="ERROR_LOG_PATH" source="logging.file.error.path"/>
 
     <!-- 개발 환경용 설정 -->
@@ -62,7 +63,7 @@
 
     </springProfile>
 
-<!-- ========================================================= -->
+    <!-- ========================================================= -->
 
     <!-- 운영 환경용 설정 -->
     <springProfile name="prod">
@@ -80,8 +81,30 @@
                 <totalSizeCap>${TOTAL_SIZE}</totalSizeCap>
             </rollingPolicy>
 
-            <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <filter class="ch.qos.logback.classic.filter.LevelFilter">
                 <level>INFO</level>
+                <onMatch>ACCEPT</onMatch>
+                <onMismatch>DENY</onMismatch>
+            </filter>
+        </appender>
+
+        <!-- WARN 전용 Appender -->
+        <appender name="FILE_WARN" class="ch.qos.logback.core.rolling.RollingFileAppender">
+            <encoder class="net.logstash.logback.encoder.LogstashEncoder"/>
+
+            <file>${LOG_PATH}/${WARN_PATH}/application-warn.log</file>
+
+            <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+                <fileNamePattern>${WARN_LOG_PATH}/application-warn-%d{yyyy-MM-dd}.%i.log.zip</fileNamePattern>
+                <maxHistory>${MAX_HISTORY}</maxHistory>
+                <maxFileSize>${MAX_FILE_SIZE}</maxFileSize>
+                <totalSizeCap>${TOTAL_SIZE}</totalSizeCap>
+            </rollingPolicy>
+
+            <filter class="ch.qos.logback.classic.filter.LevelFilter">
+                <level>WARN</level>
+                <onMatch>ACCEPT</onMatch>
+                <onMismatch>DENY</onMismatch>
             </filter>
         </appender>
 
@@ -98,13 +121,16 @@
                 <totalSizeCap>${TOTAL_SIZE}</totalSizeCap>
             </rollingPolicy>
 
-            <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <filter class="ch.qos.logback.classic.filter.LevelFilter">
                 <level>ERROR</level>
+                <onMatch>ACCEPT</onMatch>
+                <onMismatch>DENY</onMismatch>
             </filter>
         </appender>
 
         <root level="INFO">
             <appender-ref ref="FILE_INFO"/>
+            <appender-ref ref="FILE_WARN"/>
             <appender-ref ref="FILE_ERROR"/>
         </root>
     </springProfile>
