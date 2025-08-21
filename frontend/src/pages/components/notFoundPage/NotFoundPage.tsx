@@ -37,8 +37,6 @@ function NotFoundPage() {
         <p css={typography.h1}>앗! 찾으시는 페이지가 없어요</p>
         <span css={[typography.b1, notFoundPage.description()]}>
           주소가 변경되었거나 더는 제공되지 않는 페이지예요.
-          <br />
-          모잇지와 함께 새로운 약속 장소를 찾아볼까요?
         </span>
       </div>
       <BottomButton
