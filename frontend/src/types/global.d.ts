@@ -9,6 +9,7 @@ declare global {
   namespace naver.maps {
     class LatLng {
       constructor(lat: number, lng: number);
+      equals(lat: LatLng): boolean;
     }
 
     class Map {
@@ -36,5 +37,33 @@ declare global {
     }
 
     class Coord {}
+
+    // Polyline
+    type StrokeStyle =
+      | 'solid'
+      | 'dash'
+      | 'shortdash'
+      | 'longdash'
+      | 'dot'
+      | 'dashdot';
+
+    interface PolylineOptions {
+      map: Map;
+      path: LatLng[];
+      strokeWeight?: number;
+      strokeColor?: string;
+      strokeOpacity?: number;
+      strokeStyle?: StrokeStyle;
+      clickable?: boolean;
+      zIndex?: number;
+      lineCap?: 'butt' | 'round' | 'square';
+    }
+
+    class Polyline {
+      constructor(options: PolylineOptions);
+      setMap(map: Map | null): void;
+      setOptions(options: Partial<PolylineOptions>): void;
+      getPath(): LatLng[];
+    }
   }
 }
