@@ -18,8 +18,13 @@ jobs:
         uses: actions/checkout@v4
 
       - name: 애플리케이션을 빌드하고 빌드 파일을 백업한다
+        env:
+          APPLICATION_CLIENT_PROPERTIES: ${{ secrets.APPLICATION_CLIENT_PROPERTIES }}
         run: |
           echo "=== JAR 빌드 ==="
+          rm -rf src/main/resources/application-client.properties
+          echo "$APPLICATION_CLIENT_PROPERTIES" > src/main/resources/application-client.properties
+          
           ./gradlew --no-build-cache clean build --refresh-dependencies -Dspring.profiles.active=prod
 
           if [ $? -ne 0 ]; then
@@ -58,7 +63,7 @@ jobs:
 
           # 빌드한 JAR 파일을 실행시킨다
           echo "=== 앱 실행 ==="
-          RUNNER_TRACKING_ID="" && nohup java -jar -Duser.timezone=Asia/Seoul -Dspring.profiles.active=prod "$JAR_PATH" > /dev/null 2>&1 &
+          RUNNER_TRACKING_ID="" && nohup java -Duser.timezone=Asia/Seoul -Dspring.profiles.active=prod -jar "$JAR_PATH" > /dev/null 2>&1 &
           sleep 3
 
           NEW_PID=$(pgrep -f "$JAR_PATH" || true)
