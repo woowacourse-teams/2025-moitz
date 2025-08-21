@@ -1,6 +1,5 @@
 package com.f12.moitz.domain.subway;
 
-import com.f12.moitz.domain.Path;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -55,13 +54,13 @@ class SubwayMapPathFinderTest {
         // Given
 
         // When
-        List<Path> paths = pathFinder.findShortestTimePath("청량리", "회기");
+        List<SubwayPath> paths = pathFinder.findShortestTimePath("청량리", "회기");
 
         // Then
         SoftAssertions.assertSoftly(softly -> {
             softly.assertThat(paths).hasSize(1);
-            softly.assertThat(paths.getFirst().getTravelTime()).hasSeconds(180);
-            softly.assertThat(paths.getFirst().getSubwayLineName()).isEqualTo("1호선");
+            softly.assertThat(paths.getFirst().totalTime()).isEqualTo(180);
+            softly.assertThat(paths.getFirst().lineName()).isEqualTo("1호선");
         });
     }
 

@@ -11,5 +11,3 @@ export const container = () => css`
 export const title = () => css`
   color: ${colorToken.gray[2]};
 `;
-
-export const bar = () => css``;

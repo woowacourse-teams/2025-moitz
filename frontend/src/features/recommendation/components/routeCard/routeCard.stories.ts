@@ -1,13 +1,12 @@
 import { routeCardMock } from '@mocks/routeCardMock';
 
-import { withContainer } from '../../../../../.storybook/decorators/withContainer';
+import { withContainer } from '@sb/decorators/withContainer';
 
 import RouteCard from './RouteCard';
 
 import type { Meta, StoryObj } from '@storybook/react-webpack5';
 
 const meta = {
-  title: 'features/detail/RouteCard',
   component: RouteCard,
   decorators: [withContainer],
   parameters: {

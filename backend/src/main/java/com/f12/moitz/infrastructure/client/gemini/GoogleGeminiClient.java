@@ -4,7 +4,7 @@ import static com.f12.moitz.infrastructure.PromptGenerator.ADDITIONAL_PROMPT;
 import static com.f12.moitz.infrastructure.PromptGenerator.RECOMMENDATION_COUNT;
 
 import com.f12.moitz.application.dto.PlaceRecommendResponse;
-import com.f12.moitz.application.dto.RecommendedLocationResponse;
+import com.f12.moitz.application.dto.RecommendedLocationsResponse;
 import com.f12.moitz.common.error.exception.ExternalApiErrorCode;
 import com.f12.moitz.common.error.exception.ExternalApiException;
 import com.f12.moitz.common.error.exception.RetryableApiException;
@@ -38,13 +38,13 @@ public class GoogleGeminiClient {
     private final Client geminiClient;
     private final ObjectMapper objectMapper;
 
-    public RecommendedLocationResponse generateResponse(
+    public RecommendedLocationsResponse generateResponse(
             final List<String> stationNames,
             final String requirement
     ) {
         return readValue(
                 generateContent(stationNames, requirement, PromptGenerator.getSchema()).text(),
-                RecommendedLocationResponse.class
+                RecommendedLocationsResponse.class
         );
     }
 
@@ -54,7 +54,7 @@ public class GoogleGeminiClient {
             final Map<String, Object> inputData
     ) {
         final String stations = String.join(", ", stationNames);
-        final String prompt = String.format(ADDITIONAL_PROMPT, RECOMMENDATION_COUNT, stations, requirement);
+        final String prompt = String.format(ADDITIONAL_PROMPT, RECOMMENDATION_COUNT, stations, requirement, RECOMMENDATION_COUNT);
 
         final GenerateContentConfig config = GenerateContentConfig.builder()
                 .temperature(0.4F)
@@ -86,6 +86,7 @@ public class GoogleGeminiClient {
             return generate(contents, config);
         } catch (ClientException | ServerException e) {
             String message = e.message();
+            log.warn("Gemini API 호출 중 오류 발생: {}", message);
             if (e.code() == HttpStatus.FORBIDDEN.value() || message.contains("API key not valid")) {
                 throw new ExternalApiException(ExternalApiErrorCode.INVALID_GEMINI_API_KEY, e.getMessage());
             }
@@ -98,6 +99,9 @@ public class GoogleGeminiClient {
             if (e.code() == HttpStatus.INTERNAL_SERVER_ERROR.value()) {
                 throw new RetryableApiException(ExternalApiErrorCode.GEMINI_API_SERVER_UNAVAILABLE, e.getMessage());
             }
+            throw new ExternalApiException(ExternalApiErrorCode.INVALID_GEMINI_API_RESPONSE, e.getMessage());
+        } catch (RuntimeException e) {
+            log.error("Gemini API 호출 중 예기치 않은 오류 발생", e);
             throw new ExternalApiException(ExternalApiErrorCode.INVALID_GEMINI_API_RESPONSE, e.getMessage());
         }
     }
@@ -144,6 +148,7 @@ public class GoogleGeminiClient {
     private <T> T readValue(final String content, final Class<T> valueType) {
         try {
             if (content == null || content.trim().isEmpty()) {
+                log.error("Gemini API 응답이 비어있습니다.");
                 throw new RetryableApiException(ExternalApiErrorCode.INVALID_GEMINI_RESPONSE_FORMAT);
             }
 

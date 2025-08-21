@@ -48,6 +48,7 @@ public class SwaggerConfig {
                         injectExamplesForErrorEnum(responses, 500, ExternalApiErrorCode.values());
                     } else if (httpMethod.name().equals("POST") && path.startsWith("/recommendations")) {
                         injectExamplesForErrorEnum(responses, 400, GeneralErrorCode.values());
+                        injectExamplesForErrorEnum(responses, 500, ExternalApiErrorCode.values());
                     }
                 });
             });

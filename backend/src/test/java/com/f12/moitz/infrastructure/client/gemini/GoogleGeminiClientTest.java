@@ -12,8 +12,8 @@ import com.f12.moitz.common.error.exception.ExternalApiErrorCode;
 import com.f12.moitz.common.error.exception.ExternalApiException;
 import com.f12.moitz.common.error.exception.RetryableApiException;
 import com.f12.moitz.infrastructure.PromptGenerator;
-import com.f12.moitz.infrastructure.client.gemini.dto.LocationNameAndReason;
-import com.f12.moitz.application.dto.RecommendedLocationResponse;
+import com.f12.moitz.infrastructure.client.gemini.dto.RecommendedLocationResponse;
+import com.f12.moitz.application.dto.RecommendedLocationsResponse;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.genai.errors.ClientException;
@@ -68,10 +68,10 @@ class GoogleGeminiClientTest {
                 }
                 """;
 
-        RecommendedLocationResponse expectedResponse = new RecommendedLocationResponse(
+        RecommendedLocationsResponse expectedResponse = new RecommendedLocationsResponse(
                 List.of(
-                        new LocationNameAndReason("신촌역", "접근성 좋고 맛집이 많아요! 😋"),
-                        new LocationNameAndReason("이대역", "학생들이 많아 맛집이 많아요! 🍜")
+                        new RecommendedLocationResponse("신촌역", "접근성 좋고 맛집이 많아요! 😋", "설명1"),
+                        new RecommendedLocationResponse("이대역", "학생들이 많아 맛집이 많아요! 🍜", "설명2")
                 )
         );
 
@@ -82,11 +82,11 @@ class GoogleGeminiClientTest {
 
         when(mockGenerateResponse.text()).thenReturn(expectedJsonResponse);
 
-        when(objectMapper.readValue(expectedJsonResponse, RecommendedLocationResponse.class))
+        when(objectMapper.readValue(expectedJsonResponse, RecommendedLocationsResponse.class))
                 .thenReturn(expectedResponse);
 
         // When
-        RecommendedLocationResponse result = googleGeminiClient.generateResponse(stationNames, requirement);
+        RecommendedLocationsResponse result = googleGeminiClient.generateResponse(stationNames, requirement);
 
         // Then
         SoftAssertions.assertSoftly(softAssertions -> {

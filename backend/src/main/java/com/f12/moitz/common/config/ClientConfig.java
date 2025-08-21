@@ -1,16 +1,17 @@
 package com.f12.moitz.common.config;
 
+import com.f12.moitz.application.PlaceService;
+import com.f12.moitz.domain.repository.SubwayStationRepository;
 import com.f12.moitz.domain.subway.SubwayMapPathFinder;
 import com.f12.moitz.domain.subway.SubwayStation;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.f12.moitz.infrastructure.SubwayMapBuilder;
 import com.google.genai.Client;
 import io.netty.handler.timeout.ReadTimeoutHandler;
 import io.netty.handler.timeout.WriteTimeoutHandler;
-import java.io.IOException;
-import java.io.InputStream;
 import java.time.Duration;
+import java.util.ArrayList;
 import java.util.Map;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -23,6 +24,7 @@ import org.springframework.web.client.RestClient;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.netty.http.client.HttpClient;
 
+@Slf4j
 @Configuration
 public class ClientConfig {
 
@@ -31,11 +33,6 @@ public class ClientConfig {
 
     @Value("${perplexity.api.key}")
     private String perplexityApiKey;
-
-    @Bean
-    public Client geminiClient() {
-        return geminiClientBuilder().apiKey(geminiApiKey).build();
-    }
 
     @Bean
     public RestClient kakaoRestClient() {
@@ -78,10 +75,25 @@ public class ClientConfig {
     }
 
     @Bean
+    public Client geminiClient() {
+        return geminiClientBuilder().apiKey(geminiApiKey).build();
+    }
+
+    @Bean
     public WebClient odsayWebClient() {
         return WebClient.builder()
                 .baseUrl("https://api.odsay.com/v1/api")
                 .clientConnector(new ReactorClientHttpConnector(httpClient(5)))
+                .build();
+    }
+
+    @Bean
+    public WebClient perplexityWebClient() {
+        return WebClient.builder()
+                .baseUrl("https://api.perplexity.ai")
+                .clientConnector(new ReactorClientHttpConnector(httpClient(20)))
+                .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                .defaultHeader(HttpHeaders.AUTHORIZATION, "Bearer " + perplexityApiKey)
                 .build();
     }
 
@@ -93,36 +105,29 @@ public class ClientConfig {
     }
 
     @Bean
-    public SubwayMapPathFinder subwayMapPathFinder(@Autowired ObjectMapper objectMapper) {
+    public SubwayMapPathFinder subwayMapPathFinder(
+            @Autowired SubwayStationRepository stationRepository,
+            @Autowired SubwayMapBuilder subwayMapBuilder,
+            @Autowired PlaceService placeService
+    ) {
+        log.info("SubwayMapPathFinder 초기화 시작");
         try {
-            InputStream resource = this.getClass().getClassLoader().getResourceAsStream("station-map.json");
-            if (resource == null || resource.available() == 0) {
-                throw new RuntimeException("station-map.json 파일을 찾을 수 없습니다. 먼저 SubwayMapBuilder.build()를 실행하여 JSON 파일을 생성해주세요.");
+            Map<String, SubwayStation> stationMap = stationRepository.findAllAsMap();
+            if (stationMap == null || stationMap.isEmpty()) {
+                log.info("MongoDB에 데이터가 없습니다. CSV에서 자동 빌드를 시작합니다...");
+                stationMap = subwayMapBuilder.buildAndSaveToMongo();
+                log.info("자동 빌드 완료. {}개 역 저장됨", stationMap.size());
+
+                int saved = placeService.saveIfAbsent(new ArrayList<>(stationMap.keySet()));
+                log.info("Place 초기화 완료. {}개 추가되었습니다.", saved);
             }
-
-            objectMapper.findAndRegisterModules();
-
-            TypeReference<Map<String, SubwayStation>> typeReference = new TypeReference<>() {};
-            Map<String, SubwayStation> stationMap = objectMapper.readValue(resource, typeReference);
-
-            if (stationMap.isEmpty()) {
-                throw new RuntimeException("station-map.json에서 읽어온 데이터가 비어있습니다. JSON 파일을 다시 생성해주세요.");
-            }
+            log.info("SubwayMapPathFinder 초기화 완료. 총 {}개 역", stationMap.size());
 
             return new SubwayMapPathFinder(stationMap);
-        } catch (IOException e) {
-            throw new RuntimeException("station-map.json 파일 읽기에 실패했습니다.", e);
+        } catch (Exception e) {
+            log.error("SubwayMapPathFinder 초기화 실패", e);
+            throw new RuntimeException("SubwayMapPathFinder 초기화 실패: " + e.getMessage(), e);
         }
-    }
-
-    @Bean
-    public WebClient perplexityWebClient() {
-        return WebClient.builder()
-                .baseUrl("https://api.perplexity.ai")
-                .clientConnector(new ReactorClientHttpConnector(httpClient(20)))
-                .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-                .defaultHeader(HttpHeaders.AUTHORIZATION, "Bearer " + perplexityApiKey)
-                .build();
     }
 
 }

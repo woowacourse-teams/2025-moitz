@@ -27,7 +27,7 @@ import reactor.core.scheduler.Schedulers;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class PlaceRecommenderAsyncAdapter implements AsyncPlaceRecommender {
+public class GeminiPlaceRecommenderAsyncAdapter implements AsyncPlaceRecommender {
 
     private final KakaoMapClient kakaoMapClient;
     private final GoogleGeminiClient geminiClient;
@@ -42,7 +42,7 @@ public class PlaceRecommenderAsyncAdapter implements AsyncPlaceRecommender {
     }
 
     private Mono<Map<Place, List<RecommendedPlace>>> recommendPlaces(final List<Place> targets, final String requirement) {
-        Map<Place, List<KakaoApiResponse>> searchedAllPlaces = searchPlacesWithRequirement(targets, requirement);
+        final Map<Place, List<KakaoApiResponse>> searchedAllPlaces = searchPlacesWithRequirement(targets, requirement);
 
         return Flux.fromIterable(searchedAllPlaces.entrySet())
                 .flatMap(entry -> processPlaceFilteringAsync(entry.getKey(), entry.getValue(), requirement), 5)
@@ -62,7 +62,7 @@ public class PlaceRecommenderAsyncAdapter implements AsyncPlaceRecommender {
                                             requirement,
                                             place.getPoint().getX(),
                                             place.getPoint().getY(),
-                                            800
+                                            1000
                                     )
                             );
                             return List.of(response);
@@ -104,6 +104,5 @@ public class PlaceRecommenderAsyncAdapter implements AsyncPlaceRecommender {
                 .doOnError(e -> log.error("Error filtering places for: {}", place.getName(), e))
                 .onErrorResume(e -> Mono.empty());
     }
-
 
 }

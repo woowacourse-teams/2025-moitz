@@ -1,6 +1,6 @@
 package com.f12.moitz.infrastructure.client.perplexity;
 
-import com.f12.moitz.application.dto.RecommendedLocationResponse;
+import com.f12.moitz.application.dto.RecommendedLocationsResponse;
 import com.f12.moitz.common.error.exception.ExternalApiErrorCode;
 import com.f12.moitz.common.error.exception.ExternalApiException;
 import com.f12.moitz.common.error.exception.RetryableApiException;
@@ -28,13 +28,13 @@ public class PerplexityClient {
     private final WebClient perplexityWebClient;
     private final ObjectMapper objectMapper;
 
-    public RecommendedLocationResponse generateResponse(
+    public RecommendedLocationsResponse generateResponse(
             final List<String> stationNames,
             final String requirement
     ) {
         try {
             final String content = generateContent(stationNames, requirement).choices().getFirst().message().content();
-            return objectMapper.readValue(content, RecommendedLocationResponse.class);
+            return objectMapper.readValue(content, RecommendedLocationsResponse.class);
         } catch (IOException e) {
             throw new ExternalApiException(ExternalApiErrorCode.INVALID_PERPLEXITY_API_RESPONSE);
         }
@@ -113,6 +113,12 @@ public class PerplexityClient {
                         .onRetryExhaustedThrow((retryBackoffSpec, retrySignal) ->
                                 new ExternalApiException(ExternalApiErrorCode.PERPLEXITY_API_SERVER_UNRESPONSIVE)
                         )
+                )
+                .doOnSuccess(response -> {
+                            if (response != null && response.usage() != null) {
+                                log.debug("Perplexity API 호출 성공 토큰 사용량: {}개", response.usage().totalTokens());
+                            }
+                        }
                 )
                 .block();
     }
