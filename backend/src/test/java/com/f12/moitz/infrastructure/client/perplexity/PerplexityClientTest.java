@@ -49,9 +49,16 @@ class PerplexityClientTest {
                 List.of(new RecommendedLocationResponse("강남역", "맛집 많음! 😋", "설명"))
         );
         final String content = objectMapper.writeValueAsString(recommendedLocationResponse);
-
         final String escapedContent = content.replace("\"", "\\\"");
-        final String mockResponseJson = String.format("{ \"choices\": [ { \"message\": { \"content\": \"%s\" } } ] }", escapedContent);
+
+        // Mock JSON에 "usage" 필드를 추가
+        final String mockResponseJson = String.format(
+                """
+                {
+                  "choices": [ { "message": { "content": "%s" } } ],
+                  "usage": { "prompt_tokens": 10, "completion_tokens": 20, "total_tokens": 30 }
+                }
+                """, escapedContent);
 
         mockWebServer.enqueue(
                 new MockResponse()
@@ -75,8 +82,13 @@ class PerplexityClientTest {
         // Given
         final String malformedContent = "{\"recommendations\":[{\"locationName\":\"강남역\" \"reason\":\"맛집 많음\"}]}";
         final String escapedContent = malformedContent.replace("\"", "\\\"");
-        final String mockResponseJson = String.format("{ \"choices\": [ { \"message\": { \"content\": \"%s\" } } ] }", escapedContent);
-
+        final String mockResponseJson = String.format(
+                """
+                {
+                  "choices": [ { "message": { "content": "%s" } } ],
+                  "usage": { "total_tokens": 10 }
+                }
+                """, escapedContent);
         mockWebServer.enqueue(
                 new MockResponse()
                         .setResponseCode(200)

@@ -114,8 +114,11 @@ public class PerplexityClient {
                                 new ExternalApiException(ExternalApiErrorCode.PERPLEXITY_API_SERVER_UNRESPONSIVE)
                         )
                 )
-                .doOnSuccess(response ->
-                        log.debug("Perplexity API 호출 성공 토큰 사용량: {}개", response.usage().totalTokens())
+                .doOnSuccess(response -> {
+                            if (response != null && response.usage() != null) {
+                                log.debug("Perplexity API 호출 성공 토큰 사용량: {}개", response.usage().totalTokens());
+                            }
+                        }
                 )
                 .block();
     }
