@@ -19,7 +19,7 @@ import IconShare from '@icons/icon-share.svg';
 
 import * as map from './map.styled';
 
-const DEFAULT_CURRENT_RECOMMEND_LOCATION = '전체 추 지점';
+const DEFAULT_CURRENT_RECOMMEND_LOCATION = '전체 추천 지점';
 
 interface MapProps {
   startingLocations: StartingPlace[];
