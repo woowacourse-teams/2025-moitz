@@ -1,9 +1,12 @@
 package com.f12.moitz.application.adapter;
 
+import com.f12.moitz.application.PlaceService;
 import com.f12.moitz.application.port.AsyncRouteFinder;
 import com.f12.moitz.application.port.dto.StartEndPair;
+import com.f12.moitz.domain.Path;
 import com.f12.moitz.domain.Route;
 import com.f12.moitz.domain.subway.SubwayMapPathFinder;
+import com.f12.moitz.domain.subway.SubwayPath;
 import java.time.Duration;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -20,6 +23,7 @@ import reactor.core.publisher.Mono;
 public class SubwayRouteFinderAsyncAdapter implements AsyncRouteFinder {
 
     private final SubwayMapPathFinder subwayMapPathFinder;
+    private final PlaceService placeService;
 
     @Async("asyncTaskExecutor")
     @Override
@@ -31,10 +35,12 @@ public class SubwayRouteFinderAsyncAdapter implements AsyncRouteFinder {
     public List<Route> findRoutes(final List<StartEndPair> placePairs) {
         final List<Route> routes = Flux.fromIterable(placePairs)
                 .flatMapSequential(pair -> {
-                            final String startPlaceName = getStationName(pair.start().getName());
-                            final String endPlaceName = getStationName(pair.end().getName());
+                            final String startPlaceName = pair.start().getName();
+                            final String endPlaceName = pair.end().getName();
                             return Mono.delay(Duration.ofMillis(50))
-                                    .then(subwayMapPathFinder.findShortestTimePathMono(startPlaceName, endPlaceName));
+                                    .then(convertPath(
+                                            subwayMapPathFinder.findShortestTimePath(startPlaceName, endPlaceName)
+                                    ));
                         },
                         5)
                 .map(Route::new)
@@ -44,11 +50,16 @@ public class SubwayRouteFinderAsyncAdapter implements AsyncRouteFinder {
         return routes;
     }
 
-    private String getStationName(final String stationName) {
-        if (!stationName.equals("서울역") && stationName.endsWith("역")) {
-            return stationName.substring(0, stationName.length() - 1);
-        }
-        return stationName;
+    private Mono<List<Path>> convertPath(final List<SubwayPath> subwayPaths) {
+        return Mono.just(subwayPaths.stream()
+                .map(subwayPath -> new Path(
+                        placeService.findByName(subwayPath.fromName()),
+                        placeService.findByName(subwayPath.toName()),
+                        subwayPath.travelMethod(),
+                        subwayPath.totalTime(),
+                        subwayPath.lineName()
+                ))
+                .toList());
     }
 
 }

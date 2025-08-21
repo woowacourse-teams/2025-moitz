@@ -1,8 +1,5 @@
 package com.f12.moitz.domain.subway;
 
-import com.f12.moitz.domain.Path;
-import com.f12.moitz.domain.Place;
-import com.f12.moitz.domain.Point;
 import com.f12.moitz.domain.TravelMethod;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -13,7 +10,6 @@ import java.util.Map;
 import java.util.PriorityQueue;
 import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
-import reactor.core.publisher.Mono;
 
 @Slf4j
 public class SubwayMapPathFinder {
@@ -24,11 +20,7 @@ public class SubwayMapPathFinder {
         this.stationMap = stationMap;
     }
 
-    public Mono<List<Path>> findShortestTimePathMono(final String startName, final String endName) {
-        return Mono.just(findShortestTimePath(startName, endName));
-    }
-
-    public List<Path> findShortestTimePath(final String startName, final String endName) {
+    public List<SubwayPath> findShortestTimePath(final String startName, final String endName) {
         if (!stationMap.containsKey(startName) || !stationMap.containsKey(endName)) {
             log.error("노선도에 존재하지 않는 역입니다. 출발역: {}, 도착역: {}", startName, endName);
             throw new IllegalStateException("출발역 또는 도착역이 노선도에 존재하지 않아 경로를 찾을 수 없습니다.");
@@ -52,7 +44,6 @@ public class SubwayMapPathFinder {
 
         while (!pq.isEmpty()) {
             final Node current = pq.poll();
-
             if (!visited.add(current.name)) {
                 continue;
             }
@@ -68,7 +59,6 @@ public class SubwayMapPathFinder {
 
             for (Edge edge : currentStation.getPossibleEdges()) {
                 final String neighborName = edge.getDestination();
-
                 if (visited.contains(neighborName)) {
                     continue;
                 }
@@ -119,13 +109,11 @@ public class SubwayMapPathFinder {
         final List<StationWithEdge> fullPath = new ArrayList<>();
         String currentName = endName;
 
-        // 먼저 도착역을 추가 (마지막 역이므로 Edge는 null)
         fullPath.addFirst(new StationWithEdge(currentName, null));
 
-        // 역방향으로 경로 추적
         String previousName = prev.get(currentName);
         while (previousName != null) {
-            String nextName = currentName; // 현재 추적 중인 역이 다음 역이 됨
+            String nextName = currentName;
             currentName = previousName;
 
             final SubwayStation currentStation = stationMap.get(currentName);
@@ -174,7 +162,6 @@ public class SubwayMapPathFinder {
 
             previousName = prev.get(currentName);
         }
-
         if (!startName.equals(currentName)) {
             throw new IllegalStateException("경로가 출발역까지 이어지지 않습니다.");
         }
@@ -182,8 +169,8 @@ public class SubwayMapPathFinder {
         return fullPath;
     }
 
-    private List<Path> groupByLine(final List<StationWithEdge> fullPath) {
-        final List<Path> paths = new ArrayList<>();
+    private List<SubwayPath> groupByLine(final List<StationWithEdge> fullPath) {
+        final List<SubwayPath> paths = new ArrayList<>();
 
         if (fullPath.isEmpty()) {
             throw new IllegalStateException("경로가 존재하지 않습니다.");
@@ -205,13 +192,9 @@ public class SubwayMapPathFinder {
             if (current.isTransfer() || fullPath.getLast().equals(current)) {
                 final String endStation = current.stationName;
 
-                // TODO: 정확한 좌표 조회해서 Point 생성하기
-                final Place fromPlace = new Place(startStation, new Point(125.0, 37.0));
-                final Place toPlace = new Place(endStation, new Point(125.0, 37.0));
-
-                final Path path = new Path(
-                        fromPlace,
-                        toPlace,
+                final SubwayPath path = new SubwayPath(
+                        startStation,
+                        endStation,
                         TravelMethod.SUBWAY,
                         totalTime,
                         currentLine
@@ -220,15 +203,12 @@ public class SubwayMapPathFinder {
 
                 // 환승 처리: 같은 역에서 다른 호선으로 환승 (마지막 역이 아닌 경우에만)
                 if (current.isTransfer() && i < fullPath.size() - 1) {
-                    // TODO: 정확한 좌표 조회해서 Point 생성하기
-                    final Place transferFrom = new Place(endStation, new Point(125.0, 37.0));
-
                     // 환승 시간 계산: 환승 Edge의 시간 직접 활용
                     final int transferTime = current.getTimeInSeconds();
 
-                    final Path transferPath = new Path(
-                            transferFrom,
-                            transferFrom,
+                    final SubwayPath transferPath = new SubwayPath(
+                            endStation,
+                            endStation,
                             TravelMethod.TRANSFER,
                             transferTime,
                             null

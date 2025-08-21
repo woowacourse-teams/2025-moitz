@@ -6,7 +6,6 @@ import com.f12.moitz.application.dto.RecommendedLocationsResponse;
 import com.f12.moitz.application.port.AsyncPlaceRecommender;
 import com.f12.moitz.application.port.AsyncRouteFinder;
 import com.f12.moitz.application.port.LocationRecommender;
-import com.f12.moitz.application.port.PlaceFinder;
 import com.f12.moitz.application.port.dto.ReasonAndDescription;
 import com.f12.moitz.application.port.dto.StartEndPair;
 import com.f12.moitz.application.utils.RecommendationMapper;
@@ -32,24 +31,24 @@ import org.springframework.util.StopWatch;
 @Service
 public class RecommendationParallelTaskService {
 
+    private final PlaceService placeService;
     private final AsyncPlaceRecommender placeRecommender;
     private final AsyncRouteFinder routeFinder;
 
     private final LocationRecommender locationRecommender;
-    private final PlaceFinder placeFinder;
     private final RecommendationMapper recommendationMapper;
 
     public RecommendationParallelTaskService(
+            final PlaceService placeService,
             final AsyncPlaceRecommender placeRecommender,
             @Qualifier("subwayRouteFinderAsyncAdapter") final AsyncRouteFinder routeFinder,
             final LocationRecommender locationRecommender,
-            final PlaceFinder placeFinder,
             final RecommendationMapper recommendationMapper
     ) {
+        this.placeService = placeService;
         this.placeRecommender = placeRecommender;
         this.routeFinder = routeFinder;
         this.locationRecommender = locationRecommender;
-        this.placeFinder = placeFinder;
         this.recommendationMapper = recommendationMapper;
     }
 
@@ -57,13 +56,20 @@ public class RecommendationParallelTaskService {
         StopWatch stopWatch = new StopWatch("추천 서비스 전체");
         stopWatch.start("지역 추천");
         final String requirement = RecommendCondition.fromTitle(request.requirement()).getKeyword();
-        final List<Place> startingPlaces = placeFinder.findPlacesByNames(request.startingPlaceNames());
-        final RecommendedLocationsResponse recommendedLocationsResponse = locationRecommender.getRecommendedLocations(
+        final List<Place> startingPlaces = placeService.findByNames(request.startingPlaceNames());
+        final RecommendedLocationsResponse recommendedLocationsResponse = locationRecommender.recommendLocations(
                 request.startingPlaceNames(),
                 requirement
         );
-        final Map<Place, ReasonAndDescription> generatedPlacesWithReason = locationRecommender.recommendLocations(
-                recommendedLocationsResponse);
+        final Map<Place, ReasonAndDescription> generatedPlacesWithReason = recommendedLocationsResponse.recommendations()
+                .stream()
+                .collect(Collectors.toMap(
+                        recommendation -> placeService.findByName(recommendation.locationName()),
+                        recommendation -> new ReasonAndDescription(
+                                recommendation.reason(),
+                                recommendation.description()
+                        )
+                ));
         stopWatch.stop();
         final List<Place> generatedPlaces = generatedPlacesWithReason.keySet().stream().toList();
 

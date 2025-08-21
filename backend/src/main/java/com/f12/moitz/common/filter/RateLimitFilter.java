@@ -36,7 +36,7 @@ public class RateLimitFilter implements Filter {
         final HttpServletRequest httpServletRequest = (HttpServletRequest) request;
         final HttpServletResponse httpServletResponse = (HttpServletResponse) response;
 
-        final String clientIp = getClientIpAddress(httpServletRequest);
+        final String clientIp = httpServletRequest.getHeader("X-Forwarded-For");
         final String userAgent = httpServletRequest.getHeader("User-Agent");
         log.debug("Processing request from IP: {} for URI: {}", clientIp, httpServletRequest.getRequestURI());
 
@@ -59,33 +59,6 @@ public class RateLimitFilter implements Filter {
         } catch (Exception e) {
             log.error("Error occurred during rate limiting for IP: {}", clientIp, e);
         }
-    }
-
-    private String getClientIpAddress(final HttpServletRequest request) {
-        final String[] headerNames = {
-                "X-Forwarded-For",
-                "X-Real-IP",
-                "Proxy-Client-IP",
-                "WL-Proxy-Client-IP",
-                "HTTP_X_FORWARDED_FOR",
-                "HTTP_X_FORWARDED",
-                "HTTP_X_CLUSTER_CLIENT_IP",
-                "HTTP_CLIENT_IP",
-                "HTTP_FORWARDED_FOR",
-                "HTTP_FORWARDED"
-        };
-
-        for (String headerName : headerNames) {
-            String ip = request.getHeader(headerName);
-            if (ip != null && !ip.isEmpty() && !"unknown".equalsIgnoreCase(ip)) {
-                if (ip.contains(",")) {
-                    ip = ip.split(",")[0].trim();
-                }
-                return ip;
-            }
-        }
-
-        return request.getRemoteAddr();
     }
 
     private void handleRateLimitExceeded(
