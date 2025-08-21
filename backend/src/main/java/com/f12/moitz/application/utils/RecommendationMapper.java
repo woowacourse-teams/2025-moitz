@@ -152,7 +152,7 @@ public class RecommendationMapper {
                 path.getEnd().getPoint().getX(),
                 path.getEnd().getPoint().getY(),
                 path.getSubwayLineName(),
-                path.getTravelTime().toMinutesPart()
+                (int) path.getTravelTime().toMinutes()
         );
     }
 }
