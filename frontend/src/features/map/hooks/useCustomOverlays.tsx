@@ -10,6 +10,7 @@ import MarkerIndex from '@shared/components/markerIndex/MarkerIndex';
 import { numberToCharCode } from '@shared/utils/numberToCharCode';
 
 import CustomOverlay from '../lib/CustomOverlay';
+import { getCenterFromCoords } from '../lib/getCenterFromCoords';
 
 interface UseCustomOverlaysProps {
   startingLocations: StartingPlace[];
@@ -42,18 +43,24 @@ export const useCustomOverlays = ({
     const { naver } = window;
     if (!naver || !mapRef.current) return;
 
-    const all = [...startingLocations, ...recommendedLocations];
-    if (all.length === 0) return;
+    const allLocations = [...startingLocations, ...recommendedLocations];
+    if (allLocations.length === 0) return;
 
     // 지도 최초 1회 생성
     if (!naverMapRef.current) {
-      const center = new naver.maps.LatLng(all[0].y, all[0].x);
+      const { centerCoord } = getCenterFromCoords(
+        allLocations.map((location) => ({
+          x: location.x,
+          y: location.y,
+        })),
+      );
+      const center = new naver.maps.LatLng(centerCoord.y - 0.1, centerCoord.x);
+
       naverMapRef.current = new naver.maps.Map(mapRef.current, {
         center,
         zoom: 11,
       });
     }
-    const map = naverMapRef.current!;
 
     // 기존 오버레이 제거
     overlayInstancesRef.current.forEach((ov) => ov.setMap(null));
@@ -62,7 +69,7 @@ export const useCustomOverlays = ({
     // 1) 출발지 마커 (항상 표시)
     startingLocations.forEach((loc, i) => {
       const overlay = new CustomOverlay({
-        naverMap: map,
+        naverMap: naverMapRef.current!,
         position: new naver.maps.LatLng(loc.y, loc.x),
         zIndex: 300,
         content: (
@@ -87,7 +94,7 @@ export const useCustomOverlays = ({
       if (selectedLocation && loc.id !== selectedLocation.id) return;
 
       const overlay = new CustomOverlay({
-        naverMap: map,
+        naverMap: naverMapRef.current!,
         position: new naver.maps.LatLng(loc.y, loc.x),
         zIndex: 200,
         content: (
@@ -152,7 +159,7 @@ export const useCustomOverlays = ({
         path,
         strokeWeight: 4,
         strokeOpacity: 0.95,
-        strokeColor: '#2563EB', // 필요 시 디자인 토큰으로 교체
+        strokeColor: '#2563EB',
         zIndex: 1,
       });
 
