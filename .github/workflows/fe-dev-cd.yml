@@ -13,8 +13,14 @@ env:
   FE_CACHE_PATH: /* # 전체 무효화
 
 jobs:
+  ci:
+    uses: ./.github/workflows/fe-ci.yml
+
   cd:
+    needs: ci
     if: >
+      (github.event_name == 'push' && needs.ci.result == 'success') ||
+      (github.event.pull_request.merged == true && needs.ci.result == 'success') ||
       github.actor == 'eunsoA' || 
       github.actor == 'kaori-killer'
 
