@@ -42,7 +42,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: ${{ needs.ci.outputs.build.artifact-name }}
-          path: frontend/dist
+          path: frontend
         timeout-minutes: 5
 
       - name: 정적 자산 업로드 (긴 캐시, index.html 제외)
