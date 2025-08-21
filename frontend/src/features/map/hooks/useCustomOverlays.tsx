@@ -9,7 +9,6 @@ import MarkerIndex from '@shared/components/markerIndex/MarkerIndex';
 import { numberToCharCode } from '@shared/utils/numberToCharCode';
 
 import { CustomOverlay } from '../lib/CustomOverlay';
-import { getCenterFromCoords } from '../lib/getCenterFromCoords';
 
 interface useCustomOverlaysProps {
   startingLocations: StartingPlace[];
@@ -32,13 +31,7 @@ export const useCustomOverlays = ({
 
     if (allLocations.length === 0) return;
 
-    const { centerCoord } = getCenterFromCoords(
-      allLocations.map((location) => ({
-        x: location.x,
-        y: location.y,
-      })),
-    );
-    const center = new naver.maps.LatLng(centerCoord.y - 0.1, centerCoord.x);
+    const center = new naver.maps.LatLng(allLocations[0].y, allLocations[0].x);
 
     const naverMap = new naver.maps.Map(mapRef.current, {
       center,
