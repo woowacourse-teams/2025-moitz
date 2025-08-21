@@ -23,6 +23,6 @@ type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {
   args: {
-    place: LocationsMock.recommendedLocations[0].places[0],
+    place: LocationsMock.locations[0].places[0],
   },
 };
