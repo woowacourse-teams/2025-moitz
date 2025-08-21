@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 @Tag(name = "추천 테스트", description = "추천 테스트 API")
 public interface SwaggerMockingRecommendationController {
 
-    @Operation(summary = "추천 생성 요청 API 테스트용", description = "추천 조건을 기반으로 추천 생성을 요청합니다.", responses = {
+    @Operation(summary = "추천 생성 요청 API 테스트용", tags = "추천 테스트", description = "추천 조건을 기반으로 추천 생성을 요청합니다.", responses = {
             @ApiResponse(
                     responseCode = "200",
                     description = "추천 생성 성공",
@@ -34,7 +34,7 @@ public interface SwaggerMockingRecommendationController {
     })
     ResponseEntity<RecommendationCreateResponse> mockRecommend(@RequestBody RecommendationRequest request);
 
-    @Operation(summary = "추천 결과 조회 API 테스트용", description = "만남 지역 추천 결과를 확인합니다.", responses = {
+    @Operation(summary = "추천 결과 조회 API 테스트용", tags = "추천 테스트", description = "만남 지역 추천 결과를 확인합니다.", responses = {
             @ApiResponse(
                     responseCode = "200",
                     description = "추천 결과 조회 성공",
@@ -43,6 +43,6 @@ public interface SwaggerMockingRecommendationController {
                     )
             )
     })
-    ResponseEntity<MockRecommendationResponse> mockGetRecommendation(@PathVariable("id") Long id);
+    ResponseEntity<MockRecommendationResponse> mockGetRecommendation(@PathVariable("id") String id);
 
 }
