@@ -70,12 +70,6 @@ jobs:
           echo "New version: $NEW_VERSION"
           echo "new_version=$NEW_VERSION" >> $GITHUB_OUTPUT
 
-      # package.json 버전 업데이트
-      - name: Update package.json version
-        run: |
-          cd frontend
-          npm version ${{ steps.version_bump.outputs.new_version }} --no-git-tag-version
-
       # Changelog 생성
       - name: Generate Changelog
         id: changelog

@@ -39,6 +39,7 @@ function Map({
   const mapRef = useCustomOverlays({
     startingLocations,
     recommendedLocations,
+    selectedLocation,
     changeSelectedLocation,
   });
 

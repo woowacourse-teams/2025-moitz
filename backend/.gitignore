@@ -33,3 +33,4 @@ out/
 .vscode/
 
 application-client.properties
+application-devclient.properties
