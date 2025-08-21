@@ -69,7 +69,7 @@ export const useCustomOverlays = ({
     // 1) 출발지 마커 (항상 표시)
     startingLocations.forEach((loc, i) => {
       const overlay = new CustomOverlay({
-        naverMap: naverMapRef.current!, // 일관 참조
+        naverMap: naverMapRef.current!,
         position: new naver.maps.LatLng(loc.y, loc.x),
         zIndex: 300,
         content: (
@@ -94,7 +94,7 @@ export const useCustomOverlays = ({
       if (selectedLocation && loc.id !== selectedLocation.id) return;
 
       const overlay = new CustomOverlay({
-        naverMap: naverMapRef.current!, // 오타였던 map → 교정
+        naverMap: naverMapRef.current!,
         position: new naver.maps.LatLng(loc.y, loc.x),
         zIndex: 200,
         content: (
