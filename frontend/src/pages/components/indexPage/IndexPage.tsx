@@ -1,4 +1,4 @@
-import FallBackPage from '@pages/fallBackPage/FallBackPage';
+import FallBackPage from '@pages/components/fallBackPage/FallBackPage';
 
 import ProgressLoading from '@features/loading/components/progressLoading/ProgressLoading';
 import MeetingForm from '@features/meeting/components/meetingForm/MeetingForm';
