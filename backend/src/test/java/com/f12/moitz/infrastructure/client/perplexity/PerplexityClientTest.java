@@ -51,7 +51,6 @@ class PerplexityClientTest {
         final String content = objectMapper.writeValueAsString(recommendedLocationResponse);
         final String escapedContent = content.replace("\"", "\\\"");
 
-        // Mock JSON에 "usage" 필드를 추가
         final String mockResponseJson = String.format(
                 """
                 {
