@@ -110,8 +110,8 @@ class RecommendationServiceTest {
         // Then
         assertThat(id).isEqualTo(expectedResult.getId());
         assertThat(actualResponse).isNotNull();
-        assertThat(actualResponse.recommendedLocations()).hasSize(1);
-        assertThat(actualResponse.recommendedLocations().getFirst().name()).isEqualTo("선릉역");
+        assertThat(actualResponse.locations()).hasSize(1);
+        assertThat(actualResponse.locations().getFirst().name()).isEqualTo("선릉역");
 
         verify(routeFinder, times(1)).findRoutes(anyList());
     }
