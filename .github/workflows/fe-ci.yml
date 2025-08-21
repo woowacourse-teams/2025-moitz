@@ -55,3 +55,10 @@ jobs:
       - name: 빌드 실행 (dev)
         if: (github.event_name == 'push' && github.ref == 'refs/heads/dev') || (github.event_name == 'pull_request' && github.base_ref == 'dev')
         run: npm run build:dev
+
+      - name: 빌드 결과물 업로드
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-build
+          path: frontend/dist
+          retention-days: 1
