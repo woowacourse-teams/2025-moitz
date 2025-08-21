@@ -53,8 +53,10 @@ class CustomOverlay extends window.naver.maps.OverlayView {
   }
 
   onRemove() {
-    this.reactRoot.unmount();
-    this.container.remove();
+    setTimeout(() => {
+      this.reactRoot.unmount();
+      this.container.remove();
+    }, 0);
   }
 }
 
