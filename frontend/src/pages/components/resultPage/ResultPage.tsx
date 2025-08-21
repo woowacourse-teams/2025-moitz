@@ -1,6 +1,7 @@
 import { useCallback, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router';
 
+import FallBackPage from '@pages/fallBackPage/FallBackPage';
 import useSelectedRecommendedLocation from '@pages/hooks/useSelectedLocation';
 
 import ProgressLoading from '@features/loading/components/progressLoading/ProgressLoading';
@@ -49,7 +50,12 @@ function ResultPage() {
 
   if (isLoading) return <ProgressLoading />;
   if (!location || location.recommendedLocations.length === 0)
-    return <p>추천 결과가 없습니다.</p>;
+    return (
+      <FallBackPage
+        reset={() => {}}
+        error={new Error('추천 결과가 없습니다.')}
+      />
+    );
 
   const { startingPlaces, recommendedLocations } = location;
 
