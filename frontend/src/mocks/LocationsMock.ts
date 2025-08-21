@@ -1,4 +1,4 @@
-import { LocationResponse } from '@entities/location/api/types/RecommendationResultAPITypes';
+import { LocationResponse } from '@entities/location/api/types/RecommendationResultAPI';
 import {
   RecommendedLocation,
   StartingPlace,

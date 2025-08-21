@@ -2,7 +2,7 @@ import { useState, useCallback } from 'react';
 
 import { fetchRecommendationId } from '@entities/location/api/fetchRecommendationId';
 import { fetchRecommendationResult } from '@entities/location/api/fetchRecommendationResult';
-import { RecommendationRequestBody } from '@entities/location/api/types/RecommendationIdAPITypes';
+import { RecommendationRequestBody } from '@entities/location/api/types/RecommendationIdAPI';
 import { Location } from '@entities/location/types/Location';
 
 export type useLocationsReturn = {
