@@ -38,11 +38,14 @@ jobs:
       - name: 코드 가져오기
         uses: actions/checkout@v4
 
+      - name: dist 폴더 생성
+        run: mkdir -p dist
+
       - name: CI 빌드 결과물 다운로드
         uses: actions/download-artifact@v4
         with:
-          name: ${{ needs.ci.outputs.build.artifact-name }}
-          path: frontend
+          name: frontend-build
+          path: frontend/dist
         timeout-minutes: 5
 
       - name: 정적 자산 업로드 (긴 캐시, index.html 제외)
