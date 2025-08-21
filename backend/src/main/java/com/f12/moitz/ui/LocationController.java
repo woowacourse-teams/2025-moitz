@@ -1,22 +1,23 @@
 package com.f12.moitz.ui;
 
-import com.f12.moitz.application.RecommendationParallelTaskService;
 import com.f12.moitz.application.RecommendationService;
+import com.f12.moitz.application.dto.temp.RecommendationsResponse;
+import com.f12.moitz.application.dto.temp.MockRecommendationResponse;
 import com.f12.moitz.application.dto.PathResponse;
 import com.f12.moitz.application.dto.PlaceRecommendResponse;
 import com.f12.moitz.application.dto.RecommendationRequest;
 import com.f12.moitz.application.dto.RecommendationResponse;
-import com.f12.moitz.application.dto.RecommendationsResponse;
 import com.f12.moitz.application.dto.RouteResponse;
 import com.f12.moitz.application.dto.StartingPlaceResponse;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @RequiredArgsConstructor
 @RestController
@@ -24,35 +25,19 @@ import org.springframework.web.bind.annotation.*;
 public class LocationController implements SwaggerLocationController {
 
     private final RecommendationService recommendationService;
-    private final RecommendationParallelTaskService recommendationParallelTaskService;
 
     @PostMapping
-    public ResponseEntity<Map<String,String>> recommendLocations(@RequestBody RecommendationRequest request) {
-        String id = recommendationService.recommendLocation(request);
-        Map<String, String> resultResponse = new HashMap<>();
-        resultResponse.put("id", id);
-        return ResponseEntity.status(201).body(resultResponse);
-    }
-
-    @PostMapping("/async")
-    public ResponseEntity<RecommendationsResponse> recommendLocationsAsync(@RequestBody RecommendationRequest request) {
-        return ResponseEntity.ok(recommendationParallelTaskService.recommendLocation(request));
-    }
-
-    @GetMapping("/{id}")
-    public ResponseEntity<RecommendationsResponse> getRecommendationResult(@PathVariable("id") String id){
-        RecommendationsResponse response = recommendationService.findResultById(id);
-        return ResponseEntity.ok().body(response);
+    public ResponseEntity<RecommendationsResponse> recommendLocations(@RequestBody RecommendationRequest request) {
+        return ResponseEntity.status(201).body(recommendationService.tempRecommendLocation(request));
     }
 
     @PostMapping("/test")
-    public ResponseEntity<RecommendationsResponse> mockRecommendedLocation(@RequestBody RecommendationRequest request) {
+    public ResponseEntity<MockRecommendationResponse> mockRecommend(@RequestBody RecommendationRequest request) {
         return ResponseEntity.ok(mock());
     }
 
-    private RecommendationsResponse mock() {
-
-        return new RecommendationsResponse(
+    private MockRecommendationResponse mock() {
+        return new MockRecommendationResponse(
                 List.of(
                         new StartingPlaceResponse(1L, 1, 127.094741101863, 37.5351180385975, "강변역"),
                         new StartingPlaceResponse(2L, 2, 127.01063381083677, 37.571669405802616, "동대문역"),
