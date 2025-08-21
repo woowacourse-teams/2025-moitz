@@ -27,7 +27,7 @@ jobs:
       - name: 애플리케이션을 빌드하고 빌드 파일을 백업한다
         run: |
           echo "=== JAR 빌드 ==="
-          ./gradlew --no-build-cache clean build --refresh-dependencies
+          ./gradlew --no-build-cache clean build --refresh-dependencies -Dspring.profiles.active=prod
 
           if [ $? -ne 0 ]; then
             echo "빌드 실패"
