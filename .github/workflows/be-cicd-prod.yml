@@ -58,7 +58,7 @@ jobs:
 
           # 빌드한 JAR 파일을 실행시킨다
           echo "=== 앱 실행 ==="
-          RUNNER_TRACKING_ID="" && nohup java -jar -Duser.timezone=Asia/Seoul -Dspring.profiles.active=prod "$JAR_PATH" > /dev/null 2>&1 &
+          RUNNER_TRACKING_ID="" && nohup java -Duser.timezone=Asia/Seoul -Dspring.profiles.active=prod -jar "$JAR_PATH" > /dev/null 2>&1 &
           sleep 3
 
           NEW_PID=$(pgrep -f "$JAR_PATH" || true)
