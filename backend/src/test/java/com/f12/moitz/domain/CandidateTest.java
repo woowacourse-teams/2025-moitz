@@ -31,7 +31,7 @@ class CandidateTest {
         final List<RecommendedPlace> recommendedPlaces = List.of(recommendedPlace);
 
         // When & Then
-        assertThatNoException().isThrownBy(() -> new Candidate(endPlace, routes, recommendedPlaces));
+        assertThatNoException().isThrownBy(() -> new Candidate(endPlace, routes, recommendedPlaces, "123", "123"));
     }
 
     @Test
@@ -55,19 +55,19 @@ class CandidateTest {
 
         // When & Then
         assertSoftly(softAssertions -> {
-            softAssertions.assertThatThrownBy(() -> new Candidate(null, routes, recommendedPlaces))
+            softAssertions.assertThatThrownBy(() -> new Candidate(null, routes, recommendedPlaces, "123", "123"))
                     .isInstanceOf(IllegalArgumentException.class)
                     .hasMessage("추천 지역은 필수입니다.");
 
-            softAssertions.assertThatThrownBy(() -> new Candidate(endPlace, null, recommendedPlaces))
+            softAssertions.assertThatThrownBy(() -> new Candidate(endPlace, null, recommendedPlaces, "123", "123"))
                     .isInstanceOf(IllegalArgumentException.class)
                     .hasMessage("경로 목록은 필수입니다.");
 
-            softAssertions.assertThatThrownBy(() -> new Candidate(endPlace, routes, null))
+            softAssertions.assertThatThrownBy(() -> new Candidate(endPlace, routes, null, "123", "123"))
                     .isInstanceOf(IllegalArgumentException.class)
                     .hasMessage("추천 장소 목록은 비어 있을 수 없습니다.");
 
-            softAssertions.assertThatThrownBy(() -> new Candidate(endPlace, routes, Collections.emptyList()))
+            softAssertions.assertThatThrownBy(() -> new Candidate(endPlace, routes, Collections.emptyList(), "123", "123"))
                     .isInstanceOf(IllegalArgumentException.class)
                     .hasMessage("추천 장소 목록은 비어 있을 수 없습니다.");
         });
@@ -91,7 +91,7 @@ class CandidateTest {
 
         final RecommendedPlace recommendedPlace = new RecommendedPlace("스타벅스", "카페", 5, "url");
         final List<RecommendedPlace> recommendedPlaces = List.of(recommendedPlace);
-        final Candidate candidate = new Candidate(endPlace, routes, recommendedPlaces);
+        final Candidate candidate = new Candidate(endPlace, routes, recommendedPlaces, "123", "123");
 
         // When
         final int averageTravelTime = candidate.calculateAverageTravelTime();

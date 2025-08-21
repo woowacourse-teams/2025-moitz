@@ -6,7 +6,7 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 
 public interface RecommendResultRepository extends MongoRepository<Result, ObjectId> {
 
-    default ObjectId saveAndReturnId(Result result) {
+    default ObjectId saveAndReturnId(final Result result) {
         Result savedResult = save(result);
         return savedResult.getId();
     }

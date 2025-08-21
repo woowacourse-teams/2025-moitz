@@ -88,6 +88,6 @@ class RecommendationTest {
 
         final RecommendedPlace recommendedPlace = new RecommendedPlace("스타벅스", "카페", 5, "url");
         final List<RecommendedPlace> recommendedPlaces = List.of(recommendedPlace);
-        return new Candidate(endPlace, routes, recommendedPlaces);
+        return new Candidate(endPlace, routes, recommendedPlaces, "123", "123");
     }
 }
