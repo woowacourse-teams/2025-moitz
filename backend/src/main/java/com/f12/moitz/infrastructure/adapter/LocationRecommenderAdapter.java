@@ -30,9 +30,14 @@ public class LocationRecommenderAdapter implements LocationRecommender {
             final List<String> startPlaceNames,
             final String condition
     ) {
-        return geminiClient.generateResponse(
+        final RecommendedLocationsResponse generatedResponse = geminiClient.generateResponse(
                 startPlaceNames,
                 condition
+        );
+        final RecommendedLocationsResponse deduplicatedLocations = deduplicateLocation(generatedResponse);
+        return excludeStartPlaces(
+                deduplicatedLocations,
+                startPlaceNames
         );
     }
 
@@ -41,9 +46,35 @@ public class LocationRecommenderAdapter implements LocationRecommender {
             final List<String> startPlaceNames,
             final String condition
     ) {
-        return perplexityClient.generateResponse(
+        final RecommendedLocationsResponse generatedResponse = perplexityClient.generateResponse(
                 startPlaceNames,
                 condition
+        );
+        final RecommendedLocationsResponse deduplicatedLocations = deduplicateLocation(generatedResponse);
+        return excludeStartPlaces(
+                deduplicatedLocations,
+                startPlaceNames
+        );
+    }
+
+    private RecommendedLocationsResponse deduplicateLocation(
+            final RecommendedLocationsResponse response
+    ) {
+        return new RecommendedLocationsResponse(
+                response.recommendations().stream()
+                        .distinct()
+                        .toList()
+        );
+    }
+
+    private RecommendedLocationsResponse excludeStartPlaces(
+            final RecommendedLocationsResponse response,
+            final List<String> startPlaceNames
+    ) {
+        return new RecommendedLocationsResponse(
+                response.recommendations().stream()
+                .filter(recommendation -> !startPlaceNames.contains(recommendation.locationName()))
+                .toList()
         );
     }
 
