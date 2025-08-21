@@ -39,7 +39,7 @@ public class Path {
             final int travelTime,
             final String subwayLineName
     ) {
-        this(start, end, travelMethod, Duration.ofMinutes(travelTime), subwayLineName);
+        this(start, end, travelMethod, Duration.ofSeconds(travelTime), subwayLineName);
     }
 
     private void validate(final Place start, final Place end, final TravelMethod travelMethod, final Duration travelTime) {
