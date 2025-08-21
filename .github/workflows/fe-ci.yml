@@ -7,14 +7,12 @@ on:
       - dev
   pull_request:
     types: [opened, synchronize, reopened]
-  workflow_call:
-    outputs:
-      artifact-name:
-        description: 'The name of the uploaded artifact'
-        value: frontend-build
+  workflow_call: {}
 
 jobs:
   build:
+    outputs:
+      artifact-name: frontend-build
     if: >
       github.actor == 'kaori-killer' || 
       github.actor == 'eunsoA' || 
