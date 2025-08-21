@@ -4,7 +4,7 @@ import { useEffect, useRef } from 'react';
 import type {
   RecommendedLocation,
   StartingPlace,
-} from '@entities/types/Location';
+} from '@entities/location/types/Location';
 
 import MarkerIndex from '@shared/components/markerIndex/MarkerIndex';
 import { numberToCharCode } from '@shared/utils/numberToCharCode';

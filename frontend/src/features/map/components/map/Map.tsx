@@ -2,14 +2,20 @@ import { Link } from 'react-router';
 
 import { useCustomOverlays } from '@features/map/hooks/useCustomOverlays';
 import { SelectedLocation } from '@features/recommendation/types/SelectedLocation';
+import Toast from '@features/toast/components/Toast';
+import { useToast } from '@features/toast/hooks/useToast';
 
-import { RecommendedLocation, StartingPlace } from '@entities/types/Location';
+import {
+  RecommendedLocation,
+  StartingPlace,
+} from '@entities/location/types/Location';
 
 import MapButton from '@shared/components/mapButton/MapButton';
 import MapPoint from '@shared/components/mapPoint/MapPoint';
 import { flex } from '@shared/styles/default.styled';
 
 import IconBack from '@icons/icon-back.svg';
+import IconShare from '@icons/icon-share.svg';
 
 import * as map from './map.styled';
 
@@ -28,6 +34,8 @@ function Map({
   selectedLocation,
   changeSelectedLocation,
 }: MapProps) {
+  const { isVisible, message, showToast } = useToast();
+
   const mapRef = useCustomOverlays({
     startingLocations,
     recommendedLocations,
@@ -37,6 +45,11 @@ function Map({
 
   const handleBackButtonClick = () => {
     changeSelectedLocation(null);
+  };
+
+  const handleShareButtonClick = () => {
+    navigator.clipboard.writeText(window.location.href);
+    showToast('링크가 복사되었습니다.');
   };
 
   return (
@@ -55,8 +68,6 @@ function Map({
             onClick={handleBackButtonClick}
           />
         )}
-      </div>
-      <div css={[flex({ justify: 'space-between' }), map.bottom_overlay()]}>
         <MapPoint
           text={
             selectedLocation
@@ -64,7 +75,13 @@ function Map({
               : DEFAULT_CURRENT_RECOMMEND_LOCATION
           }
         />
+        <MapButton
+          src={IconShare}
+          alt="share"
+          onClick={handleShareButtonClick}
+        />
       </div>
+      <Toast message={message} isVisible={isVisible} />
     </div>
   );
 }

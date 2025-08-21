@@ -7,8 +7,8 @@ import {
   validateForm,
 } from '@features/meeting/utils/formValidation';
 
-import { getMeetingStorage } from '@entities/model/meetingStorage';
-import { LocationRequirement } from '@entities/types/LocationRequestBody';
+import { getMeetingStorage } from '@entities/location/model/meetingStorage';
+import { LocationRequirement } from '@entities/location/types/LocationRequirement';
 
 import { ValidationError } from '@shared/types/validationError';
 

@@ -5,8 +5,8 @@ import { useFormInfo } from '@features/meeting/hooks/useFormInfo';
 import Toast from '@features/toast/components/Toast';
 import { useToast } from '@features/toast/hooks/useToast';
 
-import { useLocationsContext } from '@entities/contexts/useLocationsContext';
-import { setMeetingStorage } from '@entities/model/meetingStorage';
+import { useLocationsContext } from '@entities/location/contexts/useLocationsContext';
+import { setMeetingStorage } from '@entities/location/model/meetingStorage';
 
 import BottomButton from '@shared/components/bottomButton/BottomButton';
 import { flex } from '@shared/styles/default.styled';
@@ -29,7 +29,7 @@ function MeetingForm() {
   } = useFormInfo();
   const { isVisible, message, showToast } = useToast();
 
-  const { trigger } = useLocationsContext();
+  const { getRecommendationId } = useLocationsContext();
 
   const showValidationError = (error: ValidationError) => {
     if (!error.isValid) {
@@ -59,13 +59,17 @@ function MeetingForm() {
       return;
     }
 
-    navigate('/result');
+    try {
+      const id = await getRecommendationId({
+        startingPlaceNames: departureList,
+        requirement: conditionID,
+      });
 
-    await trigger({
-      startingPlaceNames: departureList,
-      requirement: conditionID,
-    });
-    
+      if (id) navigate(`/result/${id}`);
+    } catch {
+      showToast('모임 지역 찾기에 실패했습니다.');
+    }
+
     setMeetingStorage({ departureList, conditionID });
   };
 

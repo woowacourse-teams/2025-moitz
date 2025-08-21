@@ -1,6 +1,6 @@
 import { SelectedLocation } from '@features/recommendation/types/SelectedLocation';
 
-import { StartingPlace } from '@entities/types/Location';
+import { StartingPlace } from '@entities/location/types/Location';
 
 import { flex, scroll, typography } from '@shared/styles/default.styled';
 import { numberToCharCode } from '@shared/utils/numberToCharCode';

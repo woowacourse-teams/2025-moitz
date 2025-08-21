@@ -1,4 +1,4 @@
-import { RecommendedRoute } from '@entities/types/Location';
+import { RecommendedRoute } from '@entities/location/types/Location';
 
 import Badge from '@shared/components/badge/Badge';
 import MarkerIndex from '@shared/components/markerIndex/MarkerIndex';

@@ -1,4 +1,7 @@
-import { StartingPlace, RecommendedRoute } from '@entities/types/Location';
+import {
+  StartingPlace,
+  RecommendedRoute,
+} from '@entities/location/types/Location';
 
 export const startingPlaceMock: StartingPlace = {
   id: 1,

@@ -2,7 +2,10 @@ import React, { useEffect, useRef, useState } from 'react';
 
 import { SelectedLocation } from '@features/recommendation/types/SelectedLocation';
 
-import { RecommendedLocation, StartingPlace } from '@entities/types/Location';
+import {
+  RecommendedLocation,
+  StartingPlace,
+} from '@entities/location/types/Location';
 
 import BottomSheetDetail from '../bottomSheetDetail/BottomSheetDetail';
 import BottomSheetList from '../bottomSheetList/BottomSheetList';

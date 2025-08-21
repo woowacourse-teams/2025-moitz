@@ -1,18 +1,46 @@
+import { useCallback, useEffect } from 'react';
+import { useParams, useNavigate } from 'react-router';
+
+import FallBackPage from '@pages/components/fallBackPage/FallBackPage';
 import useSelectedRecommendedLocation from '@pages/hooks/useSelectedLocation';
 
 import ProgressLoading from '@features/loading/components/progressLoading/ProgressLoading';
 import Map from '@features/map/components/map/Map';
 import BottomSheet from '@features/recommendation/components/bottomSheet/BottomSheet';
 
-import { useLocationsContext } from '@entities/contexts/useLocationsContext';
-import { RecommendedLocation } from '@entities/types/Location';
+import { useLocationsContext } from '@entities/location/contexts/useLocationsContext';
+import { RecommendedLocation } from '@entities/location/types/Location';
 
 import { flex } from '@shared/styles/default.styled';
 
 import * as resultPage from './resultPage.styled';
 
 function ResultPage() {
-  const { data: location, isLoading, isError } = useLocationsContext();
+  const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
+  const {
+    data: location,
+    isLoading,
+    getRecommendationResult,
+  } = useLocationsContext();
+
+  const fetchResult = useCallback(async () => {
+    try {
+      await getRecommendationResult(id);
+    } catch {
+      navigate('/');
+    }
+  }, [id, navigate, getRecommendationResult]);
+
+  useEffect(() => {
+    if (!id) {
+      navigate('/');
+      return;
+    }
+
+    fetchResult();
+  }, [id, fetchResult]);
+
   const { selectedLocation, changeSelectedLocation } =
     useSelectedRecommendedLocation();
 
@@ -21,9 +49,13 @@ function ResultPage() {
   };
 
   if (isLoading) return <ProgressLoading />;
-  if (isError) return <p>에러 발생!</p>;
   if (!location || location.recommendedLocations.length === 0)
-    return <p>추천 결과가 없습니다.</p>;
+    return (
+      <FallBackPage
+        reset={() => {}}
+        error={new Error('추천 결과가 없습니다.')}
+      />
+    );
 
   const { startingPlaces, recommendedLocations } = location;
 

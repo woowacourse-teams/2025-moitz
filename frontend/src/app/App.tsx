@@ -22,7 +22,7 @@ export default function App() {
   return (
     <Routes>
       <Route path="/" element={<IndexPage />} />
-      <Route path="/result" element={<ResultPage />} />
+      <Route path="/result/:id" element={<ResultPage />} />
       <Route path="*" element={<NotFoundPage />} />
     </Routes>
   );

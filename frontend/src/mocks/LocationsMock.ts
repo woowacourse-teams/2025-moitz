@@ -1,8 +1,8 @@
+import { LocationResponse } from '@entities/location/api/types/RecommendationResultAPI';
 import {
-  Location,
   RecommendedLocation,
   StartingPlace,
-} from '@entities/types/Location';
+} from '@entities/location/types/Location';
 
 export const StartingPlacesMock: StartingPlace[] = [
   { id: 1, x: 126.9784, y: 37.5665, index: 0, name: '서울역' },
@@ -68,7 +68,7 @@ export const RecommendedLocationsMock: RecommendedLocation[] = [
   },
 ];
 
-export const LocationsMock: Location = {
+export const LocationsMock: LocationResponse = {
   startingPlaces: [
     {
       id: 1,
@@ -78,7 +78,7 @@ export const LocationsMock: Location = {
       name: '잠실역',
     },
   ],
-  recommendedLocations: [
+  locations: [
     {
       id: 1,
       index: 1,
