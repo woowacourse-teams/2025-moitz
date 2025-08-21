@@ -4,6 +4,7 @@ on:
   push:
     branches: [dev]
     paths: ['frontend/**']
+  workflow_dispatch:
 
 env:
   AWS_REGION: ap-northeast-2
