@@ -23,48 +23,47 @@ import org.springframework.stereotype.Component;
 @Component
 public class RecommendationMapper {
 
-    public RecommendationsResponse toResponse(
-            final List<Place> startingPlaces,
-            final Recommendation recommendation,
-            final Map<Place, ReasonAndDescription> generatedPlaces
-    ) {
-        final int minTime = recommendation.getBestRecommendationTime();
+    public RecommendationsResponse toResponse(final Result result) {
+        final int minTime = result.getBestRecommendationTime();
 
         return new RecommendationsResponse(
-                IntStream.range(0, startingPlaces.size())
-                        .mapToObj(index -> toStartingPlaceResponse(index, startingPlaces.get(index)))
+                IntStream.range(0, result.getStartingPlacesCount())
+                        .mapToObj(index -> toStartingPlaceResponse(index, result.getStartingPlaces().get(index)))
                         .toList(),
-                IntStream.range(0, recommendation.size())
+                IntStream.range(0, result.getRecommendedLocationsCount())
                         .mapToObj(index -> {
-                            Candidate currentCandidate = recommendation.get(index);
-                            ReasonAndDescription reasonAndDescription = generatedPlaces.get(
-                                    currentCandidate.getDestination());
-                            return toLocationRecommendResponse(currentCandidate, index, minTime, reasonAndDescription);
+                            Candidate currentCandidate = result.getRecommendedLocations().get(index);
+                            return toLocationRecommendResponse(currentCandidate, index, minTime);
                         })
+                        .toList()
+        );
+    }
+
+    public Recommendation toRecommendation(
+            final Map<Place, ReasonAndDescription> generatedPlaces,
+            final Map<Place, List<RecommendedPlace>> placeListMap,
+            final Map<Place, Routes> placeRoutes
+    ) {
+        return new Recommendation(
+                generatedPlaces.entrySet().stream()
+                        .map(place -> new Candidate(
+                                place.getKey(),
+                                placeRoutes.get(place.getKey()),
+                                placeListMap.get(place.getKey()),
+                                place.getValue().description(),
+                                place.getValue().reason()
+                        ))
                         .toList()
         );
     }
 
     public Result toResult(
             final List<Place> startingPlaces,
-            final Recommendation recommendation,
-            final Map<Place, ReasonAndDescription> generatedPlaces
+            final Recommendation recommendation
     ) {
-        final int minTime = recommendation.getBestRecommendationTime();
-
         return new Result(
-                IntStream.range(0, startingPlaces.size())
-                        .mapToObj(index -> toStartingPlaceResponse(index, startingPlaces.get(index)))
-                        .toList(),
-                IntStream.range(0, recommendation.size())
-                        .mapToObj(index -> {
-                            Candidate currentCandidate = recommendation.get(index);
-                            ReasonAndDescription reasonAndDescription = generatedPlaces.get(
-                                    currentCandidate.getDestination()
-                            );
-                            return toLocationRecommendResponse(currentCandidate, index, minTime, reasonAndDescription);
-                        })
-                        .toList()
+                startingPlaces,
+                recommendation
         );
     }
 
@@ -81,8 +80,7 @@ public class RecommendationMapper {
     private RecommendationResponse toLocationRecommendResponse(
             final Candidate candidate,
             final int index,
-            final int minTime,
-            final ReasonAndDescription reasonAndDescription
+            final int minTime
     ) {
         final Place targetPlace = candidate.getDestination();
         final int totalTime = candidate.calculateAverageTravelTime();
@@ -100,8 +98,8 @@ public class RecommendationMapper {
                 targetPlace.getName(),
                 totalTime,
                 totalTime == minTime,
-                reasonAndDescription.description(),
-                reasonAndDescription.reason(),
+                candidate.getDescription(),
+                candidate.getReason(),
                 recommendedPlaces,
                 routes
         );

@@ -1,37 +1,56 @@
 package com.f12.moitz.domain;
 
 import java.time.Duration;
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Path {
 
-    private final Place start;
-    private final Place end;
-    private final TravelMethod travelMethod;
-    private final Duration travelTime;
-    private final String subwayLineName;
+    private Place start;
+    private Place end;
+    private TravelMethod travelMethod;
+    private Duration travelTime;
+    private String subwayLineName;
 
-    public Path(final Place start, final Place end, final TravelMethod travelMethod, final int travelTime, final String subwayLineName) {
+    public Path(
+            final Place start,
+            final Place end,
+            final TravelMethod travelMethod,
+            final Duration travelTime,
+            final String subwayLineName
+    ) {
         validate(start, end, travelMethod, travelTime);
         validateStartToEnd(start, end, travelMethod);
         validateSubwayLineName(travelMethod, subwayLineName);
         this.start = start;
         this.end = end;
         this.travelMethod = travelMethod;
-        this.travelTime = Duration.ofSeconds(travelTime);
+        this.travelTime = travelTime;
         this.subwayLineName = subwayLineName;
     }
 
-    private void validate(final Place start, final Place end, final TravelMethod travelMethod, final int travelTime) {
+    public Path(
+            final Place start,
+            final Place end,
+            final TravelMethod travelMethod,
+            final int travelTime,
+            final String subwayLineName
+    ) {
+        this(start, end, travelMethod, Duration.ofSeconds(travelTime), subwayLineName);
+    }
+
+    private void validate(final Place start, final Place end, final TravelMethod travelMethod, final Duration travelTime) {
         if (start == null || end == null) {
             throw new IllegalArgumentException("시작 장소와 끝 장소는 필수입니다.");
         }
         if (travelMethod == null) {
             throw new IllegalArgumentException("이동 수단은 필수입니다.");
         }
-        if (travelTime < 0) {
-            throw new IllegalArgumentException("이동 시간은 음수일 수 없습니다.");
+        if (travelTime == null || travelTime.isNegative()) {
+            throw new IllegalArgumentException("이동 시간은 null이거나 음수일 수 없습니다.");
         }
     }
 

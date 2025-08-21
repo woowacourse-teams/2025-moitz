@@ -63,7 +63,7 @@ class PathTest {
         // When & Then
         assertThatThrownBy(() -> new Path(start, end, travelMethod, travelTime, subwayLineName))
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("이동 시간은 음수일 수 없습니다.");
+                .hasMessage("이동 시간은 null이거나 음수일 수 없습니다.");
     }
 
     @Test
