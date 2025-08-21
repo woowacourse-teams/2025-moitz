@@ -1,5 +1,6 @@
 package com.f12.moitz.ui;
 
+import com.f12.moitz.application.dto.RecommendationCreateResponse;
 import com.f12.moitz.application.dto.RecommendationRequest;
 import com.f12.moitz.application.dto.RecommendationsResponse;
 import com.f12.moitz.common.error.ErrorResponse;
@@ -41,7 +42,7 @@ public interface SwaggerLocationController {
                     )
             )
     })
-    ResponseEntity<Map<String,String>> recommendLocations(@RequestBody RecommendationRequest request);
+    ResponseEntity<RecommendationCreateResponse> recommendLocations(@RequestBody RecommendationRequest request);
 
     @Operation(summary = "추천 결과 조회 API", description = "추천 결과를 조회합니다.", responses = {
             @ApiResponse(

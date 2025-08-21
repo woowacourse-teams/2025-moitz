@@ -43,7 +43,7 @@ public interface SwaggerRecommendationController {
                     )
             )
     })
-    ResponseEntity<Map<String,String>> recommendLocations(@RequestBody RecommendationRequest request);
+    ResponseEntity<RecommendationCreateResponse> recommendLocations(@RequestBody RecommendationRequest request);
 
     @Operation(summary = "추천 결과 조회 API", description = "추천 결과를 조회합니다.", responses = {
             @ApiResponse(
@@ -56,32 +56,4 @@ public interface SwaggerRecommendationController {
     })
     ResponseEntity<RecommendationsResponse> getRecommendationResult(@PathVariable("id") String id);
 
-    @Operation(summary = "추천 생성 요청 API 테스트용", description = "추천 조건을 기반으로 추천 생성을 요청합니다.", responses = {
-            @ApiResponse(
-                    responseCode = "200",
-                    description = "추천 생성 성공",
-                    content = @Content(
-                            schema = @Schema(implementation = RecommendationCreateResponse.class)
-                    )
-            ),
-            @ApiResponse(
-                    responseCode = "400",
-                    description = "잘못된 요청",
-                    content = @Content(
-                            schema = @Schema(implementation = ErrorResponse.class)
-                    )
-            )
-    })
-    ResponseEntity<RecommendationCreateResponse> mockRecommend(@RequestBody RecommendationRequest request);
-
-    @Operation(summary = "추천 결과 조회 API 테스트용", description = "만남 지역 추천 결과를 확인합니다.", responses = {
-            @ApiResponse(
-                    responseCode = "200",
-                    description = "추천 결과 조회 성공",
-                    content = @Content(
-                            schema = @Schema(implementation = MockRecommendationResponse.class)
-                    )
-            )
-    })
-    ResponseEntity<MockRecommendationResponse> mockGetRecommendation(@PathVariable("id") Long id);
 }

@@ -4,9 +4,7 @@ import com.f12.moitz.application.RecommendationParallelTaskService;
 import com.f12.moitz.application.RecommendationService;
 import com.f12.moitz.application.dto.*;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -20,19 +18,15 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/recommendations")
-public class RecommendationController implements SwaggerRecommendationController {
+public class RecommendationController implements SwaggerRecommendationController, SwaggerMockingRecommendationController {
 
     private final RecommendationService recommendationService;
     private final RecommendationParallelTaskService recommendationParallelTaskService;
 
     @PostMapping
-    public ResponseEntity<Map<String,String>> recommendLocations(@RequestBody RecommendationRequest request) {
-        String id = recommendationService.recommendLocation(request);
-        Map<String, String> resultResponse = new HashMap<>();
-        resultResponse.put("id", id);
-        return ResponseEntity.status(201).body(resultResponse);
+    public ResponseEntity<RecommendationCreateResponse> recommendLocations(@RequestBody RecommendationRequest request) {
+        return ResponseEntity.status(201).body(new RecommendationCreateResponse(recommendationService.recommendLocation(request)));
     }
-
 
     @PostMapping("/async")
     public ResponseEntity<RecommendationsResponse> recommendLocationsAsync(@RequestBody RecommendationRequest request) {
@@ -47,10 +41,10 @@ public class RecommendationController implements SwaggerRecommendationController
 
     @PostMapping("/test")
     public ResponseEntity<RecommendationCreateResponse> mockRecommend(@RequestBody RecommendationRequest request) {
-        return ResponseEntity.ok(new RecommendationCreateResponse(123));
+        return ResponseEntity.ok(new RecommendationCreateResponse("123"));
     }
 
-    @GetMapping("/{id}/test")
+    @GetMapping("/test/{id}")
     public ResponseEntity<MockRecommendationResponse> mockGetRecommendation(@PathVariable("id") Long id) {
         return ResponseEntity.ok(mock());
     }
