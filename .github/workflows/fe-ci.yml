@@ -12,7 +12,7 @@ on:
 jobs:
   build:
     outputs:
-      artifact-name: frontend-build
+      artifact-name: dist
     if: >
       github.actor == 'kaori-killer' || 
       github.actor == 'eunsoA' || 
