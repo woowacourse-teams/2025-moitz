@@ -9,10 +9,9 @@ on:
     paths:
       - "backend/**"
 
-  workflow_dispatch:
-
 jobs:
   deploy_prod:
+    if: github.event.pull_request.merged == true
     runs-on: [ self-hosted, prod ]
     env:
       S3_BUCKET: ${{ secrets.S3_BE_BUCKET }}
