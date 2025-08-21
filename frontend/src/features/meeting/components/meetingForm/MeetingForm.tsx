@@ -59,12 +59,16 @@ function MeetingForm() {
       return;
     }
 
-    const id = await getRecommendationId({
-      startingPlaceNames: departureList,
-      requirement: conditionID,
-    });
+    try {
+      const id = await getRecommendationId({
+        startingPlaceNames: departureList,
+        requirement: conditionID,
+      });
 
-    navigate(`/result/${id}`);
+      if (id) navigate(`/result/${id}`);
+    } catch {
+      showToast('모임 지역 찾기에 실패했습니다.');
+    }
 
     setMeetingStorage({ departureList, conditionID });
   };

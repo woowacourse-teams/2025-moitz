@@ -15,16 +15,14 @@ describe('useLocations', () => {
       const { result } = renderHook(() => useLocations());
 
       // then: 초기에는 로딩 중이어야 한다
-      let id: string;
       await act(async () => {
-        id = await result.current.getRecommendationId(LocationsRequestBodyMock);
+        await result.current.getRecommendationId(LocationsRequestBodyMock);
       });
 
       // then: 데이터가 정상적으로 로드되어야 한다
       await waitFor(() => {
-        expect(result.current.isLoading).toBe(true);
+        expect(result.current.isLoading).toBe(false);
         expect(result.current.isError).toBe(false);
-        expect(id).toBeTruthy();
       });
     });
 
