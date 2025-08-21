@@ -9,7 +9,7 @@ on:
     paths:
       - "backend/**"
 
-    workflow_dispatch:
+  workflow_dispatch:
 
 jobs:
   deploy_prod:
