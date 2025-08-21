@@ -1,6 +1,7 @@
 HELP.md
 .gradle
 build/
+logs/
 !gradle/wrapper/gradle-wrapper.jar
 !**/src/main/**
 !**/src/test/**
@@ -30,3 +31,6 @@ out/
 
 ### VS Code ###
 .vscode/
+
+application-client.properties
+application-devclient.properties

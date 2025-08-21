@@ -7,7 +7,57 @@
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "resolveJsonModule": true,
-    "jsxImportSource": "@emotion/react"
+    "jsxImportSource": "@emotion/react",
+    "skipLibCheck": true,
+    "typeRoots": [
+      "./node_modules/@types",
+      "./src/types"
+    ],
+    "baseUrl": ".",
+    "paths": {
+      "@app/*": [
+        "src/app/*"
+      ],
+      "@pages/*": [
+        "src/pages/*"
+      ],
+      "@widgets/*": [
+        "src/widgets/*"
+      ],
+      "@features/*": [
+        "src/features/*"
+      ],
+      "@entities/*": [
+        "src/entities/*"
+      ],
+      "@shared/*": [
+        "src/shared/*"
+      ],
+      "@shared/components/*": [
+        "src/shared/components/*"
+      ],
+      "@shared/styles/*": [
+        "src/shared/styles/*"
+      ],
+      "@shared/types/*": [
+        "src/shared/types/*"
+      ],
+      "@icons/*": [
+        "assets/icon/*"
+      ],
+      "@mocks/*": [
+        "src/mocks/*"
+      ],
+      "@config/*": [
+        "src/config/*"
+      ],
+      "@sb/*": [
+        ".storybook/*"
+      ],
+    }
   },
-  "include": ["src", "main.tsx"]
+  "include": [
+    "src",
+    "main.tsx",
+  ]
 }
