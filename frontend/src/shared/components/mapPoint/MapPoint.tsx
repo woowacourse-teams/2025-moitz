@@ -15,6 +15,7 @@ function MapPoint({ text }: MapPointProps) {
         inline_flex({ justify: 'center', align: 'center', gap: 10 }),
         shadow.map,
         mapPoint.base(),
+        mapPoint.floating(),
       ]}
     >
       <Dot size={8} colorType="main" colorTokenIndex={1} />
