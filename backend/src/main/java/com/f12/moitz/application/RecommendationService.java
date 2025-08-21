@@ -57,6 +57,17 @@ public class RecommendationService {
         this.recommendResultRepository = recommendResultRepository;
     }
 
+    /*
+        * /locations 유지를 위해 임시로 사용되는 추천 서비스 메소드입니다.
+     */
+    public com.f12.moitz.application.dto.temp.RecommendationsResponse tempRecommendLocation(final RecommendationRequest request) {
+        final RecommendationsResponse result = findResultById(recommendLocation(request));
+        return new com.f12.moitz.application.dto.temp.RecommendationsResponse(
+                result.startingPlaces(),
+                result.locations()
+        );
+    }
+
     public String recommendLocation(final RecommendationRequest request) {
         StopWatch stopWatch = new StopWatch("추천 서비스 전체");
         stopWatch.start("지역 추천");
