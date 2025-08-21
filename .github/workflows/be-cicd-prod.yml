@@ -9,6 +9,8 @@ on:
     paths:
       - "backend/**"
 
+    workflow_dispatch:
+
 jobs:
   deploy_prod:
     if: github.event.pull_request.merged == true
