@@ -18,6 +18,8 @@ jobs:
         uses: actions/checkout@v4
 
       - name: 애플리케이션을 빌드하고 빌드 파일을 백업한다
+        env:
+          APPLICATION_CLIENT_PROPERTIES: ${{ secrets.APPLICATION_CLIENT_PROPERTIES }}
         run: |
           echo "=== JAR 빌드 ==="
           rm -rf src/main/resources/application-client.properties
