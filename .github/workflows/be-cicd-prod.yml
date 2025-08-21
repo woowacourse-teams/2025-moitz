@@ -41,7 +41,7 @@ jobs:
           cd ./build/libs
           FILE_PATH=$(ls *SNAPSHOT.jar | head -n 1)
           echo $FILE_PATH
-          mv $FILE_PATH "$(date +%Y-%m-%d-%H:%M:%S)-$FILE_PATH"
+          mv $FILE_PATH "$(date +%Y-%m-%d-%H%M%S)-$FILE_PATH"
 
           echo "=== S3에 빌드 파일 백업 ==="
           FILE_PATH=$(ls *SNAPSHOT.jar | head -n 1)
