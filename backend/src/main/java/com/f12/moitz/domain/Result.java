@@ -1,11 +1,12 @@
 package com.f12.moitz.domain;
 
-import com.f12.moitz.application.dto.RecommendationResponse;
-import com.f12.moitz.application.dto.StartingPlaceResponse;
+import java.time.Instant;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.bson.types.ObjectId;
+import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 import java.util.List;
 
@@ -16,6 +17,10 @@ public class Result {
 
     @Id
     private ObjectId id;
+
+    @CreatedDate
+    @Indexed(expireAfter = "7d")
+    private Instant createdAt;
 
     private List<Place> startingPlaces;
     private Recommendation recommendedLocations;
