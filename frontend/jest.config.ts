@@ -15,6 +15,7 @@ const config: Config = {
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/src/$1',
     '\\.(css|less|scss)$': 'identity-obj-proxy',
+    '\\.(svg|png|jpg|jpeg)$': '<rootDir>/src/mocks/imageMock.ts',
     '^@app/(.*)$': '<rootDir>/src/app/$1',
     '^@pages/(.*)$': '<rootDir>/src/pages/$1',
     '^@widgets/(.*)$': '<rootDir>/src/widgets/$1',
