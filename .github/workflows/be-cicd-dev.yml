@@ -23,7 +23,7 @@ jobs:
           rm -rf src/main/resources/application-devclient.properties
           echo "$APPLICATION_CLIENT_PROPERTIES" > src/main/resources/application-devclient.properties
           rm -rf src/main/resources/application-db.properties
-          echo "APPLICATION_DB_PROPERTIES" > src/main/resources/application-db.properties
+          echo "$APPLICATION_DB_PROPERTIES" > src/main/resources/application-db.properties
           
           ./gradlew --no-build-cache clean build --refresh-dependencies
 
