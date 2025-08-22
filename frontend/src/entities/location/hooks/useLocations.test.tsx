@@ -6,7 +6,10 @@ import { server } from '@mocks/server';
 
 import useLocations from './useLocations';
 
-const BASE_URL = process.env.API_BASE_URL;
+const BASE_URL =
+  process.env.NODE_ENV === 'production'
+    ? process.env.PROD_API_BASE_URL
+    : process.env.DEV_API_BASE_URL;
 
 describe('useLocations', () => {
   describe('getRecommendationId', () => {
