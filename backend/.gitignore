@@ -34,3 +34,4 @@ out/
 
 application-client.properties
 application-devclient.properties
+application-db.properties
