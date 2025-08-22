@@ -23,11 +23,14 @@ jobs:
       - name: EC2 환경에서 애플리케이션을 빌드 및 실행한다
         env:
           APPLICATION_CLIENT_PROPERTIES: ${{ secrets.APPLICATION_DEV_CLIENT_PROPERTIES }}
+          APPLICATION_DB_PROPERTIES: ${{ secrets.APPLICATION_DB_PROPERTIES }}
         run: |
           # 이전 step에서 checkout한 코드로 JAR 파일을 새로 빌드한다
           echo "=== JAR 빌드 ==="
           rm -rf src/main/resources/application-devclient.properties
           echo "$APPLICATION_CLIENT_PROPERTIES" > src/main/resources/application-devclient.properties
+          rm -rf src/main/resources/application-db.properties
+          echo "$APPLICATION_DB_PROPERTIES" > src/main/resources/application-db.properties
 
           ./gradlew --no-build-cache clean build --refresh-dependencies
 

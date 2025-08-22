@@ -27,10 +27,13 @@ jobs:
       - name: 애플리케이션을 빌드하고 빌드 파일을 백업한다
         env:
           APPLICATION_CLIENT_PROPERTIES: ${{ secrets.APPLICATION_CLIENT_PROPERTIES }}
+          APPLICATION_DB_PROPERTIES: ${{ secrets.APPLICATION_DB_PROPERTIES }}
         run: |
           echo "=== JAR 빌드 ==="
           rm -rf src/main/resources/application-client.properties
           echo "$APPLICATION_CLIENT_PROPERTIES" > src/main/resources/application-client.properties
+          rm -rf src/main/resources/application-db.properties
+          echo "$APPLICATION_DB_PROPERTIES" > src/main/resources/application-db.properties
           
           ./gradlew --no-build-cache clean build --refresh-dependencies -Dspring.profiles.active=prod
 
