@@ -13,7 +13,6 @@ export const container = () => css`
 export const bar = (progress: number) => css`
   width: ${progress}%;
   height: 100%;
-  transition: width 0.3s ease;
   background-color: ${colorToken.main[1]};
   border-radius: ${borderRadiusToken[10]};
 `;
