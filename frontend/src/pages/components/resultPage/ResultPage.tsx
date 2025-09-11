@@ -4,7 +4,7 @@ import { useParams, useNavigate } from 'react-router';
 import FallBackPage from '@pages/components/fallBackPage/FallBackPage';
 import useSelectedRecommendedLocation from '@pages/hooks/useSelectedLocation';
 
-import ProgressLoading from '@features/loading/components/progressLoading/ProgressLoading';
+import BaseLoading from '@features/loading/components/baseLoading/BaseLoading';
 import Map from '@features/map/components/map/Map';
 import BottomSheet from '@features/recommendation/components/bottomSheet/BottomSheet';
 
@@ -18,11 +18,7 @@ import * as resultPage from './resultPage.styled';
 function ResultPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const {
-    data: location,
-    isLoading,
-    getRecommendationResult,
-  } = useLocationsContext();
+  const { data: location, isLoading, isError, errorMessage, getRecommendationResult } = useLocationsContext();
 
   const fetchResult = useCallback(async () => {
     try {
@@ -30,16 +26,17 @@ function ResultPage() {
     } catch {
       navigate('/');
     }
-  }, [id, navigate, getRecommendationResult]);
+  }, []);
 
   useEffect(() => {
     if (!id) {
       navigate('/');
       return;
     }
-
-    fetchResult();
-  }, [id, fetchResult]);
+    if (!location || location.recommendedLocations.length === 0) {
+      fetchResult();
+    }
+  }, [id, location]);
 
   const { selectedLocation, changeSelectedLocation } =
     useSelectedRecommendedLocation();
@@ -48,14 +45,12 @@ function ResultPage() {
     changeSelectedLocation(location);
   };
 
-  if (isLoading) return <ProgressLoading />;
-  if (!location || location.recommendedLocations.length === 0)
-    return (
-      <FallBackPage
-        reset={() => {}}
-        error={new Error('추천 결과가 없습니다.')}
-      />
-    );
+  if (isLoading) {
+    return <BaseLoading />;
+  }
+
+  if (isError || !location || location.recommendedLocations.length === 0)
+    return <FallBackPage reset={() => {}} error={new Error(errorMessage || '추천 결과가 없습니다.')} />;
 
   const { startingPlaces, recommendedLocations } = location;
 

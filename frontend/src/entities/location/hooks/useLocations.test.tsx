@@ -63,17 +63,19 @@ describe('useLocations', () => {
       );
 
       // then: 초기에는 로딩 중이어야 한다
+      let data;
       await act(async () => {
-        await result.current.getRecommendationResult(id);
+        data = await result.current.getRecommendationResult(id);
       });
 
       // then: 데이터가 정상적으로 로드되어야 한다
       await waitFor(() => {
         expect(result.current.isLoading).toBe(false);
         expect(result.current.isError).toBe(false);
-        expect(result.current.data.recommendedLocations.length).toBeGreaterThan(
-          0,
-        );
+
+        // 반환된 데이터 검증
+        expect(data).toBeDefined();
+        expect(data.recommendedLocations.length).toBeGreaterThan(0);
       });
     });
 
