@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { memo } from 'react';
 
 import Logo from '@shared/components/logo/Logo';
 import { flex } from '@shared/styles/default.styled';
@@ -9,6 +9,14 @@ interface BaseLoadingProps {
   children?: React.ReactNode;
 }
 
+const StaticContent = memo(() => (
+  <div css={flex({ justify: 'center', align: 'center', gap: 10 })}>
+    <Logo type="white" />
+  </div>
+));
+
+StaticContent.displayName = 'StaticContent';
+
 function BaseLoading({ children }: BaseLoadingProps) {
   return (
     <div
@@ -17,14 +25,12 @@ function BaseLoading({ children }: BaseLoadingProps) {
           direction: 'column',
           justify: 'center',
           align: 'center',
-          gap: 10,
+          gap: 10
         }),
-        loading.container(),
+        loading.container()
       ]}
     >
-      <div css={flex({ justify: 'center', align: 'center', gap: 10 })}>
-        <Logo type="white" />
-      </div>
+      <StaticContent />
       {children}
     </div>
   );
