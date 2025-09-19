@@ -9,3 +9,4 @@ reviews:
   auto_review:
     enabled: true
     drafts: false
+    ignore_updates: true
