@@ -20,7 +20,8 @@ public class StationResponseDeserializer extends JsonDeserializer<StationRespons
     );
 
     private static final Map<String, String> STATION_NAME_EXCEPTIONS = Map.of(
-            "이수", "총신대입구역",
+            "이수", "총신대입구(이수)역",
+            "총신대입구", "총신대입구(이수)역",
             "서울역", "서울역"
     );
 

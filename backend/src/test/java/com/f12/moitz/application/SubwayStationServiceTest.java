@@ -23,21 +23,24 @@ class SubwayStationServiceTest {
     @InjectMocks
     private SubwayStationService subwayStationService;
 
-    @DisplayName("'이수역'으로 지하철 역 검색 시 총신대입구역을 반환한다.")
+    @DisplayName("'이수역' 또는 '총신대입구역'으로 지하철 역 검색 시 총신대입구(이수)역을 반환한다.")
     @Test
     void convertName() {
         // Given
-        final String expectedName = "총신대입구역";
+        final String expectedName = "총신대입구(이수)역";
         final SubwayStation expectedStation = new SubwayStation(expectedName, new Point(125, 34));
 
-        Mockito.when(subwayStationRepository.findByName("총신대입구역")).thenReturn(Optional.of(expectedStation));
+        Mockito.when(subwayStationRepository.findByName("총신대입구(이수)역")).thenReturn(Optional.of(expectedStation));
 
         // When
-        final Optional<SubwayStation> station = subwayStationService.findByName("이수역");
+        final Optional<SubwayStation> station1 = subwayStationService.findByName("이수역");
+        final Optional<SubwayStation> station2 = subwayStationService.findByName("총신대입구역");
 
         // Then
-        assertThat(station).contains(expectedStation);
-        assertThat(station.get().getName()).isEqualTo(expectedName);
+        assertThat(station1).contains(expectedStation);
+        assertThat(station1.get().getName()).isEqualTo(expectedName);
+        assertThat(station2).contains(expectedStation);
+        assertThat(station2.get().getName()).isEqualTo(expectedName);
     }
 
 }
