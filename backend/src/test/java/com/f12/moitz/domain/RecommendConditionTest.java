@@ -13,13 +13,13 @@ class RecommendConditionTest {
     @DisplayName("title로부터 RecommendCondition을 올바르게 생성한다")
     void fromTitle() {
         // Given
-        final String chatTitle = "CHAT";
+        final String chatTitle = "CAFE";
 
         // When
         final RecommendCondition recommendCondition = RecommendCondition.fromTitle(chatTitle);
 
         // Then
-        assertThat(recommendCondition).isEqualTo(RecommendCondition.CHAT);
+        assertThat(recommendCondition).isEqualTo(RecommendCondition.CAFE);
     }
 
     @Test

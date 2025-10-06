@@ -8,20 +8,22 @@ import lombok.Getter;
 @Getter
 public enum RecommendCondition {
 
-    CHAT("CHAT", "떠들고 놀기 좋은", "모임"),
-    MEETING("MEETING", "회의하기 좋은", "회의"),
-    FOCUS("FOCUS", "집중하기 좋은", "스터디"),
-    DATE("DATE", "데이트하기 좋은", "분위기 좋은"),
-    NOT_SELECTED("NOT_SELECTED", "선택하지 않음", "맛집"),
-    ;
+    CAFE("CAFE", "카페"),
+    RESTAURANT("RESTAURANT","식당"),
+    BAR("BAR","술집"),
+    STUDY_CAFE("STUDY_CAFE", "스터디카페"),
+    SPACE_RENTAL("SPACE_RENTAL", "공간대여"),
+    PC_ROOM("PC_ROOM", "PC방"),
+    KARAOKE("KARAOKE", "노래방"),
+    ACTIVITY("ACTIVITY", "클라이밍,볼링,사격,당구"),
+    ENTERTAINMENT("ENTERTAINMENT", "방탈출,만화방,보드게임카페,영화관"),
+    NOT_SELECTED("NOT_SELECTED", "맛집");
 
     private final String title;
-    private final String description;
     private final String keyword;
 
-    RecommendCondition(final String title, final String description, final String keyword) {
+    RecommendCondition(final String title, final String keyword) {
         this.title = title;
-        this.description = description;
         this.keyword = keyword;
     }
 
