@@ -27,6 +27,9 @@
   --color-bg-1: #f4f4f4;
   --color-bg-2: #f7f7f7;
 
+  /* Blur Colors */
+  --color-blur: rgba(0, 0, 0, 0.5);
+
   /* Subway Line Colors */
   --color-subway-line-1: #0052a4; /* 1호선 - PANTONE 286C */
   --color-subway-line-2: #00a84d; /* 2호선 - PANTONE 354C */

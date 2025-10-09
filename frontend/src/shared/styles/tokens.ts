@@ -29,6 +29,7 @@ const colorToken = {
     1: 'var(--color-bg-1)',
     2: 'var(--color-bg-2)',
   },
+  blur: 'var(--color-blur)',
   subway: {
     1: 'var(--color-subway-line-1)',
     2: 'var(--color-subway-line-2)',
