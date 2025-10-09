@@ -20,6 +20,7 @@ function Modal({ onClose, children }: ModalProps) {
 
   return (
     <div
+      role="dialog"
       css={[
         flex({ direction: 'column', justify: 'center', align: 'center' }),
         modal.backdrop(),
