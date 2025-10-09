@@ -78,7 +78,7 @@ class RecommendationServiceTest {
     @DisplayName("추천 요청 시 올바른 최종 결과를 저장해야 한다")
     void recommendLocation_Success() {
         // Given
-        final RecommendationRequest request = new RecommendationRequest(List.of("강남역", "역삼역"), "CAFE");
+        final RecommendationRequest request = new RecommendationRequest(List.of("강남역", "역삼역"), List.of("CAFE"));
         final SubwayStation gangnam = new SubwayStation("강남역", new Point(127.027, 37.497));
         final SubwayStation yeoksam = new SubwayStation("역삼역", new Point(127.036, 37.501));
         given(subwayStationService.findByName("강남역")).willReturn(Optional.of(gangnam));

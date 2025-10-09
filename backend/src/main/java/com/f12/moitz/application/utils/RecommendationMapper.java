@@ -26,7 +26,7 @@ public class RecommendationMapper {
 
     public RecommendationsResponse toResponse(final Result result) {
         final int minTime = result.getBestRecommendationTime();
-        final String condition = getCondition(result);
+        final List<String> condition = getCondition(result);
         return new RecommendationsResponse(
                 condition,
                 IntStream.range(0, result.getStartingPlacesCount())
@@ -41,12 +41,14 @@ public class RecommendationMapper {
         );
     }
 
-    private String getCondition(final Result result) {
-        final RecommendCondition recommendCondition =
-                result.getRecommendCondition() == null ? RecommendCondition.NOT_SELECTED
+    private List<String> getCondition(final Result result) {
+        final List<RecommendCondition> recommendConditions =
+                result.getRecommendCondition() == null ? List.of(RecommendCondition.NOT_SELECTED)
                 : result.getRecommendCondition();
 
-        return recommendCondition.getTitle();
+        return recommendConditions.stream()
+                .map(RecommendCondition::getTitle)
+                .toList();
     }
 
     public Recommendation toRecommendation(
@@ -71,7 +73,7 @@ public class RecommendationMapper {
     }
 
     public Result toResult(
-            final RecommendCondition recommendCondition,
+            final List<RecommendCondition> recommendCondition,
             final List<? extends Place> startingPlaces,
             final Recommendation recommendation
     ) {

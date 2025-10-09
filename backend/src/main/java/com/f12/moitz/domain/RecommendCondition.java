@@ -33,11 +33,21 @@ public enum RecommendCondition {
         this.keyword = keyword;
     }
 
-    public static RecommendCondition fromTitle(final String title) {
+    public static List<String> getRequirements(List<RecommendCondition> recommendConditions) {
+        return recommendConditions.stream()
+                .flatMap(recommendCondition -> recommendCondition.getKeyword().stream())
+                .toList();
+    }
+
+    public static List<RecommendCondition> fromTitle(List<String> requirement) {
+        return requirement.stream().map(RecommendCondition::fromTitle)
+                .toList();
+    }
+
+    private static RecommendCondition fromTitle(final String title) {
         return Arrays.stream(values())
                 .filter(recommendCondition -> recommendCondition.title.equals(title))
                 .findFirst()
                 .orElseThrow(() -> new BadRequestException(GeneralErrorCode.INPUT_INVALID_DESCRIPTION, title));
     }
-
 }

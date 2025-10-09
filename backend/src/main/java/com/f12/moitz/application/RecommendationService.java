@@ -66,8 +66,8 @@ public class RecommendationService {
         log.debug("추천 서비스 시작");
 
         stopWatch.start("지역 추천");
-        final RecommendCondition recommendCondition = RecommendCondition.fromTitle(request.requirement());
-        final List<String> requirement = recommendCondition.getKeyword();
+        final List<RecommendCondition> recommendConditions = RecommendCondition.fromTitle(request.requirement());
+        List<String> requirements = RecommendCondition.getRequirements(recommendConditions);
         final List<SubwayStation> startingPlaces = getByNames(request.startingPlaceNames());
         final List<SubwayStation> candidatePlaces = subwayStationService.generateCandidatePlace(startingPlaces);
 
@@ -77,7 +77,7 @@ public class RecommendationService {
         final RecommendedLocationsResponse recommendedLocationsResponse = locationRecommender.recommendLocations(
                 startingPlaceNames,
                 candidatePlaceNames,
-                requirement
+                requirements
         );
         final Map<Place, ReasonAndDescription> generatedPlacesWithReason = recommendedLocationsResponse.recommendations()
                 .stream()
@@ -103,7 +103,7 @@ public class RecommendationService {
         stopWatch.start("장소 추천");
         final Map<Place, List<RecommendedPlace>> recommendedPlaces = placeRecommender.recommendPlaces(
                 generatedPlaces,
-                requirement
+                requirements
         );
         stopWatch.stop();
 
@@ -118,7 +118,7 @@ public class RecommendationService {
 
         return recommendResultRepository.saveAndReturnId(
                 recommendationMapper.toResult(
-                        recommendCondition,
+                        recommendConditions,
                         startingPlaces,
                         recommendation
                 )

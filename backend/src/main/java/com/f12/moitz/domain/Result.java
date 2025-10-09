@@ -18,7 +18,7 @@ public class Result {
     @Id
     private ObjectId id;
 
-    private RecommendCondition recommendCondition;
+    private List<RecommendCondition> recommendCondition;
 
     @CreatedDate
     @Indexed(expireAfter = "7d")
@@ -29,7 +29,7 @@ public class Result {
     private Recommendation recommendedLocations;
 
     public Result(
-            final RecommendCondition recommendCondition,
+            final List<RecommendCondition> recommendCondition,
             final List<? extends Place> startingPlaces,
             final Recommendation recommendedLocations
     ) {
@@ -41,7 +41,7 @@ public class Result {
 
     public Result(
             final ObjectId id,
-            final RecommendCondition recommendCondition,
+            final List<RecommendCondition> recommendCondition,
             final List<? extends Place> startingPlaces,
             final Recommendation recommendedLocations
     ) {
@@ -52,7 +52,7 @@ public class Result {
         this.recommendedLocations = recommendedLocations;
     }
 
-    private void validate(final RecommendCondition recommendCondition, final List<? extends Place> startingPlaces, final Recommendation recommendedLocations) {
+    private void validate(final List<RecommendCondition> recommendCondition, final List<? extends Place> startingPlaces, final Recommendation recommendedLocations) {
         if (recommendCondition == null) {
             throw new IllegalArgumentException("추천 조건은 null일 수 없습니다.");
         }
