@@ -32,7 +32,7 @@ public class PlaceRecommenderAdapter implements PlaceRecommender {
                 .collect(Collectors.toMap(
                         Map.Entry::getKey,
                         entry -> entry.getValue()
-                                .getKakaoApiResponses()
+                                .kakaoApiResponses()
                                 .values().stream()
                                 .flatMap(List::stream)
                                 .flatMap(response -> response.documents().stream())

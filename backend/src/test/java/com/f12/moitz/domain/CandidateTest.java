@@ -102,4 +102,5 @@ class CandidateTest {
         // Then
         assertThat(averageTravelTime).isEqualTo(30);
     }
+
 }

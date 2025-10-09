@@ -115,4 +115,5 @@ class RouteTest {
             softAssertions.assertThat(actualEndPlace).isEqualTo(endPlace);
         });
     }
+
 }

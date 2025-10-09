@@ -77,7 +77,7 @@ public class GeminiPlaceRecommenderAdapter implements PlaceRecommender {
         try {
 
             final String formattedKakaoData = FORMAT_SINGLE_PLACE_TO_PROMPT(place, kakaoResponses);
-            final String requirement = String.join(", ", kakaoResponses.getKakaoApiResponses().keySet());
+            final String requirement = String.join(", ", kakaoResponses.kakaoApiResponses().keySet());
             final String prompt = String.format(
                     PLACE_FILTER_PROMPT,
                     place.getName(),

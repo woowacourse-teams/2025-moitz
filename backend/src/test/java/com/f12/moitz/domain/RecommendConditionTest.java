@@ -14,7 +14,7 @@ class RecommendConditionTest {
     @DisplayName("title로부터 RecommendCondition을 올바르게 생성한다")
     void fromTitle() {
         // Given
-        final List<String> chatTitle = List.of("CAFE","BAR");
+        final List<String> chatTitle = List.of("CAFE", "BAR");
 
         // When
         final List<RecommendCondition> recommendCondition = RecommendCondition.fromTitle(chatTitle);
@@ -35,4 +35,5 @@ class RecommendConditionTest {
                 .isInstanceOf(BadRequestException.class)
                 .hasMessage("유효하지 않은 성격입니다. " + invalidTitle);
     }
+
 }

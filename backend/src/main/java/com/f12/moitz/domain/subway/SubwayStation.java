@@ -20,4 +20,5 @@ public class SubwayStation extends Place {
     public boolean equals(final Object o) {
         return super.equals(o);
     }
+
 }

@@ -148,4 +148,5 @@ class OdsayClientTest {
                 .isInstanceOf(ExternalApiException.class)
                 .hasMessage(ExternalApiErrorCode.INVALID_ODSAY_API_RESPONSE.getMessage());
     }
+
 }

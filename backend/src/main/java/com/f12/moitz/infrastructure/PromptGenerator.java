@@ -225,7 +225,7 @@ public class PromptGenerator {
                 place.getPoint().getX(), place.getPoint().getY()));
         sb.append("Search Results:\n");
 
-        Map<String, List<KakaoApiResponse>> kakaoApiResponses = kakaoResponses.getKakaoApiResponses();
+        final Map<String, List<KakaoApiResponse>> kakaoApiResponses = kakaoResponses.kakaoApiResponses();
 
         kakaoApiResponses.forEach((category, responses) -> {
             sb.append(String.format("Category: %s\n", category));

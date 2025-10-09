@@ -91,4 +91,5 @@ class RecommendationTest {
         final List<RecommendedPlace> recommendedPlaces = List.of(recommendedPlace);
         return new Candidate(endPlace, routes, recommendedPlaces, "123", "123");
     }
+
 }
