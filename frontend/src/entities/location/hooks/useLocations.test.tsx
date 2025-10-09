@@ -60,9 +60,11 @@ describe('useLocations', () => {
     it('정상적으로 추천 결과를 받아온다', async () => {
       // when: 훅을 실행하면
       const { result } = renderHook(() => useLocations());
-      const id = await result.current.getRecommendationId(
-        LocationsRequestBodyMock,
-      );
+
+      let id;
+      await act(async () => {
+        id = await result.current.getRecommendationId(LocationsRequestBodyMock);
+      });
 
       // then: 초기에는 로딩 중이어야 한다
       let data;
