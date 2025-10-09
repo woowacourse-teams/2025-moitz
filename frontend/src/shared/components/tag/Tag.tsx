@@ -1,6 +1,6 @@
 import { flex, inline_flex, typography } from '@shared/styles/default.styled';
 
-import IconCancel from '@icons/icon-cancel.svg';
+import IconCancel from '@icons/icon-cancel-blue.svg';
 
 import * as tag from './tag.styled';
 
@@ -23,7 +23,7 @@ function Tag({ text, onClick }: TagProps) {
         onClick={onClick}
         type="button"
       >
-        <img src={IconCancel} alt="icon-cancel"></img>
+        <img src={IconCancel} alt="취소 버튼"></img>
       </button>
     </div>
   );
