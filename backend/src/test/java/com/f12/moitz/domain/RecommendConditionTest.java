@@ -33,6 +33,6 @@ class RecommendConditionTest {
         // When & Then
         assertThatThrownBy(() -> RecommendCondition.fromTitle(invalidTitle))
                 .isInstanceOf(BadRequestException.class)
-                .hasMessage("유효하지 않은 성격입니다. [" + invalidTitle + "]");
+                .hasMessage("유효하지 않은 성격입니다. " + invalidTitle);
     }
 }
