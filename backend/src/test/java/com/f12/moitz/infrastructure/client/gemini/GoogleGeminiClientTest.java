@@ -52,7 +52,7 @@ class GoogleGeminiClientTest {
         // Given
         final List<String> stationNames = List.of("강남역", "홍대입구역");
         final List<String> candidateNames = List.of("이태원역", "신사역", "동작역", "신용산역", "영등포구청역");
-        final String requirement = "맛집이 많은 곳";
+        final List<String> requirement = List.of("맛집이 많은 곳");
 
         final String expectedJsonResponse = """
                 {

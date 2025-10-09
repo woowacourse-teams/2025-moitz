@@ -42,7 +42,7 @@ public class GoogleGeminiClient {
     public RecommendedLocationsResponse generateResponse(
             final List<String> startingPlaces,
             final List<String> candidatePlaces,
-            final String requirement
+            final List<String> requirement
     ) {
         return readValue(
                 generateContent(
@@ -58,7 +58,7 @@ public class GoogleGeminiClient {
     private GenerateContentResponse generateContent(
             final List<String> startingStations,
             final List<String> candidateStations,
-            final String requirement,
+            final List<String> requirement,
             final Map<String, Object> inputData
     ) {
         final String prompt = String.format(

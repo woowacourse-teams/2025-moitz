@@ -1,3 +1,4 @@
+/*
 package com.f12.moitz.infrastructure.adapter;
 
 import static com.f12.moitz.infrastructure.PromptGenerator.FORMAT_SINGLE_PLACE_TO_PROMPT;
@@ -108,3 +109,4 @@ public class GeminiPlaceRecommenderAsyncAdapter implements AsyncPlaceRecommender
     }
 
 }
+*/

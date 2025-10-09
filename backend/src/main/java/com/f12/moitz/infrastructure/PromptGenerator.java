@@ -2,7 +2,7 @@ package com.f12.moitz.infrastructure;
 
 import com.f12.moitz.domain.Place;
 import com.f12.moitz.infrastructure.client.kakao.dto.KakaoApiResponse;
-
+import com.f12.moitz.infrastructure.client.kakao.dto.KakaoApiResponses;
 import java.util.List;
 import java.util.Map;
 
@@ -187,7 +187,6 @@ public class PromptGenerator {
             
             STATION: %s
             STATION COORDINATES: (%.6f, %.6f)
-            USER REQUIREMENTS: %s
             
             KAKAO MAP SEARCH RESULTS:
             %s
@@ -215,7 +214,7 @@ public class PromptGenerator {
             9. Use the exact place information from the search results provided above
             """;
 
-    public static String FORMAT_SINGLE_PLACE_TO_PROMPT(Place place, List<KakaoApiResponse> kakaoResponses) {
+    public static String FORMAT_SINGLE_PLACE_TO_PROMPT(Place place, KakaoApiResponses kakaoResponses) {
         StringBuilder sb = new StringBuilder();
         sb.append("KAKAO MAP SEARCH RESULTS:\n");
         sb.append("========================\n\n");
@@ -226,10 +225,17 @@ public class PromptGenerator {
                 place.getPoint().getX(), place.getPoint().getY()));
         sb.append("Search Results:\n");
 
-        for (int i = 0; i < kakaoResponses.size(); i++) {
-            KakaoApiResponse response = kakaoResponses.get(i);
-            sb.append(String.format("Response %d: %s\n", i + 1, response.toString()));
-        }
+        Map<String, List<KakaoApiResponse>> kakaoApiResponses = kakaoResponses.getKakaoApiResponses();
+
+        kakaoApiResponses.forEach((category, responses) -> {
+            sb.append(String.format("Category: %s\n", category));
+            for (int i = 0; i < responses.size(); i++) {
+                KakaoApiResponse response = responses.get(i);
+                sb.append(String.format("  Response %d: %s\n", i + 1, response.toString()));
+            }
+
+            sb.append("\n");
+        });
 
         sb.append("\n========================\n");
         sb.append("RECOMMENDATION CRITERIA:\n");

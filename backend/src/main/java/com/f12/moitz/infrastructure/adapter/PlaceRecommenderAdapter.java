@@ -1,11 +1,12 @@
 package com.f12.moitz.infrastructure.adapter;
 
-import com.f12.moitz.domain.Point;
 import com.f12.moitz.application.port.PlaceRecommender;
 import com.f12.moitz.domain.Place;
+import com.f12.moitz.domain.Point;
 import com.f12.moitz.domain.RecommendedPlace;
 import com.f12.moitz.infrastructure.client.kakao.KakaoMapClient;
 import com.f12.moitz.infrastructure.client.kakao.dto.KakaoApiResponse;
+import com.f12.moitz.infrastructure.client.kakao.dto.KakaoApiResponses;
 import com.f12.moitz.infrastructure.client.kakao.dto.SearchPlacesLimitQuantityRequest;
 import java.util.Arrays;
 import java.util.List;
@@ -23,13 +24,17 @@ public class PlaceRecommenderAdapter implements PlaceRecommender {
     @Override
     public Map<Place, List<RecommendedPlace>> recommendPlaces(
             final List<Place> targetPlaces,
-            final String requirement
+            final List<String> requirements
     ) {
-        final Map<Place, List<KakaoApiResponse>> searchResults = searchPlacesWithRequirement(targetPlaces, requirement);
+        final Map<Place, KakaoApiResponses> searchResults = searchPlacesWithRequirement(targetPlaces, requirements);
+
         return searchResults.entrySet().stream()
                 .collect(Collectors.toMap(
                         Map.Entry::getKey,
-                        entry -> entry.getValue().stream()
+                        entry -> entry.getValue()
+                                .getKakaoApiResponses()
+                                .values().stream()
+                                .flatMap(List::stream)
                                 .flatMap(response -> response.documents().stream())
                                 .map(document -> new RecommendedPlace(
                                         document.placeName(),
@@ -42,21 +47,28 @@ public class PlaceRecommenderAdapter implements PlaceRecommender {
                 ));
     }
 
-    private Map<Place, List<KakaoApiResponse>> searchPlacesWithRequirement(final List<Place> targets, final String requirement) {
+    private Map<Place, KakaoApiResponses> searchPlacesWithRequirement(final List<Place> targets, final List<String> requirements) {
         return targets.stream()
                 .collect(Collectors.toMap(
                         place -> place,
                         place -> {
-                            KakaoApiResponse response = kakaoMapClient.searchPlacesBy(
-                                    new SearchPlacesLimitQuantityRequest(
-                                            requirement,
-                                            place.getPoint().getX(),
-                                            place.getPoint().getY(),
-                                            800,
-                                            3
-                                    )
-                            );
-                            return List.of(response);
+                            Map<String,List<KakaoApiResponse>> responsesByCategory =
+                            requirements.stream().collect(Collectors.toMap(
+                                    requirement -> requirement,
+                                    requirement -> {
+                                        KakaoApiResponse response = kakaoMapClient.searchPlacesBy(
+                                                new SearchPlacesLimitQuantityRequest(
+                                                        requirement,
+                                                        place.getPoint().getX(),
+                                                        place.getPoint().getY(),
+                                                        800,
+                                                        3
+                                                )
+                                        );
+                                        return List.of(response);
+                                    }
+                            ));
+                            return new KakaoApiResponses(responsesByCategory);
                         }
                 ));
     }

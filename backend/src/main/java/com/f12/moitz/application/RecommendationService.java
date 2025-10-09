@@ -67,7 +67,7 @@ public class RecommendationService {
 
         stopWatch.start("지역 추천");
         final RecommendCondition recommendCondition = RecommendCondition.fromTitle(request.requirement());
-        final String requirement = recommendCondition.getKeyword();
+        final List<String> requirement = recommendCondition.getKeyword();
         final List<SubwayStation> startingPlaces = getByNames(request.startingPlaceNames());
         final List<SubwayStation> candidatePlaces = subwayStationService.generateCandidatePlace(startingPlaces);
 

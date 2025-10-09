@@ -3,6 +3,7 @@ package com.f12.moitz.domain;
 import com.f12.moitz.common.error.exception.BadRequestException;
 import com.f12.moitz.common.error.exception.GeneralErrorCode;
 import java.util.Arrays;
+import java.util.List;
 import lombok.Getter;
 
 @Getter
@@ -15,14 +16,19 @@ public enum RecommendCondition {
     SPACE_RENTAL("SPACE_RENTAL", "공간대여"),
     PC_ROOM("PC_ROOM", "PC방"),
     KARAOKE("KARAOKE", "노래방"),
-    ACTIVITY("ACTIVITY", "클라이밍,볼링,사격,당구"),
-    ENTERTAINMENT("ENTERTAINMENT", "방탈출,만화방,보드게임카페,영화관"),
+    ACTIVITY("ACTIVITY", List.of("클라이밍,볼링,사격,당구")),
+    ENTERTAINMENT("ENTERTAINMENT", List.of("방탈출,만화방,보드게임카페,영화관")),
     NOT_SELECTED("NOT_SELECTED", "맛집");
 
     private final String title;
-    private final String keyword;
+    private final List<String> keyword;
 
     RecommendCondition(final String title, final String keyword) {
+        this.title = title;
+        this.keyword = List.of(keyword);
+    }
+
+    RecommendCondition(final String title, final List<String> keyword) {
         this.title = title;
         this.keyword = keyword;
     }

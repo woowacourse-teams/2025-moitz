@@ -14,6 +14,7 @@ import com.f12.moitz.domain.RecommendedPlace;
 import com.f12.moitz.infrastructure.client.gemini.GoogleGeminiClient;
 import com.f12.moitz.infrastructure.client.kakao.KakaoMapClient;
 import com.f12.moitz.infrastructure.client.kakao.dto.KakaoApiResponse;
+import com.f12.moitz.infrastructure.client.kakao.dto.KakaoApiResponses;
 import com.f12.moitz.infrastructure.client.kakao.dto.SearchPlacesRequest;
 import java.util.List;
 import java.util.Map;
@@ -32,40 +33,51 @@ public class GeminiPlaceRecommenderAdapter implements PlaceRecommender {
     private final GoogleGeminiClient geminiClient;
 
     @Override
-    public Map<Place, List<RecommendedPlace>> recommendPlaces(final List<Place> targets, final String requirement) {
-        final Map<Place, List<KakaoApiResponse>> searchedAllPlaces = searchPlacesWithRequirement(targets, requirement);
+    public Map<Place, List<RecommendedPlace>> recommendPlaces(final List<Place> targets, final List<String> requirement) {
+        final Map<Place, KakaoApiResponses> searchedAllPlaces = searchPlacesWithRequirement(targets, requirement);
 
         return searchedAllPlaces.entrySet().stream()
-                .map(entry -> processPlaceFiltering(entry.getKey(), entry.getValue(), requirement))
+                .map(entry -> processPlaceFiltering(entry.getKey(), entry.getValue()))
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 
-    private Map<Place, List<KakaoApiResponse>> searchPlacesWithRequirement(final List<Place> targets, final String requirement) {
+    private Map<Place, KakaoApiResponses> searchPlacesWithRequirement(
+            final List<Place> targets,
+            final List<String> requirements
+    ) {
         return targets.stream()
                 .collect(Collectors.toMap(
                         place -> place,
                         place -> {
-                            KakaoApiResponse response = kakaoMapClient.searchPlacesBy(
-                                    new SearchPlacesRequest(
-                                            requirement,
-                                            place.getPoint().getX(),
-                                            place.getPoint().getY(),
-                                            1000
-                                    )
-                            );
-                            return List.of(response);
+                            Map<String, List<KakaoApiResponse>> responsesByCategory =
+                                    requirements.stream()
+                                            .collect(Collectors.toMap(
+                                                    requirement -> requirement,
+                                                    requirement -> {
+                                                        KakaoApiResponse response = kakaoMapClient.searchPlacesBy(
+                                                                new SearchPlacesRequest(
+                                                                        requirement,
+                                                                        place.getPoint().getY(), // longitude
+                                                                        place.getPoint().getX(), // latitude
+                                                                        1000
+                                                                )
+                                                        );
+                                                        return List.of(response);
+                                                    }
+                                            ));
+                            return new KakaoApiResponses(responsesByCategory);
                         }
                 ));
     }
 
     public Entry<Place, List<RecommendedPlace>> processPlaceFiltering(
             final Place place,
-            final List<KakaoApiResponse> kakaoResponses,
-            final String requirement
+            final KakaoApiResponses kakaoResponses
     ) {
         try {
-            final String formattedKakaoData = FORMAT_SINGLE_PLACE_TO_PROMPT(place, kakaoResponses);
 
+            final String formattedKakaoData = FORMAT_SINGLE_PLACE_TO_PROMPT(place, kakaoResponses);
+            final String requirement = String.join(", ", kakaoResponses.getKakaoApiResponses().keySet());
             final String prompt = String.format(
                     PLACE_FILTER_PROMPT,
                     place.getName(),
