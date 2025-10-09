@@ -3,6 +3,9 @@ import { useParams, useNavigate } from 'react-router';
 
 import FallBackPage from '@pages/fallBackPage/FallBackPage';
 
+import Modal from '@widgets/modal/components/Modal';
+import useModal from '@widgets/modal/hooks/useModal';
+
 import BaseLoading from '@features/loading/components/baseLoading/BaseLoading';
 import Header from '@features/map/components/header/Header';
 import Map from '@features/map/components/map/Map';
@@ -24,6 +27,8 @@ function ResultPage() {
     isLoading,
     getRecommendationResult,
   } = useLocationsContext();
+
+  const { isModalOpen, handleModalClose } = useModal();
 
   const fetchResult = useCallback(async () => {
     try {
@@ -91,6 +96,9 @@ function ResultPage() {
           handleSpotClick={handleSpotClick}
         />
       </div>
+      {isModalOpen && (
+        <Modal onClose={handleModalClose}>{'모달 내용이 들어갑니다'}</Modal>
+      )}
     </div>
   );
 }
