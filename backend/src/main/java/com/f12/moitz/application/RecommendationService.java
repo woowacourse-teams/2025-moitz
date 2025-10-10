@@ -1,5 +1,6 @@
 package com.f12.moitz.application;
 
+import com.f12.moitz.application.dto.RecommendationCreateResponse;
 import com.f12.moitz.application.dto.RecommendationRequest;
 import com.f12.moitz.application.dto.RecommendationsResponse;
 import com.f12.moitz.application.dto.RecommendedLocationsResponse;
@@ -64,7 +65,7 @@ public class RecommendationService {
         this.recommendResultRepository = recommendResultRepository;
     }
 
-    public String recommendLocation(final RecommendationRequest request) {
+    public RecommendationCreateResponse recommendLocation(final RecommendationRequest request) {
         StopWatch stopWatch = new StopWatch("추천 서비스 전체");
         log.debug("추천 서비스 시작");
 
@@ -124,13 +125,14 @@ public class RecommendationService {
         stopWatch.stop();
         log.debug("추천 서비스 완료. {}", stopWatch.shortSummary());
 
-        return recommendResultRepository.saveAndReturnId(
+        String id = recommendResultRepository.saveAndReturnId(
                 recommendationMapper.toResult(
                         recommendConditions,
                         startingPlaces,
                         recommendation
                 )
         ).toHexString().toUpperCase();
+        return new RecommendationCreateResponse(id);
     }
 
     private List<String> getPlaceNames(final List<? extends Place> places) {

@@ -19,15 +19,18 @@ import org.springframework.web.bind.annotation.RestController;
 public class RecommendationController implements SwaggerRecommendationController {
 
     private final RecommendationService recommendationService;
+    private final VoteService voteService;
 
     @PostMapping
-    public ResponseEntity<RecommendationCreateResponse> recommendLocations(@RequestBody RecommendationRequest request) {
-        return ResponseEntity.status(201).body(new RecommendationCreateResponse(recommendationService.recommendLocation(request)));
+    public ResponseEntity<RecommendationCreateResponse> recommendLocations(
+            @RequestBody final RecommendationRequest request
+    ) {
+        return ResponseEntity.status(201).body(recommendationService.recommendLocation(request));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<RecommendationsResponse> getRecommendationResult(@PathVariable("id") String id){
-        RecommendationsResponse response = recommendationService.getById(id);
-        return ResponseEntity.ok().body(response);
+    public ResponseEntity<RecommendationsResponse> getRecommendationResult(@PathVariable("id") final String id) {
+        return ResponseEntity.ok().body(recommendationService.getById(id));
     }
+
 }
