@@ -45,7 +45,6 @@ public class RecommendationService {
     private final PlaceRecommender placeRecommender;
     private final LocationRecommender locationRecommender;
     private final RouteFinder routeFinder;
-
     private final RecommendationMapper recommendationMapper;
     private final RecommendResultRepository recommendResultRepository;
 
@@ -120,7 +119,8 @@ public class RecommendationService {
                 filteredPlacesWithReason,
                 recommendedPlaces,
                 placeRoutes,
-                placeCourses
+                placeCourses,
+                0
         );
         stopWatch.stop();
         log.debug("추천 서비스 완료. {}", stopWatch.shortSummary());

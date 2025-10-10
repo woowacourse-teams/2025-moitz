@@ -1,7 +1,11 @@
 package com.f12.moitz.domain.repository;
 
+import com.f12.moitz.domain.RecommendationVote;
 import com.f12.moitz.domain.Result;
+import java.util.List;
+import java.util.Optional;
 import org.bson.types.ObjectId;
+import org.springframework.data.mongodb.repository.Aggregation;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
 public interface RecommendResultRepository extends MongoRepository<Result, ObjectId> {
@@ -10,5 +14,26 @@ public interface RecommendResultRepository extends MongoRepository<Result, Objec
         Result savedResult = save(result);
         return savedResult.getId();
     }
+
+    @Aggregation(pipeline = {
+            "{ $match: { _id: ?0 } }",
+            "{ $unwind: '$recommendedLocations.candidates' }",
+            "{ $match: { 'recommendedLocations.candidates.destination.name': ?1 } }",
+            "{ $project: { " +
+                    "'recommendedLocations.candidates.destination.name': 1, " +
+                    "'recommendedLocations.candidates.votes': 1, " +
+                    "'_id': 0 } }"
+    })
+    Optional<RecommendationVote> findVotesByIdAndCandidate(ObjectId id, String location);
+
+    @Aggregation(pipeline = {
+            "{ $match: { _id: ?0 } }",
+            "{ $unwind: '$recommendedLocations.candidates' }",
+            "{ $project: { " +
+                    "'recommendedLocations.candidates.destination.name': 1, " +
+                    "'recommendedLocations.candidates.votes': 1, " +
+                    "'_id': 0 } }"
+    })
+    List<RecommendationVote> findAllVotesById(ObjectId id);
 
 }

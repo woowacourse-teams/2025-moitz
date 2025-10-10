@@ -11,6 +11,7 @@ public class Candidate {
     private final CategorizedRecommendedPlaces recommendedPlaces;
     private final String description;
     private final String reason;
+    private final Integer votes;
 
     public Candidate(
             final Place destination,
@@ -18,7 +19,8 @@ public class Candidate {
             final Courses courses,
             final CategorizedRecommendedPlaces recommendedPlaces,
             final String description,
-            final String reason
+            final String reason,
+            final Integer votes
     ) {
         validate(destination, routes, courses, recommendedPlaces, description, reason);
         this.destination = destination;
@@ -27,6 +29,7 @@ public class Candidate {
         this.recommendedPlaces = recommendedPlaces;
         this.description = description;
         this.reason = reason;
+        this.votes = votes;
     }
 
     private void validate(

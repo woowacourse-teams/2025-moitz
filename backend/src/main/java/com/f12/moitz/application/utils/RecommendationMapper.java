@@ -59,7 +59,8 @@ public class RecommendationMapper {
             final Map<Place, ReasonAndDescription> generatedPlaces,
             final Map<Place, CategorizedRecommendedPlaces> placeListMap,
             final Map<Place, Routes> placeRoutes,
-            final Map<Place, Courses> placeCourses
+            final Map<Place, Courses> placeCourses,
+            final int votes
     ) {
         return new Recommendation(
                 generatedPlaces.entrySet().stream()
@@ -72,7 +73,8 @@ public class RecommendationMapper {
                                 placeCourses.get(place.getKey()),
                                 placeListMap.get(place.getKey()),
                                 place.getValue().description(),
-                                place.getValue().reason()
+                                place.getValue().reason(),
+                                votes
                         ))
                         .toList()
         );
