@@ -34,7 +34,7 @@ public class SubwayEdges {
         return new SubwayEdges(subwayEdgeSet);
     }
 
-    public List<StationSegment> findShortestTimePath(final SubwayStation start, final SubwayStation end) {
+    public StationSequence findShortestTimePath(final SubwayStation start, final SubwayStation end) {
         if (!isContainsStation(start) || !isContainsStation(end)) {
             log.error("노선도에 존재하지 않는 역입니다. 출발역: {}, 도착역: {}", start.getName(), end.getName());
             throw new IllegalStateException("출발역 또는 도착역이 노선도에 존재하지 않아 경로를 찾을 수 없습니다.");
@@ -141,7 +141,7 @@ public class SubwayEdges {
                 .getEdges();
     }
 
-    private List<StationSegment> reconstructPaths(
+    private StationSequence reconstructPaths(
             final Map<SubwayStation, SubwayStation> prev,
             final Map<SubwayStation, List<SubwayLine>> edgeLines,
             final SubwayStation start,
@@ -245,66 +245,7 @@ public class SubwayEdges {
             throw new IllegalStateException("경로가 출발역까지 이어지지 않습니다.");
         }
 
-        return fullSegments;
-    }
-
-    public List<SubwayPath> groupByLine(final List<StationSegment> fullSegments) {
-        final List<SubwayPath> paths = new ArrayList<>();
-
-        if (fullSegments.isEmpty()) {
-            throw new IllegalStateException("경로가 존재하지 않습니다.");
-        }
-
-        SubwayLine currentLine = fullSegments.getFirst().getLine();
-        SubwayStation startStation = fullSegments.getFirst().getStation();
-        int totalTime = 0;
-
-        for (int i = 1; i < fullSegments.size(); i++) {
-            final StationSegment current = fullSegments.get(i);
-
-            // 이전 구간의 실제 이동 시간 계산 (Edge에서 직접 가져오기)
-            final StationSegment previous = fullSegments.get(i - 1);
-            final int segmentTime = previous.getTimeInSeconds();
-            totalTime += segmentTime;
-
-            // 환승 경로이거나 마지막 역인 경우
-            if (current.isTransfer() || fullSegments.getLast().equals(current)) {
-                final SubwayStation endStation = current.getStation();
-
-                final SubwayPath path = new SubwayPath(
-                        startStation,
-                        endStation,
-                        TravelMethod.SUBWAY,
-                        totalTime,
-                        currentLine
-                );
-                paths.add(path);
-
-                // 환승 처리: 같은 역에서 다른 호선으로 환승 (마지막 역이 아닌 경우에만)
-                if (current.isTransfer() && i < fullSegments.size() - 1) {
-                    // 환승 시간 계산: 환승 Edge의 시간 직접 활용
-                    final int transferTime = current.getTimeInSeconds();
-
-                    final SubwayPath transferPath = new SubwayPath(
-                            endStation,
-                            endStation,
-                            TravelMethod.TRANSFER,
-                            transferTime,
-                            null
-                    );
-                    paths.add(transferPath);
-
-                    // 다음 구간 초기화
-                    i++;
-                    final StationSegment next = fullSegments.get(i);
-                    currentLine = next.getLine();
-                    startStation = current.getStation();
-                    totalTime = 0;
-                }
-            }
-        }
-
-        return paths;
+        return new StationSequence(fullSegments);
     }
 
     private boolean isContainsStation(final SubwayStation station) {
