@@ -10,14 +10,16 @@ import com.f12.moitz.application.dto.SubwayStationResponse;
 import com.f12.moitz.application.port.dto.ReasonAndDescription;
 import com.f12.moitz.domain.Candidate;
 import com.f12.moitz.domain.CategorizedRecommendedPlaces;
+import com.f12.moitz.domain.Course;
+import com.f12.moitz.domain.Courses;
 import com.f12.moitz.domain.Path;
 import com.f12.moitz.domain.Place;
 import com.f12.moitz.domain.RecommendCondition;
 import com.f12.moitz.domain.Recommendation;
 import com.f12.moitz.domain.RecommendedPlace;
+import com.f12.moitz.domain.Result;
 import com.f12.moitz.domain.Route;
 import com.f12.moitz.domain.Routes;
-import com.f12.moitz.domain.Result;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -56,7 +58,8 @@ public class RecommendationMapper {
     public Recommendation toRecommendation(
             final Map<Place, ReasonAndDescription> generatedPlaces,
             final Map<Place, CategorizedRecommendedPlaces> placeListMap,
-            final Map<Place, Routes> placeRoutes
+            final Map<Place, Routes> placeRoutes,
+            final Map<Place, Courses> placeCourses
     ) {
         return new Recommendation(
                 generatedPlaces.entrySet().stream()
@@ -66,6 +69,7 @@ public class RecommendationMapper {
                         .map(place -> new Candidate(
                                 place.getKey(),
                                 placeRoutes.get(place.getKey()),
+                                placeCourses.get(place.getKey()),
                                 placeListMap.get(place.getKey()),
                                 place.getValue().description(),
                                 place.getValue().reason()
@@ -107,7 +111,7 @@ public class RecommendationMapper {
         Map<RecommendCondition, List<PlaceRecommendResponse>> recommendedPlaces = toPlaceRecommendResponses(
                 candidate.getRecommendedPlaces()
         );
-        final List<RouteResponse> routes = toRouteResponses(candidate.getRoutes());
+        final List<RouteResponse> routes = toRouteResponses(candidate.getRoutes(), candidate.getCourses());
 
         return new RecommendationResponse(
                 (long) index + 1,
@@ -147,20 +151,22 @@ public class RecommendationMapper {
                 ));
     }
 
-
-    private List<RouteResponse> toRouteResponses(final Routes routes) {
+    private List<RouteResponse> toRouteResponses(final Routes routes, final Courses courses) {
         return IntStream.range(0, routes.getRoutes().size())
-                .mapToObj(index -> toRouteResponse(routes.getRoutes().get(index), index + 1))
-                .toList();
+                .mapToObj(index -> toRouteResponse(
+                        routes.getRoutes().get(index),
+                        courses.getCourses().get(index),
+                        index + 1
+                )).toList();
     }
 
-    private RouteResponse toRouteResponse(final Route route, final long id) {
+    private RouteResponse toRouteResponse(final Route route, final Course course, final long id) {
         List<PathResponse> pathResponses = IntStream.range(0, route.getPaths().size())
                 .mapToObj(pathIndex -> toPathResponse(route.getPaths().get(pathIndex), pathIndex + 1))
                 .toList();
 
-        List<SubwayStationResponse> subwayStationResponses = IntStream.range(0, route.getStations().size())
-                .mapToObj(stationIndex -> toSubwayStationResponse(route.getStations().get(stationIndex), stationIndex + 1))
+        List<SubwayStationResponse> subwayStationResponses = IntStream.range(0, course.size())
+                .mapToObj(placeIndex -> toSubwayStationResponse(course.getPlaces().get(placeIndex), placeIndex + 1))
                 .toList();
 
         return new RouteResponse(
