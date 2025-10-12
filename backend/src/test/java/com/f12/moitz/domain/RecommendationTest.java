@@ -88,10 +88,14 @@ class RecommendationTest {
         final Route route = new Route(paths);
         final Routes routes = new Routes(List.of(route));
 
+        final List<Place> places = List.of(startPlace, intermediatePlace, endPlace);
+        final Course course = new Course(places);
+        final Courses courses = new Courses(List.of(course));
+
         final RecommendedPlace recommendedPlace = new RecommendedPlace("스타벅스", new Point(127.2, 37.21), "카페", 5, "url");
         Map<RecommendCondition, List<RecommendedPlace>> categorizedRecommendedPlace = Map.of(RecommendCondition.CAFE, List.of(recommendedPlace));
         final CategorizedRecommendedPlaces recommendedPlaces = new CategorizedRecommendedPlaces(categorizedRecommendedPlace);
-        return new Candidate(endPlace, routes, recommendedPlaces, "123", "123");
+        return new Candidate(endPlace, routes, courses, recommendedPlaces, "123", "123");
     }
 
 }

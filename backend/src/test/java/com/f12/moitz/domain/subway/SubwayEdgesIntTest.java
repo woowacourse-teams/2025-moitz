@@ -28,11 +28,11 @@ public class SubwayEdgesIntTest {
     @DisplayName("미금역-판교역 최단경로를 찾는다.")
     @Test
     void findShortest() {
-        SubwayStation start = subwayStationService.getByName("미금역");
-        SubwayStation end = subwayStationService.getByName("판교역");
+        final SubwayStation start = subwayStationService.getByName("미금역");
+        final SubwayStation end = subwayStationService.getByName("판교역");
 
         // When
-        List<SubwayPath> paths = subwayEdges.findShortestTimePath(start, end);
+        final List<SubwayPath> paths = subwayEdges.findShortestTimePath(start, end).groupByLine();
         for (SubwayPath path : paths) {
             log.debug("출발: {}, 도착: {}, 호선: {}", path.from().getName(), path.to().getName(), path.line() == null? "null" : path.line().getTitle());
         }
@@ -48,11 +48,11 @@ public class SubwayEdgesIntTest {
     @DisplayName("미금역-정자역 최단경로를 찾는다.")
     @Test
     void findShortest2() {
-        SubwayStation start = subwayStationService.getByName("미금역");
-        SubwayStation end = subwayStationService.getByName("정자역");
+        final SubwayStation start = subwayStationService.getByName("미금역");
+        final SubwayStation end = subwayStationService.getByName("정자역");
 
         // When
-        List<SubwayPath> paths = subwayEdges.findShortestTimePath(start, end);
+        final List<SubwayPath> paths = subwayEdges.findShortestTimePath(start, end).groupByLine();
         for (SubwayPath path : paths) {
             log.debug("출발: {}, 도착: {}, 호선: {}", path.from().getName(), path.to().getName(), path.line() == null? "null" : path.line().getTitle());
         }
@@ -68,11 +68,11 @@ public class SubwayEdgesIntTest {
     @DisplayName("오이도역-사리역 최단경로를 찾는다.")
     @Test
     void findShortest3() {
-        SubwayStation start = subwayStationService.getByName("오이도역");
-        SubwayStation end = subwayStationService.getByName("사리역");
+        final SubwayStation start = subwayStationService.getByName("오이도역");
+        final SubwayStation end = subwayStationService.getByName("사리역");
 
         // When
-        List<SubwayPath> paths = subwayEdges.findShortestTimePath(start, end);
+        final List<SubwayPath> paths = subwayEdges.findShortestTimePath(start, end).groupByLine();
         for (SubwayPath path : paths) {
             log.debug("출발: {}, 도착: {}, 호선: {}", path.from().getName(), path.to().getName(), path.line() == null? "null" : path.line().getTitle());
         }
@@ -87,11 +87,11 @@ public class SubwayEdgesIntTest {
     @DisplayName("오이도역-상록수역 최단경로를 찾는다.")
     @Test
     void findShortest4() {
-        SubwayStation start = subwayStationService.getByName("오이도역");
-        SubwayStation end = subwayStationService.getByName("상록수역");
+        final SubwayStation start = subwayStationService.getByName("오이도역");
+        final SubwayStation end = subwayStationService.getByName("상록수역");
 
         // When
-        List<SubwayPath> paths = subwayEdges.findShortestTimePath(start, end);
+        final List<SubwayPath> paths = subwayEdges.findShortestTimePath(start, end).groupByLine();
         for (SubwayPath path : paths) {
             log.debug("출발: {}, 도착: {}, 호선: {}", path.from().getName(), path.to().getName(), path.line() == null? "null" : path.line().getTitle());
         }

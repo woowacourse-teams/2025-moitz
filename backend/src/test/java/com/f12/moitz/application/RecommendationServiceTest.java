@@ -15,6 +15,7 @@ import com.f12.moitz.application.port.RouteFinder;
 import com.f12.moitz.application.utils.RecommendationMapper;
 import com.f12.moitz.domain.CategorizedRecommendedPlaces;
 import com.f12.moitz.domain.Path;
+import com.f12.moitz.domain.Course;
 import com.f12.moitz.domain.Place;
 import com.f12.moitz.domain.Point;
 import com.f12.moitz.domain.RecommendCondition;
@@ -131,6 +132,14 @@ class RecommendationServiceTest {
                 new Route(List.of(new Path(yeoksam, samsung, TravelMethod.SUBWAY, 10, SubwayLine.fromTitle("2호선"))))
         );
         given(routeFinder.findRoutes(anyList())).willReturn(mockRoutes);
+
+        List<Course> mockCourses = List.of(
+                new Course(List.of(gangnam, seolleung)),
+                new Course(List.of(yeoksam, seolleung)),
+                new Course(List.of(gangnam, samsung)),
+                new Course(List.of(yeoksam, samsung))
+        );
+        given(routeFinder.findCourses(anyList())).willReturn(mockCourses);
 
         given(recommendResultRepository.saveAndReturnId(any(Result.class))).willReturn(new ObjectId());
 

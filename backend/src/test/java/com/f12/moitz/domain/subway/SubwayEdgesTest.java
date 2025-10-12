@@ -60,7 +60,7 @@ class SubwayEdgesTest {
     @Test
     void findShortest() {
         // When
-        List<SubwayPath> paths = subwayEdges.findShortestTimePath(station1, station2);
+        final List<SubwayPath> paths = subwayEdges.findShortestTimePath(station1, station2).groupByLine();
 
         // Then
         SoftAssertions.assertSoftly(softly -> {
