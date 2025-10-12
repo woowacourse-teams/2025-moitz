@@ -6,6 +6,7 @@ import com.f12.moitz.application.dto.RecommendationResponse;
 import com.f12.moitz.application.dto.RecommendationsResponse;
 import com.f12.moitz.application.dto.RouteResponse;
 import com.f12.moitz.application.dto.StartingPlaceResponse;
+import com.f12.moitz.application.dto.SubwayStationResponse;
 import com.f12.moitz.application.port.dto.ReasonAndDescription;
 import com.f12.moitz.domain.Candidate;
 import com.f12.moitz.domain.CategorizedRecommendedPlaces;
@@ -158,12 +159,17 @@ public class RecommendationMapper {
                 .mapToObj(pathIndex -> toPathResponse(route.getPaths().get(pathIndex), pathIndex + 1))
                 .toList();
 
+        List<SubwayStationResponse> subwayStationResponses = IntStream.range(0, route.getStations().size())
+                .mapToObj(stationIndex -> toSubwayStationResponse(route.getStations().get(stationIndex), stationIndex + 1))
+                .toList();
+
         return new RouteResponse(
                 // TODO: 아이디로 변경
                 id,
                 route.calculateTransferCount(),
                 route.calculateTotalTravelTime(),
-                pathResponses
+                pathResponses,
+                subwayStationResponses
         );
     }
 
@@ -180,4 +186,14 @@ public class RecommendationMapper {
                 (int) path.getTravelTime().toMinutes()
         );
     }
+
+    private SubwayStationResponse toSubwayStationResponse(final Place station, final int order) {
+        return new SubwayStationResponse(
+                order,
+                station.getName(),
+                station.getPoint().getX(),
+                station.getPoint().getY()
+        );
+    }
+
 }

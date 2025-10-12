@@ -34,7 +34,7 @@ public class SubwayEdges {
         return new SubwayEdges(subwayEdgeSet);
     }
 
-    public List<SubwayPath> findShortestTimePath(final SubwayStation start, final SubwayStation end) {
+    public List<StationSegment> findShortestTimePath(final SubwayStation start, final SubwayStation end) {
         if (!isContainsStation(start) || !isContainsStation(end)) {
             log.error("노선도에 존재하지 않는 역입니다. 출발역: {}, 도착역: {}", start.getName(), end.getName());
             throw new IllegalStateException("출발역 또는 도착역이 노선도에 존재하지 않아 경로를 찾을 수 없습니다.");
@@ -130,9 +130,7 @@ public class SubwayEdges {
             }
         }
 
-        final List<StationWithEdge> fullPath = reconstructPaths(prev, edgeLines, start, end);
-
-        return groupByLine(fullPath);
+        return reconstructPaths(prev, edgeLines, start, end);
     }
 
     private Set<Edge> getEdges(final SubwayStation currentStation) {
@@ -143,16 +141,16 @@ public class SubwayEdges {
                 .getEdges();
     }
 
-    private List<StationWithEdge> reconstructPaths(
+    private List<StationSegment> reconstructPaths(
             final Map<SubwayStation, SubwayStation> prev,
             final Map<SubwayStation, List<SubwayLine>> edgeLines,
             final SubwayStation start,
             final SubwayStation end
     ) {
-        final List<StationWithEdge> fullPath = new ArrayList<>();
+        final List<StationSegment> fullSegments = new ArrayList<>();
         SubwayStation current = end;
 
-        fullPath.addFirst(new StationWithEdge(current, null));
+        fullSegments.addFirst(new StationSegment(current, null));
 
         SubwayStation previous = prev.get(current);
         while (previous != null) {
@@ -177,7 +175,7 @@ public class SubwayEdges {
             // 1순위: 환승 불필요 호선 선택 (다다음역의 호선과 같은 것 or 현재 역의 호선들 중 겹치는 것)
             if (!end.equals(next)) {
                 for (SubwayLine nextLine : nextLines) {
-                    if (nextLine.equals(fullPath.getFirst().edge.getSubwayLine())) {
+                    if (nextLine.equals(fullSegments.getFirst().getLine())) {
                         targetLine = nextLine;
                         break;
                     }
@@ -214,8 +212,8 @@ public class SubwayEdges {
                 throw new IllegalStateException("다음 역으로 가는 Edge가 존재하지 않습니다.");
             }
 
-            // StationWithEdge 생성하여 경로에 추가
-            fullPath.addFirst(new StationWithEdge(current, movementEdge));
+            // StationSegment 생성하여 경로에 추가
+            fullSegments.addFirst(new StationSegment(current, movementEdge));
 
             if (start.equals(current)) {
                 break;
@@ -238,7 +236,7 @@ public class SubwayEdges {
                     );
                     throw new IllegalStateException("환승역이지만 환승 Edge가 존재하지 않습니다.");
                 }
-                fullPath.addFirst(new StationWithEdge(current, transferEdge));
+                fullSegments.addFirst(new StationSegment(current, transferEdge));
             }
 
             previous = prev.get(current);
@@ -247,31 +245,31 @@ public class SubwayEdges {
             throw new IllegalStateException("경로가 출발역까지 이어지지 않습니다.");
         }
 
-        return fullPath;
+        return fullSegments;
     }
 
-    private List<SubwayPath> groupByLine(final List<StationWithEdge> fullPath) {
+    public List<SubwayPath> groupByLine(final List<StationSegment> fullSegments) {
         final List<SubwayPath> paths = new ArrayList<>();
 
-        if (fullPath.isEmpty()) {
+        if (fullSegments.isEmpty()) {
             throw new IllegalStateException("경로가 존재하지 않습니다.");
         }
 
-        SubwayLine currentLine = fullPath.getFirst().getLine();
-        SubwayStation startStation = fullPath.getFirst().station;
+        SubwayLine currentLine = fullSegments.getFirst().getLine();
+        SubwayStation startStation = fullSegments.getFirst().getStation();
         int totalTime = 0;
 
-        for (int i = 1; i < fullPath.size(); i++) {
-            final StationWithEdge current = fullPath.get(i);
+        for (int i = 1; i < fullSegments.size(); i++) {
+            final StationSegment current = fullSegments.get(i);
 
             // 이전 구간의 실제 이동 시간 계산 (Edge에서 직접 가져오기)
-            final StationWithEdge previous = fullPath.get(i - 1);
-            final int segmentTime = previous.edge != null ? previous.getTimeInSeconds() : 120;
+            final StationSegment previous = fullSegments.get(i - 1);
+            final int segmentTime = previous.getTimeInSeconds();
             totalTime += segmentTime;
 
             // 환승 경로이거나 마지막 역인 경우
-            if (current.isTransfer() || fullPath.getLast().equals(current)) {
-                final SubwayStation endStation = current.station;
+            if (current.isTransfer() || fullSegments.getLast().equals(current)) {
+                final SubwayStation endStation = current.getStation();
 
                 final SubwayPath path = new SubwayPath(
                         startStation,
@@ -283,7 +281,7 @@ public class SubwayEdges {
                 paths.add(path);
 
                 // 환승 처리: 같은 역에서 다른 호선으로 환승 (마지막 역이 아닌 경우에만)
-                if (current.isTransfer() && i < fullPath.size() - 1) {
+                if (current.isTransfer() && i < fullSegments.size() - 1) {
                     // 환승 시간 계산: 환승 Edge의 시간 직접 활용
                     final int transferTime = current.getTimeInSeconds();
 
@@ -298,9 +296,9 @@ public class SubwayEdges {
 
                     // 다음 구간 초기화
                     i++;
-                    final StationWithEdge next = fullPath.get(i);
+                    final StationSegment next = fullSegments.get(i);
                     currentLine = next.getLine();
-                    startStation = current.station;
+                    startStation = current.getStation();
                     totalTime = 0;
                 }
             }
@@ -343,34 +341,6 @@ public class SubwayEdges {
         final SubwayEdge newEdgeSet = new SubwayEdge(subwayStation);
         newEdgeSet.addEdge(edge);
         subwayEdges.add(newEdgeSet);
-    }
-
-    private static class StationWithEdge {
-        final SubwayStation station;
-        final Edge edge;
-
-        StationWithEdge(final SubwayStation station, final Edge edge) {
-            this.station = station;
-            this.edge = edge;
-        }
-
-        public boolean isTransfer() {
-            if (edge == null) {
-                return false;
-            }
-            return station.equals(edge.getDestination());
-        }
-
-        int getTimeInSeconds() {
-            return edge.getTimeInSeconds();
-        }
-
-        SubwayLine getLine() {
-            if (edge == null) {
-                return null;
-            }
-            return edge.getSubwayLine();
-        }
     }
 
     private static class Node {

@@ -7,6 +7,7 @@ import com.f12.moitz.application.port.dto.StartEndPair;
 import com.f12.moitz.domain.Path;
 import com.f12.moitz.domain.Route;
 import com.f12.moitz.domain.subway.SubwayEdges;
+import com.f12.moitz.domain.subway.StationSegment;
 import com.f12.moitz.domain.subway.SubwayPath;
 import com.f12.moitz.domain.subway.SubwayStation;
 import java.util.List;
@@ -35,10 +36,8 @@ public class SubwayRouteFinderAdapter implements RouteFinder {
                 .map(pair -> {
                     final SubwayStation startStation = subwayStationService.getByName(pair.start().getName());
                     final SubwayStation endStation = subwayStationService.getByName(pair.end().getName());
-                    return new Route(
-                            convertPath(subwayEdges.findShortestTimePath(startStation, endStation))
-                    );
-                })
+                    return subwayEdges.findShortestTimePath(startStation, endStation);
+                }).map(fullSegments -> new Route(convertPath(subwayEdges.groupByLine(fullSegments)), extractStation(fullSegments)))
                 .toList();
     }
 
@@ -52,6 +51,13 @@ public class SubwayRouteFinderAdapter implements RouteFinder {
                         subwayPath.totalTime(),
                         subwayPath.line()
                 ))
+                .toList();
+    }
+
+    private List<SubwayStation> extractStation(final List<StationSegment> segments) {
+        return segments.stream()
+                .map(StationSegment::getStation)
+                .distinct()
                 .toList();
     }
 
