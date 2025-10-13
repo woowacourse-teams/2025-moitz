@@ -19,9 +19,9 @@ export const container = (positionPercent: number) => css`
     margin: auto;
   }
 
-  height: ${MIN_VH + (MAX_VH - MIN_VH) * (positionPercent / 100)}vh;
-  min-height: ${MIN_VH}vh;
-  max-height: ${MAX_VH}vh;
+  height: ${MIN_VH + (MAX_VH - MIN_VH) * (positionPercent / 100)}dvh;
+  min-height: ${MIN_VH}dvh;
+  max-height: ${MAX_VH}dvh;
 
   padding: 0px 20px;
   background-color: ${colorToken.gray[8]};
