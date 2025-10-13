@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 
 import InputFormSection from '@features/meeting/components/meetingFormSection/MeetingFormSection';
-import { STATION_LIST } from '@features/meeting/config/stationList';
-import { INPUT_FORM_TEXT } from '@features/meeting/constant/inputForm';
+import { INPUT_FORM_TEXT } from '@features/meeting/constants/inputForm';
+import { STATION_LIST } from '@features/meeting/constants/stationList';
 
 import Input from '@shared/components/input/Input';
 import Tag from '@shared/components/tag/Tag';

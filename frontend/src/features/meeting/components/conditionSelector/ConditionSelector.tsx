@@ -1,5 +1,5 @@
-import { CONDITION_CARD_TEXT } from '@features/meeting/constant/conditionCard';
-import { INPUT_FORM_TEXT } from '@features/meeting/constant/inputForm';
+import { CONDITION_CARD_TEXT } from '@features/meeting/constants/conditionCard';
+import { INPUT_FORM_TEXT } from '@features/meeting/constants/inputForm';
 
 import ConditionCard from '../conditionCard/ConditionCard';
 import InputFormSection from '../meetingFormSection/MeetingFormSection';

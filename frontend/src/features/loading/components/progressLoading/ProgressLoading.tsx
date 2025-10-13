@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 
 import BaseLoading from '@features/loading/components/baseLoading/BaseLoading';
-import { LOADING_TEXT } from '@features/loading/constant/loadingText';
+import { LOADING_TEXT } from '@features/loading/constants/loadingText';
 import Progressbar from '@features/progressbar/components/progressbar/Progressbar';
 import { useProgress } from '@features/progressbar/hooks/useProgress';
 

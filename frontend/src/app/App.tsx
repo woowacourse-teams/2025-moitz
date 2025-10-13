@@ -1,11 +1,12 @@
-import { pageView } from '@config/gtag';
 import Clarity from '@microsoft/clarity';
 import { useEffect } from 'react';
 import { Route, Routes, useLocation } from 'react-router';
 
-import IndexPage from '@pages/components/indexPage/IndexPage';
-import NotFoundPage from '@pages/components/notFoundPage/NotFoundPage';
-import ResultPage from '@pages/components/resultPage/ResultPage';
+import IndexPage from '@pages/indexPage/IndexPage';
+import NotFoundPage from '@pages/notFoundPage/NotFoundPage';
+import ResultPage from '@pages/resultPage/ResultPage';
+
+import { pageView } from '@config/gtag';
 
 export default function App() {
   if (process.env.NODE_ENV === 'production') {

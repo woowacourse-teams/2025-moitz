@@ -5,7 +5,7 @@ import { BrowserRouter } from 'react-router';
 
 import App from '@app/App';
 
-import FallBackPage from '@pages/components/fallBackPage/FallBackPage';
+import FallBackPage from '@pages/fallBackPage/FallBackPage';
 
 import { LocationsProvider } from '@entities/location/contexts/LocationsProvider';
 

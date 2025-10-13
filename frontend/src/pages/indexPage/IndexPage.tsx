@@ -1,4 +1,4 @@
-import FallBackPage from '@pages/components/fallBackPage/FallBackPage';
+import FallBackPage from '@pages/fallBackPage/FallBackPage';
 
 import ProgressLoading from '@features/loading/components/progressLoading/ProgressLoading';
 import MeetingForm from '@features/meeting/components/meetingForm/MeetingForm';
@@ -11,7 +11,8 @@ import { flex, grid_padding, scroll } from '@shared/styles/default.styled';
 import * as indexPage from './indexPage.styled';
 
 function IndexPage() {
-  const { data, isProgressLoading, isError, errorMessage } = useLocationsContext();
+  const { data, isProgressLoading, isError, errorMessage } =
+    useLocationsContext();
 
   if (isError)
     return (
@@ -25,11 +26,24 @@ function IndexPage() {
     );
 
   if (isProgressLoading) {
-    return <ProgressLoading isReadyToComplete={isProgressLoading && data?.recommendedLocations?.length > 0} />;
+    return (
+      <ProgressLoading
+        isReadyToComplete={
+          isProgressLoading && data?.recommendedLocations?.length > 0
+        }
+      />
+    );
   }
 
   return (
-    <div css={[flex({ direction: 'column' }), grid_padding, scroll, indexPage.base()]}>
+    <div
+      css={[
+        flex({ direction: 'column' }),
+        grid_padding,
+        scroll,
+        indexPage.base(),
+      ]}
+    >
       <div css={indexPage.headerLogo()}>
         <HeaderLogo />
       </div>

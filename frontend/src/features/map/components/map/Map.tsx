@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 
-import FallBackPage from '@pages/components/fallBackPage/FallBackPage';
+import FallBackPage from '@pages/fallBackPage/FallBackPage';
 
 import { useCustomOverlays } from '@features/map/hooks/useCustomOverlays';
 import { useNaverMapLoader } from '@features/map/hooks/useNaverMapLoader';

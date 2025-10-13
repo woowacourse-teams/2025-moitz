@@ -1,9 +1,12 @@
+import { withContainer } from '@sb/decorators/withContainer';
+
 import MapPoint from './MapPoint';
 
 import type { Meta, StoryObj } from '@storybook/react-webpack5';
 
 const meta = {
   component: MapPoint,
+  decorators: [withContainer],
   parameters: {
     layout: 'centered',
   },

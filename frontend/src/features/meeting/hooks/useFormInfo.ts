@@ -5,7 +5,7 @@ import {
   validateStationName,
   validateDuplicateDeparture,
   validateForm,
-} from '@features/meeting/utils/formValidation';
+} from '@features/meeting/lib/formValidation';
 
 import { getMeetingStorage } from '@entities/location/model/meetingStorage';
 import { LocationRequirement } from '@entities/location/types/LocationRequirement';

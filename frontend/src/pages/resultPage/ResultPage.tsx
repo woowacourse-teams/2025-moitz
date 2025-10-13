@@ -1,8 +1,7 @@
 import { useCallback, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router';
 
-import FallBackPage from '@pages/components/fallBackPage/FallBackPage';
-import useSelectedRecommendedLocation from '@pages/hooks/useSelectedLocation';
+import FallBackPage from '@pages/fallBackPage/FallBackPage';
 
 import BaseLoading from '@features/loading/components/baseLoading/BaseLoading';
 import Header from '@features/map/components/header/Header';
@@ -10,6 +9,7 @@ import Map from '@features/map/components/map/Map';
 import BottomSheet from '@features/recommendation/components/bottomSheet/BottomSheet';
 
 import { useLocationsContext } from '@entities/location/contexts/useLocationsContext';
+import useSelectedRecommendedLocation from '@entities/location/hooks/useSelectedLocation';
 import { RecommendedLocation } from '@entities/location/types/Location';
 
 import { flex } from '@shared/styles/default.styled';

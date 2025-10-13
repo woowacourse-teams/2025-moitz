@@ -1,4 +1,4 @@
-import { CONDITION_CARD_TEXT } from '@features/meeting/constant/conditionCard';
+import { CONDITION_CARD_TEXT } from '@features/meeting/constants/conditionCard';
 
 import { StartingPlace } from '@entities/location/types/Location';
 import { LocationRequirement } from '@entities/location/types/LocationRequirement';

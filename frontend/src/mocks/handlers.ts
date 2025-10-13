@@ -1,7 +1,7 @@
 import dotenv from 'dotenv';
 import { http, HttpResponse } from 'msw';
 
-import { getApiBaseUrl } from '@shared/config/env';
+import { getApiBaseUrl } from '@config/env';
 
 import { LocationsMock } from './LocationsMock';
 

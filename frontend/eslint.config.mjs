@@ -131,7 +131,13 @@ export default [
               group: 'internal',
               position: 'before',
             },
-            // 8. storybook
+            // 8. config
+            {
+              pattern: '@config/**',
+              group: 'internal',
+              position: 'before',
+            },
+            // 9. storybook
             {
               pattern: '@sb/**',
               group: 'internal',

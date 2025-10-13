@@ -1,7 +1,7 @@
 import Dot from '@shared/components/dot/Dot';
+import { getLineInfo } from '@shared/lib/getLineInfo';
 import { flex, typography } from '@shared/styles/default.styled';
 import { colorToken } from '@shared/styles/tokens';
-import { getLineInfo } from '@shared/utils/getLineInfo';
 
 import * as segment from './routeSegment.styled';
 

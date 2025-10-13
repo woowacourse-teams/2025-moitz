@@ -1,10 +1,10 @@
 import { renderHook, waitFor, act } from '@testing-library/react';
 import { http, HttpResponse } from 'msw';
 
-import { getApiBaseUrl } from '@shared/config/env';
-
 import { LocationsRequestBodyMock } from '@mocks/LocationsRequestBodyMock';
 import { server } from '@mocks/server';
+
+import { getApiBaseUrl } from '@config/env';
 
 import useLocations from './useLocations';
 

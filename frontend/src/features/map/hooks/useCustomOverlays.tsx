@@ -12,7 +12,7 @@ import type {
 } from '@entities/location/types/Location';
 
 import MarkerIndex from '@shared/components/markerIndex/MarkerIndex';
-import { numberToCharCode } from '@shared/utils/numberToCharCode';
+import { numberToCharCode } from '@shared/lib/numberToCharCode';
 
 import { getCenterFromCoords } from '../lib/getCenterFromCoords';
 

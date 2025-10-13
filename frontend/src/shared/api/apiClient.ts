@@ -1,4 +1,4 @@
-import { getApiBaseUrl } from '@shared/config/env';
+import { getApiBaseUrl } from '@config/env';
 
 const BASE_URL = getApiBaseUrl();
 
