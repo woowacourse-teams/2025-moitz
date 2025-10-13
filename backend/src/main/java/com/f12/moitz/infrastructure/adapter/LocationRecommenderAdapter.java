@@ -36,12 +36,12 @@ public class LocationRecommenderAdapter implements LocationRecommender {
     public RecommendedLocationsResponse recommendLocations(
             final List<String> startingPlaces,
             final List<String> candidatePlaces,
-            final List<String> requirement
+            final List<String> requirements
     ) {
         final Supplier<RecommendedLocationsResponse> geminiCall = () -> geminiClient.generateResponse(
                 startingPlaces,
                 candidatePlaces,
-                requirement
+                requirements
         );
 
         final Supplier<RecommendedLocationsResponse> decoratedGeminiCall = Decorators.ofSupplier(geminiCall)
@@ -49,7 +49,7 @@ public class LocationRecommenderAdapter implements LocationRecommender {
                 .withCircuitBreaker(geminiRetryableBreaker)
                 .withFallback(
                         List.of(ExternalApiException.class, CallNotPermittedException.class),
-                        throwable -> fallback(startingPlaces, requirement)
+                        throwable -> fallback(startingPlaces, requirements)
                 )
                 .decorate();
 
