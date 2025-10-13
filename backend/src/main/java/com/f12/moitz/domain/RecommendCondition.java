@@ -50,4 +50,14 @@ public enum RecommendCondition {
                 .findFirst()
                 .orElseThrow(() -> new BadRequestException(GeneralErrorCode.INPUT_INVALID_DESCRIPTION, title));
     }
+
+    public static RecommendCondition fromKeyword(final String keyword) {
+        return Arrays.stream(values())
+                .filter(recommendCondition -> recommendCondition.keyword.contains(keyword))
+                .findFirst()
+                .orElseThrow(() -> new BadRequestException(GeneralErrorCode.INPUT_INVALID_DESCRIPTION, keyword));
+    }
+
+
+
 }

@@ -12,13 +12,13 @@ import com.f12.moitz.application.utils.RecommendationMapper;
 import com.f12.moitz.common.error.exception.BadRequestException;
 import com.f12.moitz.common.error.exception.GeneralErrorCode;
 import com.f12.moitz.common.error.exception.NotFoundException;
+import com.f12.moitz.domain.CategorizedRecommendedPlaces;
 import com.f12.moitz.domain.Place;
 import com.f12.moitz.domain.RecommendCondition;
 import com.f12.moitz.domain.Recommendation;
-import com.f12.moitz.domain.RecommendedPlace;
+import com.f12.moitz.domain.Result;
 import com.f12.moitz.domain.Route;
 import com.f12.moitz.domain.Routes;
-import com.f12.moitz.domain.Result;
 import com.f12.moitz.domain.repository.RecommendResultRepository;
 import com.f12.moitz.domain.subway.SubwayStation;
 import java.util.List;
@@ -101,7 +101,7 @@ public class RecommendationService {
         stopWatch.stop();
 
         stopWatch.start("장소 추천");
-        final Map<Place, List<RecommendedPlace>> recommendedPlaces = placeRecommender.recommendPlaces(
+        final Map<Place, CategorizedRecommendedPlaces> recommendedPlaces = placeRecommender.recommendPlaces(
                 generatedPlaces,
                 requirements
         );

@@ -1,8 +1,10 @@
 package com.f12.moitz.infrastructure.adapter;
 
 import com.f12.moitz.application.port.PlaceRecommender;
+import com.f12.moitz.domain.CategorizedRecommendedPlaces;
 import com.f12.moitz.domain.Place;
 import com.f12.moitz.domain.Point;
+import com.f12.moitz.domain.RecommendCondition;
 import com.f12.moitz.domain.RecommendedPlace;
 import com.f12.moitz.infrastructure.client.kakao.KakaoMapClient;
 import com.f12.moitz.infrastructure.client.kakao.dto.KakaoApiResponse;
@@ -11,6 +13,7 @@ import com.f12.moitz.infrastructure.client.kakao.dto.SearchPlacesLimitQuantityRe
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -22,7 +25,7 @@ public class PlaceRecommenderAdapter implements PlaceRecommender {
     private final KakaoMapClient kakaoMapClient;
 
     @Override
-    public Map<Place, List<RecommendedPlace>> recommendPlaces(
+    public Map<Place, CategorizedRecommendedPlaces> recommendPlaces(
             final List<Place> targetPlaces,
             final List<String> requirements
     ) {
@@ -30,21 +33,27 @@ public class PlaceRecommenderAdapter implements PlaceRecommender {
 
         return searchResults.entrySet().stream()
                 .collect(Collectors.toMap(
-                        Map.Entry::getKey,
-                        entry -> entry.getValue()
-                                .getKakaoApiResponses()
-                                .values().stream()
-                                .flatMap(List::stream)
-                                .flatMap(response -> response.documents().stream())
-                                .map(document -> new RecommendedPlace(
-                                        document.placeName(),
-                                        new Point(Double.parseDouble(document.x()), Double.parseDouble(document.y())),
-                                        parseCategoryName(document.categoryName()),
-                                        calculateWalkingTime(Integer.parseInt(document.distance())),
-                                        document.placeUrl()
-                                ))
-                                .collect(Collectors.toList())
+                        Entry::getKey,
+                        entry -> CategorizedRecommendedPlaces.from(
+                                entry.getValue()
+                                        .getKakaoApiResponses()
+                                        .entrySet().stream()
+                                        .collect(Collectors.toMap(
+                                                Entry::getKey,
+                                                reqEntry -> reqEntry.getValue().stream()
+                                                        .flatMap(resp -> resp.documents().stream())
+                                                        .map(document -> new RecommendedPlace(
+                                                                document.placeName(),
+                                                                new Point(Double.parseDouble(document.x()), Double.parseDouble(document.y())),
+                                                                parseCategoryName(document.categoryName()),
+                                                                calculateWalkingTime(Integer.parseInt(document.distance())),
+                                                                document.placeUrl()
+                                                        ))
+                                                        .toList()
+                                        ))
+                        )
                 ));
+
     }
 
     private Map<Place, KakaoApiResponses> searchPlacesWithRequirement(final List<Place> targets, final List<String> requirements) {
@@ -54,7 +63,7 @@ public class PlaceRecommenderAdapter implements PlaceRecommender {
                         place -> {
                             Map<String,List<KakaoApiResponse>> responsesByCategory =
                             requirements.stream().collect(Collectors.toMap(
-                                    requirement -> requirement,
+                                    requirement -> RecommendCondition.fromKeyword(requirement).getTitle(),
                                     requirement -> {
                                         KakaoApiResponse response = kakaoMapClient.searchPlacesBy(
                                                 new SearchPlacesLimitQuantityRequest(
