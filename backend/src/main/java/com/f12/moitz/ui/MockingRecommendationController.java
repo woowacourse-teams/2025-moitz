@@ -37,7 +37,7 @@ public class MockingRecommendationController implements SwaggerMockingRecommenda
 
     private MockRecommendationResponse mock() {
         return new MockRecommendationResponse(
-                RecommendCondition.CAFE.getTitle(),
+                List.of("식당","까페","PC방"),
                 List.of(
                         new StartingPlaceResponse(1L, 1, 127.094741101863, 37.5351180385975, "강변역"),
                         new StartingPlaceResponse(2L, 2, 127.01063381083677, 37.571669405802616, "동대문역"),
@@ -50,34 +50,22 @@ public class MockingRecommendationController implements SwaggerMockingRecommenda
                                 Map.of(
                                         "식당", List.of(
                                                 new PlaceRecommendResponse(
-                                                        1,
-                                                        127.094741101863,
-                                                        37.5351180385975,
-                                                        "육일관",
-                                                        "식당",
-                                                        1,
+                                                        1, 127.094741101863, 37.5351180385975,
+                                                        "육일관", "식당", 1,
                                                         "http://place.map.kakao.com/1050190897"
                                                 )
                                         ),
                                         "카페", List.of(
                                                 new PlaceRecommendResponse(
-                                                        1,
-                                                        127.094741101863,
-                                                        37.5351180385975,
-                                                        "바나프레소 건대역점",
-                                                        "카페",
-                                                        1,
+                                                        1, 127.094741101863, 37.5351180385975,
+                                                        "바나프레소 건대역점", "카페", 1,
                                                         "http://place.map.kakao.com/666587821"
                                                 )
                                         ),
                                         "PC방", List.of(
                                                 new PlaceRecommendResponse(
-                                                        1,
-                                                        127.094741101863,
-                                                        37.5351180385975,
-                                                        "포포PC방 건대점",
-                                                        "PC방",
-                                                        1,
+                                                        1, 127.094741101863, 37.5351180385975,
+                                                        "포포PC방 건대점", "PC방", 1,
                                                         "http://place.map.kakao.com/356960076"
                                                 )
                                         )
