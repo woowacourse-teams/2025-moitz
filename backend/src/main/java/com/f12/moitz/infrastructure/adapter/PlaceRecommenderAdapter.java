@@ -34,12 +34,12 @@ public class PlaceRecommenderAdapter implements PlaceRecommender {
         return searchResults.entrySet().stream()
                 .collect(Collectors.toMap(
                         Entry::getKey,
-                        entry -> CategorizedRecommendedPlaces.from(
+                        entry -> new CategorizedRecommendedPlaces(
                                 entry.getValue()
                                         .kakaoApiResponses()
                                         .entrySet().stream()
                                         .collect(Collectors.toMap(
-                                                Entry::getKey,
+                                                reqEntry -> RecommendCondition.fromTitle(reqEntry.getKey()),
                                                 reqEntry -> reqEntry.getValue().stream()
                                                         .flatMap(resp -> resp.documents().stream())
                                                         .map(document -> new RecommendedPlace(

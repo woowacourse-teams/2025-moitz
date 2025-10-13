@@ -3,7 +3,6 @@ package com.f12.moitz.application;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -15,18 +14,18 @@ import com.f12.moitz.application.port.PlaceRecommender;
 import com.f12.moitz.application.port.RouteFinder;
 import com.f12.moitz.application.utils.RecommendationMapper;
 import com.f12.moitz.domain.CategorizedRecommendedPlaces;
+import com.f12.moitz.domain.Path;
 import com.f12.moitz.domain.Place;
 import com.f12.moitz.domain.Point;
+import com.f12.moitz.domain.RecommendCondition;
 import com.f12.moitz.domain.RecommendedPlace;
+import com.f12.moitz.domain.Result;
 import com.f12.moitz.domain.Route;
 import com.f12.moitz.domain.TravelMethod;
+import com.f12.moitz.domain.repository.RecommendResultRepository;
 import com.f12.moitz.domain.subway.SubwayLine;
 import com.f12.moitz.domain.subway.SubwayStation;
-import com.f12.moitz.domain.Path;
-import com.f12.moitz.domain.Result;
-import com.f12.moitz.domain.repository.RecommendResultRepository;
 import com.f12.moitz.infrastructure.client.gemini.dto.RecommendedLocationResponse;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -96,9 +95,9 @@ class RecommendationServiceTest {
         given(subwayStationService.getByName("삼성역")).willReturn(samsung);
 
         Map<Place, CategorizedRecommendedPlaces> mockRecommendedPlaces = Map.of(
-                seolleung, CategorizedRecommendedPlaces.from(
+                seolleung, new CategorizedRecommendedPlaces(
                         Map.of(
-                                "CAFE", List.of(
+                                RecommendCondition.CAFE, List.of(
                                         new RecommendedPlace(
                                                 "스타벅스 선릉점",
                                                 new Point(127.048, 37.504),
@@ -109,9 +108,9 @@ class RecommendationServiceTest {
                                 )
                         )
                 ),
-                samsung, CategorizedRecommendedPlaces.from(
+                samsung, new CategorizedRecommendedPlaces(
                         Map.of(
-                                "CAFE", List.of(
+                                RecommendCondition.CAFE, List.of(
                                         new RecommendedPlace(
                                                 "스타벅스 삼성점",
                                                 new Point(127.063, 37.508),

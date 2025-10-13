@@ -44,7 +44,7 @@ public enum RecommendCondition {
                 .toList();
     }
 
-    private static RecommendCondition fromTitle(final String title) {
+    public static RecommendCondition fromTitle(final String title) {
         return Arrays.stream(values())
                 .filter(recommendCondition -> recommendCondition.title.equals(title))
                 .findFirst()

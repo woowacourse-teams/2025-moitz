@@ -32,7 +32,7 @@ class CandidateTest {
         final Routes routes = new Routes(List.of(route));
 
         final RecommendedPlace recommendedPlace = new RecommendedPlace("스타벅스", DEFAULT_POINT, "카페", 5, "url");
-        Map<String, List<RecommendedPlace>> categorizedRecommendedPlace = Map.of("카페", List.of(recommendedPlace));
+        Map<RecommendCondition, List<RecommendedPlace>> categorizedRecommendedPlace = Map.of(RecommendCondition.CAFE, List.of(recommendedPlace));
         final CategorizedRecommendedPlaces recommendedPlaces = new CategorizedRecommendedPlaces(categorizedRecommendedPlace);
 
         // When & Then
@@ -56,7 +56,7 @@ class CandidateTest {
         final Routes routes = new Routes(List.of(route));
 
         final RecommendedPlace recommendedPlace = new RecommendedPlace("스타벅스", DEFAULT_POINT, "카페", 5, "url");
-        Map<String, List<RecommendedPlace>> categorizedRecommendedPlace = Map.of("카페", List.of(recommendedPlace));
+        Map<RecommendCondition, List<RecommendedPlace>> categorizedRecommendedPlace = Map.of(RecommendCondition.CAFE, List.of(recommendedPlace));
         final CategorizedRecommendedPlaces recommendedPlaces = new CategorizedRecommendedPlaces(categorizedRecommendedPlace);
 
 
@@ -97,7 +97,7 @@ class CandidateTest {
         final Routes routes = new Routes(List.of(route));
 
         final RecommendedPlace recommendedPlace = new RecommendedPlace("스타벅스", DEFAULT_POINT, "카페", 5, "url");
-        Map<String, List<RecommendedPlace>> categorizedRecommendedPlace = Map.of("카페", List.of(recommendedPlace));
+        Map<RecommendCondition, List<RecommendedPlace>> categorizedRecommendedPlace = Map.of(RecommendCondition.CAFE, List.of(recommendedPlace));
         final CategorizedRecommendedPlaces recommendedPlaces = new CategorizedRecommendedPlaces(categorizedRecommendedPlace);
         final Candidate candidate = new Candidate(endPlace, routes, recommendedPlaces, "123", "123");
 

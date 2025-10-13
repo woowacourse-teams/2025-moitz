@@ -19,6 +19,7 @@ import com.f12.moitz.domain.Routes;
 import com.f12.moitz.domain.Result;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import org.springframework.stereotype.Component;
@@ -104,7 +105,7 @@ public class RecommendationMapper {
         final Place targetPlace = candidate.getDestination();
         final int totalTime = candidate.calculateAverageTravelTime();
 
-        Map<String, List<PlaceRecommendResponse>> recommendedPlaces = toPlaceRecommendResponses(
+        Map<RecommendCondition, List<PlaceRecommendResponse>> recommendedPlaces = toPlaceRecommendResponses(
                 candidate.getRecommendedPlaces()
         );
         final List<RouteResponse> routes = toRouteResponses(candidate.getRoutes());
@@ -124,12 +125,12 @@ public class RecommendationMapper {
         );
     }
 
-    private Map<String, List<PlaceRecommendResponse>> toPlaceRecommendResponses(
+    private Map<RecommendCondition, List<PlaceRecommendResponse>> toPlaceRecommendResponses(
             final CategorizedRecommendedPlaces categorizedRecommendedPlaces
     ) {
         return categorizedRecommendedPlaces.getCategorizedPlaces().entrySet().stream()
                 .collect(Collectors.toMap(
-                        Map.Entry::getKey,
+                        Entry::getKey,
                         entry -> IntStream.range(0, entry.getValue().size())
                                 .mapToObj(i -> {
                                     RecommendedPlace p = entry.getValue().get(i);
