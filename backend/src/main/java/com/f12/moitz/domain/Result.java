@@ -18,7 +18,7 @@ public class Result {
     @Id
     private ObjectId id;
 
-    private List<RecommendCondition> recommendCondition;
+    private List<RecommendCondition> recommendConditions;
 
     @CreatedDate
     @Indexed(expireAfter = "7d")
@@ -29,25 +29,25 @@ public class Result {
     private Recommendation recommendedLocations;
 
     public Result(
-            final List<RecommendCondition> recommendCondition,
+            final List<RecommendCondition> recommendConditions,
             final List<? extends Place> startingPlaces,
             final Recommendation recommendedLocations
     ) {
-        validate(recommendCondition, startingPlaces, recommendedLocations);
-        this.recommendCondition = recommendCondition;
+        validate(recommendConditions, startingPlaces, recommendedLocations);
+        this.recommendConditions = recommendConditions;
         this.startingPlaces = startingPlaces;
         this.recommendedLocations = recommendedLocations;
     }
 
     public Result(
             final ObjectId id,
-            final List<RecommendCondition> recommendCondition,
+            final List<RecommendCondition> recommendConditions,
             final List<? extends Place> startingPlaces,
             final Recommendation recommendedLocations
     ) {
-        validate(recommendCondition, startingPlaces, recommendedLocations);
+        validate(recommendConditions, startingPlaces, recommendedLocations);
         this.id = id;
-        this.recommendCondition = recommendCondition;
+        this.recommendConditions = recommendConditions;
         this.startingPlaces = startingPlaces;
         this.recommendedLocations = recommendedLocations;
     }

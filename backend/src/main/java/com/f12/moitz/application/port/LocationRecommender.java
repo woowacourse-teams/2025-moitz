@@ -8,6 +8,6 @@ public interface LocationRecommender {
     RecommendedLocationsResponse recommendLocations(
             List<String> startingPlaces,
             List<String> candidatePlaces,
-            List<String> requirement
+            List<String> requirements
     );
 }

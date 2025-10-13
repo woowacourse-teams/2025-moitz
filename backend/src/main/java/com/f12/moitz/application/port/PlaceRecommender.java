@@ -7,6 +7,6 @@ import java.util.Map;
 
 public interface PlaceRecommender {
 
-    Map<Place, CategorizedRecommendedPlaces> recommendPlaces(List<Place> targetPlaces, List<String> requirement);
+    Map<Place, CategorizedRecommendedPlaces> recommendPlaces(List<Place> targetPlaces, List<String> requirements);
 
 }
