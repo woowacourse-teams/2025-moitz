@@ -14,6 +14,7 @@ import com.f12.moitz.application.port.LocationRecommender;
 import com.f12.moitz.application.port.PlaceRecommender;
 import com.f12.moitz.application.port.RouteFinder;
 import com.f12.moitz.application.utils.RecommendationMapper;
+import com.f12.moitz.domain.CategorizedRecommendedPlaces;
 import com.f12.moitz.domain.Place;
 import com.f12.moitz.domain.Point;
 import com.f12.moitz.domain.RecommendedPlace;
@@ -94,9 +95,33 @@ class RecommendationServiceTest {
         given(subwayStationService.getByName("선릉역")).willReturn(seolleung);
         given(subwayStationService.getByName("삼성역")).willReturn(samsung);
 
-        Map<Place, List<RecommendedPlace>> mockRecommendedPlaces = Map.of(
-                seolleung, List.of(new RecommendedPlace("스타벅스 선릉점", new Point(127.048, 37.504), "카페", 5, "url")),
-                samsung, List.of(new RecommendedPlace("스타벅스 삼성점", new Point(127.063, 37.508), "카페", 4, "url"))
+        Map<Place, CategorizedRecommendedPlaces> mockRecommendedPlaces = Map.of(
+                seolleung, CategorizedRecommendedPlaces.from(
+                        Map.of(
+                                "CAFE", List.of(
+                                        new RecommendedPlace(
+                                                "스타벅스 선릉점",
+                                                new Point(127.048, 37.504),
+                                                "카페",
+                                                5,
+                                                "url"
+                                        )
+                                )
+                        )
+                ),
+                samsung, CategorizedRecommendedPlaces.from(
+                        Map.of(
+                                "CAFE", List.of(
+                                        new RecommendedPlace(
+                                                "스타벅스 삼성점",
+                                                new Point(127.063, 37.508),
+                                                "카페",
+                                                4,
+                                                "url"
+                                        )
+                                )
+                        )
+                )
         );
         given(placeRecommender.recommendPlaces(anyList(), anyList())).willReturn(mockRecommendedPlaces);
 
