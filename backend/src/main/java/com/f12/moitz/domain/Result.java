@@ -52,9 +52,9 @@ public class Result {
         this.recommendedLocations = recommendedLocations;
     }
 
-    private void validate(final List<RecommendCondition> recommendCondition, final List<? extends Place> startingPlaces, final Recommendation recommendedLocations) {
-        if (recommendCondition == null) {
-            throw new IllegalArgumentException("추천 조건은 null일 수 없습니다.");
+    private void validate(final List<RecommendCondition> recommendConditions, final List<? extends Place> startingPlaces, final Recommendation recommendedLocations) {
+        if (recommendConditions == null || recommendConditions.isEmpty()) {
+            throw new IllegalArgumentException("추천 조건은 비어있거나 null일 수 없습니다.");
         }
         if (startingPlaces == null || startingPlaces.isEmpty()) {
             throw new IllegalArgumentException("출발지들은 비어있거나 null일 수 없습니다.");

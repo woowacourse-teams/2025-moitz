@@ -87,7 +87,7 @@ class RecommendationServiceTest {
         final RecommendedLocationsResponse mockLocationsResponse = new RecommendedLocationsResponse(List.of(
                 new RecommendedLocationResponse("선릉역", "이유1", "설명1"),
                 new RecommendedLocationResponse("삼성역", "이유2", "설명2")));
-        given(locationRecommender.recommendLocations(anyList(), anyList(), Collections.singletonList(anyString()))).willReturn(mockLocationsResponse);
+        given(locationRecommender.recommendLocations(anyList(), anyList(), anyList())).willReturn(mockLocationsResponse);
 
         final SubwayStation seolleung = new SubwayStation("선릉역", new Point(127.048, 37.504));
         final SubwayStation samsung = new SubwayStation("삼성역", new Point(127.063, 37.508));
@@ -98,7 +98,7 @@ class RecommendationServiceTest {
                 seolleung, List.of(new RecommendedPlace("스타벅스 선릉점", new Point(127.048, 37.504), "카페", 5, "url")),
                 samsung, List.of(new RecommendedPlace("스타벅스 삼성점", new Point(127.063, 37.508), "카페", 4, "url"))
         );
-        given(placeRecommender.recommendPlaces(anyList(), Collections.singletonList(any(String.class)))).willReturn(mockRecommendedPlaces);
+        given(placeRecommender.recommendPlaces(anyList(), anyList())).willReturn(mockRecommendedPlaces);
 
         List<Route> mockRoutes = List.of(
                 new Route(List.of(new Path(gangnam, seolleung, TravelMethod.SUBWAY, 10, SubwayLine.fromTitle("2호선")))),

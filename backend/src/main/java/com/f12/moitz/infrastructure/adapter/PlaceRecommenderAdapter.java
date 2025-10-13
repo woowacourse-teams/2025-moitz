@@ -36,7 +36,7 @@ public class PlaceRecommenderAdapter implements PlaceRecommender {
                         Entry::getKey,
                         entry -> CategorizedRecommendedPlaces.from(
                                 entry.getValue()
-                                        .getKakaoApiResponses()
+                                        .kakaoApiResponses()
                                         .entrySet().stream()
                                         .collect(Collectors.toMap(
                                                 Entry::getKey,
@@ -62,21 +62,21 @@ public class PlaceRecommenderAdapter implements PlaceRecommender {
                         place -> place,
                         place -> {
                             Map<String,List<KakaoApiResponse>> responsesByCategory =
-                            requirements.stream().collect(Collectors.toMap(
-                                    requirement -> RecommendCondition.fromKeyword(requirement).getTitle(),
-                                    requirement -> {
-                                        KakaoApiResponse response = kakaoMapClient.searchPlacesBy(
-                                                new SearchPlacesLimitQuantityRequest(
-                                                        requirement,
-                                                        place.getPoint().getX(),
-                                                        place.getPoint().getY(),
-                                                        800,
-                                                        3
-                                                )
-                                        );
-                                        return List.of(response);
-                                    }
-                            ));
+                                    requirements.stream().collect(Collectors.toMap(
+                                            requirement -> RecommendCondition.fromKeyword(requirement).getTitle(),
+                                            requirement -> {
+                                                KakaoApiResponse response = kakaoMapClient.searchPlacesBy(
+                                                        new SearchPlacesLimitQuantityRequest(
+                                                                requirement,
+                                                                place.getPoint().getX(),
+                                                                place.getPoint().getY(),
+                                                                800,
+                                                                3
+                                                        )
+                                                );
+                                                return List.of(response);
+                                            }
+                                    ));
                             return new KakaoApiResponses(responsesByCategory);
                         }
                 ));
@@ -98,4 +98,3 @@ public class PlaceRecommenderAdapter implements PlaceRecommender {
     }
 
 }
-

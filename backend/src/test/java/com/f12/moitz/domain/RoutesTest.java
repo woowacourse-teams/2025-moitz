@@ -110,4 +110,5 @@ class RoutesTest {
         // Then
         assertThat(averageTravelTime).isEqualTo(15);
     }
+
 }

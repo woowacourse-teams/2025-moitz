@@ -16,26 +16,26 @@ public enum RecommendCondition {
     SPACE_RENTAL("SPACE_RENTAL", "공간대여"),
     PC_ROOM("PC_ROOM", "PC방"),
     KARAOKE("KARAOKE", "노래방"),
-    ACTIVITY("ACTIVITY", List.of("클라이밍,볼링,사격,당구")),
-    ENTERTAINMENT("ENTERTAINMENT", List.of("방탈출,만화방,보드게임카페,영화관")),
+    ACTIVITY("ACTIVITY", List.of("클라이밍, 볼링, 사격, 당구")),
+    ENTERTAINMENT("ENTERTAINMENT", List.of("방탈출, 만화방, 보드게임카페, 영화관")),
     NOT_SELECTED("NOT_SELECTED", "맛집");
 
     private final String title;
-    private final List<String> keyword;
+    private final List<String> keywords;
 
     RecommendCondition(final String title, final String keyword) {
         this.title = title;
-        this.keyword = List.of(keyword);
+        this.keywords = List.of(keyword);
     }
 
-    RecommendCondition(final String title, final List<String> keyword) {
+    RecommendCondition(final String title, final List<String> keywords) {
         this.title = title;
-        this.keyword = keyword;
+        this.keywords = keywords;
     }
 
     public static List<String> getRequirements(List<RecommendCondition> recommendConditions) {
         return recommendConditions.stream()
-                .flatMap(recommendCondition -> recommendCondition.getKeyword().stream())
+                .flatMap(recommendCondition -> recommendCondition.getKeywords().stream())
                 .toList();
     }
 
@@ -53,7 +53,7 @@ public enum RecommendCondition {
 
     public static RecommendCondition fromKeyword(final String keyword) {
         return Arrays.stream(values())
-                .filter(recommendCondition -> recommendCondition.keyword.contains(keyword))
+                .filter(recommendCondition -> recommendCondition.keywords.contains(keyword))
                 .findFirst()
                 .orElseThrow(() -> new BadRequestException(GeneralErrorCode.INPUT_INVALID_DESCRIPTION, keyword));
     }

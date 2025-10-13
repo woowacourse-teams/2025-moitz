@@ -53,4 +53,5 @@ class EdgeTest {
                     .hasMessage("이동 거리는 음수일 수 없습니다.");
         });
     }
+
 }

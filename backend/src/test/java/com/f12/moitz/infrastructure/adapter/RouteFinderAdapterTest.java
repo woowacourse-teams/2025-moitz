@@ -110,4 +110,5 @@ class RouteFinderAdapterTest {
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessage("경로 정보를 찾을 수 없습니다.");
     }
+
 }
