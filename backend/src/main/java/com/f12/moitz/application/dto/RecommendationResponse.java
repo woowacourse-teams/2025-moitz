@@ -1,7 +1,9 @@
 package com.f12.moitz.application.dto;
 
+import com.f12.moitz.domain.RecommendCondition;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
+import java.util.Map;
 
 @Schema(description = "지역 추천 응답")
 public record RecommendationResponse(
@@ -24,7 +26,7 @@ public record RecommendationResponse(
         @Schema(description = "지역 추천 이유", example = "유명한 곱창집이 있고, 전체적으로 환승을 하지 않는 최적의 지역입니다!", requiredMode = Schema.RequiredMode.REQUIRED)
         String reason,
         @Schema(description = "추천 장소 목록", requiredMode = Schema.RequiredMode.REQUIRED)
-        List<PlaceRecommendResponse> places,
+        Map<RecommendCondition,List<PlaceRecommendResponse>> places,
         @Schema(description = "각 출발지로부터 이동 경로", requiredMode = Schema.RequiredMode.REQUIRED)
         List<RouteResponse> routes
 ) {

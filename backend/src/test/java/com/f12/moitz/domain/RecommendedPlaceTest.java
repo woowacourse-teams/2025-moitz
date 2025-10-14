@@ -71,4 +71,5 @@ class RecommendedPlaceTest {
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("도보 시간은 0 이상이어야 합니다.");
     }
+
 }

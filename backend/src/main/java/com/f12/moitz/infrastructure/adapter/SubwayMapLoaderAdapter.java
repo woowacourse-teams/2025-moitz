@@ -87,4 +87,5 @@ public class SubwayMapLoaderAdapter implements SubwayMapLoader {
                 pathResponse.trainDepartureTime()
         );
     }
+
 }

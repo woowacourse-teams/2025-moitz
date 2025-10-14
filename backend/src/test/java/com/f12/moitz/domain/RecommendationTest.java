@@ -7,6 +7,7 @@ import static org.assertj.core.api.SoftAssertions.assertSoftly;
 import com.f12.moitz.domain.subway.SubwayLine;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -88,7 +89,9 @@ class RecommendationTest {
         final Routes routes = new Routes(List.of(route));
 
         final RecommendedPlace recommendedPlace = new RecommendedPlace("스타벅스", new Point(127.2, 37.21), "카페", 5, "url");
-        final List<RecommendedPlace> recommendedPlaces = List.of(recommendedPlace);
+        Map<RecommendCondition, List<RecommendedPlace>> categorizedRecommendedPlace = Map.of(RecommendCondition.CAFE, List.of(recommendedPlace));
+        final CategorizedRecommendedPlaces recommendedPlaces = new CategorizedRecommendedPlaces(categorizedRecommendedPlace);
         return new Candidate(endPlace, routes, recommendedPlaces, "123", "123");
     }
+
 }

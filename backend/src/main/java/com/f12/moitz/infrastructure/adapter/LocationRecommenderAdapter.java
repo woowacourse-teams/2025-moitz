@@ -36,12 +36,12 @@ public class LocationRecommenderAdapter implements LocationRecommender {
     public RecommendedLocationsResponse recommendLocations(
             final List<String> startingPlaces,
             final List<String> candidatePlaces,
-            final String requirement
+            final List<String> requirements
     ) {
         final Supplier<RecommendedLocationsResponse> geminiCall = () -> geminiClient.generateResponse(
                 startingPlaces,
                 candidatePlaces,
-                requirement
+                requirements
         );
 
         final Supplier<RecommendedLocationsResponse> decoratedGeminiCall = Decorators.ofSupplier(geminiCall)
@@ -49,7 +49,7 @@ public class LocationRecommenderAdapter implements LocationRecommender {
                 .withCircuitBreaker(geminiRetryableBreaker)
                 .withFallback(
                         List.of(ExternalApiException.class, CallNotPermittedException.class),
-                        throwable -> fallback(startingPlaces, requirement)
+                        throwable -> fallback(startingPlaces, requirements)
                 )
                 .decorate();
 
@@ -63,8 +63,9 @@ public class LocationRecommenderAdapter implements LocationRecommender {
         );
     }
 
-    private RecommendedLocationsResponse fallback(final List<String> startingPlaces, final String requirement) {
+    private RecommendedLocationsResponse fallback(final List<String> startingPlaces, final List<String> requirements) {
         log.debug("FallBack: Perplexity 호출을 시도합니다.");
+        String requirement = String.join("", requirements);
         return perplexityClient.generateResponse(startingPlaces, requirement);
     }
 

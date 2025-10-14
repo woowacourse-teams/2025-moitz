@@ -7,6 +7,7 @@ import static org.assertj.core.api.SoftAssertions.assertSoftly;
 import com.f12.moitz.domain.subway.SubwayLine;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -31,7 +32,8 @@ class CandidateTest {
         final Routes routes = new Routes(List.of(route));
 
         final RecommendedPlace recommendedPlace = new RecommendedPlace("스타벅스", DEFAULT_POINT, "카페", 5, "url");
-        final List<RecommendedPlace> recommendedPlaces = List.of(recommendedPlace);
+        Map<RecommendCondition, List<RecommendedPlace>> categorizedRecommendedPlace = Map.of(RecommendCondition.CAFE, List.of(recommendedPlace));
+        final CategorizedRecommendedPlaces recommendedPlaces = new CategorizedRecommendedPlaces(categorizedRecommendedPlace);
 
         // When & Then
         assertThatNoException().isThrownBy(() -> new Candidate(endPlace, routes, recommendedPlaces, "123", "123"));
@@ -54,7 +56,9 @@ class CandidateTest {
         final Routes routes = new Routes(List.of(route));
 
         final RecommendedPlace recommendedPlace = new RecommendedPlace("스타벅스", DEFAULT_POINT, "카페", 5, "url");
-        final List<RecommendedPlace> recommendedPlaces = List.of(recommendedPlace);
+        Map<RecommendCondition, List<RecommendedPlace>> categorizedRecommendedPlace = Map.of(RecommendCondition.CAFE, List.of(recommendedPlace));
+        final CategorizedRecommendedPlaces recommendedPlaces = new CategorizedRecommendedPlaces(categorizedRecommendedPlace);
+
 
         // When & Then
         assertSoftly(softAssertions -> {
@@ -70,7 +74,7 @@ class CandidateTest {
                     .isInstanceOf(IllegalArgumentException.class)
                     .hasMessage("추천 장소 목록은 비어 있을 수 없습니다.");
 
-            softAssertions.assertThatThrownBy(() -> new Candidate(endPlace, routes, Collections.emptyList(), "123", "123"))
+            softAssertions.assertThatThrownBy(() -> new Candidate(endPlace, routes, new CategorizedRecommendedPlaces(Collections.emptyMap()), "123", "123"))
                     .isInstanceOf(IllegalArgumentException.class)
                     .hasMessage("추천 장소 목록은 비어 있을 수 없습니다.");
         });
@@ -93,7 +97,8 @@ class CandidateTest {
         final Routes routes = new Routes(List.of(route));
 
         final RecommendedPlace recommendedPlace = new RecommendedPlace("스타벅스", DEFAULT_POINT, "카페", 5, "url");
-        final List<RecommendedPlace> recommendedPlaces = List.of(recommendedPlace);
+        Map<RecommendCondition, List<RecommendedPlace>> categorizedRecommendedPlace = Map.of(RecommendCondition.CAFE, List.of(recommendedPlace));
+        final CategorizedRecommendedPlaces recommendedPlaces = new CategorizedRecommendedPlaces(categorizedRecommendedPlace);
         final Candidate candidate = new Candidate(endPlace, routes, recommendedPlaces, "123", "123");
 
         // When
@@ -102,4 +107,5 @@ class CandidateTest {
         // Then
         assertThat(averageTravelTime).isEqualTo(30);
     }
+
 }

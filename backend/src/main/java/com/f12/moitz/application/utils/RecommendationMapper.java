@@ -8,6 +8,7 @@ import com.f12.moitz.application.dto.RouteResponse;
 import com.f12.moitz.application.dto.StartingPlaceResponse;
 import com.f12.moitz.application.port.dto.ReasonAndDescription;
 import com.f12.moitz.domain.Candidate;
+import com.f12.moitz.domain.CategorizedRecommendedPlaces;
 import com.f12.moitz.domain.Path;
 import com.f12.moitz.domain.Place;
 import com.f12.moitz.domain.RecommendCondition;
@@ -18,6 +19,8 @@ import com.f12.moitz.domain.Routes;
 import com.f12.moitz.domain.Result;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import org.springframework.stereotype.Component;
 
@@ -26,7 +29,7 @@ public class RecommendationMapper {
 
     public RecommendationsResponse toResponse(final Result result) {
         final int minTime = result.getBestRecommendationTime();
-        final String condition = getCondition(result);
+        final List<String> condition = getCondition(result);
         return new RecommendationsResponse(
                 condition,
                 IntStream.range(0, result.getStartingPlacesCount())
@@ -41,17 +44,19 @@ public class RecommendationMapper {
         );
     }
 
-    private String getCondition(final Result result) {
-        final RecommendCondition recommendCondition =
-                result.getRecommendCondition() == null ? RecommendCondition.NOT_SELECTED
-                : result.getRecommendCondition();
+    private List<String> getCondition(final Result result) {
+        final List<RecommendCondition> recommendConditions =
+                result.getRecommendConditions() == null ? List.of(RecommendCondition.NOT_SELECTED)
+                : result.getRecommendConditions();
 
-        return recommendCondition.getTitle();
+        return recommendConditions.stream()
+                .map(RecommendCondition::getTitle)
+                .toList();
     }
 
     public Recommendation toRecommendation(
             final Map<Place, ReasonAndDescription> generatedPlaces,
-            final Map<Place, List<RecommendedPlace>> placeListMap,
+            final Map<Place, CategorizedRecommendedPlaces> placeListMap,
             final Map<Place, Routes> placeRoutes
     ) {
         return new Recommendation(
@@ -71,7 +76,7 @@ public class RecommendationMapper {
     }
 
     public Result toResult(
-            final RecommendCondition recommendCondition,
+            final List<RecommendCondition> recommendCondition,
             final List<? extends Place> startingPlaces,
             final Recommendation recommendation
     ) {
@@ -100,7 +105,7 @@ public class RecommendationMapper {
         final Place targetPlace = candidate.getDestination();
         final int totalTime = candidate.calculateAverageTravelTime();
 
-        final List<PlaceRecommendResponse> recommendedPlaces = toPlaceRecommendResponses(
+        Map<RecommendCondition, List<PlaceRecommendResponse>> recommendedPlaces = toPlaceRecommendResponses(
                 candidate.getRecommendedPlaces()
         );
         final List<RouteResponse> routes = toRouteResponses(candidate.getRoutes());
@@ -120,24 +125,29 @@ public class RecommendationMapper {
         );
     }
 
-    private List<PlaceRecommendResponse> toPlaceRecommendResponses(
-            final List<RecommendedPlace> places
+    private Map<RecommendCondition, List<PlaceRecommendResponse>> toPlaceRecommendResponses(
+            final CategorizedRecommendedPlaces categorizedRecommendedPlaces
     ) {
-        return IntStream.range(0, places.size())
-                .mapToObj(i -> {
-                    RecommendedPlace p = places.get(i);
-                    return new PlaceRecommendResponse(
-                            i + 1,
-                            p.getX(),
-                            p.getY(),
-                            p.getName(),
-                            p.getCategory(),
-                            p.getWalkingTime(),
-                            p.getUrl()
-                    );
-                })
-                .toList();
+        return categorizedRecommendedPlaces.getCategorizedPlaces().entrySet().stream()
+                .collect(Collectors.toMap(
+                        Entry::getKey,
+                        entry -> IntStream.range(0, entry.getValue().size())
+                                .mapToObj(i -> {
+                                    RecommendedPlace p = entry.getValue().get(i);
+                                    return new PlaceRecommendResponse(
+                                            i + 1,       // 순번
+                                            p.getX(),
+                                            p.getY(),
+                                            p.getName(),
+                                            p.getCategory(),
+                                            p.getWalkingTime(),
+                                            p.getUrl()
+                                    );
+                                })
+                                .toList()
+                ));
     }
+
 
     private List<RouteResponse> toRouteResponses(final Routes routes) {
         return IntStream.range(0, routes.getRoutes().size())

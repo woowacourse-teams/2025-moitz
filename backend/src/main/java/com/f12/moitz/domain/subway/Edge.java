@@ -60,4 +60,5 @@ public class Edge {
     public boolean isTowards(final SubwayStation destination) {
         return this.destination.equals(destination);
     }
+
 }

@@ -18,7 +18,7 @@ public class Result {
     @Id
     private ObjectId id;
 
-    private RecommendCondition recommendCondition;
+    private List<RecommendCondition> recommendConditions;
 
     @CreatedDate
     @Indexed(expireAfter = "7d")
@@ -29,32 +29,32 @@ public class Result {
     private Recommendation recommendedLocations;
 
     public Result(
-            final RecommendCondition recommendCondition,
+            final List<RecommendCondition> recommendConditions,
             final List<? extends Place> startingPlaces,
             final Recommendation recommendedLocations
     ) {
-        validate(recommendCondition, startingPlaces, recommendedLocations);
-        this.recommendCondition = recommendCondition;
+        validate(recommendConditions, startingPlaces, recommendedLocations);
+        this.recommendConditions = recommendConditions;
         this.startingPlaces = startingPlaces;
         this.recommendedLocations = recommendedLocations;
     }
 
     public Result(
             final ObjectId id,
-            final RecommendCondition recommendCondition,
+            final List<RecommendCondition> recommendConditions,
             final List<? extends Place> startingPlaces,
             final Recommendation recommendedLocations
     ) {
-        validate(recommendCondition, startingPlaces, recommendedLocations);
+        validate(recommendConditions, startingPlaces, recommendedLocations);
         this.id = id;
-        this.recommendCondition = recommendCondition;
+        this.recommendConditions = recommendConditions;
         this.startingPlaces = startingPlaces;
         this.recommendedLocations = recommendedLocations;
     }
 
-    private void validate(final RecommendCondition recommendCondition, final List<? extends Place> startingPlaces, final Recommendation recommendedLocations) {
-        if (recommendCondition == null) {
-            throw new IllegalArgumentException("추천 조건은 null일 수 없습니다.");
+    private void validate(final List<RecommendCondition> recommendConditions, final List<? extends Place> startingPlaces, final Recommendation recommendedLocations) {
+        if (recommendConditions == null || recommendConditions.isEmpty()) {
+            throw new IllegalArgumentException("추천 조건은 비어있거나 null일 수 없습니다.");
         }
         if (startingPlaces == null || startingPlaces.isEmpty()) {
             throw new IllegalArgumentException("출발지들은 비어있거나 null일 수 없습니다.");

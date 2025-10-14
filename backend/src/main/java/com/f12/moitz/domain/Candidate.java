@@ -1,6 +1,5 @@
 package com.f12.moitz.domain;
 
-import java.util.List;
 import lombok.Getter;
 
 @Getter
@@ -8,14 +7,14 @@ public class Candidate {
 
     private final Place destination;
     private final Routes routes;
-    private final List<RecommendedPlace> recommendedPlaces;
+    private final CategorizedRecommendedPlaces recommendedPlaces;
     private final String description;
     private final String reason;
 
     public Candidate(
             final Place destination,
             final Routes routes,
-            final List<RecommendedPlace> recommendedPlaces,
+            final CategorizedRecommendedPlaces recommendedPlaces,
             final String description,
             final String reason
     ) {
@@ -30,7 +29,7 @@ public class Candidate {
     private void validate(
             final Place suggestedLocation,
             final Routes routes,
-            final List<RecommendedPlace> recommendedPlaces,
+            final CategorizedRecommendedPlaces recommendedPlaces,
             final String description,
             final String reason
     ) {

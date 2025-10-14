@@ -19,7 +19,6 @@ public class SubwayStationEntity {
     @GeoSpatialIndexed(type = GeoSpatialIndexType.GEO_2DSPHERE)
     private final GeoJsonPoint point;
 
-
     public SubwayStation toSubwayStation() {
         return new SubwayStation(name, new Point(point.getX(), point.getY()));
     }
@@ -32,4 +31,5 @@ public class SubwayStationEntity {
                         subwayStation.getPoint().getY()
                 ));
     }
+
 }

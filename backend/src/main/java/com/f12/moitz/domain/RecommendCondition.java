@@ -3,26 +3,46 @@ package com.f12.moitz.domain;
 import com.f12.moitz.common.error.exception.BadRequestException;
 import com.f12.moitz.common.error.exception.GeneralErrorCode;
 import java.util.Arrays;
+import java.util.List;
 import lombok.Getter;
 
 @Getter
 public enum RecommendCondition {
 
-    CHAT("CHAT", "떠들고 놀기 좋은", "모임"),
-    MEETING("MEETING", "회의하기 좋은", "회의"),
-    FOCUS("FOCUS", "집중하기 좋은", "스터디"),
-    DATE("DATE", "데이트하기 좋은", "분위기 좋은"),
-    NOT_SELECTED("NOT_SELECTED", "선택하지 않음", "맛집"),
-    ;
+    CAFE("CAFE", "카페"),
+    RESTAURANT("RESTAURANT","식당"),
+    BAR("BAR","술집"),
+    STUDY_CAFE("STUDY_CAFE", "스터디카페"),
+    SPACE_RENTAL("SPACE_RENTAL", "공간대여"),
+    PC_ROOM("PC_ROOM", "PC방"),
+    KARAOKE("KARAOKE", "노래방"),
+    ACTIVITY("ACTIVITY", List.of("클라이밍, 볼링, 사격, 당구")),
+    ENTERTAINMENT("ENTERTAINMENT", List.of("방탈출, 만화방, 보드게임카페, 영화관")),
+    NOT_SELECTED("NOT_SELECTED", "맛집");
 
     private final String title;
-    private final String description;
-    private final String keyword;
+    private final List<String> keywords;
 
-    RecommendCondition(final String title, final String description, final String keyword) {
+    RecommendCondition(final String title, final String keyword) {
         this.title = title;
-        this.description = description;
-        this.keyword = keyword;
+        this.keywords = List.of(keyword);
+    }
+
+    RecommendCondition(final String title, final List<String> keywords) {
+        this.title = title;
+        this.keywords = keywords;
+    }
+
+    public static List<String> getRequirements(List<RecommendCondition> recommendConditions) {
+        return recommendConditions.stream()
+                .flatMap(recommendCondition -> recommendCondition.getKeywords().stream())
+                .toList();
+    }
+
+    public static List<RecommendCondition> fromTitle(List<String> requirement) {
+        return requirement.stream()
+                .map(RecommendCondition::fromTitle)
+                .toList();
     }
 
     public static RecommendCondition fromTitle(final String title) {
@@ -31,5 +51,14 @@ public enum RecommendCondition {
                 .findFirst()
                 .orElseThrow(() -> new BadRequestException(GeneralErrorCode.INPUT_INVALID_DESCRIPTION, title));
     }
+
+    public static RecommendCondition fromKeyword(final String keyword) {
+        return Arrays.stream(values())
+                .filter(recommendCondition -> recommendCondition.keywords.contains(keyword))
+                .findFirst()
+                .orElseThrow(() -> new BadRequestException(GeneralErrorCode.INPUT_INVALID_DESCRIPTION, keyword));
+    }
+
+
 
 }

@@ -12,13 +12,13 @@ import com.f12.moitz.application.utils.RecommendationMapper;
 import com.f12.moitz.common.error.exception.BadRequestException;
 import com.f12.moitz.common.error.exception.GeneralErrorCode;
 import com.f12.moitz.common.error.exception.NotFoundException;
+import com.f12.moitz.domain.CategorizedRecommendedPlaces;
 import com.f12.moitz.domain.Place;
 import com.f12.moitz.domain.RecommendCondition;
 import com.f12.moitz.domain.Recommendation;
-import com.f12.moitz.domain.RecommendedPlace;
+import com.f12.moitz.domain.Result;
 import com.f12.moitz.domain.Route;
 import com.f12.moitz.domain.Routes;
-import com.f12.moitz.domain.Result;
 import com.f12.moitz.domain.repository.RecommendResultRepository;
 import com.f12.moitz.domain.subway.SubwayStation;
 import java.util.List;
@@ -66,8 +66,8 @@ public class RecommendationService {
         log.debug("추천 서비스 시작");
 
         stopWatch.start("지역 추천");
-        final RecommendCondition recommendCondition = RecommendCondition.fromTitle(request.requirement());
-        final String requirement = recommendCondition.getKeyword();
+        final List<RecommendCondition> recommendConditions = RecommendCondition.fromTitle(request.requirement());
+        final List<String> requirements = RecommendCondition.getRequirements(recommendConditions);
         final List<SubwayStation> startingPlaces = getByNames(request.startingPlaceNames());
         final List<SubwayStation> candidatePlaces = subwayStationService.generateCandidatePlace(startingPlaces);
 
@@ -77,7 +77,7 @@ public class RecommendationService {
         final RecommendedLocationsResponse recommendedLocationsResponse = locationRecommender.recommendLocations(
                 startingPlaceNames,
                 candidatePlaceNames,
-                requirement
+                requirements
         );
         final Map<Place, ReasonAndDescription> generatedPlacesWithReason = recommendedLocationsResponse.recommendations()
                 .stream()
@@ -101,9 +101,9 @@ public class RecommendationService {
         stopWatch.stop();
 
         stopWatch.start("장소 추천");
-        final Map<Place, List<RecommendedPlace>> recommendedPlaces = placeRecommender.recommendPlaces(
+        final Map<Place, CategorizedRecommendedPlaces> recommendedPlaces = placeRecommender.recommendPlaces(
                 generatedPlaces,
-                requirement
+                requirements
         );
         stopWatch.stop();
 
@@ -118,7 +118,7 @@ public class RecommendationService {
 
         return recommendResultRepository.saveAndReturnId(
                 recommendationMapper.toResult(
-                        recommendCondition,
+                        recommendConditions,
                         startingPlaces,
                         recommendation
                 )
