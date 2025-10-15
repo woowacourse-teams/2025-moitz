@@ -37,6 +37,7 @@ jobs:
         run: |
           # 테스트 코드가 실패할 경우, 리포트를 S3에 업로드하고 작업을 종료한다
           if ! ./gradlew test; then
+            echo "🔴 테스트 실패"
             echo "=== S3에 테스트 리포트 업로드 ==="
             aws s3 cp $GRADLE_FAIL_REPORT_FOLDER $S3_FAIL_REPORT_FOLDER --recursive
             exit 1
