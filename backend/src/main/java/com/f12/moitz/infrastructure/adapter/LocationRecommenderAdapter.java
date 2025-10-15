@@ -71,17 +71,18 @@ public class LocationRecommenderAdapter implements LocationRecommender {
 
     @Recover
     public RecommendedLocationsResponse recoverRecommendedLocations(
-            final List<String> startPlaceNames,
-            final String condition
+            final List<String> startingPlaces,
+            final List<String> candidatePlaces,
+            final List<String> requirements
     ) {
         final RecommendedLocationsResponse generatedResponse = perplexityClient.generateResponse(
-                startPlaceNames,
-                condition
+                startingPlaces,
+                String.join(",", requirements)
         );
         final RecommendedLocationsResponse deduplicatedLocations = deduplicateLocation(generatedResponse);
         return excludeStartPlaces(
                 deduplicatedLocations,
-                startPlaceNames
+                startingPlaces
         );
     }
 

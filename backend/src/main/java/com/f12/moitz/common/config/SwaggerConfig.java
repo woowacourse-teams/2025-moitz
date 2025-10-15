@@ -28,7 +28,7 @@ public class SwaggerConfig {
         final Info info = new Info()
                 .title(title)
                 .description(description)
-                .version("1.0.0");
+                .version("2.0.0");
 
         return new OpenAPI()
                 .addServersItem(new Server().url("/"))

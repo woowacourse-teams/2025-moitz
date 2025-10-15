@@ -10,6 +10,7 @@ import com.f12.moitz.infrastructure.client.kakao.KakaoMapClient;
 import com.f12.moitz.infrastructure.client.kakao.dto.KakaoApiResponse;
 import com.f12.moitz.infrastructure.client.kakao.dto.KakaoApiResponses;
 import com.f12.moitz.infrastructure.client.kakao.dto.SearchPlacesLimitQuantityRequest;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -39,7 +40,7 @@ public class PlaceRecommenderAdapter implements PlaceRecommender {
                                         .kakaoApiResponses()
                                         .entrySet().stream()
                                         .collect(Collectors.toMap(
-                                                reqEntry -> RecommendCondition.fromTitle(reqEntry.getKey()),
+                                                Entry::getKey,
                                                 reqEntry -> reqEntry.getValue().stream()
                                                         .flatMap(resp -> resp.documents().stream())
                                                         .map(document -> new RecommendedPlace(
@@ -61,9 +62,9 @@ public class PlaceRecommenderAdapter implements PlaceRecommender {
                 .collect(Collectors.toMap(
                         place -> place,
                         place -> {
-                            Map<String,List<KakaoApiResponse>> responsesByCategory =
+                            Map<RecommendCondition,List<KakaoApiResponse>> responsesByCategory =
                                     requirements.stream().collect(Collectors.toMap(
-                                            requirement -> RecommendCondition.fromKeyword(requirement).getTitle(),
+                                            RecommendCondition::fromKeyword,
                                             requirement -> {
                                                 KakaoApiResponse response = kakaoMapClient.searchPlacesBy(
                                                         new SearchPlacesLimitQuantityRequest(
@@ -74,7 +75,10 @@ public class PlaceRecommenderAdapter implements PlaceRecommender {
                                                                 3
                                                         )
                                                 );
-                                                return List.of(response);
+                                                return new ArrayList<>(List.of(response));                                            },
+                                            (existing, incoming) -> {
+                                                existing.addAll(incoming);
+                                                return existing;
                                             }
                                     ));
                             return new KakaoApiResponses(responsesByCategory);

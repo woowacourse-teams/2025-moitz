@@ -62,7 +62,7 @@ public class MockingRecommendationController implements SwaggerMockingRecommenda
                                                         "http://place.map.kakao.com/666587821"
                                                 )
                                         ),
-                                        RecommendCondition.PC_ROOM, List.of(
+                                        RecommendCondition.PC_ROOM_KARAOKE, List.of(
                                                 new PlaceRecommendResponse(
                                                         1, 127.094741101863, 37.5351180385975,
                                                         "포포PC방 건대점", "PC방", 1,
@@ -109,7 +109,7 @@ public class MockingRecommendationController implements SwaggerMockingRecommenda
                                                         "http://place.map.kakao.com/23447734"
                                                 )
                                         ),
-                                        RecommendCondition.PC_ROOM,List.of(
+                                        RecommendCondition.PC_ROOM_KARAOKE,List.of(
                                                 new PlaceRecommendResponse(
                                                         3, 127.094741101863, 37.5351180385975,
                                                         "레벨업PC방 사당역점", "PC방", 2,
@@ -150,7 +150,7 @@ public class MockingRecommendationController implements SwaggerMockingRecommenda
                                                         "http://place.map.kakao.com/10809505"
                                                 )
                                         ),
-                                        RecommendCondition.PC_ROOM,List.of(
+                                        RecommendCondition.PC_ROOM_KARAOKE,List.of(
                                                 new PlaceRecommendResponse(3, 127.094741101863, 37.5351180385975,
                                                         "이스포츠PC방 왕십리점", "PC방", 2,
                                                         "http://place.map.kakao.com/12326220"
@@ -196,7 +196,7 @@ public class MockingRecommendationController implements SwaggerMockingRecommenda
                                                         "http://place.map.kakao.com/1784996243"
                                                 )
                                         ),
-                                        RecommendCondition.PC_ROOM,List.of(
+                                        RecommendCondition.PC_ROOM_KARAOKE,List.of(
                                                 new PlaceRecommendResponse(3, 127.094741101863, 37.5351180385975,
                                                         "옵티멈존 PC카페 종각역점", "PC방", 1,
                                                         "http://place.map.kakao.com/1342335656"
@@ -250,7 +250,7 @@ public class MockingRecommendationController implements SwaggerMockingRecommenda
                                                         "http://place.map.kakao.com/23634722"
                                                 )
                                         ),
-                                        RecommendCondition.PC_ROOM,List.of(
+                                        RecommendCondition.PC_ROOM_KARAOKE,List.of(
                                                 new PlaceRecommendResponse(
                                                         3, 127.094741101863, 37.5351180385975,
                                                         "에스엔에스 피씨SNS PC", "PC방", 1,

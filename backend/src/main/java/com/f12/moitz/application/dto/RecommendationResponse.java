@@ -25,7 +25,55 @@ public record RecommendationResponse(
         String description,
         @Schema(description = "지역 추천 이유", example = "유명한 곱창집이 있고, 전체적으로 환승을 하지 않는 최적의 지역입니다!", requiredMode = Schema.RequiredMode.REQUIRED)
         String reason,
-        @Schema(description = "추천 장소 목록", requiredMode = Schema.RequiredMode.REQUIRED)
+        @Schema(
+                description = "카테고리별 추천 장소 목록",
+                example = """
+                {
+                  "PC_ROOM_KARAOKE": [
+                    {
+                      "index": 1,
+                      "x": 127.007079969366,
+                      "y": 37.5657600421876,
+                      "name": "GGX",
+                      "category": "게임방,PC방",
+                      "walkingTime": 3,
+                      "url": "http://place.map.kakao.com/1381860160"
+                    },
+                    {
+                      "index": 2,
+                      "x": 127.006320492392,
+                      "y": 37.5660078592087,
+                      "name": "캐슬노래연습장",
+                      "category": "노래방",
+                      "walkingTime": 4,
+                      "url": "http://place.map.kakao.com/324019013"
+                    }
+                  ],
+                  "RESTAURANT": [
+                    {
+                      "index": 1,
+                      "x": 127.00669603395768,
+                      "y": 37.56324808702588,
+                      "name": "평양면옥 본점",
+                      "category": "냉면",
+                      "walkingTime": 5,
+                      "url": "http://place.map.kakao.com/13093208"
+                    }
+                  ],
+                  "CAFE": [
+                    {
+                      "index": 1,
+                      "x": 127.007230456427,
+                      "y": 37.5651987124977,
+                      "name": "스타벅스 동대문공원점",
+                      "category": "카페",
+                      "walkingTime": 2,
+                      "url": "http://place.map.kakao.com/321907882"
+                    }
+                  ]
+                }
+                """
+        )
         Map<RecommendCondition,List<PlaceRecommendResponse>> places,
         @Schema(description = "각 출발지로부터 이동 경로", requiredMode = Schema.RequiredMode.REQUIRED)
         List<RouteResponse> routes

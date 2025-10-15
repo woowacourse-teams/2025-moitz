@@ -1,6 +1,7 @@
 package com.f12.moitz.infrastructure;
 
 import com.f12.moitz.domain.Place;
+import com.f12.moitz.domain.RecommendCondition;
 import com.f12.moitz.infrastructure.client.kakao.dto.KakaoApiResponse;
 import com.f12.moitz.infrastructure.client.kakao.dto.KakaoApiResponses;
 import java.util.List;
@@ -225,7 +226,7 @@ public class PromptGenerator {
                 place.getPoint().getX(), place.getPoint().getY()));
         sb.append("Search Results:\n");
 
-        final Map<String, List<KakaoApiResponse>> kakaoApiResponses = kakaoResponses.kakaoApiResponses();
+        final Map<RecommendCondition, List<KakaoApiResponse>> kakaoApiResponses = kakaoResponses.kakaoApiResponses();
 
         kakaoApiResponses.forEach((category, responses) -> {
             sb.append(String.format("Category: %s\n", category));
