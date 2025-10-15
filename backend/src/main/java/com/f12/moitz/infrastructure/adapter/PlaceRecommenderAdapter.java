@@ -40,7 +40,7 @@ public class PlaceRecommenderAdapter implements PlaceRecommender {
                                         .kakaoApiResponses()
                                         .entrySet().stream()
                                         .collect(Collectors.toMap(
-                                                reqEntry -> RecommendCondition.fromTitle(reqEntry.getKey()),
+                                                Entry::getKey,
                                                 reqEntry -> reqEntry.getValue().stream()
                                                         .flatMap(resp -> resp.documents().stream())
                                                         .map(document -> new RecommendedPlace(
@@ -62,9 +62,9 @@ public class PlaceRecommenderAdapter implements PlaceRecommender {
                 .collect(Collectors.toMap(
                         place -> place,
                         place -> {
-                            Map<String,List<KakaoApiResponse>> responsesByCategory =
+                            Map<RecommendCondition,List<KakaoApiResponse>> responsesByCategory =
                                     requirements.stream().collect(Collectors.toMap(
-                                            requirement -> RecommendCondition.fromKeyword(requirement).getTitle(),
+                                            RecommendCondition::fromKeyword,
                                             requirement -> {
                                                 KakaoApiResponse response = kakaoMapClient.searchPlacesBy(
                                                         new SearchPlacesLimitQuantityRequest(
