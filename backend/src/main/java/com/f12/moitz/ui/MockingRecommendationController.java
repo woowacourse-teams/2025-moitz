@@ -1,3 +1,4 @@
+/*
 package com.f12.moitz.ui;
 
 import com.f12.moitz.application.dto.MockRecommendationResponse;
@@ -282,3 +283,4 @@ public class MockingRecommendationController implements SwaggerMockingRecommenda
     }
 
 }
+*/
