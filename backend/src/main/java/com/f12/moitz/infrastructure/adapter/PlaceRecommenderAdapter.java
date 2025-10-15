@@ -10,6 +10,7 @@ import com.f12.moitz.infrastructure.client.kakao.KakaoMapClient;
 import com.f12.moitz.infrastructure.client.kakao.dto.KakaoApiResponse;
 import com.f12.moitz.infrastructure.client.kakao.dto.KakaoApiResponses;
 import com.f12.moitz.infrastructure.client.kakao.dto.SearchPlacesLimitQuantityRequest;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -74,7 +75,10 @@ public class PlaceRecommenderAdapter implements PlaceRecommender {
                                                                 3
                                                         )
                                                 );
-                                                return List.of(response);
+                                                return new ArrayList<>(List.of(response));                                            },
+                                            (existing, incoming) -> {
+                                                existing.addAll(incoming);
+                                                return existing;
                                             }
                                     ));
                             return new KakaoApiResponses(responsesByCategory);

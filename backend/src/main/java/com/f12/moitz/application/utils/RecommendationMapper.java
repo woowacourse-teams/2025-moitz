@@ -45,9 +45,7 @@ public class RecommendationMapper {
     }
 
     private List<String> getCondition(final Result result) {
-        final List<RecommendCondition> recommendConditions =
-                result.getRecommendConditions() == null ? List.of(RecommendCondition.NOT_SELECTED)
-                : result.getRecommendConditions();
+        final List<RecommendCondition> recommendConditions = result.getRecommendConditions();
 
         return recommendConditions.stream()
                 .map(RecommendCondition::getTitle)
