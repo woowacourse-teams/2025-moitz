@@ -39,8 +39,8 @@ public enum RecommendCondition {
                 .toList();
     }
 
-    public static List<RecommendCondition> fromTitle(List<String> requirement) {
-        return requirement.stream()
+    public static List<RecommendCondition> fromTitle(List<String> requirements) {
+        return requirements.stream()
                 .map(RecommendCondition::fromTitle)
                 .toList();
     }
