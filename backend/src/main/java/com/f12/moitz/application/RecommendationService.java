@@ -66,8 +66,9 @@ public class RecommendationService {
         log.debug("추천 서비스 시작");
 
         stopWatch.start("지역 추천");
-        final List<RecommendCondition> recommendConditions = RecommendCondition.fromTitle(request.requirement());
+        final List<RecommendCondition> recommendConditions = RecommendCondition.fromTitle(request.requirements());
         final List<String> requirements = RecommendCondition.getRequirements(recommendConditions);
+        log.info(requirements.toString());
         final List<SubwayStation> startingPlaces = getByNames(request.startingPlaceNames());
         final List<SubwayStation> candidatePlaces = subwayStationService.generateCandidatePlace(startingPlaces);
 

@@ -9,9 +9,8 @@ import java.util.List;
 public record RecommendationRequest(
         @Schema(description = "출발지 이름 목록", example = "[\"강변역\", \"동대문역\", \"서울대입구역\"]", requiredMode = Schema.RequiredMode.REQUIRED)
         List<String> startingPlaceNames,
-        // TODO: 추후 변수명 및 예시 복수로 수정 필요
         @Schema(description = "카테고리에 따른 조건", example = "CHAT")
-        List<String> requirement
+        List<String> requirements
 ) {
 
         public RecommendationRequest {
