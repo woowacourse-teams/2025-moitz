@@ -8,6 +8,8 @@ import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
@@ -101,6 +103,26 @@ public class SubwayEdgesIntTest {
             softly.assertThat(paths).hasSize(1);
             softly.assertThat(paths.getFirst().line()).isEqualTo(SubwayLine.fromTitle("4호선"));
         });
+    }
+
+    @DisplayName("목데이터 생성용 최단 경로의 경유역 찾기")
+    @ParameterizedTest
+    @CsvSource({"강변역,건대입구역", "동대문역,건대입구역", "서울대입구역,건대입구역",
+            "강변역,사당역", "동대문역,사당역", "서울대입구역,사당역",
+            "강변역,왕십리역", "동대문역,왕십리역", "서울대입구역,왕십리역",
+            "강변역,종각역", "동대문역,종각역", "서울대입구역,종각역",
+            "강변역,홍대입구역", "동대문역,홍대입구역", "서울대입구역,홍대입구역"})
+    void createMockData(final String start, final String end) {
+        final StationSequence stationSequence = subwayEdges.findShortestTimePath(
+                subwayStationService.getByName(start),
+                subwayStationService.getByName(end)
+        );
+
+        final List<SubwayStation> stations = stationSequence.getStations();
+
+        for (SubwayStation station : stations) {
+            log.info("{ \"name\": {}, \"x\": {}, \"y\": {} },", station.getName(), station.getPoint().getX(), station.getPoint().getY());
+        }
     }
 
 }
