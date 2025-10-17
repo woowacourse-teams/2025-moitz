@@ -41,6 +41,8 @@ import org.springframework.util.StopWatch;
 @Service
 public class RecommendationService {
 
+    private static final int STARTING_VOTES = 0;
+
     private final SubwayStationService subwayStationService;
     private final PlaceRecommender placeRecommender;
     private final LocationRecommender locationRecommender;
@@ -120,7 +122,7 @@ public class RecommendationService {
                 recommendedPlaces,
                 placeRoutes,
                 placeCourses,
-                0
+                STARTING_VOTES
         );
         stopWatch.stop();
         log.debug("추천 서비스 완료. {}", stopWatch.shortSummary());
