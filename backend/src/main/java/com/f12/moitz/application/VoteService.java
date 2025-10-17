@@ -4,16 +4,10 @@ import com.f12.moitz.application.dto.VotesResponse;
 import com.f12.moitz.common.error.exception.GeneralErrorCode;
 import com.f12.moitz.common.error.exception.NotFoundException;
 import com.f12.moitz.domain.RecommendationVote;
-import com.f12.moitz.domain.Result;
 import com.f12.moitz.domain.repository.RecommendResultRepository;
-import com.mongodb.client.result.UpdateResult;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
-import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.query.Criteria;
-import org.springframework.data.mongodb.core.query.Query;
-import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,11 +15,9 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class VoteService {
 
-    private final MongoTemplate mongoTemplate;
     private final RecommendResultRepository recommendResultRepository;
 
-    public VoteService(final MongoTemplate mongoTemplate, final RecommendResultRepository recommendResultRepository) {
-        this.mongoTemplate = mongoTemplate;
+    public VoteService(final RecommendResultRepository recommendResultRepository) {
         this.recommendResultRepository = recommendResultRepository;
     }
 
@@ -35,14 +27,7 @@ public class VoteService {
             throw new NotFoundException(GeneralErrorCode.INPUT_INVALID_RESULT);
         }
 
-        Query query = new Query(Criteria.where("_id").is(id)
-                .and("recommendedLocations.candidates.destination.name").is(location));
-        Update update = new Update().inc("recommendedLocations.candidates.$.votes", 1);
-        UpdateResult updateResult = mongoTemplate.updateFirst(query, update, Result.class);
-
-        if (updateResult.getModifiedCount() < 1) {
-            throw new RuntimeException("UPDATE 작업이 실패했습니다.");
-        }
+        recommendResultRepository.findAndIncrementVotesByIdAndLocation(parseObjectId(id), location);
 
         final RecommendationVote result = recommendResultRepository.findVotesByIdAndCandidate(parseObjectId(id), location)
                 .orElseThrow(() -> new NotFoundException(GeneralErrorCode.INPUT_INVALID_RESULT));
