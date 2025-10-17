@@ -44,12 +44,11 @@ public class VoteService {
             throw new RuntimeException("UPDATE 작업이 실패했습니다.");
         }
 
-        RecommendationVote result = recommendResultRepository.findVotesByIdAndCandidate(parseObjectId(id), location)
+        final RecommendationVote result = recommendResultRepository.findVotesByIdAndCandidate(parseObjectId(id), location)
                 .orElseThrow(() -> new NotFoundException(GeneralErrorCode.INPUT_INVALID_RESULT));
         return new VotesResponse(result.getLocation(), result.getVotes());
     }
 
-    @Transactional(readOnly = true)
     public List<VotesResponse> getAllVotes(final String id) {
         final List<RecommendationVote> result = recommendResultRepository.findAllVotesById(parseObjectId(id));
         return result.stream()

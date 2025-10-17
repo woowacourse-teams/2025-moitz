@@ -49,9 +49,9 @@ public class OpenApiClient {
             final String searchType
     ) {
         try {
-            SubwayRouteResponse response = openRestClient.get()
+            final SubwayRouteResponse response = openRestClient.get()
                     .uri(uriBuilder -> {
-                                var uri = uriBuilder
+                                final var uri = uriBuilder
                                         .path(OPEN_BASE_SEARCH)
                                         .queryParam("dataType", "JSON")
                                         .queryParam("dptreStnNm", getStationName(startPlaceName))
@@ -61,7 +61,7 @@ public class OpenApiClient {
                                         .build();
 
                                 // API 키가 이미 URL 인코딩되어 있으므로 수동으로 추가
-                                String finalUri = uri.toString() + "&serviceKey=" + openApiKey;
+                                final String finalUri = uri.toString() + "&serviceKey=" + openApiKey;
 
                                 return URI.create(finalUri);
                             }
@@ -103,7 +103,7 @@ public class OpenApiClient {
             throw new ExternalApiException(ExternalApiErrorCode.INVALID_OPEN_API_RESPONSE);
         }
 
-        String resultCode = response.header().resultCode();
+        final String resultCode = response.header().resultCode();
 
         if (resultCode.equals("99")) {
             throw new RetryableApiException(ExternalApiErrorCode.OPEN_API_SERVER_UNAVAILABLE);

@@ -106,8 +106,8 @@ public class KakaoMapClient {
 
     private void handleError(ClientHttpResponse res) {
         try {
-            byte[] body = res.getBody().readAllBytes();
-            KakaoMapErrorResponse error = objectMapper.readValue(body,
+            final byte[] body = res.getBody().readAllBytes();
+            final KakaoMapErrorResponse error = objectMapper.readValue(body,
                     KakaoMapErrorResponse.class);
             log.error(error.msg());
             if (ERROR_CODE_CAN_RETRY.contains(error.code())) {

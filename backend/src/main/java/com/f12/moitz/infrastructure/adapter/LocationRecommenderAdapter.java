@@ -65,7 +65,7 @@ public class LocationRecommenderAdapter implements LocationRecommender {
 
     private RecommendedLocationsResponse fallback(final List<String> startingPlaces, final List<String> requirements) {
         log.debug("FallBack: Perplexity 호출을 시도합니다.");
-        String requirement = String.join("", requirements);
+        final String requirement = String.join("", requirements);
         return perplexityClient.generateResponse(startingPlaces, requirement);
     }
 

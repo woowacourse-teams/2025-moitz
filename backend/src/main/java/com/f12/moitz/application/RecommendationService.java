@@ -67,7 +67,7 @@ public class RecommendationService {
     }
 
     public RecommendationCreateResponse recommendLocation(final RecommendationRequest request) {
-        StopWatch stopWatch = new StopWatch("추천 서비스 전체");
+        final StopWatch stopWatch = new StopWatch("추천 서비스 전체");
         log.debug("추천 서비스 시작");
 
         stopWatch.start("지역 추천");
@@ -127,7 +127,7 @@ public class RecommendationService {
         stopWatch.stop();
         log.debug("추천 서비스 완료. {}", stopWatch.shortSummary());
 
-        String id = recommendResultRepository.saveAndReturnId(
+        final String id = recommendResultRepository.saveAndReturnId(
                 recommendationMapper.toResult(
                         recommendConditions,
                         startingPlaces,

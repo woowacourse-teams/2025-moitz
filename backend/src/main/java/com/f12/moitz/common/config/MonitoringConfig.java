@@ -53,7 +53,7 @@ public class MonitoringConfig {
     @Bean
     public MeterFilter meterFilter() {
         return MeterFilter.denyUnless(id -> {
-            String uri = id.getTag("uri");
+            final String uri = id.getTag("uri");
             return id.getName().startsWith("http.server.requests") &&
                    uri != null && !uri.contains("swagger") && !uri.contains("api-docs")
                    || id.getName().startsWith("resilience4j.circuitbreaker.")

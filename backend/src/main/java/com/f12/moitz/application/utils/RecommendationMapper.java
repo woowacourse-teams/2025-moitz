@@ -110,7 +110,7 @@ public class RecommendationMapper {
         final Place targetPlace = candidate.getDestination();
         final int totalTime = candidate.calculateAverageTravelTime();
 
-        Map<RecommendCondition, List<PlaceRecommendResponse>> recommendedPlaces = toPlaceRecommendResponses(
+        final Map<RecommendCondition, List<PlaceRecommendResponse>> recommendedPlaces = toPlaceRecommendResponses(
                 candidate.getRecommendedPlaces()
         );
         final List<RouteResponse> routes = toRouteResponses(candidate.getRoutes(), candidate.getCourses());
@@ -163,11 +163,11 @@ public class RecommendationMapper {
     }
 
     private RouteResponse toRouteResponse(final Route route, final Course course, final long id) {
-        List<PathResponse> pathResponses = IntStream.range(0, route.getPaths().size())
+        final List<PathResponse> pathResponses = IntStream.range(0, route.getPaths().size())
                 .mapToObj(pathIndex -> toPathResponse(route.getPaths().get(pathIndex), pathIndex + 1))
                 .toList();
 
-        List<SubwayStationResponse> subwayStationResponses = IntStream.range(0, course.size())
+        final List<SubwayStationResponse> subwayStationResponses = IntStream.range(0, course.size())
                 .mapToObj(placeIndex -> toSubwayStationResponse(course.getPlaces().get(placeIndex), placeIndex + 1))
                 .toList();
 
