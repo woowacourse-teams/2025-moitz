@@ -4,7 +4,7 @@ import com.f12.moitz.application.RecommendationService;
 import com.f12.moitz.application.VoteService;
 import com.f12.moitz.application.dto.RecommendationCreateResponse;
 import com.f12.moitz.application.dto.RecommendationRequest;
-import com.f12.moitz.application.dto.RecommendationsResponse;
+import com.f12.moitz.application.dto.RecommendationResultResponse;
 import com.f12.moitz.application.dto.VoteRequest;
 import com.f12.moitz.application.dto.VotesResponse;
 import java.util.List;
@@ -34,7 +34,7 @@ public class RecommendationController implements SwaggerRecommendationController
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<RecommendationsResponse> getRecommendationResult(@PathVariable("id") final String id) {
+    public ResponseEntity<RecommendationResultResponse> getRecommendationResult(@PathVariable("id") final String id) {
         return ResponseEntity.ok().body(recommendationService.getById(id));
     }
 

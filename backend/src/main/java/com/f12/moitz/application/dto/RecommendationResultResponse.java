@@ -4,7 +4,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
 
 @Schema(description = "추천 결과 응답")
-public record RecommendationsResponse(
+public record RecommendationResultResponse(
         @Schema(description = "추천 조건", requiredMode = Schema.RequiredMode.REQUIRED)
         List<String> requirements,
         @Schema(description = "출발지 목록", requiredMode = Schema.RequiredMode.REQUIRED)

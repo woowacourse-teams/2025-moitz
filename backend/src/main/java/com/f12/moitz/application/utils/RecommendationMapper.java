@@ -3,7 +3,7 @@ package com.f12.moitz.application.utils;
 import com.f12.moitz.application.dto.LocationResponse;
 import com.f12.moitz.application.dto.PathResponse;
 import com.f12.moitz.application.dto.PlaceRecommendResponse;
-import com.f12.moitz.application.dto.RecommendationsResponse;
+import com.f12.moitz.application.dto.RecommendationResultResponse;
 import com.f12.moitz.application.dto.RouteResponse;
 import com.f12.moitz.application.dto.StartingPlaceResponse;
 import com.f12.moitz.application.dto.SubwayStationResponse;
@@ -30,10 +30,10 @@ import org.springframework.stereotype.Component;
 @Component
 public class RecommendationMapper {
 
-    public RecommendationsResponse toResponse(final Result result) {
+    public RecommendationResultResponse toResponse(final Result result) {
         final int minTime = result.getBestRecommendationTime();
         final List<String> condition = getCondition(result);
-        return new RecommendationsResponse(
+        return new RecommendationResultResponse(
                 condition,
                 IntStream.range(0, result.getStartingPlacesCount())
                         .mapToObj(index -> toStartingPlaceResponse(index, result.getStartingPlaces().get(index)))
