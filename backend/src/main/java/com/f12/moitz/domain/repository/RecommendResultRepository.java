@@ -1,6 +1,6 @@
 package com.f12.moitz.domain.repository;
 
-import com.f12.moitz.domain.LocationVote;
+import com.f12.moitz.domain.CandidateVote;
 import com.f12.moitz.domain.Result;
 import java.util.List;
 import java.util.Optional;
@@ -26,7 +26,7 @@ public interface RecommendResultRepository extends MongoRepository<Result, Objec
                     "'recommendedLocations.candidates.votes': 1, " +
                     "'_id': 0 } }"
     })
-    Optional<LocationVote> findVotesByIdAndCandidate(ObjectId id, String location);
+    Optional<CandidateVote> findVotesByIdAndCandidate(ObjectId id, String location);
 
     @Aggregation(pipeline = {
             "{ $match: { _id: ?0 } }",
@@ -36,7 +36,7 @@ public interface RecommendResultRepository extends MongoRepository<Result, Objec
                     "'recommendedLocations.candidates.votes': 1, " +
                     "'_id': 0 } }"
     })
-    List<LocationVote> findAllVotesById(ObjectId id);
+    List<CandidateVote> findAllVotesById(ObjectId id);
 
     @Query("{ '_id': ?0, 'recommendedLocations.candidates.destination.name': ?1 }")
     @Update(update = "{ '$inc': { 'recommendedLocations.candidates.$.votes': 1 } }")

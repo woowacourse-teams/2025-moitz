@@ -6,7 +6,8 @@ public enum GeneralErrorCode implements ErrorCode {
     INPUT_INVALID_START_LOCATION("C0001", "유효하지 않은 출발지입니다."),
     INPUT_INVALID_ARRIVAL_TIME("C0002", "유효하지 않은 도착시간입니다."),
     INPUT_INVALID_DESCRIPTION("C0003", "유효하지 않은 성격입니다."),
-    INPUT_INVALID_RESULT("C0004", "존재하지 않거나 유효 기간이 만료된 추천 결과입니다.");
+    INPUT_INVALID_RESULT("C0004", "존재하지 않거나 유효 기간이 만료된 추천 결과입니다."),
+    INPUT_INVALID_CANDIDATE_NAME("C0005", "유효하지 않은 추천 지역입니다.");
 
     private final String code;
     private final String message;

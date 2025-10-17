@@ -22,7 +22,7 @@ public class Candidate {
             final String reason,
             final int votes
     ) {
-        validate(destination, routes, courses, recommendedPlaces, description, reason);
+        validate(destination, routes, courses, recommendedPlaces, description, reason, votes);
         this.destination = destination;
         this.routes = routes;
         this.courses = courses;
@@ -38,7 +38,8 @@ public class Candidate {
             final Courses courses,
             final CategorizedRecommendedPlaces recommendedPlaces,
             final String description,
-            final String reason
+            final String reason,
+            final int votes
     ) {
         if (suggestedLocation == null) {
             throw new IllegalArgumentException("추천 지역은 필수입니다.");
@@ -57,6 +58,9 @@ public class Candidate {
         }
         if (reason == null || reason.isEmpty()) {
             throw new IllegalArgumentException("추천 이유는 비어 있을 수 없습니다.");
+        }
+        if (votes < 0) {
+            throw new IllegalArgumentException("투표 개수는 음수일 수 없습니다.");
         }
     }
 

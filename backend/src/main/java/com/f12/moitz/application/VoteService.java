@@ -3,7 +3,7 @@ package com.f12.moitz.application;
 import com.f12.moitz.application.dto.VotesResponse;
 import com.f12.moitz.common.error.exception.GeneralErrorCode;
 import com.f12.moitz.common.error.exception.NotFoundException;
-import com.f12.moitz.domain.LocationVote;
+import com.f12.moitz.domain.CandidateVote;
 import com.f12.moitz.domain.repository.RecommendResultRepository;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
@@ -22,26 +22,26 @@ public class VoteService {
     }
 
     @Transactional
-    public VotesResponse addVote(final String id, final String locationName) {
+    public VotesResponse addVote(final String id, final String candidateName) {
         final ObjectId objectId = parseObjectId(id);
 
         if (!recommendResultRepository.existsById(objectId)) {
             throw new NotFoundException(GeneralErrorCode.INPUT_INVALID_RESULT);
         }
 
-        recommendResultRepository.incrementVotesByIdAndCandidate(objectId, locationName);
+        recommendResultRepository.incrementVotesByIdAndCandidate(objectId, candidateName);
 
-        final LocationVote result = recommendResultRepository.findVotesByIdAndCandidate(objectId, locationName)
-                .orElseThrow(() -> new NotFoundException(GeneralErrorCode.INPUT_INVALID_RESULT));
-        return new VotesResponse(result.getLocation(), result.getVotes());
+        final CandidateVote result = recommendResultRepository.findVotesByIdAndCandidate(objectId, candidateName)
+                .orElseThrow(() -> new NotFoundException(GeneralErrorCode.INPUT_INVALID_CANDIDATE_NAME));
+        return new VotesResponse(result.getCandidateName(), result.getVotes());
     }
 
     public List<VotesResponse> getAllVotes(final String id) {
-        final List<LocationVote> result = recommendResultRepository.findAllVotesById(parseObjectId(id));
+        final List<CandidateVote> result = recommendResultRepository.findAllVotesById(parseObjectId(id));
         return result.stream()
-                .map(locationVote -> new VotesResponse(
-                        locationVote.getLocation(),
-                        locationVote.getVotes()
+                .map(candidateVote -> new VotesResponse(
+                        candidateVote.getCandidateName(),
+                        candidateVote.getVotes()
                 ))
                 .toList();
     }
