@@ -1,5 +1,6 @@
 package com.f12.moitz.domain.subway;
 
+import com.f12.moitz.domain.Point;
 import com.f12.moitz.domain.TravelMethod;
 import java.util.ArrayList;
 import java.util.List;
@@ -74,9 +75,10 @@ public class StationSequence {
         return paths;
     }
 
-    public List<SubwayStation> getStations() {
+    public List<Point> getPoints() {
         return segments.stream()
                 .map(StationSegment::getStation)
+                .map(SubwayStation::getPoint)
                 .distinct()
                 .toList();
     }

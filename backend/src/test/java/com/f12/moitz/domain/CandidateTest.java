@@ -31,8 +31,8 @@ class CandidateTest {
         final Route route = new Route(paths);
         final Routes routes = new Routes(List.of(route));
 
-        final List<Place> places = List.of(startPlace, intermediatePlace, endPlace);
-        final Course course = new Course(places);
+        final List<Point> points = List.of(startPlace.getPoint(), intermediatePlace.getPoint(), endPlace.getPoint());
+        final Course course = new Course(points);
         final Courses courses = new Courses(List.of(course));
 
         final RecommendedPlace recommendedPlace = new RecommendedPlace("스타벅스", DEFAULT_POINT, "카페", 5, "url","imageUrl");
@@ -59,8 +59,8 @@ class CandidateTest {
         final Route route = new Route(paths);
         final Routes routes = new Routes(List.of(route));
 
-        final List<Place> places = List.of(startPlace, intermediatePlace, endPlace);
-        final Course course = new Course(places);
+        final List<Point> points = List.of(startPlace.getPoint(), intermediatePlace.getPoint(), endPlace.getPoint());
+        final Course course = new Course(points);
         final Courses courses = new Courses(List.of(course));
 
         final RecommendedPlace recommendedPlace = new RecommendedPlace("스타벅스", DEFAULT_POINT, "카페", 5, "url","imageUrl");
@@ -108,8 +108,8 @@ class CandidateTest {
         final Route route = new Route(paths);
         final Routes routes = new Routes(List.of(route));
 
-        final List<Place> places = List.of(startPlace, intermediatePlace, endPlace);
-        final Course course = new Course(places);
+        final List<Point> points = List.of(startPlace.getPoint(), intermediatePlace.getPoint(), endPlace.getPoint());
+        final Course course = new Course(points);
         final Courses courses = new Courses(List.of(course));
 
         final RecommendedPlace recommendedPlace = new RecommendedPlace("스타벅스", DEFAULT_POINT, "카페", 5, "url","imageUrl");

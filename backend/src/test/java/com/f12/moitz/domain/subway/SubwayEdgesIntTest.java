@@ -2,6 +2,7 @@ package com.f12.moitz.domain.subway;
 
 import com.f12.moitz.application.SubwayEdgeService;
 import com.f12.moitz.application.SubwayStationService;
+import com.f12.moitz.domain.Point;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.assertj.core.api.SoftAssertions;
@@ -118,10 +119,10 @@ public class SubwayEdgesIntTest {
                 subwayStationService.getByName(end)
         );
 
-        final List<SubwayStation> stations = stationSequence.getStations();
+        final List<Point> points = stationSequence.getPoints();
 
-        for (SubwayStation station : stations) {
-            log.info("{ \"name\": {}, \"x\": {}, \"y\": {} },", station.getName(), station.getPoint().getX(), station.getPoint().getY());
+        for (Point point : points) {
+            log.info("{ \"x\": {}, \"y\": {} },", point.getX(), point.getY());
         }
     }
 

@@ -13,8 +13,8 @@ public record RouteResponse(
         int totalTravelTime,
         @Schema(description = "세부 경로", requiredMode = Schema.RequiredMode.REQUIRED)
         List<PathResponse> paths,
-        @Schema(description = "전체 경유 지하철역", requiredMode = Schema.RequiredMode.REQUIRED)
-        List<SubwayStationResponse> stations
+        @Schema(description = "이동 코스", requiredMode = Schema.RequiredMode.REQUIRED)
+        List<PointResponse> course
 ) {
 
 }
