@@ -136,10 +136,10 @@ class RecommendationServiceTest {
         given(routeFinder.findRoutes(anyList())).willReturn(mockRoutes);
 
         List<Course> mockCourses = List.of(
-                new Course(List.of(gangnam, seolleung)),
-                new Course(List.of(yeoksam, seolleung)),
-                new Course(List.of(gangnam, samsung)),
-                new Course(List.of(yeoksam, samsung))
+                new Course(List.of(gangnam.getPoint(), seolleung.getPoint())),
+                new Course(List.of(yeoksam.getPoint(), seolleung.getPoint())),
+                new Course(List.of(gangnam.getPoint(), samsung.getPoint())),
+                new Course(List.of(yeoksam.getPoint(), samsung.getPoint()))
         );
         given(routeFinder.findCourses(anyList())).willReturn(mockCourses);
 

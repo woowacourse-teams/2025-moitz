@@ -5,6 +5,7 @@ import com.f12.moitz.application.dto.LegacyRecommendationResponse;
 import com.f12.moitz.application.dto.LegacyRouteResponse;
 import com.f12.moitz.application.dto.LocationResponse;
 import com.f12.moitz.application.dto.MockLegacyRecommendationResponse;
+import com.f12.moitz.application.dto.PointResponse;
 import com.f12.moitz.application.dto.MockRecommendationResponse;
 import com.f12.moitz.application.dto.PathResponse;
 import com.f12.moitz.application.dto.PlaceRecommendResponse;
@@ -12,7 +13,6 @@ import com.f12.moitz.application.dto.RecommendationCreateResponse;
 import com.f12.moitz.application.dto.RecommendationRequest;
 import com.f12.moitz.application.dto.RouteResponse;
 import com.f12.moitz.application.dto.StartingPlaceResponse;
-import com.f12.moitz.application.dto.SubwayStationResponse;
 import com.f12.moitz.domain.RecommendCondition;
 import java.util.List;
 import java.util.Map;
@@ -83,9 +83,9 @@ public class MockingRecommendationController implements SwaggerMockingRecommenda
                                                 new PathResponse(1, "강변", 127.094741101863, 37.5351180385975,
                                                         "건대입구", 127.06920291650829, 37.54040751726388, "2호선", 4)
                                         ), List.of(
-                                                new SubwayStationResponse(1, "강변역", 127.094741101863, 37.5351180385975),
-                                                new SubwayStationResponse(2, "구의역", 127.086180837795, 37.5371752725594),
-                                                new SubwayStationResponse(3, "건대입구역", 127.06920291650829, 37.54040751726388)
+                                                new PointResponse(1, 127.094741101863, 37.5351180385975),
+                                                new PointResponse(2, 127.086180837795, 37.5371752725594),
+                                                new PointResponse(3, 127.06920291650829, 37.54040751726388)
                                         )),
                                         new RouteResponse(2, 1, 18, List.of(
                                                 new PathResponse(1, "동대문", 127.01063381083677, 37.571669405802616,
@@ -95,37 +95,37 @@ public class MockingRecommendationController implements SwaggerMockingRecommenda
                                                 new PathResponse(3, "동대문역사문화공원", 127.007821, 37.565147, "건대입구",
                                                         127.06920291650829, 37.54040751726388, "2호선", 13)
                                         ), List.of(
-                                                new SubwayStationResponse(1, "동대문역", 127.01063381083677, 37.571669405802616),
-                                                new SubwayStationResponse(2, "동대문역사문화공원역", 127.00900417014896, 37.56566440553802),
-                                                new SubwayStationResponse(3, "신당역", 127.019477533278, 37.5656730531732),
-                                                new SubwayStationResponse(4, "상왕십리역", 127.02927241035283, 37.56443666620397),
-                                                new SubwayStationResponse(5, "왕십리역", 127.03710337610202, 37.561268363317176),
-                                                new SubwayStationResponse(6, "한양대역", 127.043639802768, 37.5557159860408),
-                                                new SubwayStationResponse(7, "뚝섬역", 127.04738727881, 37.547241554679),
-                                                new SubwayStationResponse(8, "성수역", 127.056066999327, 37.5445888153751),
-                                                new SubwayStationResponse(9, "건대입구역", 127.06920291650829, 37.54040751726388)
+                                                new PointResponse(1, 127.01063381083677, 37.571669405802616),
+                                                new PointResponse(2, 127.00900417014896, 37.56566440553802),
+                                                new PointResponse(3, 127.019477533278, 37.5656730531732),
+                                                new PointResponse(4, 127.02927241035283, 37.56443666620397),
+                                                new PointResponse(5, 127.03710337610202, 37.561268363317176),
+                                                new PointResponse(6, 127.043639802768, 37.5557159860408),
+                                                new PointResponse(7, 127.04738727881, 37.547241554679),
+                                                new PointResponse(8, 127.056066999327, 37.5445888153751),
+                                                new PointResponse(9, 127.06920291650829, 37.54040751726388)
                                         )),
                                         new RouteResponse(3, 0, 33, List.of(
                                                 new PathResponse(1, "서울대입구", 126.952713197762, 37.4812845080678, "건대입구",
                                                         127.06920291650829, 37.54040751726388, "2호선", 33)
                                         ), List.of(
-                                                new SubwayStationResponse(1, "서울대입구역", 126.952713197762, 37.4812845080678),
-                                                new SubwayStationResponse(2, "낙성대역", 126.963523905001, 37.4770932409965),
-                                                new SubwayStationResponse(3, "사당역", 126.98155858357366, 37.47656223234824),
-                                                new SubwayStationResponse(4, "방배역", 126.997553345516, 37.4814561268152),
-                                                new SubwayStationResponse(5, "서초역", 127.007662120039, 37.4918499338918),
-                                                new SubwayStationResponse(6, "교대역", 127.013867969161, 37.4927431676548),
-                                                new SubwayStationResponse(7, "강남역", 127.02800140627488, 37.49808633653005),
-                                                new SubwayStationResponse(8, "역삼역", 127.03646946847, 37.5006744185994),
-                                                new SubwayStationResponse(9, "선릉역", 127.04896282498558, 37.504497373023206),
-                                                new SubwayStationResponse(10, "삼성역", 127.06302321147605, 37.508822740225305),
-                                                new SubwayStationResponse(11, "종합운동장역", 127.073849447402, 37.5111446632705),
-                                                new SubwayStationResponse(12, "잠실새내역", 127.086314327913, 37.5116263587296),
-                                                new SubwayStationResponse(13, "잠실역", 127.10023101886318, 37.51331105877401),
-                                                new SubwayStationResponse(14, "잠실나루역", 127.103808749487, 37.5207124124456),
-                                                new SubwayStationResponse(15, "강변역", 127.094741101863, 37.5351180385975),
-                                                new SubwayStationResponse(16, "구의역", 127.086180837795, 37.5371752725594),
-                                                new SubwayStationResponse(17, "건대입구역", 127.06920291650829, 37.54040751726388)
+                                                new PointResponse(1, 126.952713197762, 37.4812845080678),
+                                                new PointResponse(2, 126.963523905001, 37.4770932409965),
+                                                new PointResponse(3, 126.98155858357366, 37.47656223234824),
+                                                new PointResponse(4, 126.997553345516, 37.4814561268152),
+                                                new PointResponse(5, 127.007662120039, 37.4918499338918),
+                                                new PointResponse(6, 127.013867969161, 37.4927431676548),
+                                                new PointResponse(7, 127.02800140627488, 37.49808633653005),
+                                                new PointResponse(8, 127.03646946847, 37.5006744185994),
+                                                new PointResponse(9, 127.04896282498558, 37.504497373023206),
+                                                new PointResponse(10, 127.06302321147605, 37.508822740225305),
+                                                new PointResponse(11, 127.073849447402, 37.5111446632705),
+                                                new PointResponse(12, 127.086314327913, 37.5116263587296),
+                                                new PointResponse(13, 127.10023101886318, 37.51331105877401),
+                                                new PointResponse(14, 127.103808749487, 37.5207124124456),
+                                                new PointResponse(15, 127.094741101863, 37.5351180385975),
+                                                new PointResponse(16, 127.086180837795, 37.5371752725594),
+                                                new PointResponse(17, 127.06920291650829, 37.54040751726388)
                                         ))
                                 )
                         ),
@@ -163,45 +163,45 @@ public class MockingRecommendationController implements SwaggerMockingRecommenda
                                                 new PathResponse(1, "강변", 127.094741101863, 37.5351180385975, "사당",
                                                         126.98155858357366, 37.47656223234824, "2호선", 25)
                                         ), List.of(
-                                                new SubwayStationResponse(1, "강변역", 127.094741101863, 37.5351180385975),
-                                                new SubwayStationResponse(2, "잠실나루역", 127.103808749487, 37.5207124124456),
-                                                new SubwayStationResponse(3, "잠실역", 127.10023101886318, 37.51331105877401),
-                                                new SubwayStationResponse(4, "잠실새내역", 127.086314327913, 37.5116263587296),
-                                                new SubwayStationResponse(5, "종합운동장역", 127.073849447402, 37.5111446632705),
-                                                new SubwayStationResponse(6, "삼성역", 127.06302321147605, 37.508822740225305),
-                                                new SubwayStationResponse(7, "선릉역", 127.04896282498558, 37.504497373023206),
-                                                new SubwayStationResponse(8, "역삼역", 127.03646946847, 37.5006744185994),
-                                                new SubwayStationResponse(9, "강남역", 127.02800140627488, 37.49808633653005),
-                                                new SubwayStationResponse(10, "교대역", 127.013867961, 37.4927431676548),
-                                                new SubwayStationResponse(11, "서초역", 127.007662120039, 37.4918499338918),
-                                                new SubwayStationResponse(12, "방배역", 126.997553345516, 37.4814561268152),
-                                                new SubwayStationResponse(13, "사당역", 126.98155858357366, 37.47656223234824)
+                                                new PointResponse(1, 127.094741101863, 37.5351180385975),
+                                                new PointResponse(2, 127.103808749487, 37.5207124124456),
+                                                new PointResponse(3, 127.10023101886318, 37.51331105877401),
+                                                new PointResponse(4, 127.086314327913, 37.5116263587296),
+                                                new PointResponse(5, 127.073849447402, 37.5111446632705),
+                                                new PointResponse(6, 127.06302321147605, 37.508822740225305),
+                                                new PointResponse(7, 127.04896282498558, 37.504497373023206),
+                                                new PointResponse(8, 127.03646946847, 37.5006744185994),
+                                                new PointResponse(9, 127.02800140627488, 37.49808633653005),
+                                                new PointResponse(10, 127.013867961, 37.4927431676548),
+                                                new PointResponse(11, 127.007662120039, 37.4918499338918),
+                                                new PointResponse(12, 126.997553345516, 37.4814561268152),
+                                                new PointResponse(13, 126.98155858357366, 37.47656223234824)
                                         )),
                                         new RouteResponse(2, 0, 25, List.of(
                                                 new PathResponse(1, "동대문", 127.01063381083677, 37.571669405802616, "사당",
                                                         126.98155858357366, 37.47656223234824, "4호선", 25)
                                         ), List.of(
-                                                new SubwayStationResponse(1, "동대문역", 127.01063381083677, 37.571669405802616),
-                                                new SubwayStationResponse(2, "동대문역사문화공원역", 127.00900417014896, 37.56566440553802),
-                                                new SubwayStationResponse(3, "충무로역", 126.99414960395544, 37.56139658395457),
-                                                new SubwayStationResponse(4, "명동역", 126.98640235001736, 37.56096526943837),
-                                                new SubwayStationResponse(5, "회현역", 126.9784372569283, 37.55876114587941),
-                                                new SubwayStationResponse(6, "서울역", 126.96974961781686, 37.55332892758497),
-                                                new SubwayStationResponse(7, "숙대입구역", 126.972118127373, 37.5445952301115),
-                                                new SubwayStationResponse(8, "삼각지역", 126.972922951307, 37.5344393447708),
-                                                new SubwayStationResponse(9, "신용산역", 126.967965039183, 37.5292591489375),
-                                                new SubwayStationResponse(10, "이촌역", 126.97354382085399, 37.52241291408466),
-                                                new SubwayStationResponse(11, "동작역", 126.97854611382496, 37.502744106282044),
-                                                new SubwayStationResponse(12, "총신대입구(이수)역", 126.982211871752, 37.4867995957995),
-                                                new SubwayStationResponse(13, "사당역", 126.98155858357366, 37.47656223234824)
+                                                new PointResponse(1, 127.01063381083677, 37.571669405802616),
+                                                new PointResponse(2, 127.00900417014896, 37.56566440553802),
+                                                new PointResponse(3, 126.99414960395544, 37.56139658395457),
+                                                new PointResponse(4, 126.98640235001736, 37.56096526943837),
+                                                new PointResponse(5, 126.9784372569283, 37.55876114587941),
+                                                new PointResponse(6, 126.96974961781686, 37.55332892758497),
+                                                new PointResponse(7, 126.972118127373, 37.5445952301115),
+                                                new PointResponse(8, 126.972922951307, 37.5344393447708),
+                                                new PointResponse(9, 126.967965039183, 37.5292591489375),
+                                                new PointResponse(10, 126.97354382085399, 37.52241291408466),
+                                                new PointResponse(11, 126.97854611382496, 37.502744106282044),
+                                                new PointResponse(12, 126.982211871752, 37.4867995957995),
+                                                new PointResponse(13, 126.98155858357366, 37.47656223234824)
                                         )),
                                         new RouteResponse(3, 0, 4, List.of(
                                                 new PathResponse(1, "서울대입구", 126.952713197762, 37.4812845080678, "사당",
                                                         126.98155858357366, 37.47656223234824, "2호선", 4)
                                         ), List.of(
-                                                new SubwayStationResponse(1, "서울대입구역", 126.952713197762, 37.4812845080678),
-                                                new SubwayStationResponse(2, "낙성대역", 126.963523905001, 37.4770932409965),
-                                                new SubwayStationResponse(3, "사당역", 126.98155858357366, 37.47656223234824)
+                                                new PointResponse(1, 126.952713197762, 37.4812845080678),
+                                                new PointResponse(2, 126.963523905001, 37.4770932409965),
+                                                new PointResponse(3, 126.98155858357366, 37.47656223234824)
                                         ))
                                 )
                         ),
@@ -238,16 +238,16 @@ public class MockingRecommendationController implements SwaggerMockingRecommenda
                                                 new PathResponse(1, "강변", 127.094741101863, 37.5351180385975, "왕십리",
                                                         127.03710337610202, 37.561268363317176, "2호선", 11)
                                         ), List.of(
-                                                new SubwayStationResponse(1, "강변역", 127.094741101863, 37.5351180385975),
-                                                new SubwayStationResponse(2, "구의역", 127.086180837795, 37.5371752725594),
-                                                new SubwayStationResponse(3, "건대입구역", 127.06920291650829, 37.54040751726388),
-                                                new SubwayStationResponse(4, "성수역", 127.056066999327, 37.5445888153751),
-                                                new SubwayStationResponse(5, "뚝섬역", 127.04738727881, 37.547241554679),
-                                                new SubwayStationResponse(6, "한양대역", 127.043639802768, 37.5557159860408),
-                                                new SubwayStationResponse(7, "왕십리역", 127.03710337610202, 37.561268363317176),
-                                                new SubwayStationResponse(8, "상왕십리역", 127.02927241035283, 37.56443666620397),
-                                                new SubwayStationResponse(9, "신당역", 127.019477533278, 37.5656730531732),
-                                                new SubwayStationResponse(10, "동대문역사문화공원역", 127.00900417014896, 37.56566440553802)
+                                                new PointResponse(1, 127.094741101863, 37.5351180385975),
+                                                new PointResponse(2, 127.086180837795, 37.5371752725594),
+                                                new PointResponse(3, 127.06920291650829, 37.54040751726388),
+                                                new PointResponse(4, 127.056066999327, 37.5445888153751),
+                                                new PointResponse(5, 127.04738727881, 37.547241554679),
+                                                new PointResponse(6, 127.043639802768, 37.5557159860408),
+                                                new PointResponse(7, 127.03710337610202, 37.561268363317176),
+                                                new PointResponse(8, 127.02927241035283, 37.56443666620397),
+                                                new PointResponse(9, 127.019477533278, 37.5656730531732),
+                                                new PointResponse(10, 127.00900417014896, 37.56566440553802)
                                         )),
                                         new RouteResponse(2, 1, 11, List.of(
                                                 new PathResponse(1, "동대문", 127.01063381083677, 37.571669405802616,
@@ -257,12 +257,12 @@ public class MockingRecommendationController implements SwaggerMockingRecommenda
                                                 new PathResponse(3, "동대문역사문화공원", 127.007821, 37.565147, "왕십리",
                                                         127.03710337610202, 37.561268363317176, "2호선", 6)
                                         ), List.of(
-                                                new SubwayStationResponse(1, "동대문역", 127.01063381083677, 37.571669405802616),
-                                                new SubwayStationResponse(2, "동대문역사문화공원역", 127.00900417014896, 37.56566440553802),
-                                                new SubwayStationResponse(3, "동대문역사문화공원역", 127.00900417014896, 37.56566440553802),
-                                                new SubwayStationResponse(4, "신당역", 127.019477533278, 37.5656730531732),
-                                                new SubwayStationResponse(5, "상왕십리역", 127.02927241035283, 37.56443666620397),
-                                                new SubwayStationResponse(6, "왕십리역", 127.03710337610202, 37.561268363317176)
+                                                new PointResponse(1, 127.01063381083677, 37.571669405802616),
+                                                new PointResponse(2, 127.00900417014896, 37.56566440553802),
+                                                new PointResponse(3, 127.00900417014896, 37.56566440553802),
+                                                new PointResponse(4, 127.019477533278, 37.5656730531732),
+                                                new PointResponse(5, 127.02927241035283, 37.56443666620397),
+                                                new PointResponse(6, 127.03710337610202, 37.561268363317176)
                                         )),
                                         new RouteResponse(3, 1, 32, List.of(
                                                 new PathResponse(1, "서울대입구", 126.952713197762, 37.4812845080678, "선릉",
@@ -272,21 +272,21 @@ public class MockingRecommendationController implements SwaggerMockingRecommenda
                                                 new PathResponse(3, "선릉", 127.049271, 37.504577, "왕십리",
                                                         127.03710337610202, 37.561268363317176, "수인분당선", 13)
                                         ), List.of(
-                                                new SubwayStationResponse(1, "서울대입구역", 126.952713197762, 37.4812845080678),
-                                                new SubwayStationResponse(2, "낙성대역", 126.963523905001, 37.4770932409965),
-                                                new SubwayStationResponse(3, "사당역", 126.98155858357366, 37.47656223234824),
-                                                new SubwayStationResponse(4, "방배역", 126.997553345516, 37.4814561268152),
-                                                new SubwayStationResponse(5, "서초역", 127.007662120039, 37.4918499338918),
-                                                new SubwayStationResponse(6, "교대역", 127.013867969161, 37.4927431676548),
-                                                new SubwayStationResponse(7, "강남역", 127.02800140627488, 37.49808633653005),
-                                                new SubwayStationResponse(8, "역삼역", 127.03646946847, 37.5006744185994),
-                                                new SubwayStationResponse(9, "선릉역", 127.04896282498558, 37.504497373023206),
-                                                new SubwayStationResponse(10, "선릉역", 127.04896282498558, 37.504497373023206),
-                                                new SubwayStationResponse(11, "선정릉역", 127.043627289129, 37.5109326388803),
-                                                new SubwayStationResponse(12, "강남구청역", 127.0413109462156, 37.51721617197854),
-                                                new SubwayStationResponse(13, "압구정로데오역", 127.0406027693898, 37.5275184818021),
-                                                new SubwayStationResponse(14, "서울숲역", 127.044746216358, 37.543645796605),
-                                                new SubwayStationResponse(15, "왕십리역", 127.03710337610202, 37.561268363317176)
+                                                new PointResponse(1, 126.952713197762, 37.4812845080678),
+                                                new PointResponse(2, 126.963523905001, 37.4770932409965),
+                                                new PointResponse(3, 126.98155858357366, 37.47656223234824),
+                                                new PointResponse(4, 126.997553345516, 37.4814561268152),
+                                                new PointResponse(5, 127.007662120039, 37.4918499338918),
+                                                new PointResponse(6, 127.013867969161, 37.4927431676548),
+                                                new PointResponse(7, 127.02800140627488, 37.49808633653005),
+                                                new PointResponse(8, 127.03646946847, 37.5006744185994),
+                                                new PointResponse(9, 127.04896282498558, 37.504497373023206),
+                                                new PointResponse(10, 127.04896282498558, 37.504497373023206),
+                                                new PointResponse(11, 127.043627289129, 37.5109326388803),
+                                                new PointResponse(12, 127.0413109462156, 37.51721617197854),
+                                                new PointResponse(13, 127.0406027693898, 37.5275184818021),
+                                                new PointResponse(14, 127.044746216358, 37.543645796605),
+                                                new PointResponse(15, 127.03710337610202, 37.561268363317176)
                                         ))
                                 )
                         ),
@@ -329,30 +329,30 @@ public class MockingRecommendationController implements SwaggerMockingRecommenda
                                                 new PathResponse(5, "종로3가", 126.991841, 37.571653, "종각",
                                                         126.98315081716676, 37.570227990912244, "1호선", 3)
                                         ), List.of(
-                                                new SubwayStationResponse(1, "강변역", 127.094741101863, 37.5351180385975),
-                                                new SubwayStationResponse(2, "구의역", 127.086180837795, 37.5371752725594),
-                                                new SubwayStationResponse(3, "건대입구역", 127.06920291650829, 37.54040751726388),
-                                                new SubwayStationResponse(4, "성수역", 127.056066999327, 37.5445888153751),
-                                                new SubwayStationResponse(5, "뚝섬역", 127.04738727881, 37.547241554679),
-                                                new SubwayStationResponse(6, "한양대역", 127.043639802768, 37.5557159860408),
-                                                new SubwayStationResponse(7, "왕십리역", 127.03710337610202, 37.561268363317176),
-                                                new SubwayStationResponse(8, "상왕십리역", 127.02927241035283, 37.56443666620397),
-                                                new SubwayStationResponse(9, "신당역", 127.019477533278, 37.5656730531732),
-                                                new SubwayStationResponse(10, "동대문역사문화공원역", 127.00900417014896, 37.56566440553802),
-                                                new SubwayStationResponse(11, "을지로4가역", 126.997632059113, 37.5666405038268),
-                                                new SubwayStationResponse(12, "을지로3가역", 126.99098443539428, 37.56629149790628),
-                                                new SubwayStationResponse(13, "을지로입구역", 126.9821953112953, 37.566035517712955),
-                                                new SubwayStationResponse(14, "시청역", 126.97719821079865, 37.56534539636417),
-                                                new SubwayStationResponse(15, "종각역", 126.98315081716676, 37.570227990912244)
+                                                new PointResponse(1, 127.094741101863, 37.5351180385975),
+                                                new PointResponse(2, 127.086180837795, 37.5371752725594),
+                                                new PointResponse(3, 127.06920291650829, 37.54040751726388),
+                                                new PointResponse(4, 127.056066999327, 37.5445888153751),
+                                                new PointResponse(5, 127.04738727881, 37.547241554679),
+                                                new PointResponse(6, 127.043639802768, 37.5557159860408),
+                                                new PointResponse(7, 127.03710337610202, 37.561268363317176),
+                                                new PointResponse(8, 127.02927241035283, 37.56443666620397),
+                                                new PointResponse(9, 127.019477533278, 37.5656730531732),
+                                                new PointResponse(10, 127.00900417014896, 37.56566440553802),
+                                                new PointResponse(11, 126.997632059113, 37.5666405038268),
+                                                new PointResponse(12, 126.99098443539428, 37.56629149790628),
+                                                new PointResponse(13, 126.9821953112953, 37.566035517712955),
+                                                new PointResponse(14, 126.97719821079865, 37.56534539636417),
+                                                new PointResponse(15, 126.98315081716676, 37.570227990912244)
                                         )),
                                         new RouteResponse(2, 0, 5, List.of(
                                                 new PathResponse(1, "동대문", 127.01063381083677, 37.571669405802616, "종각",
                                                         126.98315081716676, 37.570227990912244, "1호선", 5)
                                         ), List.of(
-                                                new SubwayStationResponse(1, "동대문역", 127.01063381083677, 37.571669405802616),
-                                                new SubwayStationResponse(2, "종로5가역", 127.00153834521934, 37.57097610838373),
-                                                new SubwayStationResponse(3, "종로3가역", 126.9921532525476, 37.570420844523),
-                                                new SubwayStationResponse(4, "종각역", 126.98315081716676, 37.570227990912244)
+                                                new PointResponse(1, 127.01063381083677, 37.571669405802616),
+                                                new PointResponse(2, 127.00153834521934, 37.57097610838373),
+                                                new PointResponse(3, 126.9921532525476, 37.570420844523),
+                                                new PointResponse(4, 126.98315081716676, 37.570227990912244)
                                         )),
                                         new RouteResponse(3, 2, 36, List.of(
                                                 new PathResponse(1, "서울대입구", 126.952713197762, 37.4812845080678, "사당",
@@ -366,24 +366,24 @@ public class MockingRecommendationController implements SwaggerMockingRecommenda
                                                 new PathResponse(5, "서울역", 126.972709, 37.553512, "종각",
                                                         126.98315081716676, 37.570227990912244, "1호선", 8)
                                         ), List.of(
-                                                new SubwayStationResponse(1, "서울대입구역", 126.952713197762, 37.4812845080678),
-                                                new SubwayStationResponse(2, "봉천역", 126.941686527151, 37.4824725161034),
-                                                new SubwayStationResponse(3, "신림역", 126.9297453749671, 37.484267135140364),
-                                                new SubwayStationResponse(4, "신대방역", 126.91350747615147, 37.48765046104574),
-                                                new SubwayStationResponse(5, "구로디지털단지역", 126.901473080039, 37.4852605752505),
-                                                new SubwayStationResponse(6, "대림역", 126.894931036051, 37.4933099444417),
-                                                new SubwayStationResponse(7, "신도림역", 126.891312500851, 37.508908482648),
-                                                new SubwayStationResponse(8, "문래역", 126.894778820701, 37.5179757181801),
-                                                new SubwayStationResponse(9, "영등포구청역", 126.896677739939, 37.5258305311402),
-                                                new SubwayStationResponse(10, "당산역", 126.902611795523, 37.5347843171332),
-                                                new SubwayStationResponse(11, "합정역", 126.91445406513526, 37.54991315995173),
-                                                new SubwayStationResponse(12, "홍대입구역", 126.923778562273, 37.5568707448873),
-                                                new SubwayStationResponse(13, "신촌역", 126.93698075993808, 37.555198169366435),
-                                                new SubwayStationResponse(14, "이대역", 126.94642954546576, 37.556814718869),
-                                                new SubwayStationResponse(15, "아현역", 126.95614644008904, 37.55740617797663),
-                                                new SubwayStationResponse(16, "충정로역", 126.9644920746172, 37.55976328822766),
-                                                new SubwayStationResponse(17, "시청역", 126.97719821079865, 37.56534539636417),
-                                                new SubwayStationResponse(18, "종각역", 126.98315081716676, 37.570227990912244)
+                                                new PointResponse(1, 126.952713197762, 37.4812845080678),
+                                                new PointResponse(2, 126.941686527151, 37.4824725161034),
+                                                new PointResponse(3, 126.9297453749671, 37.484267135140364),
+                                                new PointResponse(4, 126.91350747615147, 37.48765046104574),
+                                                new PointResponse(5, 126.901473080039, 37.4852605752505),
+                                                new PointResponse(6, 126.894931036051, 37.4933099444417),
+                                                new PointResponse(7, 126.891312500851, 37.508908482648),
+                                                new PointResponse(8, 126.894778820701, 37.5179757181801),
+                                                new PointResponse(9, 126.896677739939, 37.5258305311402),
+                                                new PointResponse(10, 126.902611795523, 37.5347843171332),
+                                                new PointResponse(11, 126.91445406513526, 37.54991315995173),
+                                                new PointResponse(12, 126.923778562273, 37.5568707448873),
+                                                new PointResponse(13, 126.93698075993808, 37.555198169366435),
+                                                new PointResponse(14, 126.94642954546576, 37.556814718869),
+                                                new PointResponse(15, 126.95614644008904, 37.55740617797663),
+                                                new PointResponse(16, 126.9644920746172, 37.55976328822766),
+                                                new PointResponse(17, 126.97719821079865, 37.56534539636417),
+                                                new PointResponse(18, 126.98315081716676, 37.570227990912244)
                                         ))
                                 )
                         ),
@@ -420,25 +420,25 @@ public class MockingRecommendationController implements SwaggerMockingRecommenda
                                                 new PathResponse(1, "강변", 127.094741101863, 37.5351180385975, "홍대입구",
                                                         126.923778562273, 37.5568707448873, "2호선", 34)
                                         ), List.of(
-                                                new SubwayStationResponse(1, "강변역", 127.094741101863, 37.5351180385975),
-                                                new SubwayStationResponse(2, "구의역", 127.086180837795, 37.5371752725594),
-                                                new SubwayStationResponse(3, "건대입구역", 127.06920291650829, 37.54040751726388),
-                                                new SubwayStationResponse(4, "성수역", 127.056066999327, 37.5445888153751),
-                                                new SubwayStationResponse(5, "뚝섬역", 127.04738727881, 37.547241554679),
-                                                new SubwayStationResponse(6, "한양대역", 127.043639802768, 37.5557159860408),
-                                                new SubwayStationResponse(7, "왕십리역", 127.03710337610202, 37.561268363317176),
-                                                new SubwayStationResponse(8, "상왕십리역", 127.02927241035283, 37.56443666620397),
-                                                new SubwayStationResponse(9, "신당역", 127.019477533278, 37.5656730531732),
-                                                new SubwayStationResponse(10, "동대문역사문화공원역", 127.00900417014896, 37.56566440553802),
-                                                new SubwayStationResponse(11, "을지로4가역", 126.997632059113, 37.5666405038268),
-                                                new SubwayStationResponse(12, "을지로3가역", 126.99098443539428, 37.56629149790628),
-                                                new SubwayStationResponse(13, "을지로입구역", 126.9821953112953, 37.566035517712955),
-                                                new SubwayStationResponse(14, "시청역", 126.97719821079865, 37.56534539636417),
-                                                new SubwayStationResponse(15, "충정로역", 126.9644920746172, 37.55976328822766),
-                                                new SubwayStationResponse(16, "아현역", 126.95614644008904, 37.55740617797663),
-                                                new SubwayStationResponse(17, "이대역", 126.94642954546576, 37.556814718869),
-                                                new SubwayStationResponse(18, "신촌역", 126.93698075993808, 37.555198169366435),
-                                                new SubwayStationResponse(19, "홍대입구역", 126.923778562273, 37.5568707448873)
+                                                new PointResponse(1, 127.094741101863, 37.5351180385975),
+                                                new PointResponse(2, 127.086180837795, 37.5371752725594),
+                                                new PointResponse(3, 127.06920291650829, 37.54040751726388),
+                                                new PointResponse(4, 127.056066999327, 37.5445888153751),
+                                                new PointResponse(5, 127.04738727881, 37.547241554679),
+                                                new PointResponse(6, 127.043639802768, 37.5557159860408),
+                                                new PointResponse(7, 127.03710337610202, 37.561268363317176),
+                                                new PointResponse(8, 127.02927241035283, 37.56443666620397),
+                                                new PointResponse(9, 127.019477533278, 37.5656730531732),
+                                                new PointResponse(10, 127.00900417014896, 37.56566440553802),
+                                                new PointResponse(11, 126.997632059113, 37.5666405038268),
+                                                new PointResponse(12, 126.99098443539428, 37.56629149790628),
+                                                new PointResponse(13, 126.9821953112953, 37.566035517712955),
+                                                new PointResponse(14, 126.97719821079865, 37.56534539636417),
+                                                new PointResponse(15, 126.9644920746172, 37.55976328822766),
+                                                new PointResponse(16, 126.95614644008904, 37.55740617797663),
+                                                new PointResponse(17, 126.94642954546576, 37.556814718869),
+                                                new PointResponse(18, 126.93698075993808, 37.555198169366435),
+                                                new PointResponse(19, 126.923778562273, 37.5568707448873)
                                         )),
                                         new RouteResponse(2, 1, 24, List.of(
                                                 new PathResponse(1, "동대문", 127.01063381083677, 37.571669405802616,
@@ -448,33 +448,33 @@ public class MockingRecommendationController implements SwaggerMockingRecommenda
                                                 new PathResponse(3, "동대문역사문화공원", 127.007821, 37.565147, "홍대입구",
                                                         126.923778562273, 37.5568707448873, "2호선", 19)
                                         ), List.of(
-                                                new SubwayStationResponse(1, "동대문역", 127.01063381083677, 37.571669405802616),
-                                                new SubwayStationResponse(2, "종로5가역", 127.00153834521934, 37.57097610838373),
-                                                new SubwayStationResponse(3, "종로3가역", 126.9921532525476, 37.570420844523),
-                                                new SubwayStationResponse(4, "종각역", 126.98315081716676, 37.570227990912244),
-                                                new SubwayStationResponse(5, "시청역", 126.97719821079865, 37.56534539636417),
-                                                new SubwayStationResponse(6, "충정로역", 126.9644920746172, 37.55976328822766),
-                                                new SubwayStationResponse(7, "아현역", 126.95614644008904, 37.55740617797663),
-                                                new SubwayStationResponse(8, "이대역", 126.94642954546576, 37.556814718869),
-                                                new SubwayStationResponse(9, "신촌역", 126.93698075993808, 37.555198169366435),
-                                                new SubwayStationResponse(10, "홍대입구역", 126.923778562273, 37.5568707448873)
+                                                new PointResponse(1, 127.01063381083677, 37.571669405802616),
+                                                new PointResponse(2, 127.00153834521934, 37.57097610838373),
+                                                new PointResponse(3, 126.9921532525476, 37.570420844523),
+                                                new PointResponse(4, 126.98315081716676, 37.570227990912244),
+                                                new PointResponse(5, 126.97719821079865, 37.56534539636417),
+                                                new PointResponse(6, 126.9644920746172, 37.55976328822766),
+                                                new PointResponse(7, 126.95614644008904, 37.55740617797663),
+                                                new PointResponse(8, 126.94642954546576, 37.556814718869),
+                                                new PointResponse(9, 126.93698075993808, 37.555198169366435),
+                                                new PointResponse(10, 126.923778562273, 37.5568707448873)
                                         )),
                                         new RouteResponse(3, 0, 25, List.of(
                                                 new PathResponse(1, "서울대입구", 126.952713197762, 37.4812845080678, "홍대입구",
                                                         126.923778562273, 37.5568707448873, "2호선", 25)
                                         ), List.of(
-                                                new SubwayStationResponse(1, "서울대입구역", 126.952713197762, 37.4812845080678),
-                                                new SubwayStationResponse(2, "봉천역", 126.941686527151, 37.4824725161034),
-                                                new SubwayStationResponse(3, "신림역", 126.9297453749671, 37.484267135140364),
-                                                new SubwayStationResponse(4, "신대방역", 126.91350747615147, 37.48765046104574),
-                                                new SubwayStationResponse(5, "구로디지털단지역", 126.901473080039, 37.4852605752505),
-                                                new SubwayStationResponse(6, "대림역", 126.894931036051, 37.4933099444417),
-                                                new SubwayStationResponse(7, "신도림역", 126.891312500851, 37.508908482648),
-                                                new SubwayStationResponse(8, "문래역", 126.894778820701, 37.5179757181801),
-                                                new SubwayStationResponse(9, "영등포구청역", 126.896677739939, 37.5258305311402),
-                                                new SubwayStationResponse(10, "당산역", 126.902611795523, 37.5347843171332),
-                                                new SubwayStationResponse(11, "합정역", 126.91445406513526, 37.54991315995173),
-                                                new SubwayStationResponse(12, "홍대입구역", 126.923778562273, 37.5568707448873)
+                                                new PointResponse(1, 126.952713197762, 37.4812845080678),
+                                                new PointResponse(2, 126.941686527151, 37.4824725161034),
+                                                new PointResponse(3, 126.9297453749671, 37.484267135140364),
+                                                new PointResponse(4, 126.91350747615147, 37.48765046104574),
+                                                new PointResponse(5, 126.901473080039, 37.4852605752505),
+                                                new PointResponse(6, 126.894931036051, 37.4933099444417),
+                                                new PointResponse(7, 126.891312500851, 37.508908482648),
+                                                new PointResponse(8, 126.894778820701, 37.5179757181801),
+                                                new PointResponse(9, 126.896677739939, 37.5258305311402),
+                                                new PointResponse(10, 126.902611795523, 37.5347843171332),
+                                                new PointResponse(11, 126.91445406513526, 37.54991315995173),
+                                                new PointResponse(12, 126.923778562273, 37.5568707448873)
                                         ))
                                 )
                         )
