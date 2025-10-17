@@ -1,5 +1,6 @@
 package com.f12.moitz.ui;
 
+import com.f12.moitz.application.dto.LegacyRecommendationRequest;
 import com.f12.moitz.application.dto.LegacyRecommendationResponse;
 import com.f12.moitz.application.dto.LegacyRouteResponse;
 import com.f12.moitz.application.dto.MockLegacyRecommendationResponse;
@@ -465,6 +466,11 @@ public class MockingRecommendationController implements SwaggerMockingRecommenda
         );
     }
 
+    @PostMapping("/test/legacy")
+    public ResponseEntity<RecommendationCreateResponse> mockRecommend(@RequestBody LegacyRecommendationRequest request) {
+        return ResponseEntity.ok(new RecommendationCreateResponse("123"));
+    }
+
     @GetMapping("/test/legacy/{id}")
     public ResponseEntity<MockLegacyRecommendationResponse> mockLegacyGetRecommendation(@PathVariable("id") String id) {
         return ResponseEntity.ok(mockLegacy());
@@ -472,7 +478,7 @@ public class MockingRecommendationController implements SwaggerMockingRecommenda
 
     private MockLegacyRecommendationResponse mockLegacy() {
         return new MockLegacyRecommendationResponse(
-                RecommendCondition.CAFE.getTitle(),
+                "CHAT",
                 List.of(
                         new StartingPlaceResponse(1L, 1, 127.094741101863, 37.5351180385975, "강변역"),
                         new StartingPlaceResponse(2L, 2, 127.01063381083677, 37.571669405802616, "동대문역"),
