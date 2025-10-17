@@ -22,14 +22,16 @@ public class VoteService {
     }
 
     @Transactional
-    public VotesResponse addVote(final String id, final String location) {
-        if (!recommendResultRepository.existsById(parseObjectId(id))) {
+    public VotesResponse addVote(final String id, final String locationName) {
+        final ObjectId objectId = parseObjectId(id);
+
+        if (!recommendResultRepository.existsById(objectId)) {
             throw new NotFoundException(GeneralErrorCode.INPUT_INVALID_RESULT);
         }
 
-        recommendResultRepository.findAndIncrementVotesByIdAndLocation(parseObjectId(id), location);
+        recommendResultRepository.incrementVotesByIdAndCandidate(objectId, locationName);
 
-        final RecommendationVote result = recommendResultRepository.findVotesByIdAndCandidate(parseObjectId(id), location)
+        final RecommendationVote result = recommendResultRepository.findVotesByIdAndCandidate(objectId, locationName)
                 .orElseThrow(() -> new NotFoundException(GeneralErrorCode.INPUT_INVALID_RESULT));
         return new VotesResponse(result.getLocation(), result.getVotes());
     }

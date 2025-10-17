@@ -48,7 +48,7 @@ public class RecommendationController implements SwaggerRecommendationController
             @PathVariable("id") final String id,
             @RequestBody final VoteRequest request
     ) {
-        return ResponseEntity.ok().body(voteService.addVote(id, request.location()));
+        return ResponseEntity.ok().body(voteService.addVote(id, request.locationName()));
     }
 
 }

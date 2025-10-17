@@ -40,6 +40,6 @@ public interface RecommendResultRepository extends MongoRepository<Result, Objec
 
     @Query("{ '_id': ?0, 'recommendedLocations.candidates.destination.name': ?1 }")
     @Update(update = "{ '$inc': { 'recommendedLocations.candidates.$.votes': 1 } }")
-    void findAndIncrementVotesByIdAndLocation(ObjectId id, String location);
+    void incrementVotesByIdAndCandidate(ObjectId id, String location);
 
 }
