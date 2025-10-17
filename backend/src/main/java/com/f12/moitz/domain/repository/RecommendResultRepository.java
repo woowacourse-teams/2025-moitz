@@ -1,7 +1,7 @@
 package com.f12.moitz.domain.repository;
 
-import com.f12.moitz.domain.CandidateVote;
 import com.f12.moitz.domain.Result;
+import com.f12.moitz.domain.repository.dto.CandidateVote;
 import java.util.List;
 import java.util.Optional;
 import org.bson.types.ObjectId;

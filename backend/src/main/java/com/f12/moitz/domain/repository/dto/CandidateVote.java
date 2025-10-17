@@ -1,4 +1,4 @@
-package com.f12.moitz.domain;
+package com.f12.moitz.domain.repository.dto;
 
 import lombok.Getter;
 import org.bson.types.ObjectId;
