@@ -10,7 +10,7 @@ public record RecommendationsResponse(
         @Schema(description = "출발지 목록", requiredMode = Schema.RequiredMode.REQUIRED)
         List<StartingPlaceResponse> startingPlaces,
         @Schema(description = "추천 지역 정보 목록", requiredMode = Schema.RequiredMode.REQUIRED)
-        List<RecommendationResponse> locations
+        List<LocationResponse> locations
 ) {
 
 }

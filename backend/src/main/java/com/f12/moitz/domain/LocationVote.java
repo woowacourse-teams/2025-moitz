@@ -5,7 +5,7 @@ import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.core.mapping.Field;
 
 @Getter
-public class RecommendationVote {
+public class LocationVote {
 
     private ObjectId id;
 

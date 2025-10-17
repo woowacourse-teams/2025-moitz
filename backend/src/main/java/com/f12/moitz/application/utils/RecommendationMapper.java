@@ -1,8 +1,8 @@
 package com.f12.moitz.application.utils;
 
+import com.f12.moitz.application.dto.LocationResponse;
 import com.f12.moitz.application.dto.PathResponse;
 import com.f12.moitz.application.dto.PlaceRecommendResponse;
-import com.f12.moitz.application.dto.RecommendationResponse;
 import com.f12.moitz.application.dto.RecommendationsResponse;
 import com.f12.moitz.application.dto.RouteResponse;
 import com.f12.moitz.application.dto.StartingPlaceResponse;
@@ -102,7 +102,7 @@ public class RecommendationMapper {
         );
     }
 
-    private RecommendationResponse toLocationRecommendResponse(
+    private LocationResponse toLocationRecommendResponse(
             final Candidate candidate,
             final int index,
             final int minTime
@@ -115,7 +115,7 @@ public class RecommendationMapper {
         );
         final List<RouteResponse> routes = toRouteResponses(candidate.getRoutes(), candidate.getCourses());
 
-        return new RecommendationResponse(
+        return new LocationResponse(
                 (long) index + 1,
                 index + 1,
                 targetPlace.getPoint().getY(),
