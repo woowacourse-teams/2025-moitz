@@ -13,6 +13,8 @@ import com.f12.moitz.common.error.exception.BadRequestException;
 import com.f12.moitz.common.error.exception.GeneralErrorCode;
 import com.f12.moitz.common.error.exception.NotFoundException;
 import com.f12.moitz.domain.CategorizedRecommendedPlaces;
+import com.f12.moitz.domain.Course;
+import com.f12.moitz.domain.Courses;
 import com.f12.moitz.domain.Place;
 import com.f12.moitz.domain.RecommendCondition;
 import com.f12.moitz.domain.Recommendation;
@@ -24,6 +26,7 @@ import com.f12.moitz.domain.subway.SubwayStation;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import lombok.extern.slf4j.Slf4j;
@@ -90,9 +93,13 @@ public class RecommendationService {
                 ));
         stopWatch.stop();
 
-        stopWatch.start("모든 경로 찾기");
+        stopWatch.start("모든 경로와 코스 찾기");
         List<Place> generatedPlaces = generatedPlacesWithReason.keySet().stream().toList();
-        final Map<Place, Routes> placeRoutes = findRoutesForAllAsync(startingPlaces, generatedPlaces);
+
+        final List<StartEndPair> allPairs = createPairs(startingPlaces, generatedPlaces);
+
+        final Map<Place, Routes> placeRoutes = findRoutesForAll(allPairs);
+        final Map<Place, Courses> placeCourses = findCoursesForAll(allPairs);
         stopWatch.stop();
 
         stopWatch.start("기준 미달 경로 제거");
@@ -111,7 +118,8 @@ public class RecommendationService {
         final Recommendation recommendation = recommendationMapper.toRecommendation(
                 filteredPlacesWithReason,
                 recommendedPlaces,
-                placeRoutes
+                placeRoutes,
+                placeCourses
         );
         stopWatch.stop();
         log.debug("추천 서비스 완료. {}", stopWatch.shortSummary());
@@ -138,30 +146,44 @@ public class RecommendationService {
                 .toList();
     }
 
-    private Map<Place, Routes> findRoutesForAllAsync(
+    private List<StartEndPair> createPairs(
             final List<? extends Place> startingPlaces,
             final List<Place> generatedPlaces
     ) {
-        final List<StartEndPair> allPairs = generatedPlaces.stream()
+        return generatedPlaces.stream()
                 .flatMap(endPlace -> startingPlaces.stream()
                         .map(startPlace -> new StartEndPair(startPlace, endPlace)))
-                .collect(Collectors.toList());
+                .toList();
+    }
 
+    private Map<Place, Routes> findRoutesForAll(final List<StartEndPair> allPairs) {
         final List<Route> allRoutes = routeFinder.findRoutes(allPairs);
+        return collectByPlace(allPairs, allRoutes, Routes::new);
+    }
 
+    private Map<Place, Courses> findCoursesForAll(final List<StartEndPair> allPairs) {
+        final List<Course> allCourses = routeFinder.findCourses(allPairs);
+        return collectByPlace(allPairs, allCourses, Courses::new);
+    }
+
+    private <T, U> Map<Place, U> collectByPlace(
+            final List<StartEndPair> allPairs,
+            final List<T> elements,
+            final Function<List<T>, U> creator
+    ) {
         return IntStream.range(0, allPairs.size())
                 .boxed()
                 .collect(Collectors.groupingBy(
                         i -> allPairs.get(i).end(),
                         Collectors.mapping(
-                                allRoutes::get,
+                                elements::get,
                                 Collectors.toList()
                         )
                 ))
                 .entrySet().stream()
                 .collect(Collectors.toMap(
                         Entry::getKey,
-                        entry -> new Routes(entry.getValue())
+                        entry -> creator.apply(entry.getValue())
                 ));
     }
 

@@ -45,7 +45,10 @@ public class PlaceRecommenderAdapter implements PlaceRecommender {
                                                         .flatMap(resp -> resp.documents().stream())
                                                         .map(document -> new RecommendedPlace(
                                                                 document.placeName(),
-                                                                new Point(Double.parseDouble(document.x()), Double.parseDouble(document.y())),
+                                                                new Point(
+                                                                        Double.parseDouble(document.x()),
+                                                                        Double.parseDouble(document.y())
+                                                                ),
                                                                 parseCategoryName(document.categoryName()),
                                                                 calculateWalkingTime(Integer.parseInt(document.distance())),
                                                                 document.placeUrl()
@@ -57,12 +60,15 @@ public class PlaceRecommenderAdapter implements PlaceRecommender {
 
     }
 
-    private Map<Place, KakaoApiResponses> searchPlacesWithRequirement(final List<Place> targets, final List<String> requirements) {
+    private Map<Place, KakaoApiResponses> searchPlacesWithRequirement(
+            final List<Place> targets,
+            final List<String> requirements
+    ) {
         return targets.stream()
                 .collect(Collectors.toMap(
                         place -> place,
                         place -> {
-                            Map<RecommendCondition,List<KakaoApiResponse>> responsesByCategory =
+                            Map<RecommendCondition, List<KakaoApiResponse>> responsesByCategory =
                                     requirements.stream().collect(Collectors.toMap(
                                             RecommendCondition::fromKeyword,
                                             requirement -> {
@@ -75,7 +81,8 @@ public class PlaceRecommenderAdapter implements PlaceRecommender {
                                                                 3
                                                         )
                                                 );
-                                                return new ArrayList<>(List.of(response));                                            },
+                                                return new ArrayList<>(List.of(response));
+                                            },
                                             (existing, incoming) -> {
                                                 existing.addAll(incoming);
                                                 return existing;

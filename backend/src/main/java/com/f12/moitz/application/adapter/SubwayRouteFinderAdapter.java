@@ -4,8 +4,10 @@ import com.f12.moitz.application.SubwayEdgeService;
 import com.f12.moitz.application.SubwayStationService;
 import com.f12.moitz.application.port.RouteFinder;
 import com.f12.moitz.application.port.dto.StartEndPair;
+import com.f12.moitz.domain.Course;
 import com.f12.moitz.domain.Path;
 import com.f12.moitz.domain.Route;
+import com.f12.moitz.domain.subway.StationSequence;
 import com.f12.moitz.domain.subway.SubwayEdges;
 import com.f12.moitz.domain.subway.SubwayPath;
 import com.f12.moitz.domain.subway.SubwayStation;
@@ -31,15 +33,28 @@ public class SubwayRouteFinderAdapter implements RouteFinder {
 
     @Override
     public List<Route> findRoutes(final List<StartEndPair> placePairs) {
-        return placePairs.stream()
-                .map(pair -> {
-                    final SubwayStation startStation = subwayStationService.getByName(pair.start().getName());
-                    final SubwayStation endStation = subwayStationService.getByName(pair.end().getName());
-                    return new Route(
-                            convertPath(subwayEdges.findShortestTimePath(startStation, endStation))
-                    );
-                })
+        return findStationSequences(placePairs).stream()
+                .map(sequence -> new Route(convertPath(sequence.groupByLine())))
                 .toList();
+    }
+
+    @Override
+    public List<Course> findCourses(final List<StartEndPair> placePairs) {
+        return findStationSequences(placePairs).stream()
+                .map(sequence -> new Course(sequence.getStations()))
+                .toList();
+    }
+
+    private List<StationSequence> findStationSequences(final List<StartEndPair> placePairs) {
+        return placePairs.stream()
+                .map(this::findStationSequence)
+                .toList();
+    }
+
+    private StationSequence findStationSequence(final StartEndPair pair) {
+        final SubwayStation startStation = subwayStationService.getByName(pair.start().getName());
+        final SubwayStation endStation = subwayStationService.getByName(pair.end().getName());
+        return subwayEdges.findShortestTimePath(startStation, endStation);
     }
 
     private List<Path> convertPath(final List<SubwayPath> subwayPaths) {
