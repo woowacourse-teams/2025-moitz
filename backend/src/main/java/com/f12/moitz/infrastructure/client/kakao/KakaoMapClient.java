@@ -12,13 +12,13 @@ import java.io.IOException;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 
 @Slf4j
-@RequiredArgsConstructor
 @Component
 public class KakaoMapClient {
 
@@ -32,6 +32,11 @@ public class KakaoMapClient {
 
     @Value("${kakao.api.key}")
     private String kakaoApiKey;
+
+    public KakaoMapClient(@Qualifier("mockKaKaoRestClient") final RestClient kakaoRestClient, final ObjectMapper objectMapper) {
+        this.kakaoRestClient = kakaoRestClient;
+        this.objectMapper = objectMapper;
+    }
 
     public Point searchPointBy(final String placeName) {
         final String url = String.format(SEARCH_POINT_URL, placeName);
