@@ -113,8 +113,11 @@ public class SetupService {
                 .orElseThrow(() -> new NoSuchElementException("이름이 일치하는 SubwayStation이 존재하지 않습니다: " + fromName));
     }
 
-    private int calculateTravelTime(final RawPathInfo currentPath, final List<RawPathInfo> allPaths,
-                                    final int currentIndex) {
+    private int calculateTravelTime(
+            final RawPathInfo currentPath,
+            final List<RawPathInfo> allPaths,
+            final int currentIndex
+    ) {
         if (currentPath.isTransfer()) {
             return currentPath.waitingSeconds() + currentPath.requiredSeconds();
         }

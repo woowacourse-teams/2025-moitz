@@ -216,11 +216,11 @@ public class PromptGenerator {
             """;
 
     public static String FORMAT_SINGLE_PLACE_TO_PROMPT(Place place, KakaoApiResponses kakaoResponses) {
-        StringBuilder sb = new StringBuilder();
+        final StringBuilder sb = new StringBuilder();
         sb.append("KAKAO MAP SEARCH RESULTS:\n");
         sb.append("========================\n\n");
 
-        String stationName = place.getName();
+        final String stationName = place.getName();
         sb.append(String.format("=== %s ===\n", stationName));
         sb.append(String.format("Station Coordinates: (%.6f, %.6f)\n",
                 place.getPoint().getX(), place.getPoint().getY()));

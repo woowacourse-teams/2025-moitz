@@ -3,13 +3,13 @@ package com.f12.moitz.ui;
 import com.f12.moitz.application.dto.LegacyRecommendationRequest;
 import com.f12.moitz.application.dto.LegacyRecommendationResponse;
 import com.f12.moitz.application.dto.LegacyRouteResponse;
+import com.f12.moitz.application.dto.LocationResponse;
 import com.f12.moitz.application.dto.MockLegacyRecommendationResponse;
 import com.f12.moitz.application.dto.MockRecommendationResponse;
 import com.f12.moitz.application.dto.PathResponse;
 import com.f12.moitz.application.dto.PlaceRecommendResponse;
 import com.f12.moitz.application.dto.RecommendationCreateResponse;
 import com.f12.moitz.application.dto.RecommendationRequest;
-import com.f12.moitz.application.dto.RecommendationResponse;
 import com.f12.moitz.application.dto.RouteResponse;
 import com.f12.moitz.application.dto.StartingPlaceResponse;
 import com.f12.moitz.application.dto.SubwayStationResponse;
@@ -42,14 +42,14 @@ public class MockingRecommendationController implements SwaggerMockingRecommenda
 
     private MockRecommendationResponse mock() {
         return new MockRecommendationResponse(
-                List.of("식당","까페","PC방"),
+                List.of("식당","카페","PC방"),
                 List.of(
                         new StartingPlaceResponse(1L, 1, 127.094741101863, 37.5351180385975, "강변역"),
                         new StartingPlaceResponse(2L, 2, 127.01063381083677, 37.571669405802616, "동대문역"),
                         new StartingPlaceResponse(3L, 3, 126.952713197762, 37.4812845080678, "서울대입구역")
                 ),
                 List.of(
-                        new RecommendationResponse(1L, 1, 37.54040751726388, 127.06920291650829, "건대입구역", 18, true,
+                        new LocationResponse(1L, 1, 37.54040751726388, 127.06920291650829, "건대입구역", 18, true,
                                 "다양한 즐길거리가 가득! 🥳 (식당, 카페, PC방, 노래방, 오락시설)",
                                 "어디에서 출발해도 교통이 좋은 중심지이며, 다양한 만남 장소가 존재하는 최적의 장소 중 하나입니다.",
                                 Map.of(
@@ -126,7 +126,7 @@ public class MockingRecommendationController implements SwaggerMockingRecommenda
                                         ))
                                 )
                         ),
-                        new RecommendationResponse(2L, 2, 37.47656223234824, 126.98155858357366, "사당역", 18, true,
+                        new LocationResponse(2L, 2, 37.47656223234824, 126.98155858357366, "사당역", 18, true,
                                 "만남의 광장, 맛집도 다양! 😋 (식당, 카페, PC방)",
                                 "다양한 장소에서 접근하기 편하며, 주어진 카테고리에 대한 요건을 만족하는 가장 추천드리는 선택지입니다.",
                                 Map.of(
@@ -199,7 +199,7 @@ public class MockingRecommendationController implements SwaggerMockingRecommenda
                                         ))
                                 )
                         ),
-                        new RecommendationResponse(3L, 3, 37.561268363317176, 127.03710337610202, "왕십리역", 18, true,
+                        new LocationResponse(3L, 3, 37.561268363317176, 127.03710337610202, "왕십리역", 18, true,
                                 "교통 요충지, 엔터-식사 해결! ✨ (식당, 카페, PC방, 노래방, 오락시설)",
                                 "어디에서 출발해도 교통이 좋은 중심지이며, 다양한 만남 장소가 존재하는 최적의 장소 중 하나입니다.",
                                 Map.of(
@@ -281,7 +281,7 @@ public class MockingRecommendationController implements SwaggerMockingRecommenda
                                         ))
                                 )
                         ),
-                        new RecommendationResponse(4L, 4, 37.570227990912244, 126.98315081716676, "종각역", 24, false,
+                        new LocationResponse(4L, 4, 37.570227990912244, 126.98315081716676, "종각역", 24, false,
                                 "젊음의 거리, 핫플집합소! 😉 (식당, 카페, PC방, 노래방)",
                                 "다양한 장소에서 접근하기 편하며, 주어진 카테고리에 대한 요건을 만족하는 가장 추천드리는 선택지입니다.",
                                 Map.of(
@@ -375,7 +375,7 @@ public class MockingRecommendationController implements SwaggerMockingRecommenda
                                         ))
                                 )
                         ),
-                        new RecommendationResponse(5L, 5, 37.5568707448873, 126.923778562273, "홍대입구역", 27, false,
+                        new LocationResponse(5L, 5, 37.5568707448873, 126.923778562273, "홍대입구역", 27, false,
                                 "젊음의 거리, 놀거리 천국! 😎 (식당, 카페, PC방, 노래방, 오락시설)", "젊음과 문화의 거리인 홍대입구, 적절히 요소들을 잘 고려했습니다.",
                                 Map.of(
                                         RecommendCondition.RESTAURANT,List.of(

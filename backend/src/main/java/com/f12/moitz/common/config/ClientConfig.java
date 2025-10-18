@@ -51,7 +51,7 @@ public class ClientConfig {
     }
 
     private SimpleClientHttpRequestFactory simpleClientHttpRequestFactory() {
-        SimpleClientHttpRequestFactory requestFactory = new SimpleClientHttpRequestFactory();
+        final SimpleClientHttpRequestFactory requestFactory = new SimpleClientHttpRequestFactory();
         requestFactory.setConnectTimeout(Duration.ofSeconds(3));
         requestFactory.setReadTimeout(Duration.ofSeconds(5));
         return requestFactory;

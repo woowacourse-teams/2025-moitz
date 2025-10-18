@@ -87,7 +87,7 @@ public class GoogleGeminiClient {
                 .maxOutputTokens(5000)
                 .build();
 
-        GenerateContentResponse response = generateWith(prompt, config);
+        final GenerateContentResponse response = generateWith(prompt, config);
         return extractResponse(response).getPlacesByStationName();
     }
 
@@ -99,7 +99,7 @@ public class GoogleGeminiClient {
         try {
             return generate(contents, config);
         } catch (ClientException | ServerException e) {
-            String message = e.message();
+            final String message = e.message();
             log.warn("Gemini API 호출 중 오류 발생: {}", message);
             if (e.code() == HttpStatus.FORBIDDEN.value() || message.contains("API key not valid")) {
                 throw new ExternalApiException(ExternalApiErrorCode.INVALID_GEMINI_API_KEY, e.getMessage());
@@ -133,7 +133,7 @@ public class GoogleGeminiClient {
 
     public RecommendedPlaceResponses extractResponse(final GenerateContentResponse generateContentResponse) {
         try {
-            String originalText = generateContentResponse.candidates()
+            final String originalText = generateContentResponse.candidates()
                     .map(List::getFirst)
                     .flatMap(Candidate::content)
                     .flatMap(Content::parts)
@@ -146,7 +146,7 @@ public class GoogleGeminiClient {
                 throw new RetryableApiException(ExternalApiErrorCode.INVALID_GEMINI_RESPONSE_FORMAT);
             }
 
-            String cleanedText = jsonParser.cleanJsonResponse(originalText);
+            final String cleanedText = jsonParser.cleanJsonResponse(originalText);
             if (!jsonParser.isValidJson(cleanedText)) {
                 log.error("유효하지 않은 JSON 형식: {}", cleanedText);
                 throw new RetryableApiException(ExternalApiErrorCode.INVALID_GEMINI_RESPONSE_FORMAT);
@@ -172,4 +172,5 @@ public class GoogleGeminiClient {
             throw new RetryableApiException(ExternalApiErrorCode.INVALID_GEMINI_RESPONSE_FORMAT);
         }
     }
+
 }

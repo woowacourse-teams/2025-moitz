@@ -11,6 +11,7 @@ public class Candidate {
     private final CategorizedRecommendedPlaces recommendedPlaces;
     private final String description;
     private final String reason;
+    private final int votes;
 
     public Candidate(
             final Place destination,
@@ -18,15 +19,17 @@ public class Candidate {
             final Courses courses,
             final CategorizedRecommendedPlaces recommendedPlaces,
             final String description,
-            final String reason
+            final String reason,
+            final int votes
     ) {
-        validate(destination, routes, courses, recommendedPlaces, description, reason);
+        validate(destination, routes, courses, recommendedPlaces, description, reason, votes);
         this.destination = destination;
         this.routes = routes;
         this.courses = courses;
         this.recommendedPlaces = recommendedPlaces;
         this.description = description;
         this.reason = reason;
+        this.votes = votes;
     }
 
     private void validate(
@@ -35,7 +38,8 @@ public class Candidate {
             final Courses courses,
             final CategorizedRecommendedPlaces recommendedPlaces,
             final String description,
-            final String reason
+            final String reason,
+            final int votes
     ) {
         if (suggestedLocation == null) {
             throw new IllegalArgumentException("추천 지역은 필수입니다.");
@@ -54,6 +58,9 @@ public class Candidate {
         }
         if (reason == null || reason.isEmpty()) {
             throw new IllegalArgumentException("추천 이유는 비어 있을 수 없습니다.");
+        }
+        if (votes < 0) {
+            throw new IllegalArgumentException("투표 개수는 음수일 수 없습니다.");
         }
     }
 

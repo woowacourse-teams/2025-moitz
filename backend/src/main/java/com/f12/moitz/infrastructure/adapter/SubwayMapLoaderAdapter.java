@@ -64,7 +64,7 @@ public class SubwayMapLoaderAdapter implements SubwayMapLoader {
     }
 
     private RawRouteInfo toRawRouteInfo(final SubwayRouteResponse response) {
-        List<RawPathInfo> rawPaths = response.body().paths().stream()
+        final List<RawPathInfo> rawPaths = response.body().paths().stream()
                 .map(this::toRawPathInfo)
                 .collect(Collectors.toList());
         return new RawRouteInfo(rawPaths);

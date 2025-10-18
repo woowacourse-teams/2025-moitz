@@ -1,9 +1,9 @@
 package com.f12.moitz.application.utils;
 
+import com.f12.moitz.application.dto.LocationResponse;
 import com.f12.moitz.application.dto.PathResponse;
 import com.f12.moitz.application.dto.PlaceRecommendResponse;
-import com.f12.moitz.application.dto.RecommendationResponse;
-import com.f12.moitz.application.dto.RecommendationsResponse;
+import com.f12.moitz.application.dto.RecommendationResultResponse;
 import com.f12.moitz.application.dto.RouteResponse;
 import com.f12.moitz.application.dto.StartingPlaceResponse;
 import com.f12.moitz.application.dto.SubwayStationResponse;
@@ -30,10 +30,10 @@ import org.springframework.stereotype.Component;
 @Component
 public class RecommendationMapper {
 
-    public RecommendationsResponse toResponse(final Result result) {
+    public RecommendationResultResponse toResponse(final Result result) {
         final int minTime = result.getBestRecommendationTime();
         final List<String> condition = getCondition(result);
-        return new RecommendationsResponse(
+        return new RecommendationResultResponse(
                 condition,
                 IntStream.range(0, result.getStartingPlacesCount())
                         .mapToObj(index -> toStartingPlaceResponse(index, result.getStartingPlaces().get(index)))
@@ -59,7 +59,8 @@ public class RecommendationMapper {
             final Map<Place, ReasonAndDescription> generatedPlaces,
             final Map<Place, CategorizedRecommendedPlaces> placeListMap,
             final Map<Place, Routes> placeRoutes,
-            final Map<Place, Courses> placeCourses
+            final Map<Place, Courses> placeCourses,
+            final int votes
     ) {
         return new Recommendation(
                 generatedPlaces.entrySet().stream()
@@ -72,7 +73,8 @@ public class RecommendationMapper {
                                 placeCourses.get(place.getKey()),
                                 placeListMap.get(place.getKey()),
                                 place.getValue().description(),
-                                place.getValue().reason()
+                                place.getValue().reason(),
+                                votes
                         ))
                         .toList()
         );
@@ -100,7 +102,7 @@ public class RecommendationMapper {
         );
     }
 
-    private RecommendationResponse toLocationRecommendResponse(
+    private LocationResponse toLocationRecommendResponse(
             final Candidate candidate,
             final int index,
             final int minTime
@@ -108,12 +110,12 @@ public class RecommendationMapper {
         final Place targetPlace = candidate.getDestination();
         final int totalTime = candidate.calculateAverageTravelTime();
 
-        Map<RecommendCondition, List<PlaceRecommendResponse>> recommendedPlaces = toPlaceRecommendResponses(
+        final Map<RecommendCondition, List<PlaceRecommendResponse>> recommendedPlaces = toPlaceRecommendResponses(
                 candidate.getRecommendedPlaces()
         );
         final List<RouteResponse> routes = toRouteResponses(candidate.getRoutes(), candidate.getCourses());
 
-        return new RecommendationResponse(
+        return new LocationResponse(
                 (long) index + 1,
                 index + 1,
                 targetPlace.getPoint().getY(),
@@ -161,11 +163,11 @@ public class RecommendationMapper {
     }
 
     private RouteResponse toRouteResponse(final Route route, final Course course, final long id) {
-        List<PathResponse> pathResponses = IntStream.range(0, route.getPaths().size())
+        final List<PathResponse> pathResponses = IntStream.range(0, route.getPaths().size())
                 .mapToObj(pathIndex -> toPathResponse(route.getPaths().get(pathIndex), pathIndex + 1))
                 .toList();
 
-        List<SubwayStationResponse> subwayStationResponses = IntStream.range(0, course.size())
+        final List<SubwayStationResponse> subwayStationResponses = IntStream.range(0, course.size())
                 .mapToObj(placeIndex -> toSubwayStationResponse(course.getPlaces().get(placeIndex), placeIndex + 1))
                 .toList();
 

@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 @Schema(description = "지역 추천 응답")
-public record RecommendationResponse(
+public record LocationResponse(
         @Schema(description = "ID", example = "1", requiredMode = Schema.RequiredMode.REQUIRED)
         Long id,
         @Schema(description = "순번", example = "1", requiredMode = Schema.RequiredMode.REQUIRED)
@@ -74,7 +74,7 @@ public record RecommendationResponse(
                 }
                 """
         )
-        Map<RecommendCondition,List<PlaceRecommendResponse>> places,
+        Map<RecommendCondition, List<PlaceRecommendResponse>> places,
         @Schema(description = "각 출발지로부터 이동 경로", requiredMode = Schema.RequiredMode.REQUIRED)
         List<RouteResponse> routes
 ) {

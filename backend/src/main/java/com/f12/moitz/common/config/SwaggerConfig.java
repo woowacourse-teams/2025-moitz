@@ -38,7 +38,7 @@ public class SwaggerConfig {
     @Bean
     public OpenApiCustomizer customizer() {
         return openApi -> {
-            if(openApi.getPaths() == null) return;
+            if (openApi.getPaths() == null) return;
 
             openApi.getPaths().forEach((path, pathItem) -> {
                 pathItem.readOperationsMap().forEach((httpMethod, operation) -> {
@@ -56,9 +56,9 @@ public class SwaggerConfig {
     }
 
     private void injectExamplesForErrorEnum(final ApiResponses responses, final int statusCode, final ErrorCode[] codes) {
-        String statusKey = String.valueOf(statusCode);
+        final String statusKey = String.valueOf(statusCode);
 
-        ApiResponse apiResponse = responses.computeIfAbsent(
+        final ApiResponse apiResponse = responses.computeIfAbsent(
                 statusKey,
                 k -> new ApiResponse().description("자동 생성된 예외 응답")
         );
@@ -69,7 +69,7 @@ public class SwaggerConfig {
             apiResponse.setContent(content);
         }
 
-        MediaType mediaType = content.computeIfAbsent(
+        final MediaType mediaType = content.computeIfAbsent(
                 "*/*",
                 k -> new MediaType()
         );
@@ -81,7 +81,7 @@ public class SwaggerConfig {
         }
 
         for (ErrorCode code : codes) {
-            Example example = new Example();
+            final Example example = new Example();
             example.setDescription(code.getMessage());
             example.setValue(buildExampleResponse(statusCode, code));
             examples.put(code.getCode(), example);

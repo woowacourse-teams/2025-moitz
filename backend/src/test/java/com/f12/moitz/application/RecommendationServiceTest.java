@@ -144,7 +144,7 @@ class RecommendationServiceTest {
         given(recommendResultRepository.saveAndReturnId(any(Result.class))).willReturn(new ObjectId());
 
         // When
-        String resultId = recommendationService.recommendLocation(request);
+        String resultId = recommendationService.recommendLocation(request).id();
 
         // Then
         assertThat(resultId).isNotNull();
