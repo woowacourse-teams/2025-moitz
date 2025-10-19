@@ -17,8 +17,10 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class PlaceRecommenderAdapter implements PlaceRecommender {
@@ -51,7 +53,8 @@ public class PlaceRecommenderAdapter implements PlaceRecommender {
                                                                 ),
                                                                 parseCategoryName(document.categoryName()),
                                                                 calculateWalkingTime(Integer.parseInt(document.distance())),
-                                                                document.placeUrl()
+                                                                document.placeUrl(),
+                                                                document.imageUrl()
                                                         ))
                                                         .toList()
                                         ))
@@ -75,6 +78,7 @@ public class PlaceRecommenderAdapter implements PlaceRecommender {
                                                 KakaoApiResponse response = kakaoMapClient.searchPlacesBy(
                                                         new SearchPlacesLimitQuantityRequest(
                                                                 requirement,
+                                                                place.getName(),
                                                                 place.getPoint().getX(),
                                                                 place.getPoint().getY(),
                                                                 800,

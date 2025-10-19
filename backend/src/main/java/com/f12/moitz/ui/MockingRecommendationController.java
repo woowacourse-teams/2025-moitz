@@ -57,21 +57,24 @@ public class MockingRecommendationController implements SwaggerMockingRecommenda
                                                 new PlaceRecommendResponse(
                                                         1, 127.094741101863, 37.5351180385975,
                                                         "육일관", "식당", 1,
-                                                        "http://place.map.kakao.com/1050190897"
+                                                        "http://place.map.kakao.com/1050190897",
+                                                        "http://t1.daumcdn.net/news/201706/21/kedtv/20170621155930292vyyx.jpg"
                                                 )
                                         ),
                                         RecommendCondition.CAFE, List.of(
                                                 new PlaceRecommendResponse(
                                                         1, 127.094741101863, 37.5351180385975,
                                                         "바나프레소 건대역점", "카페", 1,
-                                                        "http://place.map.kakao.com/666587821"
+                                                        "http://place.map.kakao.com/666587821",
+                                                        "http://t1.daumcdn.net/news/201706/21/kedtv/20170621155930292vyyx.jpg"
                                                 )
                                         ),
                                         RecommendCondition.PC_ROOM_KARAOKE, List.of(
                                                 new PlaceRecommendResponse(
                                                         1, 127.094741101863, 37.5351180385975,
                                                         "포포PC방 건대점", "PC방", 1,
-                                                        "http://place.map.kakao.com/356960076"
+                                                        "http://place.map.kakao.com/356960076",
+                                                        "http://t1.daumcdn.net/news/201706/21/kedtv/20170621155930292vyyx.jpg"
                                                 )
                                         )
                                 ),
@@ -134,21 +137,24 @@ public class MockingRecommendationController implements SwaggerMockingRecommenda
                                                 new PlaceRecommendResponse(
                                                         1, 127.094741101863, 37.5351180385975,
                                                         "훈장골 사당점", "식당", 1,
-                                                        "http://place.map.kakao.com/63778027"
+                                                        "http://place.map.kakao.com/63778027",
+                                                        "http://t1.daumcdn.net/news/201706/21/kedtv/20170621155930292vyyx.jpg"
                                                 )
                                         ),
                                         RecommendCondition.CAFE,List.of(
                                                 new PlaceRecommendResponse(
                                                         2, 127.094741101863, 37.5351180385975,
                                                         "스타벅스 사당점", "카페", 1,
-                                                        "http://place.map.kakao.com/23447734"
+                                                        "http://place.map.kakao.com/23447734",
+                                                        "http://t1.daumcdn.net/news/201706/21/kedtv/20170621155930292vyyx.jpg"
                                                 )
                                         ),
                                         RecommendCondition.PC_ROOM_KARAOKE,List.of(
                                                 new PlaceRecommendResponse(
                                                         3, 127.094741101863, 37.5351180385975,
                                                         "레벨업PC방 사당역점", "PC방", 2,
-                                                        "http://place.map.kakao.com/1705311839"
+                                                        "http://place.map.kakao.com/1705311839",
+                                                        "http://t1.daumcdn.net/news/201706/21/kedtv/20170621155930292vyyx.jpg"
                                                 )
                                         )
                                 ),
@@ -207,20 +213,23 @@ public class MockingRecommendationController implements SwaggerMockingRecommenda
                                                 new PlaceRecommendResponse(
                                                         1, 127.094741101863, 37.5351180385975,
                                                         "스시도쿠", "식당", 1,
-                                                        "http://place.map.kakao.com/26792732"
+                                                        "http://place.map.kakao.com/26792732",
+                                                        "http://t1.daumcdn.net/news/201706/21/kedtv/20170621155930292vyyx.jpg"
                                                 )
                                         ),
                                         RecommendCondition.CAFE,List.of(
                                                 new PlaceRecommendResponse(
                                                         2, 127.094741101863, 37.5351180385975,
                                                         "탐앤탐스 왕십리역점", "카페", 1,
-                                                        "http://place.map.kakao.com/10809505"
+                                                        "http://place.map.kakao.com/10809505",
+                                                        "http://t1.daumcdn.net/news/201706/21/kedtv/20170621155930292vyyx.jpg"
                                                 )
                                         ),
                                         RecommendCondition.PC_ROOM_KARAOKE,List.of(
                                                 new PlaceRecommendResponse(3, 127.094741101863, 37.5351180385975,
                                                         "이스포츠PC방 왕십리점", "PC방", 2,
-                                                        "http://place.map.kakao.com/12326220"
+                                                        "http://place.map.kakao.com/12326220",
+                                                        "http://t1.daumcdn.net/news/201706/21/kedtv/20170621155930292vyyx.jpg"
                                                 )
                                         )
                                 ),
@@ -288,19 +297,22 @@ public class MockingRecommendationController implements SwaggerMockingRecommenda
                                         RecommendCondition.RESTAURANT,List.of(
                                                 new PlaceRecommendResponse(2, 127.094741101863, 37.5351180385975,
                                                         "한우공방", "식당", 1,
-                                                        "http://place.map.kakao.com/886708185"
+                                                        "http://place.map.kakao.com/886708185",
+                                                        "http://t1.daumcdn.net/news/201706/21/kedtv/20170621155930292vyyx.jpg"
                                                 )
                                         ),
                                         RecommendCondition.CAFE,List.of(
                                                 new PlaceRecommendResponse(1, 127.094741101863, 37.5351180385975,
                                                         "스타벅스 종로R점", "카페", 1,
-                                                        "http://place.map.kakao.com/1784996243"
+                                                        "http://place.map.kakao.com/1784996243",
+                                                        "http://t1.daumcdn.net/news/201706/21/kedtv/20170621155930292vyyx.jpg"
                                                 )
                                         ),
                                         RecommendCondition.PC_ROOM_KARAOKE,List.of(
                                                 new PlaceRecommendResponse(3, 127.094741101863, 37.5351180385975,
                                                         "옵티멈존 PC카페 종각역점", "PC방", 1,
-                                                        "http://place.map.kakao.com/1342335656"
+                                                        "http://place.map.kakao.com/1342335656",
+                                                        "http://t1.daumcdn.net/news/201706/21/kedtv/20170621155930292vyyx.jpg"
                                                 )
                                         )
                                 ),
@@ -382,20 +394,24 @@ public class MockingRecommendationController implements SwaggerMockingRecommenda
                                                 new PlaceRecommendResponse(
                                                         1, 127.094741101863, 37.5351180385975,
                                                         "하이디라오 홍대지점", "음식점", 1,
-                                                        "http://place.map.kakao.com/1622865435")
+                                                        "http://place.map.kakao.com/1622865435",
+                                                        "http://t1.daumcdn.net/news/201706/21/kedtv/20170621155930292vyyx.jpg"
+                                                )
                                         ),
                                         RecommendCondition.CAFE,List.of(
                                                 new PlaceRecommendResponse(
                                                         2, 127.094741101863, 37.5351180385975,
                                                         "1984", "카페", 1,
-                                                        "http://place.map.kakao.com/23634722"
+                                                        "http://place.map.kakao.com/23634722",
+                                                        "http://t1.daumcdn.net/news/201706/21/kedtv/20170621155930292vyyx.jpg"
                                                 )
                                         ),
                                         RecommendCondition.PC_ROOM_KARAOKE,List.of(
                                                 new PlaceRecommendResponse(
                                                         3, 127.094741101863, 37.5351180385975,
                                                         "에스엔에스 피씨SNS PC", "PC방", 1,
-                                                        "http://place.map.kakao.com/798252372"
+                                                        "http://place.map.kakao.com/798252372",
+                                                        "http://t1.daumcdn.net/news/201706/21/kedtv/20170621155930292vyyx.jpg"
                                                 )
                                         )
                                 ),
@@ -491,13 +507,18 @@ public class MockingRecommendationController implements SwaggerMockingRecommenda
                                 List.of(
                                         new PlaceRecommendResponse(1, 127.094741101863, 37.5351180385975,
                                                 "육일관", "식당", 1,
-                                                "http://place.map.kakao.com/1050190897"),
+                                                "http://place.map.kakao.com/1050190897",
+                                                "http://t1.daumcdn.net/news/201706/21/kedtv/20170621155930292vyyx.jpg"
+                                        ),
                                         new PlaceRecommendResponse(2, 127.094741101863, 37.5351180385975,
                                                 "바나프레소 건대역점", "카페", 1,
-                                                "http://place.map.kakao.com/666587821"),
+                                                "http://place.map.kakao.com/666587821",
+                                                "http://t1.daumcdn.net/news/201706/21/kedtv/20170621155930292vyyx.jpg"
+                                        ),
                                         new PlaceRecommendResponse(3, 127.094741101863, 37.5351180385975,
                                                 "포포PC방 건대점", "PC방", 1,
-                                                "http://place.map.kakao.com/356960076")
+                                                "http://place.map.kakao.com/356960076",
+                                                "http://t1.daumcdn.net/news/201706/21/kedtv/20170621155930292vyyx.jpg")
                                 ),
                                 List.of(
                                         new LegacyRouteResponse(1, 0, 4, List.of(
@@ -527,17 +548,20 @@ public class MockingRecommendationController implements SwaggerMockingRecommenda
                                         new PlaceRecommendResponse(
                                                 1, 127.094741101863, 37.5351180385975,
                                                 "훈장골 사당점", "식당", 1,
-                                                "http://place.map.kakao.com/63778027"
+                                                "http://place.map.kakao.com/63778027",
+                                                "http://t1.daumcdn.net/news/201706/21/kedtv/20170621155930292vyyx.jpg"
                                         ),
                                         new PlaceRecommendResponse(
                                                 2, 127.094741101863, 37.5351180385975,
                                                 "스타벅스 사당점", "카페", 1,
-                                                "http://place.map.kakao.com/23447734"
+                                                "http://place.map.kakao.com/23447734",
+                                                "https://postfiles.pstatic.net/MjAyNTEwMTFfMTc4/MDAxNzYwMTc5OTY1Nzk0.g0QMYYmtwApndSwRP589w3xB4FXUx4hoYJqM2WC16MIg.N6yAEBTJDWquseEPWtc5DLTZSjN__3msUVDXUJobF-gg.PNG/image.png?type=w966"
                                         ),
                                         new PlaceRecommendResponse(
                                                 3, 127.094741101863, 37.5351180385975,
                                                 "레벨업PC방 사당역점", "PC방", 2,
-                                                "http://place.map.kakao.com/1705311839"
+                                                "http://place.map.kakao.com/1705311839",
+                                                "https://postfiles.pstatic.net/MjAyNTEwMTFfMTc4/MDAxNzYwMTc5OTY1Nzk0.g0QMYYmtwApndSwRP589w3xB4FXUx4hoYJqM2WC16MIg.N6yAEBTJDWquseEPWtc5DLTZSjN__3msUVDXUJobF-gg.PNG/image.png?type=w966"
                                         )
                                 ),
                                 List.of(
@@ -562,16 +586,19 @@ public class MockingRecommendationController implements SwaggerMockingRecommenda
                                         new PlaceRecommendResponse(
                                                 1, 127.094741101863, 37.5351180385975,
                                                 "스시도쿠", "식당", 1,
-                                                "http://place.map.kakao.com/26792732"
+                                                "http://place.map.kakao.com/26792732",
+                                                "https://postfiles.pstatic.net/MjAyNTEwMTFfMTc4/MDAxNzYwMTc5OTY1Nzk0.g0QMYYmtwApndSwRP589w3xB4FXUx4hoYJqM2WC16MIg.N6yAEBTJDWquseEPWtc5DLTZSjN__3msUVDXUJobF-gg.PNG/image.png?type=w966"
                                         ),
                                         new PlaceRecommendResponse(
                                                 2, 127.094741101863, 37.5351180385975,
                                                 "탐앤탐스 왕십리역점", "카페", 1,
-                                                "http://place.map.kakao.com/10809505"
+                                                "http://place.map.kakao.com/10809505",
+                                                "https://postfiles.pstatic.net/MjAyNTEwMTFfMTc4/MDAxNzYwMTc5OTY1Nzk0.g0QMYYmtwApndSwRP589w3xB4FXUx4hoYJqM2WC16MIg.N6yAEBTJDWquseEPWtc5DLTZSjN__3msUVDXUJobF-gg.PNG/image.png?type=w966"
                                         ),
                                         new PlaceRecommendResponse(3, 127.094741101863, 37.5351180385975,
                                                 "이스포츠PC방 왕십리점", "PC방", 2,
-                                                "http://place.map.kakao.com/12326220"
+                                                "http://place.map.kakao.com/12326220",
+                                                "https://postfiles.pstatic.net/MjAyNTEwMTFfMTc4/MDAxNzYwMTc5OTY1Nzk0.g0QMYYmtwApndSwRP589w3xB4FXUx4hoYJqM2WC16MIg.N6yAEBTJDWquseEPWtc5DLTZSjN__3msUVDXUJobF-gg.PNG/image.png?type=w966"
                                         )
                                 ),
                                 List.of(
@@ -603,15 +630,18 @@ public class MockingRecommendationController implements SwaggerMockingRecommenda
                                 List.of(
                                         new PlaceRecommendResponse(1, 127.094741101863, 37.5351180385975,
                                                 "스타벅스 종로R점", "카페", 1,
-                                                "http://place.map.kakao.com/1784996243"
+                                                "http://place.map.kakao.com/1784996243",
+                                                "https://postfiles.pstatic.net/MjAyNTEwMTFfMTc4/MDAxNzYwMTc5OTY1Nzk0.g0QMYYmtwApndSwRP589w3xB4FXUx4hoYJqM2WC16MIg.N6yAEBTJDWquseEPWtc5DLTZSjN__3msUVDXUJobF-gg.PNG/image.png?type=w966"
                                         ),
                                         new PlaceRecommendResponse(2, 127.094741101863, 37.5351180385975,
                                                 "한우공방", "식당", 1,
-                                                "http://place.map.kakao.com/886708185"
+                                                "http://place.map.kakao.com/886708185",
+                                                "https://postfiles.pstatic.net/MjAyNTEwMTFfMTc4/MDAxNzYwMTc5OTY1Nzk0.g0QMYYmtwApndSwRP589w3xB4FXUx4hoYJqM2WC16MIg.N6yAEBTJDWquseEPWtc5DLTZSjN__3msUVDXUJobF-gg.PNG/image.png?type=w966"
                                         ),
                                         new PlaceRecommendResponse(3, 127.094741101863, 37.5351180385975,
                                                 "옵티멈존 PC카페 종각역점", "PC방", 1,
-                                                "http://place.map.kakao.com/1342335656"
+                                                "http://place.map.kakao.com/1342335656",
+                                                "https://postfiles.pstatic.net/MjAyNTEwMTFfMTc4/MDAxNzYwMTc5OTY1Nzk0.g0QMYYmtwApndSwRP589w3xB4FXUx4hoYJqM2WC16MIg.N6yAEBTJDWquseEPWtc5DLTZSjN__3msUVDXUJobF-gg.PNG/image.png?type=w966"
                                         )
                                 ),
                                 List.of(
@@ -651,17 +681,21 @@ public class MockingRecommendationController implements SwaggerMockingRecommenda
                                         new PlaceRecommendResponse(
                                                 1, 127.094741101863, 37.5351180385975,
                                                 "하이디라오 홍대지점", "음식점", 1,
-                                                "http://place.map.kakao.com/1622865435"),
+                                                "http://place.map.kakao.com/1622865435",
+                                                "https://postfiles.pstatic.net/MjAyNTEwMTFfMTc4/MDAxNzYwMTc5OTY1Nzk0.g0QMYYmtwApndSwRP589w3xB4FXUx4hoYJqM2WC16MIg.N6yAEBTJDWquseEPWtc5DLTZSjN__3msUVDXUJobF-gg.PNG/image.png?type=w966"
+                                        ),
 
                                         new PlaceRecommendResponse(
                                                 2, 127.094741101863, 37.5351180385975,
                                                 "1984", "카페", 1,
-                                                "http://place.map.kakao.com/23634722"
+                                                "http://place.map.kakao.com/23634722",
+                                                "https://postfiles.pstatic.net/MjAyNTEwMTFfMTc4/MDAxNzYwMTc5OTY1Nzk0.g0QMYYmtwApndSwRP589w3xB4FXUx4hoYJqM2WC16MIg.N6yAEBTJDWquseEPWtc5DLTZSjN__3msUVDXUJobF-gg.PNG/image.png?type=w966"
                                         ),
                                         new PlaceRecommendResponse(
                                                 3, 127.094741101863, 37.5351180385975,
                                                 "에스엔에스 피씨SNS PC", "PC방", 1,
-                                                "http://place.map.kakao.com/798252372"
+                                                "http://place.map.kakao.com/798252372",
+                                                "https://postfiles.pstatic.net/MjAyNTEwMTFfMTc4/MDAxNzYwMTc5OTY1Nzk0.g0QMYYmtwApndSwRP589w3xB4FXUx4hoYJqM2WC16MIg.N6yAEBTJDWquseEPWtc5DLTZSjN__3msUVDXUJobF-gg.PNG/image.png?type=w966"
                                         )
                                 ),
                                 List.of(
