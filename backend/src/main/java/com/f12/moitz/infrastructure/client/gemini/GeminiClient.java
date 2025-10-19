@@ -15,4 +15,5 @@ public interface GeminiClient {
             List<String> candidatePlaces,
             List<String> requirements
     );
+
 }
