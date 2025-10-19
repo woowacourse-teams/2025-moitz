@@ -15,7 +15,7 @@ public enum RecommendCondition {
     RESTAURANT("RESTAURANT","식당"),
     BAR("BAR","술집"),
     STUDY_CAFE("STUDY_CAFE", "스터디카페"),
-    SPACE_RENTAL("SPACE_RENTAL", "공간대여"),
+    SPACE_RENTAL("SPACE_RENTAL", "파티룸"),
     PC_ROOM_KARAOKE("PC_ROOM_KARAOKE", List.of("PC방", "노래방")),
     ACTIVITY("ACTIVITY", List.of("클라이밍", "볼링", "사격", "당구")),
     ENTERTAINMENT("ENTERTAINMENT", List.of("방탈출", "만화방", "보드게임카페", "영화관"));
