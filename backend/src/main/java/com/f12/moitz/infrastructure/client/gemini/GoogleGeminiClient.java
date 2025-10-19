@@ -25,13 +25,15 @@ import java.util.List;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
 @Component
+@Profile("!load-test")
 @RequiredArgsConstructor
 @Slf4j
-public class GoogleGeminiClient {
+public class GoogleGeminiClient implements GeminiClient {
 
     private static final String GEMINI_MODEL = "gemini-2.0-flash";
 
@@ -80,7 +82,7 @@ public class GoogleGeminiClient {
         return generateWith(prompt, config);
     }
 
-    public List<PlaceRecommendResponse> generateWith(final String prompt) {
+    private List<PlaceRecommendResponse> generateWith(final String prompt) {
         final GenerateContentConfig config = GenerateContentConfig.builder()
                 .temperature(0.4F)
                 .responseMimeType("application/json")

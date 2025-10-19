@@ -8,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
@@ -50,6 +51,24 @@ public class ClientConfig {
                 .build();
     }
 
+    @Bean
+    @Profile("load-test")
+    public RestClient mcokKakaoRestClient() {
+        return restClientBuilder()
+                .baseUrl("http://localhost:8081/mock/kakaomap")
+                .requestFactory(simpleClientHttpRequestFactory())
+                .build();
+    }
+
+    @Bean
+    @Profile("load-test")
+    public RestClient mockGeminiRestClient() {
+        return restClientBuilder()
+                .baseUrl("http://localhost:8081/mock/gemini")
+                .requestFactory(simpleClientHttpRequestFactory())
+                .build();
+    }
+
     private SimpleClientHttpRequestFactory simpleClientHttpRequestFactory() {
         final SimpleClientHttpRequestFactory requestFactory = new SimpleClientHttpRequestFactory();
         requestFactory.setConnectTimeout(Duration.ofSeconds(3));
@@ -62,11 +81,13 @@ public class ClientConfig {
     }
 
     @Bean
+    @Profile("!load-test")
     public Client.Builder geminiClientBuilder() {
         return Client.builder();
     }
 
     @Bean
+    @Profile("!load-test")
     public Client geminiClient() {
         return geminiClientBuilder().apiKey(geminiApiKey).build();
     }
