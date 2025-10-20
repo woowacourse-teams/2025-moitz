@@ -28,6 +28,7 @@ public class ClientConfig {
     private String perplexityApiKey;
 
     @Bean
+    @Profile("!load-test")
     public RestClient kakaoRestClient() {
         return restClientBuilder()
                 .baseUrl("https://dapi.kakao.com/v2")
@@ -59,9 +60,9 @@ public class ClientConfig {
                 .build();
     }
 
-    @Bean
+    @Bean("kakaoRestClient")
     @Profile("load-test")
-    public RestClient mcokKakaoRestClient() {
+    public RestClient mockKakaoRestClient() {
         return restClientBuilder()
                 .baseUrl("http://localhost:8081/mock/kakaomap")
                 .requestFactory(simpleClientHttpRequestFactory())
