@@ -1,0 +1,76 @@
+name: Backend 개발 서버 CI/CD - 부하 테스트용
+
+on:
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: [ self-hosted, dev ]
+
+    defaults:
+      run:
+        working-directory: ./backend
+
+    steps:
+      - name: 최신 커밋 내역으로 checkout 한다
+        uses: actions/checkout@v4
+
+      - name: properties 파일을 갱신한다
+        env:
+          APPLICATION_DEV_CLIENT_PROPERTIES: ${{ secrets.APPLICATION_DEV_CLIENT_PROPERTIES }}
+          APPLICATION_DB_PROPERTIES: ${{ secrets.APPLICATION_DB_PROPERTIES }}
+        run: |
+          rm -rf src/main/resources/application-devclient.properties
+          echo "$APPLICATION_DEV_CLIENT_PROPERTIES" > src/main/resources/application-devclient.properties
+          rm -rf src/main/resources/application-db.properties
+          echo "$APPLICATION_DB_PROPERTIES" > src/main/resources/application-db.properties
+
+      - name: 애플리케이션을 테스트한다
+        env:
+          GRADLE_FAIL_REPORT_FOLDER: "build/reports/tests/test"
+          S3_FAIL_REPORT_FOLDER: ${{ secrets.S3_BE_FAIL_REPORT_BUCKET }}
+        run: |
+          # 테스트 코드가 실패할 경우, 리포트를 S3에 업로드하고 작업을 종료한다
+          if ! ./gradlew test; then
+            echo "🔴 테스트 실패"
+            echo "=== S3에 테스트 리포트 업로드 ==="
+            aws s3 cp $GRADLE_FAIL_REPORT_FOLDER $S3_FAIL_REPORT_FOLDER --recursive
+            exit 1
+          fi
+
+      - name: 애플리케이션을 빌드 및 실행한다
+        env:
+          LOGS_DIRECTORY: "/home/ubuntu/app-logs"
+        run: |
+          echo "=== JAR 빌드 ==="
+          ./gradlew --no-build-cache clean build -Dspring.profiles.active="dev,load-test"
+
+          JAR_PATH=$(ls build/libs/*SNAPSHOT.jar | head -n 1)
+          if [ ! -f "$JAR_PATH" ]; then
+            echo "빌드된 JAR 파일이 없습니다: $JAR_PATH"
+            exit 1
+          fi
+
+          # 기존에 실행 중인 애플리케이션을 먼저 종료한다
+          echo "=== 실행 중인 앱 종료 ==="
+          PID=$(pgrep -f "$JAR_PATH" || true)
+
+          if [ -n "$PID" ]; then
+            kill -15 $PID
+            echo "→ 종료 완료 (PID: $PID)"
+            sleep 5
+          fi
+
+          # 빌드한 JAR 파일을 실행시킨다
+          echo "=== 앱 실행 ==="
+          RUNNER_TRACKING_ID="" && nohup java -jar -Duser.timezone=Asia/Seoul -Dspring.profiles.active="dev,load-test" "$JAR_PATH" > "$LOGS_DIRECTORY/nohup.log" 2>&1 &
+          sleep 3
+
+          NEW_PID=$(pgrep -f "$JAR_PATH" || true)
+
+          if [ -n "$NEW_PID" ]; then
+            echo "앱 실행 성공 (PID: $NEW_PID)"
+          else
+            echo "앱 실행 실패"
+            exit 1
+          fi
