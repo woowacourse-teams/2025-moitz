@@ -60,6 +60,8 @@ public class MonitoringConfig {
                    || id.getName().startsWith("executor.completed") || id.getName().startsWith("executor.queued")
                    || id.getName().startsWith("jvm.threads")
                    || id.getName().startsWith("jvm.memory.used")
+                   || id.getName().startsWith("tomcat.threads")
+                   || id.getName().startsWith("mongodb.driver.pool")
                    || id.getName().startsWith("process");
         });
     }
