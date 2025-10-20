@@ -64,7 +64,7 @@ public class ClientConfig {
     @Profile("load-test")
     public RestClient mockKakaoRestClient() {
         return restClientBuilder()
-                .baseUrl("http://localhost:8081/mock/kakaomap")
+                .baseUrl("http://3.34.130.156:8081/mock/kakaomap")
                 .requestFactory(simpleClientHttpRequestFactory())
                 .build();
     }
@@ -73,7 +73,7 @@ public class ClientConfig {
     @Profile("load-test")
     public RestClient mockGeminiRestClient() {
         return restClientBuilder()
-                .baseUrl("http://localhost:8081/mock/gemini")
+                .baseUrl("http://3.34.130.156:8081/mock/gemini")
                 .requestFactory(simpleClientHttpRequestFactory())
                 .build();
     }
