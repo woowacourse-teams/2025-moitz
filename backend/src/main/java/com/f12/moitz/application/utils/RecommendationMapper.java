@@ -1,9 +1,9 @@
 package com.f12.moitz.application.utils;
 
 import com.f12.moitz.application.dto.LocationResponse;
-import com.f12.moitz.application.dto.PointResponse;
 import com.f12.moitz.application.dto.PathResponse;
 import com.f12.moitz.application.dto.PlaceRecommendResponse;
+import com.f12.moitz.application.dto.PointResponse;
 import com.f12.moitz.application.dto.RecommendationResultResponse;
 import com.f12.moitz.application.dto.RouteResponse;
 import com.f12.moitz.application.dto.StartingPlaceResponse;
@@ -169,7 +169,7 @@ public class RecommendationMapper {
                 .mapToObj(pathIndex -> toPathResponse(route.getPaths().get(pathIndex), pathIndex + 1))
                 .toList();
 
-        List<PointResponse> pointResponses = IntStream.range(0, course.size())
+        final List<PointResponse> pointResponses = IntStream.range(0, course.size())
                 .mapToObj(pointIndex -> toPointResponse(course.getPoints().get(pointIndex), pointIndex + 1))
                 .toList();
 
