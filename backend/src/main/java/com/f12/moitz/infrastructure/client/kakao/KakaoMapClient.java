@@ -138,7 +138,6 @@ public class KakaoMapClient {
         final List<DocumentResponse> documentsWithImages = response.documents().stream()
                 .map(documentResponse -> addImageUrlToDocument(documentResponse, stationName))
                 .collect(Collectors.toList());
-        log.debug(documentsWithImages.toString());
         return response.withImageUrls(documentsWithImages);
     }
 
