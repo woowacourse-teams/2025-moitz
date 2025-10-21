@@ -21,7 +21,6 @@ public class Result {
     private List<RecommendCondition> recommendConditions;
 
     @CreatedDate
-    @Indexed(expireAfter = "7d")
     private Instant createdAt;
 
     private List<? extends Place> startingPlaces;
