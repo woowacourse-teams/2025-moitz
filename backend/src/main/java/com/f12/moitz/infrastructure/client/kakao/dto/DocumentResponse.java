@@ -9,7 +9,21 @@ public record DocumentResponse(
         @JsonProperty("place_name") String placeName,
         @JsonProperty("place_url") String placeUrl,
         String x,
-        String y
+        String y,
+        @JsonProperty("image_url")String imageUrl
 ) {
+
+    public DocumentResponse withImageUrl(String imageUrl) {
+        return new DocumentResponse(
+                categoryGroupName,
+                categoryName,
+                distance,
+                placeName,
+                placeUrl,
+                x,
+                y,
+                imageUrl
+        );
+    }
 
 }

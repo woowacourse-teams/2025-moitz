@@ -3,20 +3,17 @@ package com.f12.moitz.infrastructure.client.gemini;
 import static com.f12.moitz.infrastructure.PromptGenerator.ADDITIONAL_WITH_CANDIDATE_PROMPT;
 import static com.f12.moitz.infrastructure.PromptGenerator.RECOMMENDATION_COUNT;
 
-import com.f12.moitz.application.dto.PlaceRecommendResponse;
 import com.f12.moitz.application.dto.RecommendedLocationsResponse;
 import com.f12.moitz.common.error.exception.ExternalApiErrorCode;
 import com.f12.moitz.common.error.exception.ExternalApiException;
 import com.f12.moitz.common.error.exception.RetryableApiException;
 import com.f12.moitz.infrastructure.PromptGenerator;
-import com.f12.moitz.infrastructure.client.gemini.dto.RecommendedPlaceResponses;
 import com.f12.moitz.infrastructure.client.gemini.utils.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.genai.Client;
 import com.google.genai.errors.ClientException;
 import com.google.genai.errors.ServerException;
-import com.google.genai.types.Candidate;
 import com.google.genai.types.Content;
 import com.google.genai.types.GenerateContentConfig;
 import com.google.genai.types.GenerateContentResponse;
@@ -80,17 +77,6 @@ public class GoogleGeminiClient {
         return generateWith(prompt, config);
     }
 
-    public List<PlaceRecommendResponse> generateWith(final String prompt) {
-        final GenerateContentConfig config = GenerateContentConfig.builder()
-                .temperature(0.4F)
-                .responseMimeType("application/json")
-                .maxOutputTokens(5000)
-                .build();
-
-        final GenerateContentResponse response = generateWith(prompt, config);
-        return extractResponse(response).getPlacesByStationName();
-    }
-
     public GenerateContentResponse generateWith(final String prompt, final GenerateContentConfig config) {
         return generateWith(List.of(Content.fromParts(Part.fromText(prompt))), config);
     }
@@ -129,34 +115,6 @@ public class GoogleGeminiClient {
         log.debug("Gemini 응답 성공, 토큰 사용 {}개", generateContentResponse.usageMetadata().get().totalTokenCount().get());
 
         return generateContentResponse;
-    }
-
-    public RecommendedPlaceResponses extractResponse(final GenerateContentResponse generateContentResponse) {
-        try {
-            final String originalText = generateContentResponse.candidates()
-                    .map(List::getFirst)
-                    .flatMap(Candidate::content)
-                    .flatMap(Content::parts)
-                    .map(List::getFirst)
-                    .flatMap(Part::text)
-                    .orElse(null);
-
-            if (originalText == null || originalText.trim().isEmpty()) {
-                log.error("Gemini API 응답은 존재하나, 생성된 응답이 비어있습니다.");
-                throw new RetryableApiException(ExternalApiErrorCode.INVALID_GEMINI_RESPONSE_FORMAT);
-            }
-
-            final String cleanedText = jsonParser.cleanJsonResponse(originalText);
-            if (!jsonParser.isValidJson(cleanedText)) {
-                log.error("유효하지 않은 JSON 형식: {}", cleanedText);
-                throw new RetryableApiException(ExternalApiErrorCode.INVALID_GEMINI_RESPONSE_FORMAT);
-            }
-            return readValue(cleanedText, RecommendedPlaceResponses.class);
-
-        } catch (Exception e) {
-            log.error("Gemini 응답 파싱 중 오류 발생", e);
-            throw new RetryableApiException(ExternalApiErrorCode.INVALID_GEMINI_RESPONSE_FORMAT);
-        }
     }
 
     private <T> T readValue(final String content, final Class<T> valueType) {

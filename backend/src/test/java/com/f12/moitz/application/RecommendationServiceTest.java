@@ -104,7 +104,8 @@ class RecommendationServiceTest {
                                                 new Point(127.048, 37.504),
                                                 "카페",
                                                 5,
-                                                "url"
+                                                "url",
+                                                "imageUrl"
                                         )
                                 )
                         )
@@ -117,7 +118,8 @@ class RecommendationServiceTest {
                                                 new Point(127.063, 37.508),
                                                 "카페",
                                                 4,
-                                                "url"
+                                                "url",
+                                                "imageUrl"
                                         )
                                 )
                         )

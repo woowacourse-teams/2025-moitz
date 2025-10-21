@@ -19,9 +19,11 @@ class RecommendedPlaceTest {
         final String category = "카페";
         final int walkingTime = 5;
         final String url = "https://www.starbucks.co.kr";
+        final String imageUrl = "https://postfiles.pstatic.net/MjAyNTEwMTFfMTc4/MDAxNzYwMTc5OTY1Nzk0.g0QMYYmtwApndSwRP589w3xB4FXUx4hoYJqM2WC16MIg.N6yAEBTJDWquseEPWtc5DLTZSjN__3msUVDXUJobF-gg.PNG/image.png?type=w966";
 
         // When & Then
-        assertThatNoException().isThrownBy(() -> new RecommendedPlace(placeName, DEFAULT_POINT, category, walkingTime, url));
+        assertThatNoException().isThrownBy(
+                () -> new RecommendedPlace(placeName, DEFAULT_POINT, category, walkingTime, url, imageUrl));
     }
 
     @Test
@@ -32,26 +34,32 @@ class RecommendedPlaceTest {
         final String category = "카페";
         final int walkingTime = 5;
         final String url = "https://www.starbucks.co.kr";
+        final String imageUrl = "https://postfiles.pstatic.net/MjAyNTEwMTFfMTc4/MDAxNzYwMTc5OTY1Nzk0.g0QMYYmtwApndSwRP589w3xB4FXUx4hoYJqM2WC16MIg.N6yAEBTJDWquseEPWtc5DLTZSjN__3msUVDXUJobF-gg.PNG/image.png?type=w966";
 
         // When & Then
         assertSoftly(softAssertions -> {
-            softAssertions.assertThatThrownBy(() -> new RecommendedPlace(null, DEFAULT_POINT, category, walkingTime, url))
+            softAssertions.assertThatThrownBy(
+                            () -> new RecommendedPlace(null, DEFAULT_POINT, category, walkingTime, url, imageUrl))
                     .isInstanceOf(IllegalArgumentException.class)
                     .hasMessage("이름은 비어있거나 null일 수 없습니다.");
 
-            softAssertions.assertThatThrownBy(() -> new RecommendedPlace(placeName, DEFAULT_POINT, null, walkingTime, url))
+            softAssertions.assertThatThrownBy(
+                            () -> new RecommendedPlace(placeName, DEFAULT_POINT, null, walkingTime, url, imageUrl))
                     .isInstanceOf(IllegalArgumentException.class)
                     .hasMessage("카테고리는 필수입니다.");
 
-            softAssertions.assertThatThrownBy(() -> new RecommendedPlace(placeName, DEFAULT_POINT, "", walkingTime, url))
+            softAssertions.assertThatThrownBy(
+                            () -> new RecommendedPlace(placeName, DEFAULT_POINT, "", walkingTime, url, imageUrl))
                     .isInstanceOf(IllegalArgumentException.class)
                     .hasMessage("카테고리는 필수입니다.");
 
-            softAssertions.assertThatThrownBy(() -> new RecommendedPlace(placeName, DEFAULT_POINT, category, walkingTime, null))
+            softAssertions.assertThatThrownBy(
+                            () -> new RecommendedPlace(placeName, DEFAULT_POINT, category, walkingTime, null, imageUrl))
                     .isInstanceOf(IllegalArgumentException.class)
                     .hasMessage("URL은 필수입니다.");
 
-            softAssertions.assertThatThrownBy(() -> new RecommendedPlace(placeName, DEFAULT_POINT, category, walkingTime, ""))
+            softAssertions.assertThatThrownBy(
+                            () -> new RecommendedPlace(placeName, DEFAULT_POINT, category, walkingTime, "", imageUrl))
                     .isInstanceOf(IllegalArgumentException.class)
                     .hasMessage("URL은 필수입니다.");
         });
@@ -65,9 +73,10 @@ class RecommendedPlaceTest {
         final String category = "카페";
         final int walkingTime = -5;
         final String url = "https://www.starbucks.co.kr";
+        final String imageUrl = "https://postfiles.pstatic.net/MjAyNTEwMTFfMTc4/MDAxNzYwMTc5OTY1Nzk0.g0QMYYmtwApndSwRP589w3xB4FXUx4hoYJqM2WC16MIg.N6yAEBTJDWquseEPWtc5DLTZSjN__3msUVDXUJobF-gg.PNG/image.png?type=w966";
 
         // When & Then
-        assertThatThrownBy(() -> new RecommendedPlace(placeName, DEFAULT_POINT, category, walkingTime, url))
+        assertThatThrownBy(() -> new RecommendedPlace(placeName, DEFAULT_POINT, category, walkingTime, url, imageUrl))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("도보 시간은 0 이상이어야 합니다.");
     }

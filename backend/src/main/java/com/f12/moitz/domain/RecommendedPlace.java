@@ -10,14 +10,23 @@ public class RecommendedPlace extends Place {
 
     private String category;
     private int walkingTime;
-    private String url;
+    private String placeUrl;
+    private String imageUrl;
 
-    public RecommendedPlace(final String placeName, final Point point, final String category, final int walkingTime, final String url) {
+    public RecommendedPlace(
+            final String placeName,
+            final Point point,
+            final String category,
+            final int walkingTime,
+            final String placeUrl,
+            final String imageUrl
+    ) {
         super(placeName, point);
-        validate(category, walkingTime, url);
+        validate(category, walkingTime, placeUrl);
         this.category = category;
         this.walkingTime = walkingTime;
-        this.url = url;
+        this.placeUrl = placeUrl;
+        this.imageUrl = imageUrl;
     }
 
     private void validate(final String category, final int walkingTime, final String url) {

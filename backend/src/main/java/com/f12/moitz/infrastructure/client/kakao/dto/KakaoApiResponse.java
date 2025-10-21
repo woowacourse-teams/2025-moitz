@@ -7,6 +7,10 @@ public record KakaoApiResponse(
         MetaResponse meta
 ) {
 
+    public KakaoApiResponse withImageUrls(List<DocumentResponse> documentsWithImages) {
+        return new KakaoApiResponse(documentsWithImages, meta);
+    }
+
     public double findStationX() {
         return Double.parseDouble(findStation().x());
     }

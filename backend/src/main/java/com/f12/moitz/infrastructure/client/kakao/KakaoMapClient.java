@@ -3,13 +3,17 @@ package com.f12.moitz.infrastructure.client.kakao;
 import com.f12.moitz.common.error.exception.ExternalApiErrorCode;
 import com.f12.moitz.common.error.exception.ExternalApiException;
 import com.f12.moitz.domain.Point;
+import com.f12.moitz.infrastructure.client.kakao.dto.DocumentResponse;
 import com.f12.moitz.infrastructure.client.kakao.dto.KakaoApiResponse;
+import com.f12.moitz.infrastructure.client.kakao.dto.KakaoImageApiResponse;
 import com.f12.moitz.infrastructure.client.kakao.dto.KakaoMapErrorResponse;
+import com.f12.moitz.infrastructure.client.kakao.dto.SearchImageRequest;
 import com.f12.moitz.infrastructure.client.kakao.dto.SearchPlacesLimitQuantityRequest;
 import com.f12.moitz.infrastructure.client.kakao.dto.SearchPlacesRequest;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.util.List;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -22,9 +26,10 @@ import org.springframework.web.client.RestClient;
 @Component
 public class KakaoMapClient {
 
-    private static final String SEARCH_PLACE_URL = "/keyword.json?query=%s&x=%s&y=%s&radius=%d";
-    private static final String SEARCH_PLACE_WITH_SIZE_URL = "/keyword.json?query=%s&x=%s&y=%s&radius=%d&size=%d";
-    private static final String SEARCH_POINT_URL = "/keyword.json?query=%s";
+    private static final String SEARCH_PLACE_URL = "/local/search/keyword.json?query=%s&x=%s&y=%s&radius=%d";
+    private static final String SEARCH_PLACE_WITH_SIZE_URL = "/local/search/keyword.json?query=%s&x=%s&y=%s&radius=%d&size=%d";
+    private static final String SEARCH_POINT_URL = "/local/search/keyword.json?query=%s";
+    private static final String SEARCH_IMAGE_URL = "/search/image?query=%s&page=%d&size=%d";
     private static final List<String> ERROR_CODE_CAN_RETRY = List.of("-1", "-7", "-603");
 
     private final RestClient kakaoRestClient;
@@ -51,6 +56,7 @@ public class KakaoMapClient {
     public KakaoApiResponse searchPlacesBy(final SearchPlacesLimitQuantityRequest request) {
         return searchPlacesBy(
                 request.query(),
+                request.name(),
                 String.valueOf(request.longitude()),
                 String.valueOf(request.latitude()),
                 request.radius(),
@@ -76,6 +82,7 @@ public class KakaoMapClient {
 
     private KakaoApiResponse searchPlacesBy(
             final String keyword,
+            final String stationName,
             final String longitude,
             final String latitude,
             final int radius,
@@ -89,7 +96,18 @@ public class KakaoMapClient {
                 radius,
                 size
         );
-        return getData(url);
+        final KakaoApiResponse response = getData(url);
+        return enrichWithImages(response, stationName);
+    }
+
+    public KakaoImageApiResponse searchImagesBy(final SearchImageRequest request) {
+        final String url = String.format(
+                SEARCH_IMAGE_URL,
+                request.getQuery(),
+                request.getPage(),
+                request.getSize()
+        );
+        return getImageData(url);
     }
 
     private KakaoApiResponse getData(final String url) {
@@ -102,6 +120,43 @@ public class KakaoMapClient {
                         (req, res) -> handleError(res)
                 )
                 .body(KakaoApiResponse.class);
+    }
+
+    private KakaoImageApiResponse getImageData(final String url) {
+        return kakaoRestClient.get()
+                .uri(url)
+                .header("Authorization", "KakaoAK " + kakaoApiKey)
+                .retrieve()
+                .onStatus(
+                        status -> status.is4xxClientError() || status.is5xxServerError(),
+                        (req, res) -> handleError(res)
+                )
+                .body(KakaoImageApiResponse.class);
+    }
+
+    private KakaoApiResponse enrichWithImages(final KakaoApiResponse response, final String stationName) {
+        final List<DocumentResponse> documentsWithImages = response.documents().stream()
+                .map(documentResponse -> addImageUrlToDocument(documentResponse, stationName))
+                .collect(Collectors.toList());
+        log.debug(documentsWithImages.toString());
+        return response.withImageUrls(documentsWithImages);
+    }
+
+    private DocumentResponse addImageUrlToDocument(final DocumentResponse document, final String stationName) {
+        try {
+            final SearchImageRequest imageRequest = new SearchImageRequest(stationName, document.placeName(), 1, 1);
+            final KakaoImageApiResponse imageResponse = searchImagesBy(imageRequest);
+
+            if (imageResponse.documents() != null && !imageResponse.documents().isEmpty()) {
+                final String imageUrl = imageResponse.documents().get(0).imageUrl();
+                return document.withImageUrl(imageUrl);
+            }
+            log.info("No image found for place: {}", document.placeName());
+            return document.withImageUrl(null);
+        } catch (ExternalApiException e) {
+            log.warn("Failed to fetch image for place: {}", document.placeName(), e);
+            return document.withImageUrl(null);
+        }
     }
 
     private void handleError(ClientHttpResponse res) {

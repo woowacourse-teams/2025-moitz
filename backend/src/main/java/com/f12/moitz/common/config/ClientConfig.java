@@ -29,7 +29,7 @@ public class ClientConfig {
     @Bean
     public RestClient kakaoRestClient() {
         return restClientBuilder()
-                .baseUrl("https://dapi.kakao.com/v2/local/search")
+                .baseUrl("https://dapi.kakao.com/v2")
                 .requestFactory(simpleClientHttpRequestFactory())
                 .build();
     }

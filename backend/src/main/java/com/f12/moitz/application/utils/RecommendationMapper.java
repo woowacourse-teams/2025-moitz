@@ -146,7 +146,8 @@ public class RecommendationMapper {
                                             p.getName(),
                                             p.getCategory(),
                                             p.getWalkingTime(),
-                                            p.getUrl()
+                                            p.getPlaceUrl(),
+                                            p.getImageUrl()
                                     );
                                 })
                                 .toList()
