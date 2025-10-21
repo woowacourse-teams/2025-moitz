@@ -3,10 +3,10 @@ package com.f12.moitz.application.utils;
 import com.f12.moitz.application.dto.LocationResponse;
 import com.f12.moitz.application.dto.PathResponse;
 import com.f12.moitz.application.dto.PlaceRecommendResponse;
+import com.f12.moitz.application.dto.PointResponse;
 import com.f12.moitz.application.dto.RecommendationResultResponse;
 import com.f12.moitz.application.dto.RouteResponse;
 import com.f12.moitz.application.dto.StartingPlaceResponse;
-import com.f12.moitz.application.dto.SubwayStationResponse;
 import com.f12.moitz.application.port.dto.ReasonAndDescription;
 import com.f12.moitz.domain.Candidate;
 import com.f12.moitz.domain.CategorizedRecommendedPlaces;
@@ -14,6 +14,7 @@ import com.f12.moitz.domain.Course;
 import com.f12.moitz.domain.Courses;
 import com.f12.moitz.domain.Path;
 import com.f12.moitz.domain.Place;
+import com.f12.moitz.domain.Point;
 import com.f12.moitz.domain.RecommendCondition;
 import com.f12.moitz.domain.Recommendation;
 import com.f12.moitz.domain.RecommendedPlace;
@@ -168,8 +169,8 @@ public class RecommendationMapper {
                 .mapToObj(pathIndex -> toPathResponse(route.getPaths().get(pathIndex), pathIndex + 1))
                 .toList();
 
-        final List<SubwayStationResponse> subwayStationResponses = IntStream.range(0, course.size())
-                .mapToObj(placeIndex -> toSubwayStationResponse(course.getPlaces().get(placeIndex), placeIndex + 1))
+        final List<PointResponse> pointResponses = IntStream.range(0, course.size())
+                .mapToObj(pointIndex -> toPointResponse(course.getPoints().get(pointIndex), pointIndex + 1))
                 .toList();
 
         return new RouteResponse(
@@ -178,7 +179,7 @@ public class RecommendationMapper {
                 route.calculateTransferCount(),
                 route.calculateTotalTravelTime(),
                 pathResponses,
-                subwayStationResponses
+                pointResponses
         );
     }
 
@@ -196,12 +197,11 @@ public class RecommendationMapper {
         );
     }
 
-    private SubwayStationResponse toSubwayStationResponse(final Place station, final int order) {
-        return new SubwayStationResponse(
+    private PointResponse toPointResponse(final Point point, final int order) {
+        return new PointResponse(
                 order,
-                station.getName(),
-                station.getPoint().getX(),
-                station.getPoint().getY()
+                point.getX(),
+                point.getY()
         );
     }
 

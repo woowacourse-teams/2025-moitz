@@ -41,7 +41,7 @@ public class SubwayRouteFinderAdapter implements RouteFinder {
     @Override
     public List<Course> findCourses(final List<StartEndPair> placePairs) {
         return findStationSequences(placePairs).stream()
-                .map(sequence -> new Course(sequence.getStations()))
+                .map(sequence -> new Course(sequence.getPoints()))
                 .toList();
     }
 
