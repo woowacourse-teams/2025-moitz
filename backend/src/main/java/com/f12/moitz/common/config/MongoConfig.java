@@ -14,8 +14,8 @@ public class MongoConfig {
     public MongoClientSettingsBuilderCustomizer mongoClientSettingsBuilderCustomizer() {
         return builder -> builder
                 .applyToConnectionPoolSettings(connectionPool -> connectionPool
-                        .maxSize(15)
-                        .minSize(3)
+                        .maxSize(30)
+                        .minSize(5)
                         .maxConnectionIdleTime(300_000, TimeUnit.MILLISECONDS)
                         .maxConnectionLifeTime(600_000, TimeUnit.MILLISECONDS)
                         .maxWaitTime(15_000, TimeUnit.MILLISECONDS)
