@@ -97,7 +97,7 @@ public class KakaoMapClient {
                 size
         );
         final KakaoApiResponse response = getData(url);
-        return enrichWithImages(response,stationName);
+        return enrichWithImages(response, stationName);
     }
 
     public KakaoImageApiResponse searchImagesBy(final SearchImageRequest request) {
@@ -123,15 +123,15 @@ public class KakaoMapClient {
     }
 
     private KakaoImageApiResponse getImageData(final String url) {
-            return kakaoRestClient.get()
-                    .uri(url)
-                    .header("Authorization", "KakaoAK " + kakaoApiKey)
-                    .retrieve()
-                    .onStatus(
-                            status -> status.is4xxClientError() || status.is5xxServerError(),
-                            (req, res) -> handleError(res)
-                    )
-                    .body(KakaoImageApiResponse.class);
+        return kakaoRestClient.get()
+                .uri(url)
+                .header("Authorization", "KakaoAK " + kakaoApiKey)
+                .retrieve()
+                .onStatus(
+                        status -> status.is4xxClientError() || status.is5xxServerError(),
+                        (req, res) -> handleError(res)
+                )
+                .body(KakaoImageApiResponse.class);
     }
 
     private KakaoApiResponse enrichWithImages(final KakaoApiResponse response, final String stationName) {

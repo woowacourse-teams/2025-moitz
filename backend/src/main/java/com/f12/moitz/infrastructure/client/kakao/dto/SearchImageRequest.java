@@ -3,7 +3,7 @@ package com.f12.moitz.infrastructure.client.kakao.dto;
 import lombok.Getter;
 
 @Getter
-public class SearchImageRequest{
+public class SearchImageRequest {
 
     private final String query;
     private final int page;
@@ -14,4 +14,5 @@ public class SearchImageRequest{
         this.page = page;
         this.size = size;
     }
+
 }
