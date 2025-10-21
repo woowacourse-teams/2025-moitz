@@ -16,9 +16,9 @@ public enum ExternalApiErrorCode implements ErrorCode {
     ODSAY_API_BLOCKED("E0013", "ODDAY API에서 요청을 차단했습니다. 잠시 후 다시 시도해주세요.", true),
 
     // KAKAO MAP API 예외 E002
-    INVALID_KAKAO_MAP_API_RESPONSE("E0021", "KAKAO MAP API 응답 처리 중 문제가 발생했습니다.", false),
-    EXCEEDED_KAKAO_MAP_API_TOKEN_QUOTA("E0022", "KAKAO MAP API 토큰 사용량이 초과되었습니다.", false),
-    TEMPORARILY_INVALID_KAKAO_MAP_API_RESPONSE("E0023", "KAKAO MAP API 응답 처리 중 일시적인 문제가 발생했습니다.", true),
+    INVALID_KAKAO_MAP_API_RESPONSE("E0021", "KAKAO API 응답 처리 중 문제가 발생했습니다.", false),
+    EXCEEDED_KAKAO_MAP_API_TOKEN_QUOTA("E0022", "KAKAO API 토큰 사용량이 초과되었습니다.", false),
+    TEMPORARILY_INVALID_KAKAO_MAP_API_RESPONSE("E0023", "KAKAO API 응답 처리 중 일시적인 문제가 발생했습니다.", true),
 
     // PERPLEXITY API 예외 E003
     INVALID_PERPLEXITY_API_KEY("E0031", "유효하지 않은 PERPLEXITY API KEY입니다.", false),
