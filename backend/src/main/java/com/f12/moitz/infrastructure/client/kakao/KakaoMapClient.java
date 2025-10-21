@@ -26,10 +26,10 @@ import org.springframework.web.client.RestClient;
 @Component
 public class KakaoMapClient {
 
-    private static final String SEARCH_PLACE_URL = "/keyword.json?query=%s&x=%s&y=%s&radius=%d";
-    private static final String SEARCH_PLACE_WITH_SIZE_URL = "/keyword.json?query=%s&x=%s&y=%s&radius=%d&size=%d";
-    private static final String SEARCH_POINT_URL = "/keyword.json?query=%s";
-    private static final String SEARCH_IMAGE_URL = "https://dapi.kakao.com/v2/search/image?query=%s&page=%d&size=%d";
+    private static final String SEARCH_PLACE_URL = "/local/search/keyword.json?query=%s&x=%s&y=%s&radius=%d";
+    private static final String SEARCH_PLACE_WITH_SIZE_URL = "/local/search/keyword.json?query=%s&x=%s&y=%s&radius=%d&size=%d";
+    private static final String SEARCH_POINT_URL = "/local/search/keyword.json?query=%s";
+    private static final String SEARCH_IMAGE_URL = "/search/image?query=%s&page=%d&size=%d";
     private static final List<String> ERROR_CODE_CAN_RETRY = List.of("-1", "-7", "-603");
 
     private final RestClient kakaoRestClient;
