@@ -32,4 +32,5 @@ public record KakaoApiResponse(
         }
         return documents.size();
     }
+
 }
