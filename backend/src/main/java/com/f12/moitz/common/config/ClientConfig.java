@@ -35,6 +35,14 @@ public class ClientConfig {
     }
 
     @Bean
+    public WebClient kakaoWebClient() {
+        return WebClient.builder()
+                .baseUrl("https://dapi.kakao.com/v2")
+                .clientConnector(new ReactorClientHttpConnector(httpClient(5)))
+                .build();
+    }
+
+    @Bean
     public RestClient odsayRestClient() {
         return restClientBuilder()
                 .baseUrl("https://api.odsay.com/v1/api")
