@@ -100,16 +100,6 @@ public class KakaoMapClient {
         return enrichWithImages(response, stationName);
     }
 
-    public KakaoImageApiResponse searchImagesBy(final SearchImageRequest request) {
-        final String url = String.format(
-                SEARCH_IMAGE_URL,
-                request.getQuery(),
-                request.getPage(),
-                request.getSize()
-        );
-        return getImageData(url);
-    }
-
     private KakaoApiResponse getData(final String url) {
         return kakaoRestClient.get()
                 .uri(url)
@@ -120,6 +110,16 @@ public class KakaoMapClient {
                         (req, res) -> handleError(res)
                 )
                 .body(KakaoApiResponse.class);
+    }
+
+    public KakaoImageApiResponse searchImagesBy(final SearchImageRequest request) {
+        final String url = String.format(
+                SEARCH_IMAGE_URL,
+                request.getQuery(),
+                request.getPage(),
+                request.getSize()
+        );
+        return getImageData(url);
     }
 
     private KakaoImageApiResponse getImageData(final String url) {
