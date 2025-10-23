@@ -125,7 +125,8 @@ public class RecommendationService {
                 recommendedPlaces,
                 placeRoutes,
                 placeCourses,
-                STARTING_VOTES
+                STARTING_VOTES,
+                recommendConditions
         );
         stopWatch.stop();
         log.debug("추천 서비스 완료. {}", stopWatch.shortSummary());

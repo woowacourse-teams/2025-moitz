@@ -61,13 +61,22 @@ public class RecommendationMapper {
             final Map<Place, CategorizedRecommendedPlaces> placeListMap,
             final Map<Place, Routes> placeRoutes,
             final Map<Place, Courses> placeCourses,
-            final int votes
+            final int votes,
+            final List<RecommendCondition> recommendConditions
     ) {
         return new Recommendation(
                 generatedPlaces.entrySet().stream()
-                        // TODO: 카테고리 키워드 재정의 혹은 네이버 장소 추천 도입 고려
                         .filter(entry -> placeListMap.get(entry.getKey()) != null)
-                        .filter(entry -> !placeListMap.get(entry.getKey()).isEmpty())
+                        .filter(entry -> {
+                            Map<RecommendCondition, List<RecommendedPlace>> categoryMap =
+                                    placeListMap.get(entry.getKey()).getCategorizedPlaces();
+
+                            return recommendConditions.stream()
+                                    .allMatch(condition ->
+                                        categoryMap.containsKey(condition) &&
+                                        !categoryMap.get(condition).isEmpty()
+                                    );
+                        })
                         .map(place -> new Candidate(
                                 place.getKey(),
                                 placeRoutes.get(place.getKey()),
