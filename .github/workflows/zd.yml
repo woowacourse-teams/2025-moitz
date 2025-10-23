@@ -105,11 +105,11 @@ jobs:
         run: |
           # Green 애플리케이션 헬스체크
           echo "➡️ Green 애플리케이션 헬스체크"
-          HEALTH_URL="http://${{ env.GREEN_INSTANCE_IP }}:8080/health"
+          HEALTH_URL="http://${{ env.GREEN_INSTANCE_IP }}:80/health"
           EXPECTED_HEALTH='{"status":"UP"}'
           response=$(curl -fsS --max-time 5 "$HEALTH_URL" || echo "curl_failed")
           
-          if [[ "$response" == "$EXPECTED" ]]; then
+          if [[ "$response" == "$EXPECTED_HEALTH" ]]; then
             echo "✅ Green 인스턴스의 헬스체크가 성공했습니다: $response"
           else
             echo "🔴 Green 인스턴스의 헬스체크가 실패했습니다: $response"
