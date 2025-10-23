@@ -36,6 +36,16 @@ public class RateLimitFilter implements Filter {
         final HttpServletRequest httpServletRequest = (HttpServletRequest) request;
         final HttpServletResponse httpServletResponse = (HttpServletResponse) response;
 
+        // POST 요청이 아니면 rate limit을 적용하지 않고 통과
+        if (!"POST".equalsIgnoreCase(httpServletRequest.getMethod())) {
+            try {
+                chain.doFilter(request, response);
+            } catch (Exception e) {
+                log.error("Error occurred during filter chain", e);
+            }
+            return;
+        }
+
         final String clientIp = httpServletRequest.getHeader("X-Forwarded-For");
         final String userAgent = httpServletRequest.getHeader("User-Agent");
 
