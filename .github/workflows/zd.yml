@@ -1,4 +1,4 @@
-name: 무중단 배포 테스트
+name: 무중단 배포 테스트 (안정형)
 
 on:
   push:
@@ -32,8 +32,10 @@ jobs:
           aws ec2 wait instance-status-ok --instance-ids $GREEN_INSTANCE_ID
           echo "✅ Green 인스턴스 부팅 완료"
 
-      - name: 2단계 Blue/Green IP 가져오기 및 deploy.sh 실행
+      - name: 2단계 Blue/Green IP 가져오기 및 deploy.sh 실행 + 내부 헬스체크
         run: |
+          echo "➡️ Blue/Green 인스턴스 정보 조회"
+
           BLUE_INSTANCE_ID=$(aws ec2 describe-instances \
             --filters 'Name=tag:ProjectTeam,Values=moitz' \
                       'Name=tag:Color,Values=blue' \
@@ -62,26 +64,53 @@ jobs:
           echo BLUE_INSTANCE_IP=$BLUE_INSTANCE_IP >> $GITHUB_ENV
           echo GREEN_INSTANCE_IP=$GREEN_INSTANCE_IP >> $GITHUB_ENV
 
-          echo "➡️ Green 인스턴스에서 deploy.sh 실행"
+          echo "➡️ Green 인스턴스에서 deploy.sh 실행 (Polling 방식)"
           COMMAND_ID=$(aws ssm send-command \
             --instance-ids ${{ env.GREEN_INSTANCE_ID }} \
             --document-name "AWS-RunShellScript" \
             --comment "Run deploy.sh on Green EC2" \
-            --parameters 'commands=["chmod +x /var/snap/amazon-ssm-agent/11798/deploy.sh && sudo /var/snap/amazon-ssm-agent/11798/deploy.sh"]' \
+            --parameters 'commands=["sudo /var/snap/amazon-ssm-agent/11798/deploy.sh"]' \
             --query "Command.CommandId" \
             --output text)
 
-          echo "✅ deploy.sh 실행 완료 대기 중..."
-          aws ssm wait command-executed --command-id "$COMMAND_ID" --instance-id ${{ env.GREEN_INSTANCE_ID }}
-          echo "✅ Green 인스턴스 애플리케이션 기동 완료 로그 감지"
+          echo "SSM Command ID: $COMMAND_ID"
+          echo "✅ deploy.sh 실행 감시 중..."
+
+          MAX_ATTEMPTS=120
+          SLEEP_SEC=10
+          for ((i=1; i<=MAX_ATTEMPTS; i++)); do
+            STATUS=$(aws ssm list-command-invocations \
+              --command-id "$COMMAND_ID" \
+              --instance-id ${{ env.GREEN_INSTANCE_ID }} \
+              --query "CommandInvocations[0].Status" \
+              --output text)
+            echo "[$i/$MAX_ATTEMPTS] 현재 상태: $STATUS"
+
+            if [[ "$STATUS" == "Success" ]]; then
+              echo "✅ deploy.sh 실행 성공"
+              break
+            elif [[ "$STATUS" == "Failed" ]]; then
+              echo "🔴 deploy.sh 실패 로그 출력"
+              aws ssm get-command-invocation \
+                --command-id "$COMMAND_ID" \
+                --instance-id ${{ env.GREEN_INSTANCE_ID }} \
+                --query "{stdout:StandardOutputContent, stderr:StandardErrorContent}" \
+                --output text
+              exit 1
+            fi
+            sleep $SLEEP_SEC
+          done
 
           echo "➡️ Private IP 기반 헬스체크 수행"
           HEALTH_RESULT=$(curl -fsS "http://${GREEN_INSTANCE_IP}:80/health" || echo "curl_failed")
 
-          if [[ "$HEALTH_RESULT" == '{"status":"UP"}' ]]; then
+          if echo "$HEALTH_RESULT" | jq -e '.status == "UP"' >/dev/null 2>&1; then
               echo "✅ Green 헬스체크 성공: $HEALTH_RESULT"
           else
               echo "🔴 Green 헬스체크 실패: $HEALTH_RESULT"
+              echo "⚠️ Blue로 즉시 롤백 수행"
+              sudo sed -i "s/${{ env.GREEN_INSTANCE_IP }}/${{ env.BLUE_INSTANCE_IP }}/g" /etc/nginx/sites-available/default
+              sudo nginx -t && sudo nginx -s reload
               exit 1
           fi
 
