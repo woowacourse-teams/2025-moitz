@@ -10,8 +10,10 @@ import java.lang.management.ManagementFactory;
 import java.lang.management.ThreadMXBean;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
 
 @Slf4j
+@Component
 public class CpuAndLatencyFilter implements Filter {
 
   private final ThreadMXBean tmx = ManagementFactory.getThreadMXBean();
