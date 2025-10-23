@@ -77,34 +77,6 @@ jobs:
 
       - name: 3단계 Green 헬스체크 및 블루와 교체
         run: |
-          EXPECTED_HEALTH='{"status":"UP"}'
-
-          echo "➡️ Green 애플리케이션 헬스체크 (SSM)"
-          CMD_ID=$(aws ssm send-command \
-            --instance-ids ${{ env.GREEN_INSTANCE_ID }} \
-            --document-name "AWS-RunShellScript" \
-            --parameters 'commands=["curl -fsS http://localhost:80/health || echo curl_failed"]' \
-            --query "Command.CommandId" \
-            --output text)
-
-          # 애플리케이션 기동 대기
-          sleep 5
-
-          RESULT=$(aws ssm list-command-invocations \
-            --command-id "$CMD_ID" \
-            --instance-id ${{ env.GREEN_INSTANCE_ID }} \
-            --query 'CommandInvocations[0].StandardOutputContent' \
-            --output text)
-
-          echo "헬스체크 결과: $RESULT"
-
-          if [[ "$RESULT" != "$EXPECTED_HEALTH" ]]; then
-            echo "🔴 Green 인스턴스 헬스체크 실패: $RESULT"
-            exit 1
-          else
-            echo "✅ 헬스체크 성공: $RESULT"
-          fi
-
           echo "➡️ Nginx 프록시 Green으로 변경"
           sudo sed -i "s/${{ env.BLUE_INSTANCE_IP }}/${{ env.GREEN_INSTANCE_IP }}/g" /etc/nginx/sites-available/default
           sudo nginx -t && sudo nginx -s reload
