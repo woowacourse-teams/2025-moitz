@@ -1,6 +1,8 @@
 package com.f12.moitz.infrastructure.adapter;
 
 import com.f12.moitz.application.port.AsyncPlaceRecommender;
+import com.f12.moitz.common.error.exception.ExternalApiErrorCode;
+import com.f12.moitz.common.error.exception.ExternalApiException;
 import com.f12.moitz.domain.CategorizedRecommendedPlaces;
 import com.f12.moitz.domain.Place;
 import com.f12.moitz.domain.Point;
@@ -10,7 +12,6 @@ import com.f12.moitz.infrastructure.client.kakao.KakaoMapAsyncClient;
 import com.f12.moitz.infrastructure.client.kakao.dto.DocumentResponse;
 import com.f12.moitz.infrastructure.client.kakao.dto.KakaoApiResponse;
 import com.f12.moitz.infrastructure.client.kakao.dto.SearchPlacesLimitQuantityRequest;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -114,11 +115,12 @@ public class PlaceRecommenderAsyncAdapter implements AsyncPlaceRecommender {
                                 3
                         )
                 )
-                .doOnError(e -> log.warn(
-                        "Failed to search places for keyword: {} at place: {}",
-                        keyword, place.getName(), e
+                .retry(2)
+                .onErrorMap(e -> new ExternalApiException(
+                        ExternalApiErrorCode.INVALID_KAKAO_MAP_API_RESPONSE,
+                        "조건 '" + condition.getTitle() + "'의 키워드 '" + keyword +
+                        "'에 대한 검색이 실패했습니다. / " + e.getMessage()
                 ))
-                .onErrorResume(e -> Mono.empty())
                 )
                 .collectList()
                 .map(responses -> Map.entry(condition, responses));
