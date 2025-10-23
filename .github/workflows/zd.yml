@@ -89,6 +89,13 @@ jobs:
           aws ssm wait command-executed \
             --command-id "$COMMAND_ID" \
             --instance-id ${{ env.GREEN_INSTANCE_ID }}
+
+          echo "➡️ SSM 명령 stdout/stderr 확인"
+          aws ssm list-command-invocations \
+          --command-id "$COMMAND_ID" \
+          --instance-id ${{ env.GREEN_INSTANCE_ID }} \
+          --query 'CommandInvocations[0].[Status,StandardOutputContent,StandardErrorContent]' \
+          --output text
           
           echo "✅ Green EC2에서 deploy.sh 실행 완료"
           
