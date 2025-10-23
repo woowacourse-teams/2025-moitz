@@ -79,7 +79,7 @@ jobs:
             --instance-ids ${{ env.GREEN_INSTANCE_ID }} \
             --document-name "AWS-RunShellScript" \
             --comment "Run deploy.sh on Green EC2" \
-            --parameters 'commands=["chmod +x /home/ubuntu/deploy.sh && sudo /home/ubuntu/deploy.sh"]' \
+            --parameters 'commands=["chmod +x /var/snap/amazon-ssm-agent/11798/deploy.sh && sudo /var/snap/amazon-ssm-agent/11798/deploy.sh"]' \
             --query "Command.CommandId" \
             --output text)
           
