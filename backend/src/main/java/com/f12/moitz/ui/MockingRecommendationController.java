@@ -32,7 +32,7 @@ public class MockingRecommendationController implements SwaggerMockingRecommenda
 
     @PostMapping("/test")
     public ResponseEntity<RecommendationCreateResponse> mockRecommend(@RequestBody RecommendationRequest request) {
-        return ResponseEntity.ok(new RecommendationCreateResponse("123"));
+        return ResponseEntity.ok(new RecommendationCreateResponse("68F9860B4BB1192E031D93F8"));
     }
 
     @GetMapping("/test/{id}")
@@ -485,7 +485,7 @@ public class MockingRecommendationController implements SwaggerMockingRecommenda
     @PostMapping("/test/legacy")
     public ResponseEntity<RecommendationCreateResponse> mockRecommend(
             @RequestBody LegacyRecommendationRequest request) {
-        return ResponseEntity.ok(new RecommendationCreateResponse("123"));
+        return ResponseEntity.ok(new RecommendationCreateResponse("68F9860B4BB1192E031D93F8"));
     }
 
     @GetMapping("/test/legacy/{id}")
