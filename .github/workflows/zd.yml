@@ -11,7 +11,7 @@ jobs:
     runs-on: [self-hosted, lb]
 
     steps:
-      - name: 1단계 그린 활성화
+      - name: 1단계 Green 인스턴스 부팅
         run: |
           echo "➡️ Green 인스턴스 부팅"
           GREEN_INSTANCE_ID=$(aws ec2 describe-instances \
@@ -71,11 +71,21 @@ jobs:
             --query "Command.CommandId" \
             --output text)
 
-          # deploy.sh가 백그라운드 실행이라 wait command 제거하고 잠시 대기
-          sleep 5
-          echo "✅ deploy.sh 실행 완료"
+          echo "✅ deploy.sh 실행 완료 대기 중..."
+          aws ssm wait command-executed --command-id "$COMMAND_ID" --instance-id ${{ env.GREEN_INSTANCE_ID }}
+          echo "✅ Green 인스턴스 애플리케이션 기동 완료 로그 감지"
 
-      - name: 3단계 Green 헬스체크 및 블루와 교체
+          echo "➡️ Private IP 기반 헬스체크 수행"
+          HEALTH_RESULT=$(curl -fsS "http://${GREEN_INSTANCE_IP}:80/health" || echo "curl_failed")
+
+          if [[ "$HEALTH_RESULT" == '{"status":"UP"}' ]]; then
+              echo "✅ Green 헬스체크 성공: $HEALTH_RESULT"
+          else
+              echo "🔴 Green 헬스체크 실패: $HEALTH_RESULT"
+              exit 1
+          fi
+
+      - name: 3단계 Green으로 프록시 전환 및 Blue 정지
         run: |
           echo "➡️ Nginx 프록시 Green으로 변경"
           sudo sed -i "s/${{ env.BLUE_INSTANCE_IP }}/${{ env.GREEN_INSTANCE_IP }}/g" /etc/nginx/sites-available/default
