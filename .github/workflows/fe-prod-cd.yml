@@ -50,7 +50,7 @@ jobs:
 
       - name: 정적 자산 업로드 (긴 캐시, index.html 제외)
         run: |
-          aws s3 sync "dist/" "s3://${{ env.S3_BUCKET }}/${{ env.FE_PROD_PREFIX }}/" \
+          aws s3 sync "dist" "s3://${{ env.S3_BUCKET }}/${{ env.FE_PROD_PREFIX }}" \
             --delete \
             --exclude "index.html" \
             --cache-control "public, max-age=31536000, immutable"
