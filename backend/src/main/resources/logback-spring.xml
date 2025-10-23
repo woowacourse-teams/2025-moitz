@@ -68,7 +68,11 @@
 
     <!-- 운영 환경용 설정 -->
     <springProfile name="prod">
-
+        <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+            <encoder>
+                <pattern>${CONSOLE_PATTERN}</pattern>
+            </encoder>
+        </appender>
         <!-- INFO 전용 Appender -->
         <appender name="FILE_INFO" class="ch.qos.logback.core.rolling.RollingFileAppender">
             <encoder class="net.logstash.logback.encoder.LogstashEncoder"/>
@@ -130,6 +134,7 @@
         </appender>
 
         <root level="INFO">
+            <appender-ref ref="CONSOLE"/>
             <appender-ref ref="FILE_INFO"/>
             <appender-ref ref="FILE_WARN"/>
             <appender-ref ref="FILE_ERROR"/>
