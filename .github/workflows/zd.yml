@@ -71,43 +71,38 @@ jobs:
             --query "Command.CommandId" \
             --output text)
 
-          aws ssm wait command-executed --command-id "$COMMAND_ID" --instance-id ${{ env.GREEN_INSTANCE_ID }}
+          # deploy.sh가 백그라운드 실행이라 wait command 제거하고 잠시 대기
+          sleep 5
           echo "✅ deploy.sh 실행 완료"
 
       - name: 3단계 Green 헬스체크 및 블루와 교체
         run: |
           EXPECTED_HEALTH='{"status":"UP"}'
-          MAX_RETRIES=6
-          SLEEP_SEC=5
 
-          for i in $(seq 1 $MAX_RETRIES); do
-            RESPONSE=$(aws ssm send-command \
-              --instance-ids ${{ env.GREEN_INSTANCE_ID }} \
-              --document-name "AWS-RunShellScript" \
-              --parameters 'commands=["curl -fsS http://localhost:80/health || echo curl_failed"]' \
-              --query "Command.CommandId" \
-              --output text)
+          echo "➡️ Green 애플리케이션 헬스체크 (SSM)"
+          CMD_ID=$(aws ssm send-command \
+            --instance-ids ${{ env.GREEN_INSTANCE_ID }} \
+            --document-name "AWS-RunShellScript" \
+            --parameters 'commands=["curl -fsS http://localhost:80/health || echo curl_failed"]' \
+            --query "Command.CommandId" \
+            --output text)
 
-            aws ssm wait command-executed --command-id "$RESPONSE" --instance-id ${{ env.GREEN_INSTANCE_ID }}
+          # 애플리케이션 기동 대기
+          sleep 5
 
-            RESULT=$(aws ssm list-command-invocations \
-              --command-id "$RESPONSE" \
-              --instance-id ${{ env.GREEN_INSTANCE_ID }} \
-              --query 'CommandInvocations[0].StandardOutputContent' \
-              --output text)
+          RESULT=$(aws ssm list-command-invocations \
+            --command-id "$CMD_ID" \
+            --instance-id ${{ env.GREEN_INSTANCE_ID }} \
+            --query 'CommandInvocations[0].StandardOutputContent' \
+            --output text)
 
-            if [[ "$(echo $RESULT | jq -c .)" == "$(echo $EXPECTED_HEALTH | jq -c .)" ]]; then
-              echo "✅ 헬스체크 성공: $RESULT"
-              break
-            else
-              echo "⏳ 헬스체크 실패, 재시도 $i/$MAX_RETRIES: $RESULT"
-              sleep $SLEEP_SEC
-            fi
-          done
+          echo "헬스체크 결과: $RESULT"
 
-          if [[ "$(echo $RESULT | jq -c .)" != "$(echo $EXPECTED_HEALTH | jq -c .)" ]]; then
-            echo "🔴 Green 인스턴스 헬스체크 최종 실패"
+          if [[ "$RESULT" != "$EXPECTED_HEALTH" ]]; then
+            echo "🔴 Green 인스턴스 헬스체크 실패: $RESULT"
             exit 1
+          else
+            echo "✅ 헬스체크 성공: $RESULT"
           fi
 
           echo "➡️ Nginx 프록시 Green으로 변경"
