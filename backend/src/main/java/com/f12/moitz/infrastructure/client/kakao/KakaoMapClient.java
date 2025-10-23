@@ -178,22 +178,32 @@ public class KakaoMapClient {
                 return null;
             }
 
-            byte[] imageBytes = kakaoRestClient.get()
+            org.springframework.http.ResponseEntity<byte[]> response = kakaoRestClient.get()
                     .uri(imageUrl)
                     .retrieve()
-                    .body(byte[].class);
+                    .toEntity(byte[].class);
 
+            byte[] imageBytes = response.getBody();
             if (imageBytes == null || imageBytes.length == 0) {
                 log.warn("Downloaded image is empty for URL: {}", imageUrl);
                 return null;
             }
 
+            String mediaType = getMediaTypeFromResponse(response);
             String base64 = Base64.getEncoder().encodeToString(imageBytes);
-            return "data:image/jpeg;base64," + base64;
+            return "data:" + mediaType + ";base64," + base64;
         } catch (Exception e) {
             log.warn("Failed to download image from URL: {}", imageUrl, e);
             return null;
         }
+    }
+
+    private String getMediaTypeFromResponse(org.springframework.http.ResponseEntity<byte[]> response) {
+        org.springframework.http.MediaType contentType = response.getHeaders().getContentType();
+        if (contentType != null) {
+            return contentType.toString();
+        }
+        return "image/jpeg"; // 기본값
     }
 
 }

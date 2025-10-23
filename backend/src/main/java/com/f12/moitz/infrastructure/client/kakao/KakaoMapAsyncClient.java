@@ -29,6 +29,7 @@ import reactor.core.publisher.Mono;
 public class KakaoMapAsyncClient {
 
     private static final Duration REQUEST_TIMEOUT = Duration.ofSeconds(KakaoMapConstants.REQUEST_TIMEOUT_SECONDS);
+    private static final Duration IMAGE_DOWNLOAD_TIMEOUT = Duration.ofSeconds(10);
 
     private final WebClient kakaoWebClient;
     private final ObjectMapper objectMapper;
@@ -190,22 +191,39 @@ public class KakaoMapAsyncClient {
             return Mono.empty();
         }
 
+        long startTime = System.currentTimeMillis();
+
         return kakaoWebClient.get()
                 .uri(imageUrl)
                 .retrieve()
-                .bodyToMono(byte[].class)
-                .timeout(REQUEST_TIMEOUT)
-                .map(imageBytes -> {
+                .toEntity(byte[].class)
+                .timeout(IMAGE_DOWNLOAD_TIMEOUT)
+                .map(response -> {
+                    long elapsed = System.currentTimeMillis() - startTime;
+                    byte[] imageBytes = response.getBody();
                     if (imageBytes == null || imageBytes.length == 0) {
+                        log.debug("Downloaded empty image in {}ms: {}", elapsed, imageUrl);
                         return null;
                     }
+                    log.debug("Image downloaded in {}ms: {}", elapsed, imageUrl);
+                    String mediaType = getMediaTypeFromResponse(response);
                     String base64 = Base64.getEncoder().encodeToString(imageBytes);
-                    return "data:image/jpeg;base64," + base64;
+                    return "data:" + mediaType + ";base64," + base64;
                 })
                 .onErrorResume(e -> {
-                    log.warn("Failed to download image from URL: {}", imageUrl, e);
+                    long elapsed = System.currentTimeMillis() - startTime;
+                    log.warn("Image download failed after {}ms: {}", elapsed, imageUrl, e);
                     return Mono.empty();
                 });
+    }
+
+    private String getMediaTypeFromResponse(
+            org.springframework.http.ResponseEntity<byte[]> response) {
+        org.springframework.http.MediaType contentType = response.getHeaders().getContentType();
+        if (contentType != null) {
+            return contentType.toString();
+        }
+        return "image/jpeg"; // 기본값
     }
 
     private Throwable mapException(final Throwable throwable) {
