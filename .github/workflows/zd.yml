@@ -1,0 +1,137 @@
+name: 무중단 배포 테스트
+
+on:
+  push:
+    branches:
+      - zero-downtime
+  workflow_dispatch:
+
+jobs:
+  deploy_prod:
+    runs-on: [ self-hosted, lb ]
+
+    steps:
+      - name: 1단계 그린 활성화
+        run: |
+          # GitHub 환경변수에 green 인스턴스 id 저장 및 green 인스턴스 재활성화
+          echo "➡️ Green 인스턴스 부팅"
+          GREEN_INSTANCE_ID=$(aws ec2 describe-instances \
+          --filters 'Name=tag:ProjectTeam,Values=moitz' \
+            'Name=tag:Color,Values=green' \
+          --query 'Reservations[0].Instances[0].InstanceId' \
+          --output text)
+          
+          echo "::add-mask::$GREEN_INSTANCE_ID"
+          
+          if [ -z "$GREEN_INSTANCE_ID" ] || [ "$GREEN_INSTANCE_ID" == "None" ]; then
+            echo "🔴 Green 인스턴스를 찾을 수 없습니다"
+            exit 1
+          fi
+          
+          echo GREEN_INSTANCE_ID=$GREEN_INSTANCE_ID >> $GITHUB_ENV
+          aws ec2 start-instances --instance-ids $GREEN_INSTANCE_ID
+          
+          # Green 인스턴스 부팅 대기
+          aws ec2 wait instance-status-ok --instance-ids $GREEN_INSTANCE_ID
+          echo "✅ Green 인스턴스 부팅 완료"
+
+      - name: 2단계 그린 인스턴스에서 도커 컨테이너 실행
+        run: |
+          # 기존 running blue 인스턴스의 id 저장
+          BLUE_INSTANCE_ID=$(aws ec2 describe-instances \
+          --filters 'Name=tag:ProjectTeam,Values=moitz' \
+            'Name=tag:Color,Values=blue' \
+          --query 'Reservations[0].Instances[0].InstanceId' \
+          --output text)
+          
+          # 기존 running blue 인스턴스의 private IP 저장
+          BLUE_INSTANCE_IP=$(aws ec2 describe-instances \
+          --instance-ids $BLUE_INSTANCE_ID \
+          --query "Reservations[0].Instances[0].PrivateIpAddress" \
+          --output text)
+          
+          # Green 인스턴스의 private IP 저장
+          GREEN_INSTANCE_IP=$(aws ec2 describe-instances \
+          --instance-ids ${{ env.GREEN_INSTANCE_ID }} \
+          --query "Reservations[0].Instances[0].PrivateIpAddress" \
+          --output text)
+          
+          if [ -z "$BLUE_INSTANCE_ID" ] || [ "$BLUE_INSTANCE_ID" == "None" ]; then
+            echo "🔴 Blue 인스턴스를 찾을 수 없습니다"
+            exit 1
+          fi
+          
+          # 변수 마스킹 처리 및 GitHub 환경변수에 저장
+          echo "::add-mask::$BLUE_INSTANCE_ID"
+          echo "::add-mask::$BLUE_INSTANCE_IP"
+          echo "::add-mask::$GREEN_INSTANCE_IP"
+          echo BLUE_INSTANCE_ID=$BLUE_INSTANCE_ID >> $GITHUB_ENV
+          echo BLUE_INSTANCE_IP=$BLUE_INSTANCE_IP >> $GITHUB_ENV
+          echo GREEN_INSTANCE_IP=$GREEN_INSTANCE_IP >> $GITHUB_ENV
+          
+          # Green에서 애플리케이션 빌드
+          echo "➡️ Green에서 애플리케이션 빌드"
+          ### 환경변수(e.g. Green 인스턴스 id)는 이거 쓰면 됩니다: ${{ env.GREEN_INSTANCE_ID }}
+          
+          echo "➡️ Green 인스턴스에서 deploy.sh 실행 (SSM CLI)"
+          
+          COMMAND_ID=$(aws ssm send-command \
+            --instance-ids ${{ env.GREEN_INSTANCE_ID }} \
+            --document-name "AWS-RunShellScript" \
+            --comment "Run deploy.sh on Green EC2" \
+            --parameters 'commands=["chmod +x /home/ubuntu/deploy.sh && sudo /home/ubuntu/deploy.sh"]' \
+            --query "Command.CommandId" \
+            --output text)
+          
+          echo "✅ SSM 명령 전송 완료 (Command ID: $COMMAND_ID)"
+          
+          # SSM 실행 완료 대기
+          aws ssm wait command-executed \
+            --command-id "$COMMAND_ID" \
+            --instance-id ${{ env.GREEN_INSTANCE_ID }}
+          
+          echo "✅ Green EC2에서 deploy.sh 실행 완료"
+          
+          sleep 5 # 필요없다면 삭제--도커 컨테이너에서 스프링 앱 실행이 블로킹/sync 작업이면 필요없을듯?
+
+      - name: 3단계 그린 헬스체크 및 블루와 교체
+        run: |
+          # Green 애플리케이션 헬스체크
+          echo "➡️ Green 애플리케이션 헬스체크"
+          HEALTH_URL="http://${{ env.GREEN_INSTANCE_IP }}:80/health"
+          EXPECTED_HEALTH='{"status":"UP"}'
+          response=$(curl -fsS --max-time 5 "$HEALTH_URL" || echo "curl_failed")
+          
+          if [[ "$response" == "$EXPECTED" ]]; then
+            echo "✅ Green 인스턴스의 헬스체크가 성공했습니다: $response"
+          else
+            echo "🔴 Green 인스턴스의 헬스체크가 실패했습니다: $response"
+            exit 1
+          fi
+          
+          # Nginx config 파일 갱신
+          echo "➡️ Nginx 설정에서 green으로 프록시 변경"
+          sudo sed -i "s/${{ env.BLUE_INSTANCE_IP }}/${{ env.GREEN_INSTANCE_IP }}/g" /etc/nginx/sites-available/default
+          sudo nginx -t && sudo nginx -s reload
+          sleep 5
+          echo "✅ Green으로 프록시 변경 완료"
+          
+          # Blue 인스턴스 중지(임시정지) 처리
+          echo "➡️ Blue 인스턴스 임시정지 처리"
+          aws ec2 stop-instances --instance-ids ${{ env.BLUE_INSTANCE_ID }}
+          aws ec2 wait instance-stopped --instance-ids ${{ env.BLUE_INSTANCE_ID }}
+          echo "✅ Blue 인스턴스 임시정지 완료"
+          
+          # Green 인스턴스의 Color 태그 값을 blue로 변경
+          echo "➡️ Green 인스턴스의 Color 태그 값을 blue로 변경"
+          aws ec2 create-tags \
+          --resources ${{ env.GREEN_INSTANCE_ID }} \
+          --tags Key=Color,Value=blue
+          echo "✅ green -> blue 태그 변경 완료"
+          
+          # Blue 인스턴스의 Color 태그 값을 green으로 변경
+          echo "➡️ Blue 인스턴스의 Color 태그 값을 green으로 변경"
+          aws ec2 create-tags \
+          --resources ${{ env.BLUE_INSTANCE_ID }} \
+          --tags Key=Color,Value=green
+          echo "✅ blue -> green 태그 변경 완료"
