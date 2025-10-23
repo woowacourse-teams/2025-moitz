@@ -3,6 +3,7 @@ package com.f12.moitz.common.config;
 import com.mongodb.ReadConcern;
 import com.mongodb.ReadPreference;
 import java.util.concurrent.TimeUnit;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.mongo.MongoClientSettingsBuilderCustomizer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -10,12 +11,18 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class MongoConfig {
 
+    @Value("${mongo.pool.max-size:20}")  // 기본값 20
+    private int maxSize;
+
+    @Value("${mongo.pool.min-size:5}")   // 기본값 5
+    private int minSize;
+
     @Bean
     public MongoClientSettingsBuilderCustomizer mongoClientSettingsBuilderCustomizer() {
         return builder -> builder
                 .applyToConnectionPoolSettings(connectionPool -> connectionPool
-                        .maxSize(20)
-                        .minSize(5)
+                        .maxSize(maxSize)
+                        .minSize(minSize)
                         .maxConnectionIdleTime(300_000, TimeUnit.MILLISECONDS)
                         .maxConnectionLifeTime(600_000, TimeUnit.MILLISECONDS)
                         .maxWaitTime(15_000, TimeUnit.MILLISECONDS)
