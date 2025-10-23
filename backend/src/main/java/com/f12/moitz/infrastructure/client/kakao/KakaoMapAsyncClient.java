@@ -12,6 +12,7 @@ import com.f12.moitz.infrastructure.client.kakao.dto.SearchPlacesLimitQuantityRe
 import com.f12.moitz.infrastructure.client.kakao.dto.SearchPlacesRequest;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.time.Duration;
+import java.util.Base64;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -164,17 +165,46 @@ public class KakaoMapAsyncClient {
         );
 
         return searchImagesByAsync(imageRequest)
-                .mapNotNull(imageResponse -> {
+                .flatMap(imageResponse -> {
                     if (imageResponse.documents() != null && !imageResponse.documents().isEmpty()) {
-                        final String imageUrl = imageResponse.documents().get(0).imageUrl();
-                        return document.withImageUrl(imageUrl);
+                        final String imageUrl = imageResponse.documents().get(0).thumbnailUrl();
+                        return downloadImageAsBase64Async(imageUrl)
+                                .map(base64 -> document.withImageUrl(base64))
+                                .onErrorResume(e -> {
+                                    log.debug("Failed to download image as base64 for place: {}",
+                                            document.placeName(), e);
+                                    return Mono.just(document.withImageUrl(null));
+                                });
                     }
                     log.debug("No image found for place: {}", document.placeName());
-                    return document.withImageUrl(null);
+                    return Mono.just(document.withImageUrl(null));
                 })
                 .onErrorResume(e -> {
                     log.debug("Failed to fetch image for place: {}", document.placeName(), e);
                     return Mono.just(document.withImageUrl(null));
+                });
+    }
+
+    private Mono<String> downloadImageAsBase64Async(final String imageUrl) {
+        if (imageUrl == null || imageUrl.isEmpty()) {
+            return Mono.empty();
+        }
+
+        return kakaoWebClient.get()
+                .uri(imageUrl)
+                .retrieve()
+                .bodyToMono(byte[].class)
+                .timeout(REQUEST_TIMEOUT)
+                .map(imageBytes -> {
+                    if (imageBytes == null || imageBytes.length == 0) {
+                        return null;
+                    }
+                    String base64 = Base64.getEncoder().encodeToString(imageBytes);
+                    return "data:image/jpeg;base64," + base64;
+                })
+                .onErrorResume(e -> {
+                    log.warn("Failed to download image from URL: {}", imageUrl, e);
+                    return Mono.empty();
                 });
     }
 
