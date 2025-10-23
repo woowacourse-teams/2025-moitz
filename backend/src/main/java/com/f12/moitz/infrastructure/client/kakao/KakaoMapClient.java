@@ -171,7 +171,7 @@ public class KakaoMapClient {
         }
     }
 
-    public String downloadImageAsBase64(final String imageUrl) {
+    private String downloadImageAsBase64(final String imageUrl) {
         try {
             if (imageUrl == null || imageUrl.isEmpty()) {
                 log.warn("Image URL is null or empty");
