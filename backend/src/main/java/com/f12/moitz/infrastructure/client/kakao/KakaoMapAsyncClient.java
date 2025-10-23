@@ -170,7 +170,8 @@ public class KakaoMapAsyncClient {
                     if (imageResponse.documents() != null && !imageResponse.documents().isEmpty()) {
                         final String imageUrl = imageResponse.documents().get(0).thumbnailUrl();
                         return downloadImageAsBase64Async(imageUrl)
-                                .map(base64 -> document.withImageUrl(base64))
+                                .map(document::withImageUrl)
+                                .switchIfEmpty(Mono.just(document.withImageUrl(null)))
                                 .onErrorResume(e -> {
                                     log.debug("Failed to download image as base64 for place: {}",
                                             document.placeName(), e);
@@ -198,17 +199,17 @@ public class KakaoMapAsyncClient {
                 .retrieve()
                 .toEntity(byte[].class)
                 .timeout(IMAGE_DOWNLOAD_TIMEOUT)
-                .map(response -> {
+                .flatMap(response -> {
                     long elapsed = System.currentTimeMillis() - startTime;
                     byte[] imageBytes = response.getBody();
                     if (imageBytes == null || imageBytes.length == 0) {
                         log.debug("Downloaded empty image in {}ms: {}", elapsed, imageUrl);
-                        return null;
+                        return Mono.empty();
                     }
                     log.debug("Image downloaded in {}ms: {}", elapsed, imageUrl);
                     String mediaType = getMediaTypeFromResponse(response);
                     String base64 = Base64.getEncoder().encodeToString(imageBytes);
-                    return "data:" + mediaType + ";base64," + base64;
+                    return Mono.just("data:" + mediaType + ";base64," + base64);
                 })
                 .onErrorResume(e -> {
                     long elapsed = System.currentTimeMillis() - startTime;
@@ -223,7 +224,7 @@ public class KakaoMapAsyncClient {
         if (contentType != null) {
             return contentType.toString();
         }
-        return "image/jpeg"; // 기본값
+        return "image/jpeg";
     }
 
     private Throwable mapException(final Throwable throwable) {
