@@ -101,21 +101,34 @@ jobs:
           
           sleep 5 # 필요없다면 삭제--도커 컨테이너에서 스프링 앱 실행이 블로킹/sync 작업이면 필요없을듯?
 
-      - name: 3단계 그린 헬스체크 및 블루와 교체
+      - name: 3단계 Green 헬스체크 및 블루와 교체
         run: |
-          # Green 애플리케이션 헬스체크
-          echo "➡️ Green 애플리케이션 헬스체크"
           HEALTH_URL="http://${{ env.GREEN_INSTANCE_IP }}:80/health"
           EXPECTED_HEALTH='{"status":"UP"}'
-          response=$(curl -fsS --max-time 5 "$HEALTH_URL" || echo "curl_failed")
-          
-          if [[ "$response" == "$EXPECTED_HEALTH" ]]; then
-            echo "✅ Green 인스턴스의 헬스체크가 성공했습니다: $response"
-          else
-            echo "🔴 Green 인스턴스의 헬스체크가 실패했습니다: $response"
+          MAX_RETRIES=6
+          SLEEP_SEC=5
+
+          echo "➡️ Green 애플리케이션 헬스체크 시작"
+
+          for i in $(seq 1 $MAX_RETRIES); do
+            response=$(curl -fsS --max-time 10 "$HEALTH_URL" || echo "curl_failed")
+            if [[ "$response" != "curl_failed" ]]; then
+              if [[ "$(echo $response | jq -c .)" == "$(echo $EXPECTED_HEALTH | jq -c .)" ]]; then
+                echo "✅ Green 인스턴스 헬스체크 성공: $response"
+                break
+              else
+                echo "⚠️ 헬스 응답 수신: $response, 재시도 $i/$MAX_RETRIES"
+              fi
+            else
+              echo "⏳ 헬스체크 실패, 재시도 $i/$MAX_RETRIES"
+            fi
+            sleep $SLEEP_SEC
+          done
+
+          if [[ "$(echo $response | jq -c .)" != "$(echo $EXPECTED_HEALTH | jq -c .)" ]]; then
+            echo "🔴 Green 인스턴스 헬스체크 최종 실패: $response"
             exit 1
           fi
-          
           # Nginx config 파일 갱신
           echo "➡️ Nginx 설정에서 green으로 프록시 변경"
           sudo sed -i "s/${{ env.BLUE_INSTANCE_IP }}/${{ env.GREEN_INSTANCE_IP }}/g" /etc/nginx/sites-available/default
