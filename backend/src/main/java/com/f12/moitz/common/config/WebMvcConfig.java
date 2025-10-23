@@ -42,7 +42,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
         final FilterRegistrationBean<RateLimitFilter> registration = new FilterRegistrationBean<>();
 
         registration.setFilter(rateLimitFilter);
-        registration.addUrlPatterns("/locations");
+        registration.addUrlPatterns("/recommendations");
         registration.setName("rateLimitFilter");
         registration.setOrder(2);
 
