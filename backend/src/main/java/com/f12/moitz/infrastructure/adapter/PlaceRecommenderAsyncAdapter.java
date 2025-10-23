@@ -7,13 +7,16 @@ import com.f12.moitz.domain.Point;
 import com.f12.moitz.domain.RecommendCondition;
 import com.f12.moitz.domain.RecommendedPlace;
 import com.f12.moitz.infrastructure.client.kakao.KakaoMapAsyncClient;
+import com.f12.moitz.infrastructure.client.kakao.dto.DocumentResponse;
 import com.f12.moitz.infrastructure.client.kakao.dto.KakaoApiResponse;
 import com.f12.moitz.infrastructure.client.kakao.dto.SearchPlacesLimitQuantityRequest;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -29,7 +32,7 @@ public class PlaceRecommenderAsyncAdapter implements AsyncPlaceRecommender {
 
     public Mono<Map<Place, CategorizedRecommendedPlaces>> recommendPlacesAsync(
             final List<Place> targetPlaces,
-            final List<String> requirements
+            final List<RecommendCondition> requirements
     ) {
         return searchPlacesWithRequirementAsync(targetPlaces, requirements)
                 .map(this::buildCategorizedRecommendedPlaces);
@@ -39,7 +42,7 @@ public class PlaceRecommenderAsyncAdapter implements AsyncPlaceRecommender {
             final Map<Place, Map<RecommendCondition, List<KakaoApiResponse>>> searchResults
     ) {
         return searchResults.entrySet().stream()
-                .collect(java.util.stream.Collectors.toMap(
+                .collect(Collectors.toMap(
                         Entry::getKey,
                         entry -> new CategorizedRecommendedPlaces(
                                 buildCategoryMap(entry.getValue())
@@ -51,7 +54,7 @@ public class PlaceRecommenderAsyncAdapter implements AsyncPlaceRecommender {
             final Map<RecommendCondition, List<KakaoApiResponse>> categoryResponses
     ) {
         return categoryResponses.entrySet().stream()
-                .collect(java.util.stream.Collectors.toMap(
+                .collect(Collectors.toMap(
                         Entry::getKey,
                         entry -> entry.getValue().stream()
                                 .flatMap(resp -> resp.documents().stream())
@@ -61,7 +64,7 @@ public class PlaceRecommenderAsyncAdapter implements AsyncPlaceRecommender {
     }
 
     private RecommendedPlace toRecommendedPlace(
-            final com.f12.moitz.infrastructure.client.kakao.dto.DocumentResponse document
+            final DocumentResponse document
     ) {
         return new RecommendedPlace(
                 document.placeName(),
@@ -78,7 +81,7 @@ public class PlaceRecommenderAsyncAdapter implements AsyncPlaceRecommender {
 
     private Mono<Map<Place, Map<RecommendCondition, List<KakaoApiResponse>>>> searchPlacesWithRequirementAsync(
             final List<Place> targetPlaces,
-            final List<String> requirements
+            final List<RecommendCondition> requirements
     ) {
         return Flux.fromIterable(targetPlaces)
                 .flatMap(place -> searchRequirementsForPlaceAsync(place, requirements)
@@ -89,12 +92,21 @@ public class PlaceRecommenderAsyncAdapter implements AsyncPlaceRecommender {
 
     private Mono<Map<RecommendCondition, List<KakaoApiResponse>>> searchRequirementsForPlaceAsync(
             final Place place,
-            final List<String> requirements
+            final List<RecommendCondition> requirements
     ) {
         return Flux.fromIterable(requirements)
-                .flatMap(requirement -> kakaoMapAsyncClient.searchPlacesByAsync(
+                .flatMap(condition -> searchKeywordsForConditionAsync(condition, place))
+                .collectMap(Map.Entry::getKey, Map.Entry::getValue, HashMap::new);
+    }
+
+    private Mono<Map.Entry<RecommendCondition, List<KakaoApiResponse>>> searchKeywordsForConditionAsync(
+            final RecommendCondition condition,
+            final Place place
+    ) {
+        return Flux.fromIterable(condition.getKeywords())
+                .flatMap(keyword -> kakaoMapAsyncClient.searchPlacesByAsync(
                         new SearchPlacesLimitQuantityRequest(
-                                requirement,
+                                keyword,
                                 place.getName(),
                                 place.getPoint().getX(),
                                 place.getPoint().getY(),
@@ -102,20 +114,14 @@ public class PlaceRecommenderAsyncAdapter implements AsyncPlaceRecommender {
                                 3
                         )
                 )
-                        .map(response -> Map.entry(
-                                RecommendCondition.fromKeyword(requirement),
-                                new ArrayList<>(List.of(response))
-                        ))
-                        .doOnError(e -> log.warn(
-                                "Failed to search places for requirement: {} at place: {}",
-                                requirement, place.getName(), e
-                        ))
-                        .onErrorResume(e -> {
-                            log.debug("Skipping requirement {} due to error", requirement);
-                            return Mono.empty();
-                        })
+                .doOnError(e -> log.warn(
+                        "Failed to search places for keyword: {} at place: {}",
+                        keyword, place.getName(), e
+                ))
+                .onErrorResume(e -> Mono.empty())
                 )
-                .collectMap(Map.Entry::getKey, Map.Entry::getValue, java.util.HashMap::new);
+                .collectList()
+                .map(responses -> Map.entry(condition, responses));
     }
 
     private int calculateWalkingTime(final int distance) {

@@ -7,6 +7,7 @@ import com.f12.moitz.domain.Point;
 import com.f12.moitz.domain.RecommendCondition;
 import com.f12.moitz.domain.RecommendedPlace;
 import com.f12.moitz.infrastructure.client.kakao.KakaoMapClient;
+import com.f12.moitz.infrastructure.client.kakao.dto.DocumentResponse;
 import com.f12.moitz.infrastructure.client.kakao.dto.KakaoApiResponse;
 import com.f12.moitz.infrastructure.client.kakao.dto.KakaoApiResponses;
 import com.f12.moitz.infrastructure.client.kakao.dto.SearchPlacesLimitQuantityRequest;
@@ -30,42 +31,54 @@ public class PlaceRecommenderAdapter implements PlaceRecommender {
     @Override
     public Map<Place, CategorizedRecommendedPlaces> recommendPlaces(
             final List<Place> targetPlaces,
-            final List<String> requirements
+            final List<RecommendCondition> requirements
     ) {
         final Map<Place, KakaoApiResponses> searchResults = searchPlacesWithRequirement(targetPlaces, requirements);
+        return buildCategorizedRecommendedPlaces(searchResults);
+    }
 
+    private Map<Place, CategorizedRecommendedPlaces> buildCategorizedRecommendedPlaces(
+            final Map<Place, KakaoApiResponses> searchResults
+    ) {
         return searchResults.entrySet().stream()
                 .collect(Collectors.toMap(
                         Entry::getKey,
                         entry -> new CategorizedRecommendedPlaces(
-                                entry.getValue()
-                                        .kakaoApiResponses()
-                                        .entrySet().stream()
-                                        .collect(Collectors.toMap(
-                                                Entry::getKey,
-                                                reqEntry -> reqEntry.getValue().stream()
-                                                        .flatMap(resp -> resp.documents().stream())
-                                                        .map(document -> new RecommendedPlace(
-                                                                document.placeName(),
-                                                                new Point(
-                                                                        Double.parseDouble(document.x()),
-                                                                        Double.parseDouble(document.y())
-                                                                ),
-                                                                parseCategoryName(document.categoryName()),
-                                                                calculateWalkingTime(Integer.parseInt(document.distance())),
-                                                                document.placeUrl(),
-                                                                document.imageUrl()
-                                                        ))
-                                                        .toList()
-                                        ))
+                                buildCategoryMap(entry.getValue().kakaoApiResponses())
                         )
                 ));
+    }
 
+    private Map<RecommendCondition, List<RecommendedPlace>> buildCategoryMap(
+            final Map<RecommendCondition, List<KakaoApiResponse>> categoryResponses
+    ) {
+        return categoryResponses.entrySet().stream()
+                .collect(Collectors.toMap(
+                        Entry::getKey,
+                        entry -> entry.getValue().stream()
+                                .flatMap(resp -> resp.documents().stream())
+                                .map(this::toRecommendedPlace)
+                                .toList()
+                ));
+    }
+
+    private RecommendedPlace toRecommendedPlace(final DocumentResponse document) {
+        return new RecommendedPlace(
+                document.placeName(),
+                new Point(
+                        Double.parseDouble(document.x()),
+                        Double.parseDouble(document.y())
+                ),
+                parseCategoryName(document.categoryName()),
+                calculateWalkingTime(Integer.parseInt(document.distance())),
+                document.placeUrl(),
+                document.imageUrl()
+        );
     }
 
     private Map<Place, KakaoApiResponses> searchPlacesWithRequirement(
             final List<Place> targets,
-            final List<String> requirements
+            final List<RecommendCondition> requirements
     ) {
         return targets.stream()
                 .collect(Collectors.toMap(
@@ -73,20 +86,8 @@ public class PlaceRecommenderAdapter implements PlaceRecommender {
                         place -> {
                             Map<RecommendCondition, List<KakaoApiResponse>> responsesByCategory =
                                     requirements.stream().collect(Collectors.toMap(
-                                            RecommendCondition::fromKeyword,
-                                            requirement -> {
-                                                KakaoApiResponse response = kakaoMapClient.searchPlacesBy(
-                                                        new SearchPlacesLimitQuantityRequest(
-                                                                requirement,
-                                                                place.getName(),
-                                                                place.getPoint().getX(),
-                                                                place.getPoint().getY(),
-                                                                800,
-                                                                3
-                                                        )
-                                                );
-                                                return new ArrayList<>(List.of(response));
-                                            },
+                                            condition -> condition,
+                                            condition -> searchKeywordsForCondition(place, condition),
                                             (existing, incoming) -> {
                                                 existing.addAll(incoming);
                                                 return existing;
@@ -95,6 +96,34 @@ public class PlaceRecommenderAdapter implements PlaceRecommender {
                             return new KakaoApiResponses(responsesByCategory);
                         }
                 ));
+    }
+
+    private List<KakaoApiResponse> searchKeywordsForCondition(
+            final Place place,
+            final RecommendCondition condition
+    ) {
+        List<KakaoApiResponse> allResponses = new ArrayList<>();
+        for (String keyword : condition.getKeywords()) {
+            try {
+                KakaoApiResponse response = kakaoMapClient.searchPlacesBy(
+                        new SearchPlacesLimitQuantityRequest(
+                                keyword,
+                                place.getName(),
+                                place.getPoint().getX(),
+                                place.getPoint().getY(),
+                                800,
+                                3
+                        )
+                );
+                allResponses.add(response);
+            } catch (Exception e) {
+                log.warn(
+                        "Failed to search places for keyword: {} at place: {}",
+                        keyword, place.getName(), e
+                );
+            }
+        }
+        return allResponses;
     }
 
     private int calculateWalkingTime(final int distance) {

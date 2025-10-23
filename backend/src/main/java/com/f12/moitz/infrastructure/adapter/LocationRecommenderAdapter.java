@@ -4,6 +4,7 @@ import com.f12.moitz.application.dto.RecommendedLocationsResponse;
 import com.f12.moitz.application.port.LocationRecommender;
 import com.f12.moitz.common.error.exception.ExternalApiException;
 import com.f12.moitz.common.error.exception.RetryableApiException;
+import com.f12.moitz.domain.RecommendCondition;
 import com.f12.moitz.infrastructure.client.gemini.GoogleGeminiClient;
 import com.f12.moitz.infrastructure.client.perplexity.PerplexityClient;
 import io.github.resilience4j.circuitbreaker.CallNotPermittedException;
@@ -36,12 +37,13 @@ public class LocationRecommenderAdapter implements LocationRecommender {
     public RecommendedLocationsResponse recommendLocations(
             final List<String> startingPlaces,
             final List<String> candidatePlaces,
-            final List<String> requirements
+            final List<RecommendCondition> requirements
     ) {
+        final List<String> requirementStrings = RecommendCondition.getRequirements(requirements);
         final Supplier<RecommendedLocationsResponse> geminiCall = () -> geminiClient.generateResponse(
                 startingPlaces,
                 candidatePlaces,
-                requirements
+                requirementStrings
         );
 
         final Supplier<RecommendedLocationsResponse> decoratedGeminiCall = Decorators.ofSupplier(geminiCall)
@@ -49,7 +51,7 @@ public class LocationRecommenderAdapter implements LocationRecommender {
                 .withCircuitBreaker(geminiRetryableBreaker)
                 .withFallback(
                         List.of(ExternalApiException.class, CallNotPermittedException.class),
-                        throwable -> fallback(startingPlaces, requirements)
+                        throwable -> fallback(startingPlaces, requirementStrings)
                 )
                 .decorate();
 
@@ -73,11 +75,12 @@ public class LocationRecommenderAdapter implements LocationRecommender {
     public RecommendedLocationsResponse recoverRecommendedLocations(
             final List<String> startingPlaces,
             final List<String> candidatePlaces,
-            final List<String> requirements
+            final List<RecommendCondition> requirements
     ) {
+        final List<String> requirementStrings = RecommendCondition.getRequirements(requirements);
         final RecommendedLocationsResponse generatedResponse = perplexityClient.generateResponse(
                 startingPlaces,
-                String.join(",", requirements)
+                String.join(",", requirementStrings)
         );
         final RecommendedLocationsResponse deduplicatedLocations = deduplicateLocation(generatedResponse);
         return excludeStartPlaces(
