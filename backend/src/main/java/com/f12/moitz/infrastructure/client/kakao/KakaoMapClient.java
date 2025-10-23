@@ -12,6 +12,7 @@ import com.f12.moitz.infrastructure.client.kakao.dto.SearchPlacesLimitQuantityRe
 import com.f12.moitz.infrastructure.client.kakao.dto.SearchPlacesRequest;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
+import java.util.Base64;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -141,7 +142,7 @@ public class KakaoMapClient {
             final KakaoImageApiResponse imageResponse = searchImagesBy(imageRequest);
 
             if (imageResponse.documents() != null && !imageResponse.documents().isEmpty()) {
-                final String imageUrl = imageResponse.documents().get(0).imageUrl();
+                final String imageUrl = imageResponse.documents().get(0).thumbnailUrl();
                 return document.withImageUrl(imageUrl);
             }
             log.info("No image found for place: {}", document.placeName());
@@ -168,6 +169,41 @@ public class KakaoMapClient {
         } catch (IOException e) {
             throw new ExternalApiException(ExternalApiErrorCode.INVALID_KAKAO_MAP_API_RESPONSE);
         }
+    }
+
+    private String downloadImageAsBase64(final String imageUrl) {
+        try {
+            if (imageUrl == null || imageUrl.isEmpty()) {
+                log.warn("Image URL is null or empty");
+                return null;
+            }
+
+            org.springframework.http.ResponseEntity<byte[]> response = kakaoRestClient.get()
+                    .uri(imageUrl)
+                    .retrieve()
+                    .toEntity(byte[].class);
+
+            byte[] imageBytes = response.getBody();
+            if (imageBytes == null || imageBytes.length == 0) {
+                log.warn("Downloaded image is empty for URL: {}", imageUrl);
+                return null;
+            }
+
+            String mediaType = getMediaTypeFromResponse(response);
+            String base64 = Base64.getEncoder().encodeToString(imageBytes);
+            return "data:" + mediaType + ";base64," + base64;
+        } catch (Exception e) {
+            log.warn("Failed to download image from URL: {}", imageUrl, e);
+            return null;
+        }
+    }
+
+    private String getMediaTypeFromResponse(org.springframework.http.ResponseEntity<byte[]> response) {
+        org.springframework.http.MediaType contentType = response.getHeaders().getContentType();
+        if (contentType != null) {
+            return contentType.toString();
+        }
+        return "image/jpeg"; // 기본값
     }
 
 }

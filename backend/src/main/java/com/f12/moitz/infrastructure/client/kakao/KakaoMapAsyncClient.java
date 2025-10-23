@@ -12,6 +12,7 @@ import com.f12.moitz.infrastructure.client.kakao.dto.SearchPlacesLimitQuantityRe
 import com.f12.moitz.infrastructure.client.kakao.dto.SearchPlacesRequest;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.time.Duration;
+import java.util.Base64;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -28,6 +29,7 @@ import reactor.core.publisher.Mono;
 public class KakaoMapAsyncClient {
 
     private static final Duration REQUEST_TIMEOUT = Duration.ofSeconds(KakaoMapConstants.REQUEST_TIMEOUT_SECONDS);
+    private static final Duration IMAGE_DOWNLOAD_TIMEOUT = Duration.ofSeconds(10);
 
     private final WebClient kakaoWebClient;
     private final ObjectMapper objectMapper;
@@ -164,18 +166,65 @@ public class KakaoMapAsyncClient {
         );
 
         return searchImagesByAsync(imageRequest)
-                .mapNotNull(imageResponse -> {
+                .flatMap(imageResponse -> {
                     if (imageResponse.documents() != null && !imageResponse.documents().isEmpty()) {
-                        final String imageUrl = imageResponse.documents().get(0).imageUrl();
-                        return document.withImageUrl(imageUrl);
+                        final String imageUrl = imageResponse.documents().get(0).thumbnailUrl();
+                        return downloadImageAsBase64Async(imageUrl)
+                                .map(document::withImageUrl)
+                                .switchIfEmpty(Mono.just(document.withImageUrl(null)))
+                                .onErrorResume(e -> {
+                                    log.debug("Failed to download image as base64 for place: {}",
+                                            document.placeName(), e);
+                                    return Mono.just(document.withImageUrl(null));
+                                });
                     }
                     log.debug("No image found for place: {}", document.placeName());
-                    return document.withImageUrl(null);
+                    return Mono.just(document.withImageUrl(null));
                 })
                 .onErrorResume(e -> {
                     log.debug("Failed to fetch image for place: {}", document.placeName(), e);
                     return Mono.just(document.withImageUrl(null));
                 });
+    }
+
+    private Mono<String> downloadImageAsBase64Async(final String imageUrl) {
+        if (imageUrl == null || imageUrl.isEmpty()) {
+            return Mono.empty();
+        }
+
+        long startTime = System.currentTimeMillis();
+
+        return kakaoWebClient.get()
+                .uri(imageUrl)
+                .retrieve()
+                .toEntity(byte[].class)
+                .timeout(IMAGE_DOWNLOAD_TIMEOUT)
+                .flatMap(response -> {
+                    long elapsed = System.currentTimeMillis() - startTime;
+                    byte[] imageBytes = response.getBody();
+                    if (imageBytes == null || imageBytes.length == 0) {
+                        log.debug("Downloaded empty image in {}ms: {}", elapsed, imageUrl);
+                        return Mono.empty();
+                    }
+                    log.debug("Image downloaded in {}ms: {}", elapsed, imageUrl);
+                    String mediaType = getMediaTypeFromResponse(response);
+                    String base64 = Base64.getEncoder().encodeToString(imageBytes);
+                    return Mono.just("data:" + mediaType + ";base64," + base64);
+                })
+                .onErrorResume(e -> {
+                    long elapsed = System.currentTimeMillis() - startTime;
+                    log.warn("Image download failed after {}ms: {}", elapsed, imageUrl, e);
+                    return Mono.empty();
+                });
+    }
+
+    private String getMediaTypeFromResponse(
+            org.springframework.http.ResponseEntity<byte[]> response) {
+        org.springframework.http.MediaType contentType = response.getHeaders().getContentType();
+        if (contentType != null) {
+            return contentType.toString();
+        }
+        return "image/jpeg";
     }
 
     private Throwable mapException(final Throwable throwable) {
