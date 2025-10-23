@@ -8,73 +8,61 @@ on:
 
 jobs:
   deploy_prod:
-    runs-on: [ self-hosted, lb ]
+    runs-on: [self-hosted, lb]
 
     steps:
       - name: 1단계 그린 활성화
         run: |
-          # GitHub 환경변수에 green 인스턴스 id 저장 및 green 인스턴스 재활성화
           echo "➡️ Green 인스턴스 부팅"
           GREEN_INSTANCE_ID=$(aws ec2 describe-instances \
-          --filters 'Name=tag:ProjectTeam,Values=moitz' \
-            'Name=tag:Color,Values=green' \
-          --query 'Reservations[0].Instances[0].InstanceId' \
-          --output text)
-          
+            --filters 'Name=tag:ProjectTeam,Values=moitz' \
+                      'Name=tag:Color,Values=green' \
+            --query 'Reservations[0].Instances[0].InstanceId' \
+            --output text)
+
           echo "::add-mask::$GREEN_INSTANCE_ID"
-          
+
           if [ -z "$GREEN_INSTANCE_ID" ] || [ "$GREEN_INSTANCE_ID" == "None" ]; then
             echo "🔴 Green 인스턴스를 찾을 수 없습니다"
             exit 1
           fi
-          
+
           echo GREEN_INSTANCE_ID=$GREEN_INSTANCE_ID >> $GITHUB_ENV
           aws ec2 start-instances --instance-ids $GREEN_INSTANCE_ID
-          
-          # Green 인스턴스 부팅 대기
           aws ec2 wait instance-status-ok --instance-ids $GREEN_INSTANCE_ID
           echo "✅ Green 인스턴스 부팅 완료"
 
-      - name: 2단계 그린 인스턴스에서 도커 컨테이너 실행
+      - name: 2단계 Blue/Green IP 가져오기 및 deploy.sh 실행
         run: |
-          # 기존 running blue 인스턴스의 id 저장
           BLUE_INSTANCE_ID=$(aws ec2 describe-instances \
-          --filters 'Name=tag:ProjectTeam,Values=moitz' \
-            'Name=tag:Color,Values=blue' \
-          --query 'Reservations[0].Instances[0].InstanceId' \
-          --output text)
-          
-          # 기존 running blue 인스턴스의 private IP 저장
+            --filters 'Name=tag:ProjectTeam,Values=moitz' \
+                      'Name=tag:Color,Values=blue' \
+            --query 'Reservations[0].Instances[0].InstanceId' \
+            --output text)
+
           BLUE_INSTANCE_IP=$(aws ec2 describe-instances \
-          --instance-ids $BLUE_INSTANCE_ID \
-          --query "Reservations[0].Instances[0].PrivateIpAddress" \
-          --output text)
-          
-          # Green 인스턴스의 private IP 저장
+            --instance-ids $BLUE_INSTANCE_ID \
+            --query "Reservations[0].Instances[0].PrivateIpAddress" \
+            --output text)
+
           GREEN_INSTANCE_IP=$(aws ec2 describe-instances \
-          --instance-ids ${{ env.GREEN_INSTANCE_ID }} \
-          --query "Reservations[0].Instances[0].PrivateIpAddress" \
-          --output text)
-          
+            --instance-ids ${{ env.GREEN_INSTANCE_ID }} \
+            --query "Reservations[0].Instances[0].PrivateIpAddress" \
+            --output text)
+
           if [ -z "$BLUE_INSTANCE_ID" ] || [ "$BLUE_INSTANCE_ID" == "None" ]; then
             echo "🔴 Blue 인스턴스를 찾을 수 없습니다"
             exit 1
           fi
-          
-          # 변수 마스킹 처리 및 GitHub 환경변수에 저장
+
           echo "::add-mask::$BLUE_INSTANCE_ID"
           echo "::add-mask::$BLUE_INSTANCE_IP"
           echo "::add-mask::$GREEN_INSTANCE_IP"
           echo BLUE_INSTANCE_ID=$BLUE_INSTANCE_ID >> $GITHUB_ENV
           echo BLUE_INSTANCE_IP=$BLUE_INSTANCE_IP >> $GITHUB_ENV
           echo GREEN_INSTANCE_IP=$GREEN_INSTANCE_IP >> $GITHUB_ENV
-          
-          # Green에서 애플리케이션 빌드
-          echo "➡️ Green에서 애플리케이션 빌드"
-          ### 환경변수(e.g. Green 인스턴스 id)는 이거 쓰면 됩니다: ${{ env.GREEN_INSTANCE_ID }}
-          
-          echo "➡️ Green 인스턴스에서 deploy.sh 실행 (SSM CLI)"
-          
+
+          echo "➡️ Green 인스턴스에서 deploy.sh 실행"
           COMMAND_ID=$(aws ssm send-command \
             --instance-ids ${{ env.GREEN_INSTANCE_ID }} \
             --document-name "AWS-RunShellScript" \
@@ -82,76 +70,58 @@ jobs:
             --parameters 'commands=["chmod +x /var/snap/amazon-ssm-agent/11798/deploy.sh && sudo /var/snap/amazon-ssm-agent/11798/deploy.sh"]' \
             --query "Command.CommandId" \
             --output text)
-          
-          echo "✅ SSM 명령 전송 완료 (Command ID: $COMMAND_ID)"
-          
-          # SSM 실행 완료 대기
-          aws ssm wait command-executed \
-            --command-id "$COMMAND_ID" \
-            --instance-id ${{ env.GREEN_INSTANCE_ID }}
 
-          echo "➡️ SSM 명령 stdout/stderr 확인"
-          aws ssm list-command-invocations \
-          --command-id "$COMMAND_ID" \
-          --instance-id ${{ env.GREEN_INSTANCE_ID }} \
-          --query 'CommandInvocations[0].[Status,StandardOutputContent,StandardErrorContent]' \
-          --output text
-          
-          echo "✅ Green EC2에서 deploy.sh 실행 완료"
-          
-          sleep 5 # 필요없다면 삭제--도커 컨테이너에서 스프링 앱 실행이 블로킹/sync 작업이면 필요없을듯?
+          aws ssm wait command-executed --command-id "$COMMAND_ID" --instance-id ${{ env.GREEN_INSTANCE_ID }}
+          echo "✅ deploy.sh 실행 완료"
 
       - name: 3단계 Green 헬스체크 및 블루와 교체
         run: |
-          HEALTH_URL="http://${{ env.GREEN_INSTANCE_IP }}:80/health"
           EXPECTED_HEALTH='{"status":"UP"}'
           MAX_RETRIES=6
           SLEEP_SEC=5
 
-          echo "➡️ Green 애플리케이션 헬스체크 시작"
-
           for i in $(seq 1 $MAX_RETRIES); do
-            response=$(curl -fsS --max-time 10 "$HEALTH_URL" || echo "curl_failed")
-            if [[ "$response" != "curl_failed" ]]; then
-              if [[ "$(echo $response | jq -c .)" == "$(echo $EXPECTED_HEALTH | jq -c .)" ]]; then
-                echo "✅ Green 인스턴스 헬스체크 성공: $response"
-                break
-              else
-                echo "⚠️ 헬스 응답 수신: $response, 재시도 $i/$MAX_RETRIES"
-              fi
+            RESPONSE=$(aws ssm send-command \
+              --instance-ids ${{ env.GREEN_INSTANCE_ID }} \
+              --document-name "AWS-RunShellScript" \
+              --parameters 'commands=["curl -fsS http://localhost:80/health || echo curl_failed"]' \
+              --query "Command.CommandId" \
+              --output text)
+
+            aws ssm wait command-executed --command-id "$RESPONSE" --instance-id ${{ env.GREEN_INSTANCE_ID }}
+
+            RESULT=$(aws ssm list-command-invocations \
+              --command-id "$RESPONSE" \
+              --instance-id ${{ env.GREEN_INSTANCE_ID }} \
+              --query 'CommandInvocations[0].StandardOutputContent' \
+              --output text)
+
+            if [[ "$(echo $RESULT | jq -c .)" == "$(echo $EXPECTED_HEALTH | jq -c .)" ]]; then
+              echo "✅ 헬스체크 성공: $RESULT"
+              break
             else
-              echo "⏳ 헬스체크 실패, 재시도 $i/$MAX_RETRIES"
+              echo "⏳ 헬스체크 실패, 재시도 $i/$MAX_RETRIES: $RESULT"
+              sleep $SLEEP_SEC
             fi
-            sleep $SLEEP_SEC
           done
 
-          if [[ "$(echo $response | jq -c .)" != "$(echo $EXPECTED_HEALTH | jq -c .)" ]]; then
-            echo "🔴 Green 인스턴스 헬스체크 최종 실패: $response"
+          if [[ "$(echo $RESULT | jq -c .)" != "$(echo $EXPECTED_HEALTH | jq -c .)" ]]; then
+            echo "🔴 Green 인스턴스 헬스체크 최종 실패"
             exit 1
           fi
-          # Nginx config 파일 갱신
-          echo "➡️ Nginx 설정에서 green으로 프록시 변경"
+
+          echo "➡️ Nginx 프록시 Green으로 변경"
           sudo sed -i "s/${{ env.BLUE_INSTANCE_IP }}/${{ env.GREEN_INSTANCE_IP }}/g" /etc/nginx/sites-available/default
           sudo nginx -t && sudo nginx -s reload
           sleep 5
-          echo "✅ Green으로 프록시 변경 완료"
-          
-          # Blue 인스턴스 중지(임시정지) 처리
-          echo "➡️ Blue 인스턴스 임시정지 처리"
+          echo "✅ Nginx 프록시 변경 완료"
+
+          echo "➡️ Blue 인스턴스 임시정지"
           aws ec2 stop-instances --instance-ids ${{ env.BLUE_INSTANCE_ID }}
           aws ec2 wait instance-stopped --instance-ids ${{ env.BLUE_INSTANCE_ID }}
           echo "✅ Blue 인스턴스 임시정지 완료"
-          
-          # Green 인스턴스의 Color 태그 값을 blue로 변경
-          echo "➡️ Green 인스턴스의 Color 태그 값을 blue로 변경"
-          aws ec2 create-tags \
-          --resources ${{ env.GREEN_INSTANCE_ID }} \
-          --tags Key=Color,Value=blue
-          echo "✅ green -> blue 태그 변경 완료"
-          
-          # Blue 인스턴스의 Color 태그 값을 green으로 변경
-          echo "➡️ Blue 인스턴스의 Color 태그 값을 green으로 변경"
-          aws ec2 create-tags \
-          --resources ${{ env.BLUE_INSTANCE_ID }} \
-          --tags Key=Color,Value=green
-          echo "✅ blue -> green 태그 변경 완료"
+
+          echo "➡️ Green/Blue 태그 교체"
+          aws ec2 create-tags --resources ${{ env.GREEN_INSTANCE_ID }} --tags Key=Color,Value=blue
+          aws ec2 create-tags --resources ${{ env.BLUE_INSTANCE_ID }} --tags Key=Color,Value=green
+          echo "✅ 태그 교체 완료"
