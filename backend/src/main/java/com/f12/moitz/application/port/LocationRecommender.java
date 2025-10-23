@@ -1,6 +1,7 @@
 package com.f12.moitz.application.port;
 
 import com.f12.moitz.application.dto.RecommendedLocationsResponse;
+import com.f12.moitz.domain.RecommendCondition;
 import java.util.List;
 
 public interface LocationRecommender {
@@ -8,6 +9,6 @@ public interface LocationRecommender {
     RecommendedLocationsResponse recommendLocations(
             List<String> startingPlaces,
             List<String> candidatePlaces,
-            List<String> requirements
+            List<RecommendCondition> requirements
     );
 }

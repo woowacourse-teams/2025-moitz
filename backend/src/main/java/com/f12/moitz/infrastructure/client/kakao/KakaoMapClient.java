@@ -26,12 +26,6 @@ import org.springframework.web.client.RestClient;
 @Component
 public class KakaoMapClient {
 
-    private static final String SEARCH_PLACE_URL = "/local/search/keyword.json?query=%s&x=%s&y=%s&radius=%d";
-    private static final String SEARCH_PLACE_WITH_SIZE_URL = "/local/search/keyword.json?query=%s&x=%s&y=%s&radius=%d&size=%d";
-    private static final String SEARCH_POINT_URL = "/local/search/keyword.json?query=%s";
-    private static final String SEARCH_IMAGE_URL = "/search/image?query=%s&page=%d&size=%d";
-    private static final List<String> ERROR_CODE_CAN_RETRY = List.of("-1", "-7", "-603");
-
     private final RestClient kakaoRestClient;
     private final ObjectMapper objectMapper;
 
@@ -39,7 +33,7 @@ public class KakaoMapClient {
     private String kakaoApiKey;
 
     public Point searchPointBy(final String placeName) {
-        final String url = String.format(SEARCH_POINT_URL, placeName);
+        final String url = String.format(KakaoMapConstants.SEARCH_POINT_URL, placeName);
         final KakaoApiResponse response = getData(url);
         return new Point(response.findStationX(), response.findStationY());
     }
@@ -71,7 +65,7 @@ public class KakaoMapClient {
             final int radius
     ) {
         final String url = String.format(
-                SEARCH_PLACE_URL,
+                KakaoMapConstants.SEARCH_PLACE_URL,
                 keyword,
                 longitude,
                 latitude,
@@ -89,7 +83,7 @@ public class KakaoMapClient {
             final int size
     ) {
         final String url = String.format(
-                SEARCH_PLACE_WITH_SIZE_URL,
+                KakaoMapConstants.SEARCH_PLACE_WITH_SIZE_URL,
                 keyword,
                 longitude,
                 latitude,
@@ -98,16 +92,6 @@ public class KakaoMapClient {
         );
         final KakaoApiResponse response = getData(url);
         return enrichWithImages(response, stationName);
-    }
-
-    public KakaoImageApiResponse searchImagesBy(final SearchImageRequest request) {
-        final String url = String.format(
-                SEARCH_IMAGE_URL,
-                request.getQuery(),
-                request.getPage(),
-                request.getSize()
-        );
-        return getImageData(url);
     }
 
     private KakaoApiResponse getData(final String url) {
@@ -120,6 +104,16 @@ public class KakaoMapClient {
                         (req, res) -> handleError(res)
                 )
                 .body(KakaoApiResponse.class);
+    }
+
+    public KakaoImageApiResponse searchImagesBy(final SearchImageRequest request) {
+        final String url = String.format(
+                KakaoMapConstants.SEARCH_IMAGE_URL,
+                request.getQuery(),
+                request.getPage(),
+                request.getSize()
+        );
+        return getImageData(url);
     }
 
     private KakaoImageApiResponse getImageData(final String url) {
@@ -164,10 +158,10 @@ public class KakaoMapClient {
             final KakaoMapErrorResponse error = objectMapper.readValue(body,
                     KakaoMapErrorResponse.class);
             log.error(error.msg());
-            if (ERROR_CODE_CAN_RETRY.contains(error.code())) {
+            if (KakaoMapConstants.ERROR_CODE_CAN_RETRY.contains(error.code())) {
                 throw new ExternalApiException(ExternalApiErrorCode.TEMPORARILY_INVALID_KAKAO_MAP_API_RESPONSE);
             }
-            if ("-10".equals(error.code())) {
+            if (KakaoMapConstants.ERROR_CODE_QUOTA_EXCEEDED.equals(error.code())) {
                 throw new ExternalApiException(ExternalApiErrorCode.EXCEEDED_KAKAO_MAP_API_TOKEN_QUOTA);
             }
             throw new ExternalApiException(ExternalApiErrorCode.INVALID_KAKAO_MAP_API_RESPONSE);

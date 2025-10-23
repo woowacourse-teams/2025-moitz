@@ -9,6 +9,7 @@ import static org.mockito.Mockito.verify;
 
 import com.f12.moitz.application.dto.RecommendationRequest;
 import com.f12.moitz.application.dto.RecommendedLocationsResponse;
+import com.f12.moitz.application.port.AsyncPlaceRecommender;
 import com.f12.moitz.application.port.LocationRecommender;
 import com.f12.moitz.application.port.PlaceRecommender;
 import com.f12.moitz.application.port.RouteFinder;
@@ -39,6 +40,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import reactor.core.publisher.Mono;
 
 @ExtendWith(MockitoExtension.class)
 class RecommendationServiceTest {
@@ -50,6 +52,9 @@ class RecommendationServiceTest {
 
     @Mock
     private PlaceRecommender placeRecommender;
+
+    @Mock
+    private AsyncPlaceRecommender asyncPlaceRecommender;
 
     @Mock
     private SubwayStationService subwayStationService;
@@ -68,6 +73,7 @@ class RecommendationServiceTest {
         recommendationService = new RecommendationService(
                 subwayStationService,
                 placeRecommender,
+                asyncPlaceRecommender,
                 locationRecommender,
                 routeFinder,
                 recommendationMapper,
@@ -125,7 +131,8 @@ class RecommendationServiceTest {
                         )
                 )
         );
-        given(placeRecommender.recommendPlaces(anyList(), anyList())).willReturn(mockRecommendedPlaces);
+        given(asyncPlaceRecommender.recommendPlacesAsync(anyList(), anyList()))
+                .willReturn(Mono.just(mockRecommendedPlaces));
 
         List<Route> mockRoutes = List.of(
                 new Route(List.of(new Path(gangnam, seolleung, TravelMethod.SUBWAY, 10, SubwayLine.fromTitle("2호선")))),

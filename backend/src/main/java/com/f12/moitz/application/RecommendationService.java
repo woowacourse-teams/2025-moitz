@@ -4,6 +4,7 @@ import com.f12.moitz.application.dto.RecommendationCreateResponse;
 import com.f12.moitz.application.dto.RecommendationRequest;
 import com.f12.moitz.application.dto.RecommendationResultResponse;
 import com.f12.moitz.application.dto.RecommendedLocationsResponse;
+import com.f12.moitz.application.port.AsyncPlaceRecommender;
 import com.f12.moitz.application.port.LocationRecommender;
 import com.f12.moitz.application.port.PlaceRecommender;
 import com.f12.moitz.application.port.RouteFinder;
@@ -45,6 +46,7 @@ public class RecommendationService {
 
     private final SubwayStationService subwayStationService;
     private final PlaceRecommender placeRecommender;
+    private final AsyncPlaceRecommender asyncPlaceRecommender;
     private final LocationRecommender locationRecommender;
     private final RouteFinder routeFinder;
     private final RecommendationMapper recommendationMapper;
@@ -53,6 +55,7 @@ public class RecommendationService {
     public RecommendationService(
             @Autowired final SubwayStationService subwayStationService,
             @Qualifier("placeRecommenderAdapter") final PlaceRecommender placeRecommender,
+            @Autowired final AsyncPlaceRecommender asyncPlaceRecommender,
             @Autowired final LocationRecommender locationRecommender,
             @Qualifier("subwayRouteFinderAdapter") final RouteFinder routeFinder,
             @Autowired final RecommendationMapper recommendationMapper,
@@ -60,6 +63,7 @@ public class RecommendationService {
     ) {
         this.subwayStationService = subwayStationService;
         this.placeRecommender = placeRecommender;
+        this.asyncPlaceRecommender = asyncPlaceRecommender;
         this.locationRecommender = locationRecommender;
         this.routeFinder = routeFinder;
         this.recommendationMapper = recommendationMapper;
@@ -72,7 +76,6 @@ public class RecommendationService {
 
         stopWatch.start("지역 추천");
         final List<RecommendCondition> recommendConditions = RecommendCondition.fromTitle(request.requirements());
-        final List<String> requirements = RecommendCondition.getRequirements(recommendConditions);
         final List<SubwayStation> startingPlaces = getByNames(request.startingPlaceNames());
         final List<SubwayStation> candidatePlaces = subwayStationService.generateCandidatePlace(startingPlaces);
 
@@ -82,7 +85,7 @@ public class RecommendationService {
         final RecommendedLocationsResponse recommendedLocationsResponse = locationRecommender.recommendLocations(
                 startingPlaceNames,
                 candidatePlaceNames,
-                requirements
+                recommendConditions
         );
         final Map<Place, ReasonAndDescription> generatedPlacesWithReason = recommendedLocationsResponse.recommendations()
                 .stream()
@@ -110,10 +113,10 @@ public class RecommendationService {
         stopWatch.stop();
 
         stopWatch.start("장소 추천");
-        final Map<Place, CategorizedRecommendedPlaces> recommendedPlaces = placeRecommender.recommendPlaces(
+        final Map<Place, CategorizedRecommendedPlaces> recommendedPlaces = asyncPlaceRecommender.recommendPlacesAsync(
                 generatedPlaces,
-                requirements
-        );
+                recommendConditions
+        ).block();
         stopWatch.stop();
 
         stopWatch.start("Recommendation으로 변환");
@@ -122,7 +125,8 @@ public class RecommendationService {
                 recommendedPlaces,
                 placeRoutes,
                 placeCourses,
-                STARTING_VOTES
+                STARTING_VOTES,
+                recommendConditions
         );
         stopWatch.stop();
         log.debug("추천 서비스 완료. {}", stopWatch.shortSummary());

@@ -1,18 +1,19 @@
 package com.f12.moitz.infrastructure.adapter;
 
-import com.f12.moitz.application.port.PlaceRecommender;
+import com.f12.moitz.application.port.AsyncPlaceRecommender;
+import com.f12.moitz.common.error.exception.ExternalApiErrorCode;
+import com.f12.moitz.common.error.exception.ExternalApiException;
 import com.f12.moitz.domain.CategorizedRecommendedPlaces;
 import com.f12.moitz.domain.Place;
 import com.f12.moitz.domain.Point;
 import com.f12.moitz.domain.RecommendCondition;
 import com.f12.moitz.domain.RecommendedPlace;
-import com.f12.moitz.infrastructure.client.kakao.KakaoMapClient;
+import com.f12.moitz.infrastructure.client.kakao.KakaoMapAsyncClient;
 import com.f12.moitz.infrastructure.client.kakao.dto.DocumentResponse;
 import com.f12.moitz.infrastructure.client.kakao.dto.KakaoApiResponse;
-import com.f12.moitz.infrastructure.client.kakao.dto.KakaoApiResponses;
 import com.f12.moitz.infrastructure.client.kakao.dto.SearchPlacesLimitQuantityRequest;
-import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -20,31 +21,32 @@ import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class PlaceRecommenderAdapter implements PlaceRecommender {
+public class PlaceRecommenderAsyncAdapter implements AsyncPlaceRecommender {
 
-    private final KakaoMapClient kakaoMapClient;
+    private final KakaoMapAsyncClient kakaoMapAsyncClient;
 
-    @Override
-    public Map<Place, CategorizedRecommendedPlaces> recommendPlaces(
+    public Mono<Map<Place, CategorizedRecommendedPlaces>> recommendPlacesAsync(
             final List<Place> targetPlaces,
             final List<RecommendCondition> requirements
     ) {
-        final Map<Place, KakaoApiResponses> searchResults = searchPlacesWithRequirement(targetPlaces, requirements);
-        return buildCategorizedRecommendedPlaces(searchResults);
+        return searchPlacesWithRequirementAsync(targetPlaces, requirements)
+                .map(this::buildCategorizedRecommendedPlaces);
     }
 
     private Map<Place, CategorizedRecommendedPlaces> buildCategorizedRecommendedPlaces(
-            final Map<Place, KakaoApiResponses> searchResults
+            final Map<Place, Map<RecommendCondition, List<KakaoApiResponse>>> searchResults
     ) {
         return searchResults.entrySet().stream()
                 .collect(Collectors.toMap(
                         Entry::getKey,
                         entry -> new CategorizedRecommendedPlaces(
-                                buildCategoryMap(entry.getValue().kakaoApiResponses())
+                                buildCategoryMap(entry.getValue())
                         )
                 ));
     }
@@ -62,7 +64,9 @@ public class PlaceRecommenderAdapter implements PlaceRecommender {
                 ));
     }
 
-    private RecommendedPlace toRecommendedPlace(final DocumentResponse document) {
+    private RecommendedPlace toRecommendedPlace(
+            final DocumentResponse document
+    ) {
         return new RecommendedPlace(
                 document.placeName(),
                 new Point(
@@ -76,36 +80,32 @@ public class PlaceRecommenderAdapter implements PlaceRecommender {
         );
     }
 
-    private Map<Place, KakaoApiResponses> searchPlacesWithRequirement(
-            final List<Place> targets,
+    private Mono<Map<Place, Map<RecommendCondition, List<KakaoApiResponse>>>> searchPlacesWithRequirementAsync(
+            final List<Place> targetPlaces,
             final List<RecommendCondition> requirements
     ) {
-        return targets.stream()
-                .collect(Collectors.toMap(
-                        place -> place,
-                        place -> {
-                            Map<RecommendCondition, List<KakaoApiResponse>> responsesByCategory =
-                                    requirements.stream().collect(Collectors.toMap(
-                                            condition -> condition,
-                                            condition -> searchKeywordsForCondition(place, condition),
-                                            (existing, incoming) -> {
-                                                existing.addAll(incoming);
-                                                return existing;
-                                            }
-                                    ));
-                            return new KakaoApiResponses(responsesByCategory);
-                        }
-                ));
+        return Flux.fromIterable(targetPlaces)
+                .flatMap(place -> searchRequirementsForPlaceAsync(place, requirements)
+                        .map(requirementMap -> Map.entry(place, requirementMap))
+                )
+                .collectMap(Map.Entry::getKey, Map.Entry::getValue);
     }
 
-    private List<KakaoApiResponse> searchKeywordsForCondition(
+    private Mono<Map<RecommendCondition, List<KakaoApiResponse>>> searchRequirementsForPlaceAsync(
             final Place place,
-            final RecommendCondition condition
+            final List<RecommendCondition> requirements
     ) {
-        List<KakaoApiResponse> allResponses = new ArrayList<>();
-        for (String keyword : condition.getKeywords()) {
-            try {
-                KakaoApiResponse response = kakaoMapClient.searchPlacesBy(
+        return Flux.fromIterable(requirements)
+                .flatMap(condition -> searchKeywordsForConditionAsync(condition, place))
+                .collectMap(Map.Entry::getKey, Map.Entry::getValue, HashMap::new);
+    }
+
+    private Mono<Map.Entry<RecommendCondition, List<KakaoApiResponse>>> searchKeywordsForConditionAsync(
+            final RecommendCondition condition,
+            final Place place
+    ) {
+        return Flux.fromIterable(condition.getKeywords())
+                .flatMap(keyword -> kakaoMapAsyncClient.searchPlacesByAsync(
                         new SearchPlacesLimitQuantityRequest(
                                 keyword,
                                 place.getName(),
@@ -114,16 +114,16 @@ public class PlaceRecommenderAdapter implements PlaceRecommender {
                                 800,
                                 3
                         )
-                );
-                allResponses.add(response);
-            } catch (Exception e) {
-                log.warn(
-                        "Failed to search places for keyword: {} at place: {}",
-                        keyword, place.getName(), e
-                );
-            }
-        }
-        return allResponses;
+                )
+                .retry(2)
+                .onErrorMap(e -> new ExternalApiException(
+                        ExternalApiErrorCode.INVALID_KAKAO_MAP_API_RESPONSE,
+                        "조건 '" + condition.getTitle() + "'의 키워드 '" + keyword +
+                        "'에 대한 검색이 실패했습니다. / " + e.getMessage()
+                ))
+                )
+                .collectList()
+                .map(responses -> Map.entry(condition, responses));
     }
 
     private int calculateWalkingTime(final int distance) {
