@@ -4,8 +4,8 @@ import com.f12.moitz.application.dto.RecommendedLocationsResponse;
 import com.f12.moitz.application.port.LocationRecommender;
 import com.f12.moitz.common.error.exception.ExternalApiException;
 import com.f12.moitz.common.error.exception.RetryableApiException;
+import com.f12.moitz.infrastructure.client.gemini.GeminiClient;
 import com.f12.moitz.domain.RecommendCondition;
-import com.f12.moitz.infrastructure.client.gemini.GoogleGeminiClient;
 import com.f12.moitz.infrastructure.client.perplexity.PerplexityClient;
 import io.github.resilience4j.circuitbreaker.CallNotPermittedException;
 import io.github.resilience4j.circuitbreaker.CircuitBreaker;
@@ -23,7 +23,7 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class LocationRecommenderAdapter implements LocationRecommender {
 
-    private final GoogleGeminiClient geminiClient;
+    private final GeminiClient geminiClient;
     private final PerplexityClient perplexityClient;
     private final CircuitBreaker geminiBreaker;
     private final CircuitBreaker geminiRetryableBreaker;
