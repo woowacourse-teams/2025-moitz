@@ -3,16 +3,14 @@ package com.f12.moitz.infrastructure.adapter;
 import com.f12.moitz.application.port.PlaceRecommender;
 import com.f12.moitz.domain.CategorizedRecommendedPlaces;
 import com.f12.moitz.domain.Place;
-import com.f12.moitz.domain.Point;
 import com.f12.moitz.domain.RecommendCondition;
 import com.f12.moitz.domain.RecommendedPlace;
 import com.f12.moitz.infrastructure.client.kakao.KakaoMapClient;
-import com.f12.moitz.infrastructure.client.kakao.dto.DocumentResponse;
 import com.f12.moitz.infrastructure.client.kakao.dto.KakaoApiResponse;
 import com.f12.moitz.infrastructure.client.kakao.dto.KakaoApiResponses;
 import com.f12.moitz.infrastructure.client.kakao.dto.SearchPlacesLimitQuantityRequest;
+import com.f12.moitz.infrastructure.utils.KakaoPlaceMapper;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -27,6 +25,7 @@ import org.springframework.stereotype.Component;
 public class PlaceRecommenderAdapter implements PlaceRecommender {
 
     private final KakaoMapClient kakaoMapClient;
+    private final KakaoPlaceMapper kakaoPlaceMapper;
 
     @Override
     public Map<Place, CategorizedRecommendedPlaces> recommendPlaces(
@@ -57,23 +56,9 @@ public class PlaceRecommenderAdapter implements PlaceRecommender {
                         Entry::getKey,
                         entry -> entry.getValue().stream()
                                 .flatMap(resp -> resp.documents().stream())
-                                .map(this::toRecommendedPlace)
+                                .map(kakaoPlaceMapper::toRecommendedPlace)
                                 .toList()
                 ));
-    }
-
-    private RecommendedPlace toRecommendedPlace(final DocumentResponse document) {
-        return new RecommendedPlace(
-                document.placeName(),
-                new Point(
-                        Double.parseDouble(document.x()),
-                        Double.parseDouble(document.y())
-                ),
-                parseCategoryName(document.categoryName()),
-                calculateWalkingTime(Integer.parseInt(document.distance())),
-                document.placeUrl(),
-                document.imageUrl()
-        );
     }
 
     private Map<Place, KakaoApiResponses> searchPlacesWithRequirement(
@@ -124,21 +109,6 @@ public class PlaceRecommenderAdapter implements PlaceRecommender {
             }
         }
         return allResponses;
-    }
-
-    private int calculateWalkingTime(final int distance) {
-        return Math.toIntExact(Math.round((double) distance / 100 * 1.5));
-    }
-
-    private String parseCategoryName(final String categoryName) {
-        final String regex = ">";
-        if (!categoryName.contains(regex)) {
-            return categoryName;
-        }
-        final List<String> tokens = Arrays.stream(categoryName.split(regex))
-                .map(String::trim)
-                .toList();
-        return tokens.getLast();
     }
 
 }
