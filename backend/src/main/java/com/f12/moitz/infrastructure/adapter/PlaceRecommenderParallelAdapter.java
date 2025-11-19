@@ -25,7 +25,7 @@ import reactor.core.publisher.Mono;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class PlaceRecommenderAsyncAdapter implements PlaceRecommender {
+public class PlaceRecommenderParallelAdapter implements PlaceRecommender {
 
     private final KakaoMapAsyncClient kakaoMapAsyncClient;
     private final KakaoPlaceMapper kakaoPlaceMapper;

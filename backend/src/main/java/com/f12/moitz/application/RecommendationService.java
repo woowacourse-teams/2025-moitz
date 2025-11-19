@@ -52,7 +52,7 @@ public class RecommendationService {
 
     public RecommendationService(
             @Autowired final SubwayStationService subwayStationService,
-            @Qualifier("placeRecommenderAsyncAdapter") final PlaceRecommender placeRecommender,
+            @Qualifier("placeRecommenderParallelAdapter") final PlaceRecommender placeRecommender,
             @Autowired final LocationRecommender locationRecommender,
             @Qualifier("subwayRouteFinderAdapter") final RouteFinder routeFinder,
             @Autowired final RecommendationMapper recommendationMapper,
