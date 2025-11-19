@@ -1,6 +1,6 @@
 package com.f12.moitz.infrastructure.adapter;
 
-import com.f12.moitz.application.port.AsyncPlaceRecommender;
+import com.f12.moitz.application.port.PlaceRecommender;
 import com.f12.moitz.common.error.exception.ExternalApiErrorCode;
 import com.f12.moitz.common.error.exception.ExternalApiException;
 import com.f12.moitz.domain.CategorizedRecommendedPlaces;
@@ -27,11 +27,20 @@ import reactor.core.publisher.Mono;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class PlaceRecommenderAsyncAdapter implements AsyncPlaceRecommender {
+public class PlaceRecommenderAsyncAdapter implements PlaceRecommender {
 
     private final KakaoMapAsyncClient kakaoMapAsyncClient;
 
-    public Mono<Map<Place, CategorizedRecommendedPlaces>> recommendPlacesAsync(
+    @Override
+    public Map<Place, CategorizedRecommendedPlaces> recommendPlaces(
+            final List<Place> targetPlaces,
+            final List<RecommendCondition> requirements
+    ) {
+        return recommendPlacesAsync(targetPlaces, requirements)
+                .block();
+    }
+
+    private Mono<Map<Place, CategorizedRecommendedPlaces>> recommendPlacesAsync(
             final List<Place> targetPlaces,
             final List<RecommendCondition> requirements
     ) {
