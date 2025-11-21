@@ -18,6 +18,8 @@ import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
@@ -138,7 +140,12 @@ public class KakaoMapClient {
 
     private DocumentResponse addImageUrlToDocument(final DocumentResponse document, final String stationName) {
         try {
-            final SearchImageRequest imageRequest = new SearchImageRequest(stationName, document.placeName(), 1, 1);
+            final SearchImageRequest imageRequest = new SearchImageRequest(
+                    stationName,
+                    stationName + " " + document.placeName(),
+                    1,
+                    1
+            );
             final KakaoImageApiResponse imageResponse = searchImagesBy(imageRequest);
 
             if (imageResponse.documents() != null && !imageResponse.documents().isEmpty()) {
@@ -178,7 +185,7 @@ public class KakaoMapClient {
                 return null;
             }
 
-            org.springframework.http.ResponseEntity<byte[]> response = kakaoRestClient.get()
+            ResponseEntity<byte[]> response = kakaoRestClient.get()
                     .uri(imageUrl)
                     .retrieve()
                     .toEntity(byte[].class);
@@ -198,12 +205,12 @@ public class KakaoMapClient {
         }
     }
 
-    private String getMediaTypeFromResponse(org.springframework.http.ResponseEntity<byte[]> response) {
-        org.springframework.http.MediaType contentType = response.getHeaders().getContentType();
+    private String getMediaTypeFromResponse(ResponseEntity<byte[]> response) {
+        MediaType contentType = response.getHeaders().getContentType();
         if (contentType != null) {
             return contentType.toString();
         }
-        return "image/jpeg"; // 기본값
+        return "image/jpeg";
     }
 
 }

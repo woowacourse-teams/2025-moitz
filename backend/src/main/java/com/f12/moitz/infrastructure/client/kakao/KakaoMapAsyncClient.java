@@ -160,7 +160,7 @@ public class KakaoMapAsyncClient {
     ) {
         final SearchImageRequest imageRequest = new SearchImageRequest(
                 stationName,
-                document.placeName(),
+                stationName + " " + document.placeName(),
                 1,
                 1
         );
