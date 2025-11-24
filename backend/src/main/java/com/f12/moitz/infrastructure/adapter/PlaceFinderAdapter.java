@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
-public class KakaoPlaceFinderAdapter implements PlaceFinder {
+public class PlaceFinderAdapter implements PlaceFinder {
 
     private final KakaoMapClient kakaoMapClient;
 
