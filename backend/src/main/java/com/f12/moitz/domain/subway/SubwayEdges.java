@@ -1,6 +1,5 @@
 package com.f12.moitz.domain.subway;
 
-import com.f12.moitz.domain.TravelMethod;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -45,8 +44,7 @@ public class SubwayEdges {
         }
 
         final Map<SubwayStation, Integer> times = new HashMap<>();
-        final Map<SubwayStation, SubwayStation> prev = new HashMap<>();
-        final Map<SubwayStation, List<SubwayLine>> edgeLines = new HashMap<>(); // 각 역에 도달할 때 사용 가능한 호선들 저장
+        final Map<SubwayStation, List<PreviousInfo>> prev = new HashMap<>();
         final PriorityQueue<Node> pq = new PriorityQueue<>(Comparator.comparingInt(n -> n.time));
         final Set<SubwayStation> visited = new HashSet<>();
 
@@ -59,78 +57,80 @@ public class SubwayEdges {
 
         while (!pq.isEmpty()) {
             final Node current = pq.poll();
-            if (!visited.add(current.station)) {
-                continue;
-            }
-
-            if (current.station.equals(end)) {
-                break;
-            }
-
             // 현재 역 정보 가져오기
             final SubwayStation currentStation = current.station;
+
             if (!isContainsStation(currentStation)) {
                 continue;
             }
+            if (!visited.add(currentStation)) {
+                continue;
+            }
+            if (end.equals(currentStation)) {
+                break;
+            }
 
-            for (Edge edge : getEdges(currentStation)) {
+            Set<Edge> currentEdges = getEdges(currentStation);
+            
+            for (Edge edge : currentEdges) {
                 final SubwayStation neighbor = edge.getDestination();
+                
                 if (visited.contains(neighbor)) {
                     continue;
                 }
-
                 if (times.get(currentStation) == null || times.get(neighbor) == null) {
                     log.warn("출발역({}) 혹은 도착역({})에 도달하는 시간이 초기화되지 않았습니다.", currentStation.getName(), neighbor.getName());
                     continue;
                 }
 
+                final SubwayLine currentLine = edge.getSubwayLine();
                 int newTime = times.get(currentStation) + edge.getTimeInSeconds();
 
-                final List<SubwayLine> currentLines = edgeLines.get(currentStation);
+                if (!start.equals(currentStation)) {
+                    final List<SubwayLine> previousLines = getPreviousLines(prev.get(currentStation));
 
-                // 환승 시간 추가: 현재 역의 가능한 호선들 중 다음 간선의 호선이 포함되어 있지 않은 경우
-                if (currentLines != null && !currentLines.contains(edge.getSubwayLine())) {
-                    Edge transferEdge = null;
-                    for (Edge currentEdge : getEdges(currentStation)) {
-                        if (currentEdge.isTowards(currentStation) && currentEdge.isSameLine(edge.getSubwayLine())) {
-                            transferEdge = currentEdge;
-                            break;
+                    // 환승 시간 추가: 현재 역에 도달할 수 있는 호선들 중 간선의 호선이 포함되어 있지 않은 경우
+                    if (!previousLines.contains(currentLine)) {
+                        Edge transferEdge = null;
+                        for (Edge currentEdge : currentEdges) {
+                            if (currentEdge.isTowards(currentStation) && currentEdge.isSameLine(currentLine)) {
+                                transferEdge = currentEdge;
+                                break;
+                            }
                         }
-                    }
-                    if (transferEdge == null) {
-                        log.warn(
-                                "환승 Edge가 존재하지 않아 경로를 건너뜁니다. 현재역: {}, 다음역: {}, 환승호선: {} -> {}",
-                                currentStation.getName(),
-                                neighbor.getName(),
-                                currentLines.getFirst().getTitle(),
-                                edge.getSubwayLine().getTitle()
-                        );
-                        continue;
-                    }
+                        if (transferEdge == null) {
+                            log.warn(
+                                    "환승 Edge가 존재하지 않아 경로를 건너뜁니다. 현재역: {}, 다음역: {}, 환승호선: {} -> {}",
+                                    currentStation.getName(),
+                                    neighbor.getName(),
+                                    previousLines.getFirst().getTitle(),
+                                    currentLine.getTitle()
+                            );
+                            continue;
+                        }
 
-                    newTime += transferEdge.getTimeInSeconds();
+                        newTime += transferEdge.getTimeInSeconds();
+                    }
                 }
 
                 if (newTime < times.get(neighbor)) {
                     times.put(neighbor, newTime);
-                    prev.put(neighbor, currentStation);
+                    prev.put(neighbor, new ArrayList<>(List.of(new PreviousInfo(currentStation, currentLine))));
                     pq.add(new Node(neighbor, newTime));
-
-                    // 새로운 최단 시간이므로 호선 리스트를 새로 생성
-                    final List<SubwayLine> lines = new ArrayList<>();
-                    lines.add(edge.getSubwayLine());
-                    edgeLines.put(neighbor, lines);
                 } else if (newTime == times.get(neighbor)) {
-                    // 같은 시간으로 도착 가능한 다른 호선 추가
-                    final List<SubwayLine> lines = edgeLines.get(neighbor);
-                    if (lines != null && !lines.contains(edge.getSubwayLine())) {
-                        lines.add(edge.getSubwayLine());
-                    }
+                    final List<PreviousInfo> previousInfos = prev.get(neighbor);
+                    previousInfos.add(new PreviousInfo(currentStation, currentLine));
                 }
             }
         }
 
-        return reconstructPaths(prev, edgeLines, start, end);
+        return reconstructPaths(prev, start, end);
+    }
+
+    private List<SubwayLine> getPreviousLines(final List<PreviousInfo> previousInfos) {
+        return previousInfos.stream()
+                .map(p -> p.line)
+                .toList();
     }
 
     private Set<Edge> getEdges(final SubwayStation currentStation) {
@@ -142,8 +142,7 @@ public class SubwayEdges {
     }
 
     private StationSequence reconstructPaths(
-            final Map<SubwayStation, SubwayStation> prev,
-            final Map<SubwayStation, List<SubwayLine>> edgeLines,
+            final Map<SubwayStation, List<PreviousInfo>> prev,
             final SubwayStation start,
             final SubwayStation end
     ) {
@@ -152,46 +151,52 @@ public class SubwayEdges {
 
         fullSegments.addFirst(new StationSegment(current, null));
 
-        SubwayStation previous = prev.get(current);
-        while (previous != null) {
-            SubwayStation next = current;
-            current = previous;
-
+        List<PreviousInfo> previousInfos = prev.get(current);
+        while (previousInfos != null) {
             if (!isContainsStation(current)) {
                 log.error("노선도에 존재하지 않는 지하철 역: {}", current.getName());
                 throw new IllegalStateException("찾으려는 이름과 일치하는 역이 노선도에 존재하지 않습니다.");
             }
 
-            // edgeLines에서 현재 역(current)와 다음 역(next)에 도달할 때 사용 가능한 호선들을 가져옴
-            final List<SubwayLine> currentLines = edgeLines.get(current);
-            final List<SubwayLine> nextLines = edgeLines.get(next);
-            if (nextLines == null) {
-                throw new IllegalStateException("다음역으로 가는 호선은 꼭 존재해야 합니다.");
-            }
-
-            // 현재 역에서 다음 역으로 이동할 호선 선택하기
+            SubwayStation next = current;
+            // 현재 역에서 이전 역으로 이동할 호선 선택하기
             SubwayLine targetLine = null;
 
-            // 1순위: 환승 불필요 호선 선택 (다다음역의 호선과 같은 것 or 현재 역의 호선들 중 겹치는 것)
-            if (!end.equals(next)) {
-                for (SubwayLine nextLine : nextLines) {
-                    if (nextLine.equals(fullSegments.getFirst().getLine())) {
-                        targetLine = nextLine;
-                        break;
-                    }
-                }
-            } else if (!start.equals(current)) {
-                for (SubwayLine nextLine : nextLines) {
-                    if (currentLines.contains(nextLine)) {
-                        targetLine = nextLine;
-                        break;
-                    }
-                }
-            }
+            if (previousInfos.size() == 1) {
+                current = previousInfos.getFirst().station;
+                targetLine = previousInfos.getFirst().line;
+            } else {
+                for (PreviousInfo previousInfo : previousInfos) {
+                    current = previousInfo.station;
 
-            // 2순위: 겹치는 호선이 없으면 다음 역의 첫 번째 호선 선택 (환승 필요)
-            if (targetLine == null) {
-                targetLine = nextLines.getFirst();
+                    if (!isContainsStation(current)) {
+                        log.error("노선도에 존재하지 않는 지하철 역: {}", current.getName());
+                        throw new IllegalStateException("찾으려는 이름과 일치하는 역이 노선도에 존재하지 않습니다.");
+                    }
+
+                    final SubwayLine nextLine = previousInfo.line;
+
+                    if (!end.equals(next)) {
+                        if (nextLine.equals(fullSegments.getFirst().getLine())) {
+                            targetLine = nextLine;
+                            break;
+                        }
+
+                    } else if (!start.equals(current)) {
+                        final List<PreviousInfo> beforeCurrentStations = prev.get(current);
+                        if (beforeCurrentStations == null) {
+                            throw new IllegalStateException("현재 역이 출발역이 아니면 이전 역과 호선은 꼭 존재해야 합니다.");
+                        }
+
+                        final List<SubwayLine> currentLines = getPreviousLines(beforeCurrentStations);
+                        if (currentLines.contains(nextLine)) {
+                            targetLine = nextLine;
+                            break;
+                        }
+                    } else {
+                        targetLine = nextLine;
+                    }
+                }
             }
 
             // 현재 역에서 다음 역으로 가는 Edge 중에서 호선명이 일치하는 Edge 찾기
@@ -219,6 +224,13 @@ public class SubwayEdges {
                 break;
             }
 
+            final List<PreviousInfo> beforeCurrentInfos = prev.get(current);
+            if (beforeCurrentInfos == null) {
+                throw new IllegalStateException("현재 역이 출발역이 아니면 이전 역과 호선은 꼭 존재해야 합니다.");
+            }
+
+            final List<SubwayLine> currentLines = getPreviousLines(beforeCurrentInfos);
+
             if (currentLines != null && !currentLines.contains(targetLine)) {
                 Edge transferEdge = null;
                 for (Edge edge : getEdges(current)) {
@@ -239,7 +251,7 @@ public class SubwayEdges {
                 fullSegments.addFirst(new StationSegment(current, transferEdge));
             }
 
-            previous = prev.get(current);
+            previousInfos = beforeCurrentInfos;
         }
         if (!start.equals(current)) {
             throw new IllegalStateException("경로가 출발역까지 이어지지 않습니다.");
@@ -291,6 +303,16 @@ public class SubwayEdges {
         Node(final SubwayStation station, final int time) {
             this.station = station;
             this.time = time;
+        }
+    }
+
+    private static class PreviousInfo {
+        SubwayStation station;
+        SubwayLine line;
+
+        PreviousInfo(final SubwayStation station, final SubwayLine line) {
+            this.station = station;
+            this.line = line;
         }
     }
 

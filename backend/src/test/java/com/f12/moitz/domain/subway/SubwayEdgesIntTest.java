@@ -106,6 +106,27 @@ public class SubwayEdgesIntTest {
         });
     }
 
+    @DisplayName("서울역-광화문역 최단경로를 찾는다.")
+    @Test
+    void findShortest5() {
+        // Given
+        final SubwayStation start = subwayStationService.getByName("서울역");
+        final SubwayStation end = subwayStationService.getByName("광화문역");
+
+        // When
+        final List<SubwayPath> paths = subwayEdges.findShortestTimePath(start, end).groupByLine();
+        for (SubwayPath path : paths) {
+            log.debug("출발: {}, 도착: {}, 호선: {}", path.from().getName(), path.to().getName(),
+                    path.line() == null ? "null" : path.line().getTitle());
+        }
+
+        // Then
+        SoftAssertions.assertSoftly(softly -> {
+            softly.assertThat(paths).hasSize(3);
+            softly.assertThat(paths.getFirst().line()).isEqualTo(SubwayLine.fromTitle("공항철도"));
+        });
+    }
+
     @DisplayName("목데이터 생성용 최단 경로의 경유역 찾기")
     @ParameterizedTest
     @CsvSource({"강변역,건대입구역", "동대문역,건대입구역", "서울대입구역,건대입구역",
