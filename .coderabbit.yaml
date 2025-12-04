@@ -22,13 +22,6 @@ reviews:
       - fe-dev
       - be-prod
       - be-dev
-
-ignore:
-  - "node_modules/**"
-  - "frontend/build/**"
-  - "backend/target/**"
-
-reviews:
   path_instructions:
     - path: "frontend/**"
       instructions: |
@@ -54,6 +47,11 @@ reviews:
         5. 예외 처리, 트랜잭션 경계, 입력 검증, 인증·인가 등 보안 측면 점검
         6. 리뷰는 신입 개발자가 이해하고 학습할 수 있도록 설명 중심으로 작성
         
+ignore:
+  - "node_modules/**"
+  - "frontend/build/**"
+  - "backend/target/**"
+
 tools:
   checkstyle:
     enabled: false
