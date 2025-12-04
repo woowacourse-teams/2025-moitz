@@ -49,7 +49,7 @@ public class SubwayRouteCalculator {
                 break;
             }
 
-            Set<Edge> currentEdges = edges.getEdges(currentStation);
+            final Set<Edge> currentEdges = edges.getEdges(currentStation);
 
             for (Edge edge : currentEdges) {
                 final SubwayStation neighbor = edge.getDestination();
@@ -129,7 +129,7 @@ public class SubwayRouteCalculator {
         fullSegments.addFirst(new StationSegment(current, null));
 
         while (!start.equals(current)) {
-            List<PreviousInfo> previousInfos = prev.get(current);
+            final List<PreviousInfo> previousInfos = prev.get(current);
             if (previousInfos == null || previousInfos.isEmpty()) {
                 throw new IllegalStateException("경로가 출발역까지 이어지지 않습니다.");
             }
@@ -210,13 +210,15 @@ public class SubwayRouteCalculator {
         }
 
         private boolean canContinueFromPrevious(final Map<SubwayStation, List<PreviousInfo>> prev) {
-            List<PreviousInfo> beforeCurrent = prev.get(station);
+            final List<PreviousInfo> beforeCurrent = prev.get(station);
             if (beforeCurrent == null || beforeCurrent.isEmpty()) {
                 throw new IllegalStateException("station이 출발역이 아니면 이전 역과 호선은 꼭 존재해야 합니다.");
             }
+
             return beforeCurrent.stream()
                     .anyMatch(info -> info.isSameLine(line));
         }
+
     }
 
 }
