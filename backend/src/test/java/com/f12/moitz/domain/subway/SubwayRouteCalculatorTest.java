@@ -9,9 +9,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-class SubwayEdgesTest {
+class SubwayRouteCalculatorTest {
 
-    private SubwayEdges subwayEdges;
+    private SubwayRouteCalculator subwayRouteCalculator;
     private static final Point DEFAULT_POINT = new Point(127.0, 37.0);
     private final Set<SubwayEdge> subwayEdgeSet = new HashSet<>();
 
@@ -19,7 +19,6 @@ class SubwayEdgesTest {
     private final SubwayStation station2 = new SubwayStation("회기", DEFAULT_POINT);
     private final SubwayStation station3 = new SubwayStation("중랑", DEFAULT_POINT);
     private final SubwayStation station4 = new SubwayStation("상봉", DEFAULT_POINT);
-
 
     @BeforeEach
     void setUp() {
@@ -53,14 +52,14 @@ class SubwayEdgesTest {
         subwayEdgeSet.add(subwayEdge3);
         subwayEdgeSet.add(subwayEdge4);
 
-        subwayEdges = new SubwayEdges(subwayEdgeSet);
+        subwayRouteCalculator = new SubwayRouteCalculator(new SubwayEdges(subwayEdgeSet));
     }
 
     @DisplayName("청량리-회기 최단경로를 찾는다.")
     @Test
     void findShortest() {
         // When
-        final List<SubwayPath> paths = subwayEdges.findShortestTimePath(station1, station2).groupByLine();
+        final List<SubwayPath> paths = subwayRouteCalculator.findShortestTimePath(station1, station2).groupByLine();
 
         // Then
         SoftAssertions.assertSoftly(softly -> {

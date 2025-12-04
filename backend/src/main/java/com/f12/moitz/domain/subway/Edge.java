@@ -49,15 +49,19 @@ public class Edge {
                 && this.subwayLine.equals(edge.getSubwayLine());
     }
 
+    public boolean hasSameValue(final SubwayStation destination, final SubwayLine subwayLine) {
+        return isTowards(destination) && isSameLine(subwayLine);
+    }
+
     public int getTimeInSeconds() {
         return (int) travelTime.getSeconds();
     }
 
-    public boolean isSameLine(final SubwayLine subwayLine) {
+    private boolean isSameLine(final SubwayLine subwayLine) {
         return this.subwayLine == subwayLine;
     }
 
-    public boolean isTowards(final SubwayStation destination) {
+    private boolean isTowards(final SubwayStation destination) {
         return this.destination.equals(destination);
     }
 
