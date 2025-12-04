@@ -37,7 +37,7 @@ public class SubwayRouteCalculator {
             // 현재 역 정보 가져오기
             final SubwayStation currentStation = current.station;
 
-            if (!edges.isContainsStation(currentStation)) {
+            if (!edges.containsStation(currentStation)) {
                 continue;
             }
             if (!visited.add(currentStation)) {
@@ -102,7 +102,7 @@ public class SubwayRouteCalculator {
     }
 
     private void validateStationsExist(final SubwayStation start, final SubwayStation end) {
-        if (!edges.isContainsStation(start) || !edges.isContainsStation(end)) {
+        if (!edges.containsStation(start) || !edges.containsStation(end)) {
             log.error("노선도에 존재하지 않는 역입니다. 출발역: {}, 도착역: {}", start.getName(), end.getName());
             throw new IllegalStateException("출발역 또는 도착역이 노선도에 존재하지 않아 경로를 찾을 수 없습니다.");
         }

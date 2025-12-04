@@ -1,6 +1,5 @@
 package com.f12.moitz.domain.subway;
 
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -29,7 +28,7 @@ public class SubwayEdges {
         return new SubwayEdges(subwayEdgeSet);
     }
 
-    public boolean isContainsStation(final SubwayStation station) {
+    public boolean containsStation(final SubwayStation station) {
         return subwayEdges.stream()
                 .anyMatch(edgeSet -> edgeSet.isSameStation(station));
     }
@@ -40,14 +39,6 @@ public class SubwayEdges {
                 .filter(station -> station.isNameMatch(stationName))
                 .findFirst()
                 .orElseThrow(() -> new IllegalStateException("이름이 일치하는 SubwayStation이 존재하지 않습니다: " + stationName));
-    }
-
-    public Set<SubwayStation> getAllStations() {
-        final Set<SubwayStation> stations = new HashSet<>();
-        for (SubwayEdge edgeSet : subwayEdges) {
-            stations.add(edgeSet.getSubwayStation());
-        }
-        return stations;
     }
 
     public void addEdge(final SubwayStation subwayStation, final Edge edge) {
