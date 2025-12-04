@@ -14,6 +14,8 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class SubwayRouteCalculator {
 
+    private static final int UNREACHABLE_TIME = Integer.MAX_VALUE;
+
     private final SubwayEdges edges;
 
     public SubwayRouteCalculator(final SubwayEdges edges) {
@@ -57,7 +59,7 @@ public class SubwayRouteCalculator {
                 }
 
                 final SubwayLine currentLine = edge.getSubwayLine();
-                int newTime = times.getOrDefault(currentStation, Integer.MAX_VALUE) + edge.getTimeInSeconds();
+                int newTime = times.getOrDefault(currentStation, UNREACHABLE_TIME) + edge.getTimeInSeconds();
 
                 if (!start.equals(currentStation)) {
                     final List<PreviousInfo> previousInfos = prev.get(currentStation);
@@ -85,7 +87,7 @@ public class SubwayRouteCalculator {
                     }
                 }
 
-                int neighborTime = times.getOrDefault(neighbor, Integer.MAX_VALUE);
+                int neighborTime = times.getOrDefault(neighbor, UNREACHABLE_TIME);
 
                 if (newTime < neighborTime) {
                     times.put(neighbor, newTime);
