@@ -205,20 +205,11 @@ public class SubwayRouteCalculator {
         SubwayStation station;
         int time;
 
-        Node(final SubwayStation station, final int time) {
-            this.station = station;
-            this.time = time;
-        }
+    private record Node(SubwayStation station, int time) {
+
     }
 
-    private static class PreviousInfo {
-        SubwayStation station;
-        SubwayLine line;
-
-        PreviousInfo(final SubwayStation station, final SubwayLine line) {
-            this.station = station;
-            this.line = line;
-        }
+    private record PreviousInfo(SubwayStation station, SubwayLine line) {
 
         private boolean isSameLine(final SubwayLine line) {
             return this.line == line;
