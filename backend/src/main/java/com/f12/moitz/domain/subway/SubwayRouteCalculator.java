@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.PriorityQueue;
 import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
@@ -20,24 +21,14 @@ public class SubwayRouteCalculator {
     }
 
     public StationSequence findShortestTimePath(final SubwayStation start, final SubwayStation end) {
-        if (!edges.isContainsStation(start) || !edges.isContainsStation(end)) {
-            log.error("노선도에 존재하지 않는 역입니다. 출발역: {}, 도착역: {}", start.getName(), end.getName());
-            throw new IllegalStateException("출발역 또는 도착역이 노선도에 존재하지 않아 경로를 찾을 수 없습니다.");
-        }
-        if (start.equals(end)) {
-            log.error("동일한 출발역, 도착역: {}", start.getName());
-            throw new IllegalStateException("출발역과 도착역은 동일할 수 없습니다.");
-        }
+        validateStationsExist(start, end);
+        validateNotSameStation(start, end);
 
         final Map<SubwayStation, Integer> times = new HashMap<>();
         final Map<SubwayStation, List<PreviousInfo>> prev = new HashMap<>();
         final PriorityQueue<Node> pq = new PriorityQueue<>(Comparator.comparingInt(n -> n.time));
         final Set<SubwayStation> visited = new HashSet<>();
 
-        // 초기화
-        for (SubwayStation station : edges.getAllStations()) {
-            times.put(station, Integer.MAX_VALUE);
-        }
         times.put(start, 0);
         pq.add(new Node(start, 0));
 
@@ -64,46 +55,43 @@ public class SubwayRouteCalculator {
                 if (visited.contains(neighbor)) {
                     continue;
                 }
-                if (times.get(currentStation) == null || times.get(neighbor) == null) {
-                    log.warn("출발역({}) 혹은 도착역({})에 도달하는 시간이 초기화되지 않았습니다.", currentStation.getName(), neighbor.getName());
-                    continue;
-                }
 
                 final SubwayLine currentLine = edge.getSubwayLine();
-                int newTime = times.get(currentStation) + edge.getTimeInSeconds();
+                int newTime = times.getOrDefault(currentStation, Integer.MAX_VALUE) + edge.getTimeInSeconds();
 
                 if (!start.equals(currentStation)) {
-                    final List<SubwayLine> previousLines = getPreviousLines(prev.get(currentStation));
+                    final List<PreviousInfo> previousInfos = prev.get(currentStation);
+                    boolean isContinuous = previousInfos.stream()
+                            .anyMatch(info -> info.isSameLine(currentLine));
 
                     // 환승 시간 추가: 현재 역에 도달할 수 있는 호선들 중 간선의 호선이 포함되어 있지 않은 경우
-                    if (!previousLines.contains(currentLine)) {
-                        Edge transferEdge = null;
-                        for (Edge currentEdge : currentEdges) {
-                            if (currentEdge.hasSameValue(currentStation, currentLine)) {
-                                transferEdge = currentEdge;
-                                break;
-                            }
-                        }
-                        if (transferEdge == null) {
+                    if (!isContinuous) {
+                        Optional<Edge> transferEdge = currentEdges.stream()
+                                .filter(currentEdge -> currentEdge.hasSameValue(currentStation, currentLine))
+                                .findFirst();
+
+                        if (transferEdge.isEmpty()) {
                             log.warn(
                                     "환승 Edge가 존재하지 않아 경로를 건너뜁니다. 현재역: {}, 다음역: {}, 환승호선: {} -> {}",
                                     currentStation.getName(),
                                     neighbor.getName(),
-                                    previousLines.getFirst().getTitle(),
+                                    previousInfos.getFirst().line.getTitle(),
                                     currentLine.getTitle()
                             );
                             continue;
                         }
 
-                        newTime += transferEdge.getTimeInSeconds();
+                        newTime += transferEdge.get().getTimeInSeconds();
                     }
                 }
 
-                if (newTime < times.get(neighbor)) {
+                int neighborTime = times.getOrDefault(neighbor, Integer.MAX_VALUE);
+
+                if (newTime < neighborTime) {
                     times.put(neighbor, newTime);
                     prev.put(neighbor, new ArrayList<>(List.of(new PreviousInfo(currentStation, currentLine))));
                     pq.add(new Node(neighbor, newTime));
-                } else if (newTime == times.get(neighbor)) {
+                } else if (newTime == neighborTime) {
                     final List<PreviousInfo> previousInfos = prev.get(neighbor);
                     previousInfos.add(new PreviousInfo(currentStation, currentLine));
                 }
@@ -113,10 +101,18 @@ public class SubwayRouteCalculator {
         return reconstructPaths(prev, start, end);
     }
 
-    private List<SubwayLine> getPreviousLines(final List<PreviousInfo> previousInfos) {
-        return previousInfos.stream()
-                .map(p -> p.line)
-                .toList();
+    private void validateStationsExist(final SubwayStation start, final SubwayStation end) {
+        if (!edges.isContainsStation(start) || !edges.isContainsStation(end)) {
+            log.error("노선도에 존재하지 않는 역입니다. 출발역: {}, 도착역: {}", start.getName(), end.getName());
+            throw new IllegalStateException("출발역 또는 도착역이 노선도에 존재하지 않아 경로를 찾을 수 없습니다.");
+        }
+    }
+
+    private void validateNotSameStation(final SubwayStation start, final SubwayStation end) {
+        if (start.equals(end)) {
+            log.error("동일한 출발역, 도착역: {}", start.getName());
+            throw new IllegalStateException("출발역과 도착역은 동일할 수 없습니다.");
+        }
     }
 
     private StationSequence reconstructPaths(
@@ -149,6 +145,7 @@ public class SubwayRouteCalculator {
                     }
                 }
             }
+
             if (selected == null) {
                 for (PreviousInfo candidate : previousInfos) {
                     // 2순위: 출발역
