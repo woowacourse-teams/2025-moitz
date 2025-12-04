@@ -1,6 +1,5 @@
 package com.f12.moitz.domain.subway;
 
-import com.f12.moitz.application.SubwayEdgeService;
 import com.f12.moitz.application.SubwayStationService;
 import com.f12.moitz.domain.Point;
 import java.util.List;
@@ -18,14 +17,17 @@ import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 @Disabled
 @Slf4j
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
-public class SubwayEdgesIntTest {
+public class SubwayRouteCalculatorIntTest {
 
     private final SubwayStationService subwayStationService;
-    private final SubwayEdges subwayEdges;
+    private final SubwayRouteCalculator subwayRouteCalculator;
 
-    public SubwayEdgesIntTest(@Autowired final SubwayStationService subwayStationService, @Autowired final SubwayEdgeService subwayEdgeService) {
+    public SubwayRouteCalculatorIntTest(
+            @Autowired final SubwayStationService subwayStationService,
+            @Autowired final SubwayRouteCalculator subwayRouteCalculator
+    ) {
         this.subwayStationService = subwayStationService;
-        this.subwayEdges = subwayEdgeService.getSubwayEdges();
+        this.subwayRouteCalculator = subwayRouteCalculator;
     }
 
     @DisplayName("미금역-판교역 최단경로를 찾는다.")
@@ -35,9 +37,10 @@ public class SubwayEdgesIntTest {
         final SubwayStation end = subwayStationService.getByName("판교역");
 
         // When
-        final List<SubwayPath> paths = subwayEdges.findShortestTimePath(start, end).groupByLine();
+        final List<SubwayPath> paths = subwayRouteCalculator.findShortestTimePath(start, end).groupByLine();
         for (SubwayPath path : paths) {
-            log.debug("출발: {}, 도착: {}, 호선: {}", path.from().getName(), path.to().getName(), path.line() == null? "null" : path.line().getTitle());
+            log.debug("출발: {}, 도착: {}, 호선: {}", path.from().getName(), path.to().getName(),
+                    path.line() == null ? "null" : path.line().getTitle());
         }
 
         // Then
@@ -55,16 +58,18 @@ public class SubwayEdgesIntTest {
         final SubwayStation end = subwayStationService.getByName("정자역");
 
         // When
-        final List<SubwayPath> paths = subwayEdges.findShortestTimePath(start, end).groupByLine();
+        final List<SubwayPath> paths = subwayRouteCalculator.findShortestTimePath(start, end).groupByLine();
         for (SubwayPath path : paths) {
-            log.debug("출발: {}, 도착: {}, 호선: {}", path.from().getName(), path.to().getName(), path.line() == null? "null" : path.line().getTitle());
+            log.debug("출발: {}, 도착: {}, 호선: {}", path.from().getName(), path.to().getName(),
+                    path.line() == null ? "null" : path.line().getTitle());
         }
 
         // Then
         SoftAssertions.assertSoftly(softly -> {
             softly.assertThat(paths).hasSize(1);
             softly.assertThat(paths.getFirst().totalTime()).isEqualTo(150);
-            softly.assertThat(List.of(SubwayLine.fromTitle("신분당선"), SubwayLine.fromTitle("수인분당선"))).contains(paths.getFirst().line());
+            softly.assertThat(List.of(SubwayLine.fromTitle("신분당선"), SubwayLine.fromTitle("수인분당선")))
+                    .contains(paths.getFirst().line());
         });
     }
 
@@ -75,9 +80,10 @@ public class SubwayEdgesIntTest {
         final SubwayStation end = subwayStationService.getByName("사리역");
 
         // When
-        final List<SubwayPath> paths = subwayEdges.findShortestTimePath(start, end).groupByLine();
+        final List<SubwayPath> paths = subwayRouteCalculator.findShortestTimePath(start, end).groupByLine();
         for (SubwayPath path : paths) {
-            log.debug("출발: {}, 도착: {}, 호선: {}", path.from().getName(), path.to().getName(), path.line() == null? "null" : path.line().getTitle());
+            log.debug("출발: {}, 도착: {}, 호선: {}", path.from().getName(), path.to().getName(),
+                    path.line() == null ? "null" : path.line().getTitle());
         }
 
         // Then
@@ -94,9 +100,10 @@ public class SubwayEdgesIntTest {
         final SubwayStation end = subwayStationService.getByName("상록수역");
 
         // When
-        final List<SubwayPath> paths = subwayEdges.findShortestTimePath(start, end).groupByLine();
+        final List<SubwayPath> paths = subwayRouteCalculator.findShortestTimePath(start, end).groupByLine();
         for (SubwayPath path : paths) {
-            log.debug("출발: {}, 도착: {}, 호선: {}", path.from().getName(), path.to().getName(), path.line() == null? "null" : path.line().getTitle());
+            log.debug("출발: {}, 도착: {}, 호선: {}", path.from().getName(), path.to().getName(),
+                    path.line() == null ? "null" : path.line().getTitle());
         }
 
         // Then
@@ -114,7 +121,7 @@ public class SubwayEdgesIntTest {
         final SubwayStation end = subwayStationService.getByName("광화문역");
 
         // When
-        final List<SubwayPath> paths = subwayEdges.findShortestTimePath(start, end).groupByLine();
+        final List<SubwayPath> paths = subwayRouteCalculator.findShortestTimePath(start, end).groupByLine();
         for (SubwayPath path : paths) {
             log.debug("출발: {}, 도착: {}, 호선: {}", path.from().getName(), path.to().getName(),
                     path.line() == null ? "null" : path.line().getTitle());
@@ -135,7 +142,7 @@ public class SubwayEdgesIntTest {
             "강변역,종각역", "동대문역,종각역", "서울대입구역,종각역",
             "강변역,홍대입구역", "동대문역,홍대입구역", "서울대입구역,홍대입구역"})
     void createMockData(final String start, final String end) {
-        final StationSequence stationSequence = subwayEdges.findShortestTimePath(
+        final StationSequence stationSequence = subwayRouteCalculator.findShortestTimePath(
                 subwayStationService.getByName(start),
                 subwayStationService.getByName(end)
         );

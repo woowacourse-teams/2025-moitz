@@ -11,13 +11,15 @@ import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class SubwayPathFinder {
+public class SubwayRouteCalculator {
 
-    public StationSequence findShortestTimePath(
-            final SubwayEdges edges,
-            final SubwayStation start,
-            final SubwayStation end
-    ) {
+    private final SubwayEdges edges;
+
+    public SubwayRouteCalculator(final SubwayEdges edges) {
+        this.edges = edges;
+    }
+
+    public StationSequence findShortestTimePath(final SubwayStation start, final SubwayStation end) {
         if (!edges.isContainsStation(start) || !edges.isContainsStation(end)) {
             log.error("노선도에 존재하지 않는 역입니다. 출발역: {}, 도착역: {}", start.getName(), end.getName());
             throw new IllegalStateException("출발역 또는 도착역이 노선도에 존재하지 않아 경로를 찾을 수 없습니다.");
@@ -108,7 +110,7 @@ public class SubwayPathFinder {
             }
         }
 
-        return reconstructPaths(edges, prev, start, end);
+        return reconstructPaths(prev, start, end);
     }
 
     private List<SubwayLine> getPreviousLines(final List<PreviousInfo> previousInfos) {
@@ -118,7 +120,6 @@ public class SubwayPathFinder {
     }
 
     private StationSequence reconstructPaths(
-            final SubwayEdges edges,
             final Map<SubwayStation, List<PreviousInfo>> prev,
             final SubwayStation start,
             final SubwayStation end

@@ -29,11 +29,6 @@ public class SubwayEdges {
         return new SubwayEdges(subwayEdgeSet);
     }
 
-    public StationSequence findShortestTimePath(final SubwayStation start, final SubwayStation end) {
-        final SubwayPathFinder pathFinder = new SubwayPathFinder();
-        return pathFinder.findShortestTimePath(this, start, end);
-    }
-
     public Set<Edge> getEdges(final SubwayStation currentStation) {
         return subwayEdges.stream()
                 .filter(edgeSet -> edgeSet.isSameStation(currentStation))
