@@ -78,4 +78,10 @@ public class SubwayEdges {
         subwayEdges.add(newEdgeSet);
     }
 
+    public Optional<Edge> findEdgeBy(final SubwayStation from, final SubwayStation to, final SubwayLine line) {
+        return subwayEdges.stream()
+                .flatMap(subwayEdge -> subwayEdge.findEdgeBy(from, to, line).stream())
+                .findFirst();
+    }
+
 }

@@ -35,4 +35,13 @@ public class SubwayEdge {
         return this.subwayStation.equals(otherStation);
     }
 
+    public Optional<Edge> findEdgeBy(final SubwayStation from, final SubwayStation to, final SubwayLine line) {
+        if (!subwayStation.equals(from)) {
+            return Optional.empty();
+        }
+        return edges.stream()
+                .filter(edge -> edge.hasSameValue(to, line))
+                .findFirst();
+    }
+
 }
