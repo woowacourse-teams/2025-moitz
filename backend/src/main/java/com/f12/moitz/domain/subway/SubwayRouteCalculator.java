@@ -176,22 +176,12 @@ public class SubwayRouteCalculator {
             final SubwayStation previousStation = selected.station;
             final SubwayLine selectedLine = selected.line;
 
-            // 환승이 필요하면 환승 Edge 먼저 추가
             if (needsTransfer) {
-                Edge transferEdge = edges.findEdgeBy(previousStation, previousStation, selectedLine)
-                        .orElseThrow(() -> {
-                            log.error("현재역: {}, 환승호선: {}", previousStation.getName(), selectedLine.getTitle());
-                            return new IllegalStateException("환승역이지만 환승 Edge가 존재하지 않습니다.");
-                        });
+                final Edge transferEdge = getEdgeBy(previousStation, previousStation, selectedLine);
                 fullSegments.addFirst(new StationSegment(previousStation, transferEdge));
             }
 
-            // 이동 Edge 추가
-            Edge movementEdge = edges.findEdgeBy(previousStation, currentStation, selectedLine)
-                    .orElseThrow(() -> {
-                        log.error("현재역: {}, 다음역: {}, 노선: {}", previousStation.getName(), currentStation.getName(), selectedLine.getTitle());
-                        return new IllegalStateException("다음 역으로 가는 Edge가 존재하지 않습니다.");
-                    });
+            final Edge movementEdge = getEdgeBy(previousStation, currentStation, selectedLine);
             fullSegments.addFirst(new StationSegment(previousStation, movementEdge));
 
             current = previousStation;
@@ -201,9 +191,13 @@ public class SubwayRouteCalculator {
         return new StationSequence(fullSegments);
     }
 
-    private static class Node {
-        SubwayStation station;
-        int time;
+    private Edge getEdgeBy(final SubwayStation from, final SubwayStation to, final SubwayLine line) {
+        return edges.findEdgeBy(from, to, line)
+                .orElseThrow(() -> {
+                    log.error("현재역: {}, 다음역: {}, 노선: {}", from.getName(), to.getName(), line.getTitle());
+                    return new IllegalStateException("다음 역으로 가는 Edge가 존재하지 않습니다.");
+                });
+    }
 
     private record Node(SubwayStation station, int time) {
 
