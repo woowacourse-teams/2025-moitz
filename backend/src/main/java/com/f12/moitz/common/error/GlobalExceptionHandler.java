@@ -2,6 +2,7 @@ package com.f12.moitz.common.error;
 
 import com.f12.moitz.common.error.exception.BadRequestException;
 import com.f12.moitz.common.error.exception.ExternalApiException;
+import com.f12.moitz.common.error.exception.SubwayRouteException;
 import com.f12.moitz.common.error.exception.NotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
@@ -37,6 +38,22 @@ public class GlobalExceptionHandler {
     ) {
         log.warn("NotFound Exception - URI '{} {}' ", request.getMethod(), request.getRequestURI(), e);
         final HttpStatus httpStatus = HttpStatus.NOT_FOUND;
+        ErrorResponse errorResponse = new ErrorResponse(
+                httpStatus.value(),
+                e.getErrorCode(),
+                request.getMethod(),
+                request.getRequestURI()
+        );
+        return ResponseEntity.status(httpStatus).body(errorResponse);
+    }
+
+    @ExceptionHandler(SubwayRouteException.class)
+    public ResponseEntity<ErrorResponse> handleSubwayRouteException(
+            final SubwayRouteException e,
+            final HttpServletRequest request
+    ) {
+        log.error("SubwayRoute Exception - URI '{} {}' ", request.getMethod(), request.getRequestURI(), e);
+        final HttpStatus httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
         ErrorResponse errorResponse = new ErrorResponse(
                 httpStatus.value(),
                 e.getErrorCode(),
