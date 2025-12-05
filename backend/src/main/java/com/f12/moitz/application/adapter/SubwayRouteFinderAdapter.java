@@ -1,6 +1,5 @@
 package com.f12.moitz.application.adapter;
 
-import com.f12.moitz.application.SubwayEdgeService;
 import com.f12.moitz.application.SubwayStationService;
 import com.f12.moitz.application.port.RouteFinder;
 import com.f12.moitz.application.port.dto.StartEndPair;
@@ -8,12 +7,11 @@ import com.f12.moitz.domain.Course;
 import com.f12.moitz.domain.Path;
 import com.f12.moitz.domain.Route;
 import com.f12.moitz.domain.subway.StationSequence;
-import com.f12.moitz.domain.subway.SubwayEdges;
 import com.f12.moitz.domain.subway.SubwayPath;
+import com.f12.moitz.domain.subway.SubwayRouteCalculator;
 import com.f12.moitz.domain.subway.SubwayStation;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Slf4j
@@ -21,14 +19,14 @@ import org.springframework.stereotype.Component;
 public class SubwayRouteFinderAdapter implements RouteFinder {
 
     private final SubwayStationService subwayStationService;
-    private final SubwayEdges subwayEdges;
+    private final SubwayRouteCalculator subwayRouteCalculator;
 
     public SubwayRouteFinderAdapter(
-            @Autowired final SubwayStationService subwayStationService,
-            @Autowired final SubwayEdgeService subwayEdgeService
+            final SubwayStationService subwayStationService,
+            final SubwayRouteCalculator subwayRouteCalculator
     ) {
         this.subwayStationService = subwayStationService;
-        this.subwayEdges = subwayEdgeService.getSubwayEdges();
+        this.subwayRouteCalculator = subwayRouteCalculator;
     }
 
     @Override
@@ -54,7 +52,7 @@ public class SubwayRouteFinderAdapter implements RouteFinder {
     private StationSequence findStationSequence(final StartEndPair pair) {
         final SubwayStation startStation = subwayStationService.getByName(pair.start().getName());
         final SubwayStation endStation = subwayStationService.getByName(pair.end().getName());
-        return subwayEdges.findShortestTimePath(startStation, endStation);
+        return subwayRouteCalculator.findShortestTimePath(startStation, endStation);
     }
 
     private List<Path> convertPath(final List<SubwayPath> subwayPaths) {
