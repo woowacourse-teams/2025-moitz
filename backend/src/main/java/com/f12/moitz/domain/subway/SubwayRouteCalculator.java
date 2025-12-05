@@ -104,8 +104,10 @@ public class SubwayRouteCalculator {
 
                         if (transferEdge.isEmpty()) {
                             log.warn(
-                                    "환승 Edge가 존재하지 않아 경로를 건너뜁니다. 현재역: {}, 다음역: {}, 환승호선: {} -> {} "
-                                    + "(탐색경로 - 출발역: {}, 도착역: {})",
+                                    """
+                                    환승 Edge가 존재하지 않아 경로를 건너뜁니다. 현재역: {}, 다음역: {}, 환승호선: {} -> {}
+                                    (탐색경로 - 출발역: {}, 도착역: {})
+                                    """,
                                     currentStation.getName(),
                                     neighbor.getName(),
                                     previousInfos.getFirst().line.getTitle(),
