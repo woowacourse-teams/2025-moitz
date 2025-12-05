@@ -1,5 +1,7 @@
 package com.f12.moitz.domain.subway;
 
+import com.f12.moitz.common.error.exception.ExternalApiErrorCode;
+import com.f12.moitz.common.error.exception.SubwayRouteException;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -23,9 +25,37 @@ public class SubwayRouteCalculator {
     }
 
     public StationSequence findShortestTimePath(final SubwayStation start, final SubwayStation end) {
-        validateStationsExist(start, end);
-        validateNotSameStation(start, end);
+        try {
+            validateStationsExist(start, end);
+            validateNotSameStation(start, end);
 
+            final Map<SubwayStation, List<PreviousInfo>> prev = searchShortestTimePath(start, end);
+
+            return reconstructPaths(prev, start, end);
+        } catch (SubwayRouteException e) {
+            log.error("지하철 경로 탐색 실패. 출발역: {}, 도착역: {}", start.getName(), end.getName());
+            throw e;
+        }
+    }
+
+    private void validateStationsExist(final SubwayStation start, final SubwayStation end) {
+        if (!edges.containsStation(start) || !edges.containsStation(end)) {
+            log.error("노선도에 존재하지 않는 역입니다. 출발역: {}, 도착역: {}", start.getName(), end.getName());
+            throw new IllegalStateException("출발역 또는 도착역이 노선도에 존재하지 않아 경로를 찾을 수 없습니다.");
+        }
+    }
+
+    private void validateNotSameStation(final SubwayStation start, final SubwayStation end) {
+        if (start.equals(end)) {
+            log.error("동일한 출발역, 도착역: {}", start.getName());
+            throw new IllegalStateException("출발역과 도착역은 동일할 수 없습니다.");
+        }
+    }
+
+    private Map<SubwayStation, List<PreviousInfo>> searchShortestTimePath(
+            final SubwayStation start,
+            final SubwayStation end
+    ) {
         final Map<SubwayStation, Integer> times = new HashMap<>();
         final Map<SubwayStation, List<PreviousInfo>> prev = new HashMap<>();
         final PriorityQueue<Node> pq = new PriorityQueue<>(Comparator.comparingInt(n -> n.time));
@@ -74,11 +104,16 @@ public class SubwayRouteCalculator {
 
                         if (transferEdge.isEmpty()) {
                             log.warn(
-                                    "환승 Edge가 존재하지 않아 경로를 건너뜁니다. 현재역: {}, 다음역: {}, 환승호선: {} -> {}",
+                                    """
+                                    환승 Edge가 존재하지 않아 경로를 건너뜁니다. 현재역: {}, 다음역: {}, 환승호선: {} -> {}
+                                    (탐색경로 - 출발역: {}, 도착역: {})
+                                    """,
                                     currentStation.getName(),
                                     neighbor.getName(),
                                     previousInfos.getFirst().line.getTitle(),
-                                    currentLine.getTitle()
+                                    currentLine.getTitle(),
+                                    start,
+                                    end
                             );
                             continue;
                         }
@@ -99,22 +134,7 @@ public class SubwayRouteCalculator {
                 }
             }
         }
-
-        return reconstructPaths(prev, start, end);
-    }
-
-    private void validateStationsExist(final SubwayStation start, final SubwayStation end) {
-        if (!edges.containsStation(start) || !edges.containsStation(end)) {
-            log.error("노선도에 존재하지 않는 역입니다. 출발역: {}, 도착역: {}", start.getName(), end.getName());
-            throw new IllegalStateException("출발역 또는 도착역이 노선도에 존재하지 않아 경로를 찾을 수 없습니다.");
-        }
-    }
-
-    private void validateNotSameStation(final SubwayStation start, final SubwayStation end) {
-        if (start.equals(end)) {
-            log.error("동일한 출발역, 도착역: {}", start.getName());
-            throw new IllegalStateException("출발역과 도착역은 동일할 수 없습니다.");
-        }
+        return prev;
     }
 
     private StationSequence reconstructPaths(
@@ -131,18 +151,22 @@ public class SubwayRouteCalculator {
         while (!start.equals(current)) {
             final List<PreviousInfo> previousInfos = prev.get(current);
             if (previousInfos == null || previousInfos.isEmpty()) {
-                throw new IllegalStateException("경로가 출발역까지 이어지지 않습니다.");
+                throw new SubwayRouteException(
+                        ExternalApiErrorCode.SUBWAY_ROUTE_CALCULATION_FAILED,
+                        "경로가 출발역까지 이어지지 않습니다."
+                );
             }
 
             // 최적의 이전 역 선택 (환승 최소화)
             PreviousInfo selected = null;
-            boolean needsTransfer = false;
+            boolean needsTransfer = (preferredLine != null);
 
             if (preferredLine != null) {
                 for (PreviousInfo candidate : previousInfos) {
                     // 1순위: 다음 경로와 같은 호선 (환승 없음)
                     if (candidate.isSameLine(preferredLine)) {
                         selected = candidate;
+                        needsTransfer = false;
                         break;
                     }
                 }
@@ -153,9 +177,6 @@ public class SubwayRouteCalculator {
                     // 2순위: 출발역
                     if (start.equals(candidate.station)) {
                         selected = candidate;
-                        if (preferredLine != null) {
-                            needsTransfer = true;
-                        }
                         break;
                     }
                     // 3순위: 이전 역에서 연속성 있는 호선
@@ -169,7 +190,6 @@ public class SubwayRouteCalculator {
             // 기본값
             if (selected == null) {
                 selected = previousInfos.getFirst();
-                needsTransfer = true;
             }
 
             final SubwayStation currentStation = current;
@@ -177,8 +197,8 @@ public class SubwayRouteCalculator {
             final SubwayLine selectedLine = selected.line;
 
             if (needsTransfer) {
-                final Edge transferEdge = getEdgeBy(previousStation, previousStation, selectedLine);
-                fullSegments.addFirst(new StationSegment(previousStation, transferEdge));
+                final Edge transferEdge = getEdgeBy(currentStation, currentStation, preferredLine);
+                fullSegments.addFirst(new StationSegment(currentStation, transferEdge));
             }
 
             final Edge movementEdge = getEdgeBy(previousStation, currentStation, selectedLine);
@@ -195,7 +215,10 @@ public class SubwayRouteCalculator {
         return edges.findEdgeBy(from, to, line)
                 .orElseThrow(() -> {
                     log.error("현재역: {}, 다음역: {}, 노선: {}", from.getName(), to.getName(), line.getTitle());
-                    return new IllegalStateException("다음 역으로 가는 Edge가 존재하지 않습니다.");
+                    return new SubwayRouteException(
+                            ExternalApiErrorCode.SUBWAY_ROUTE_CALCULATION_FAILED,
+                            "다음 역으로 가는 Edge가 존재하지 않습니다."
+                    );
                 });
     }
 
@@ -212,7 +235,10 @@ public class SubwayRouteCalculator {
         private boolean canContinueFromPrevious(final Map<SubwayStation, List<PreviousInfo>> prev) {
             final List<PreviousInfo> beforeCurrent = prev.get(station);
             if (beforeCurrent == null || beforeCurrent.isEmpty()) {
-                throw new IllegalStateException("station이 출발역이 아니면 이전 역과 호선은 꼭 존재해야 합니다.");
+                throw new SubwayRouteException(
+                        ExternalApiErrorCode.SUBWAY_ROUTE_CALCULATION_FAILED,
+                        "station이 출발역이 아니면 이전 역과 호선은 꼭 존재해야 합니다."
+                );
             }
 
             return beforeCurrent.stream()

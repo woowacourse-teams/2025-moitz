@@ -32,7 +32,10 @@ public enum ExternalApiErrorCode implements ErrorCode {
     INVALID_OPEN_API_RESPONSE("E0042", "OPEN API 응답이 정상적으로 생성되지 않았습니다.", false),
     OPEN_API_SERVER_UNRESPONSIVE("E0043", "OPEN API 서버가 응답하지 않습니다.", false),
     OPEN_API_SERVER_UNAVAILABLE("E0044", "OPEN API 서버가 일시적으로 응답하지 않습니다.", true),
-    EXCEEDED_OPEN_API_TOKEN_QUOTA("E0045", "OPEN API 토큰 사용량이 초과되었습니다.", false);
+    EXCEEDED_OPEN_API_TOKEN_QUOTA("E0045", "OPEN API 토큰 사용량이 초과되었습니다.", false),
+
+    // SERVER 예외 S000
+    SUBWAY_ROUTE_CALCULATION_FAILED("S0001", "지하철 경로 탐색에 실패했습니다.", false);
 
     private static final String CLIENT_ERROR_MESSAGE = "서버 오류입니다. 관리자에게 문의해주세요.";
     private static final String CLIENT_RETRY_ERROR_MESSAGE = "일시적인 서버 오류입니다. 잠시 후 시도해주세요.";

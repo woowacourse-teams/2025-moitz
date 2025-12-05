@@ -9,6 +9,7 @@ reviews:
   profile: assertive
   high_level_summary: true
   request_changes_workflow: false
+  review_status: true
   commit_status: false
   fail_commit_status: true
   auto_review:
@@ -16,42 +17,47 @@ reviews:
     auto_incremental_review: false
     drafts: false
     ignore_updates: true
-
-path_filters:
-  - "!node_modules/"
-  - "!frontend/build/"
-  - "!backend/target/"
-
-path_instructions:
-  - path: "frontend/**"
-    instructions: |
-      1. 타입 안정성과 타입스크립트 사용 적절성 점검
-      2. 클린 UI 구조 및 컴포넌트 재사용성 확인
-      3. 접근성(a11y) 준수 여부 검토
-      4. 상태 관리 및 코드 분할, 성능 최적화 고려
-      5. 리뷰는 신입 개발자가 이해할 수 있도록 설명 중심으로 작성
-    tools:
-      eslint:
-        enabled: true
-      gitleaks:
-        enabled: true
-      semgrep:
-        enabled: true
-
-  - path: "backend/**"
-    instructions: |
-      1. OOP 원칙 준수 여부 확인 (단일 책임, 역할 분리 등)
-      2. DDD 관점에서 엔티티, 값 객체, 레포지토리, 서비스 경계와 책임 검토
-      3. 도메인 규칙 및 계층 구조 준수 확인
-      4. 불필요한 결합도, 잘못된 계층 간 의존, 무분별한 getter/setter 남용 지적
-      5. 예외 처리, 트랜잭션 경계, 입력 검증, 인증·인가 등 보안 측면 점검
-      6. 리뷰는 신입 개발자가 이해하고 학습할 수 있도록 설명 중심으로 작성
-    tools:
-      checkstyle:
-        enabled: false
-      spotbugs:
-        enabled: true
-      gitleaks:
-        enabled: true
-      semgrep:
-        enabled: true
+    base_branches:
+      - fe-prod
+      - fe-dev
+      - be-prod
+      - be-dev
+  
+  path_filters:
+    - "!node_modules/**"
+    - "!frontend/build/**"
+    - "!backend/target/**"
+    - "!**/*.min.js"
+    - "!**/*.lock"
+    - "!package-lock.json"
+    - "!yarn.lock"
+  
+  path_instructions:
+    - path: "frontend/**"
+      instructions: |
+        1. 타입 안정성과 타입스크립트 사용 적절성 점검
+        2. 클린 UI 구조 및 컴포넌트 재사용성 확인
+        3. 접근성(a11y) 준수 여부 검토
+        4. 상태 관리 및 코드 분할, 성능 최적화 고려
+        5. 리뷰는 신입 개발자가 이해할 수 있도록 설명 중심으로 작성
+    
+    - path: "backend/**"
+      instructions: |
+        1. OOP 원칙 준수 여부 확인 (단일 책임, 역할 분리 등)
+        2. DDD 관점에서 엔티티, 값 객체, 레포지토리, 서비스 경계와 책임 검토
+        3. 도메인 규칙 및 계층 구조 준수 확인
+        4. 불필요한 결합도, 잘못된 계층 간 의존, 무분별한 getter/setter 남용 지적
+        5. 예외 처리, 트랜잭션 경계, 입력 검증, 인증·인가 등 보안 측면 점검
+        6. 리뷰는 신입 개발자가 이해하고 학습할 수 있도록 설명 중심으로 작성
+  
+  tools:
+    checkstyle:
+      enabled: false
+    spotbugs:
+      enabled: true
+    gitleaks:
+      enabled: true
+    semgrep:
+      enabled: true
+    eslint:
+      enabled: true
