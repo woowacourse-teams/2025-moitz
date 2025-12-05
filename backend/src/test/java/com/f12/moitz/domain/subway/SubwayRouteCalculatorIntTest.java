@@ -33,6 +33,7 @@ public class SubwayRouteCalculatorIntTest {
     @DisplayName("미금역-판교역 최단경로를 찾는다.")
     @Test
     void findShortest() {
+        // Given
         final SubwayStation start = subwayStationService.getByName("미금역");
         final SubwayStation end = subwayStationService.getByName("판교역");
 
@@ -54,6 +55,7 @@ public class SubwayRouteCalculatorIntTest {
     @DisplayName("미금역-정자역 최단경로를 찾는다.")
     @Test
     void findShortest2() {
+        // Given
         final SubwayStation start = subwayStationService.getByName("미금역");
         final SubwayStation end = subwayStationService.getByName("정자역");
 
@@ -76,6 +78,7 @@ public class SubwayRouteCalculatorIntTest {
     @DisplayName("오이도역-사리역 최단경로를 찾는다.")
     @Test
     void findShortest3() {
+        // Given
         final SubwayStation start = subwayStationService.getByName("오이도역");
         final SubwayStation end = subwayStationService.getByName("사리역");
 
@@ -96,6 +99,7 @@ public class SubwayRouteCalculatorIntTest {
     @DisplayName("오이도역-상록수역 최단경로를 찾는다.")
     @Test
     void findShortest4() {
+        // Given
         final SubwayStation start = subwayStationService.getByName("오이도역");
         final SubwayStation end = subwayStationService.getByName("상록수역");
 
@@ -134,12 +138,56 @@ public class SubwayRouteCalculatorIntTest {
         });
     }
 
+    @DisplayName("잠실나루역-올림픽공원역 최단경로를 찾는다.")
+    @Test
+    void findShortest6() {
+        // Given
+        final SubwayStation start = subwayStationService.getByName("잠실나루역");
+        final SubwayStation end = subwayStationService.getByName("올림픽공원역");
+
+        // When
+        final List<SubwayPath> paths = subwayRouteCalculator.findShortestTimePath(start, end).groupByLine();
+        for (SubwayPath path : paths) {
+            log.debug("출발: {}, 도착: {}, 호선: {}", path.from().getName(), path.to().getName(),
+                    path.line() == null ? "null" : path.line().getTitle());
+        }
+
+        // Then
+        SoftAssertions.assertSoftly(softly -> {
+            softly.assertThat(paths).hasSize(5);
+            softly.assertThat(paths.getFirst().line()).isEqualTo(SubwayLine.fromTitle("2호선"));
+        });
+    }
+
+    @DisplayName("잠실역-잠실나루역 최단경로를 찾는다.")
+    @Test
+    void findShortest7() {
+        // Given
+        final SubwayStation start = subwayStationService.getByName("잠실역");
+        final SubwayStation end = subwayStationService.getByName("잠실나루역");
+
+        // When
+        final StationSequence stationSequence = subwayRouteCalculator.findShortestTimePath(start, end);
+        log.debug("");
+        final List<SubwayPath> paths = stationSequence.groupByLine();
+        for (SubwayPath path : paths) {
+            log.debug("출발: {}, 도착: {}, 호선: {}", path.from().getName(), path.to().getName(),
+                    path.line() == null ? "null" : path.line().getTitle());
+        }
+
+        // Then
+        SoftAssertions.assertSoftly(softly -> {
+            softly.assertThat(paths).hasSize(1);
+            softly.assertThat(paths.getFirst().line()).isEqualTo(SubwayLine.fromTitle("2호선"));
+        });
+    }
+
     @DisplayName("목데이터 생성용 최단 경로의 경유역 찾기")
     @ParameterizedTest
-    @CsvSource({"강변역,건대입구역", "동대문역,건대입구역", "서울대입구역,건대입구역",
+    @CsvSource({"강변역,종각역", "동대문역,종각역", "서울대입구역,종각역",
+            "강변역,건대입구역", "동대문역,건대입구역", "서울대입구역,건대입구역",
             "강변역,사당역", "동대문역,사당역", "서울대입구역,사당역",
             "강변역,왕십리역", "동대문역,왕십리역", "서울대입구역,왕십리역",
-            "강변역,종각역", "동대문역,종각역", "서울대입구역,종각역",
             "강변역,홍대입구역", "동대문역,홍대입구역", "서울대입구역,홍대입구역"})
     void createMockData(final String start, final String end) {
         final StationSequence stationSequence = subwayRouteCalculator.findShortestTimePath(
