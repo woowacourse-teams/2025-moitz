@@ -136,13 +136,14 @@ public class SubwayRouteCalculator {
 
             // 최적의 이전 역 선택 (환승 최소화)
             PreviousInfo selected = null;
-            boolean needsTransfer = false;
+            boolean needsTransfer = (preferredLine != null);
 
             if (preferredLine != null) {
                 for (PreviousInfo candidate : previousInfos) {
                     // 1순위: 다음 경로와 같은 호선 (환승 없음)
                     if (candidate.isSameLine(preferredLine)) {
                         selected = candidate;
+                        needsTransfer = false;
                         break;
                     }
                 }
@@ -153,9 +154,6 @@ public class SubwayRouteCalculator {
                     // 2순위: 출발역
                     if (start.equals(candidate.station)) {
                         selected = candidate;
-                        if (preferredLine != null) {
-                            needsTransfer = true;
-                        }
                         break;
                     }
                     // 3순위: 이전 역에서 연속성 있는 호선
@@ -169,7 +167,6 @@ public class SubwayRouteCalculator {
             // 기본값
             if (selected == null) {
                 selected = previousInfos.getFirst();
-                needsTransfer = true;
             }
 
             final SubwayStation currentStation = current;
@@ -177,8 +174,8 @@ public class SubwayRouteCalculator {
             final SubwayLine selectedLine = selected.line;
 
             if (needsTransfer) {
-                final Edge transferEdge = getEdgeBy(previousStation, previousStation, selectedLine);
-                fullSegments.addFirst(new StationSegment(previousStation, transferEdge));
+                final Edge transferEdge = getEdgeBy(currentStation, currentStation, preferredLine);
+                fullSegments.addFirst(new StationSegment(currentStation, transferEdge));
             }
 
             final Edge movementEdge = getEdgeBy(previousStation, currentStation, selectedLine);
