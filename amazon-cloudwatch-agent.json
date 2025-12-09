@@ -1,0 +1,54 @@
+{
+  "metrics": {
+    "namespace": "Moitz2025Prod",
+    "metrics_collected": {
+      "cpu": {
+        "resources": [
+          "*"
+        ],
+        "measurement": [
+          "usage_active", "usage_iowait", "usage_system", "usage_user"
+        ],
+        "totalcpu": true
+      },
+      "diskio": {
+        "measurement": [
+          "reads", "writes", "read_bytes", "write_bytes", "read_time", "write_time", "io_time"
+        ]
+      },
+      "mem": {
+        "measurement": [
+          "free", "available", "available_percent", "used", "used_percent"
+        ]
+      },
+      "swap": {
+        "measurement": [
+          "free", "used_percent"
+        ]
+      }
+    }
+  },
+  "logs": {
+    "logs_collected": {
+      "files": {
+        "collect_list": [
+          {
+            "file_path": "/app-logs/info/application-info.log",
+            "log_group_name": "/aws/ec2/moitz-2025-prod",
+            "log_stream_name": "info"
+          },
+          {
+            "file_path": "/app-logs/error/application-error.log",
+            "log_group_name": "/aws/ec2/moitz-2025-prod",
+            "log_stream_name": "error"
+          },
+          {
+            "file_path": "/app-logs/warn/application-warn.log",
+            "log_group_name": "/aws/ec2/moitz-2025-prod",
+            "log_stream_name": "warn"
+          }
+        ]
+      }
+    }
+  }
+}

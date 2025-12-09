@@ -1,0 +1,55 @@
+version: '3.9'
+
+services:
+  redis:
+    image: redis:7-alpine
+    container_name: moitz-redis
+    platform: linux/arm64
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    command: redis-server --appendonly yes
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+    restart: always
+    networks:
+      - moitz-network
+
+  app:
+    image: moitz-app:latest
+    container_name: moitz-app
+    platform: linux/arm64
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./app-logs:/app-logs
+    environment:
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - SPRING_PROFILES_ACTIVE=prod
+      - TZ=Asia/Seoul
+      - AWS_REGION=ap-northeast-2
+    depends_on:
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - moitz-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+networks:
+  moitz-network:
+    driver: bridge
+
+volumes:
+  redis_data:
+    driver: local

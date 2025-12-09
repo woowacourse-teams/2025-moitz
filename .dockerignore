@@ -1,0 +1,35 @@
+# Gradle
+2025-moitz/backend/.gradle/
+2025-moitz/backend/build/
+2025-moitz/backend/out/
+2025-moitz/backend/bin/
+
+# IDE
+**/.idea/
+**/.vscode/
+**/*.iml
+**/.project
+**/.classpath
+**/.settings/
+
+# OS
+**/.DS_Store
+**/Thumbs.db
+
+# Git
+**/.git/
+**/.gitignore
+**/.gitattributes
+
+# Logs
+**/*.log
+**/logs/
+
+# Docker
+docker-compose.yml
+*.md
+README.md
+
+# Test
+**/test-results/
+**/coverage/

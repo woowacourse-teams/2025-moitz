@@ -1,0 +1,93 @@
+name: Backend 운영 서버 CI/CD (Docker)
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - be/feat-docker-build
+    paths:
+      - 'backend/**'
+      - 'Dockerfile'
+      - 'docker-compose.yaml'
+
+jobs:
+  deploy_prod:
+    runs-on: [ self-hosted, prod ]
+
+    steps:
+      - name: 최신 커밋 내역으로 checkout 한다
+        uses: actions/checkout@v4
+
+      - name: properties 파일을 갱신한다
+        env:
+          APPLICATION_CLIENT_PROPERTIES: ${{ secrets.APPLICATION_CLIENT_PROPERTIES }}
+          APPLICATION_DB_PROPERTIES: ${{ secrets.APPLICATION_DB_PROPERTIES }}
+        run: |
+          cd backend
+          rm -rf src/main/resources/application-client.properties
+          echo "$APPLICATION_CLIENT_PROPERTIES" > src/main/resources/application-client.properties
+          rm -rf src/main/resources/application-db.properties
+          echo "$APPLICATION_DB_PROPERTIES" > src/main/resources/application-db.properties
+
+      - name: Docker 이미지 빌드 (ARM64)
+        run: |
+          echo "=== Docker 이미지 빌드 시작 ==="
+          IMAGE_TAG="moitz-app:$(date +%Y%m%d-%H%M%S)"
+          IMAGE_LATEST="moitz-app:latest"
+
+          docker build --platform linux/arm64 -t $IMAGE_TAG -t $IMAGE_LATEST .
+
+          if [ $? -ne 0 ]; then
+            echo "Docker 이미지 빌드 실패"
+            exit 1
+          fi
+
+          echo "✅ 빌드 완료: $IMAGE_TAG"
+
+      - name: 기존 컨테이너 중지 및 제거
+        run: |
+          echo "=== 기존 컨테이너 중지 ==="
+          if [ -f docker-compose.yaml ]; then
+            docker-compose down || true
+          fi
+
+          # 혹시 남아있는 컨테이너 정리
+          docker ps -a | grep moitz | awk '{print $1}' | xargs -r docker rm -f || true
+
+      - name: Docker Compose로 애플리케이션 실행
+        run: |
+          echo "=== Docker Compose 실행 ==="
+          docker-compose up -d
+
+          if [ $? -ne 0 ]; then
+            echo "Docker Compose 실행 실패"
+            exit 1
+          fi
+
+          echo "=== 컨테이너 상태 확인 ==="
+          sleep 5
+          docker-compose ps
+
+      - name: 애플리케이션 헬스체크
+        run: |
+          echo "=== 헬스체크 시작 (최대 60초) ==="
+          for i in {1..12}; do
+            if curl -f http://localhost:8080/actuator/health > /dev/null 2>&1; then
+              echo "✅ 애플리케이션 정상 실행 (${i}번째 시도)"
+              docker-compose logs --tail=50 app
+              exit 0
+            fi
+            echo "대기 중... (${i}/12)"
+            sleep 5
+          done
+
+          echo "❌ 헬스체크 실패"
+          docker-compose logs app
+          exit 1
+
+      - name: 실패 시 롤백
+        if: failure()
+        run: |
+          echo "=== 배포 실패, 컨테이너 로그 출력 ==="
+          docker-compose logs app
+          docker-compose down
