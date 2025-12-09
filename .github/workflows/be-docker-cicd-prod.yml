@@ -12,7 +12,7 @@ on:
 
 jobs:
   deploy_prod:
-    runs-on: [ self-hosted, prod ]
+    runs-on: [ self-hosted, prod-v2 ]
 
     steps:
       - name: 최신 커밋 내역으로 checkout 한다
