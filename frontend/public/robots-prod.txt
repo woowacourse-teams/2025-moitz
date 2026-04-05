@@ -1,9 +1,9 @@
 # 운영환경용 robots.txt
-# 홈페이지만 크롤링 허용, 동적 페이지(/result/:id 등)는 차단
+# 동적 페이지(/result/:id 등)만 차단, 나머지 허용
 
 User-agent: *
-Disallow: /
-Allow: /$
+Allow: /
+Disallow: /result
 
 # Sitemap 위치
 Sitemap: https://moitz.kr/sitemap.xml
