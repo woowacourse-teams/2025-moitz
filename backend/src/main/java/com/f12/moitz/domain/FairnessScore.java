@@ -1,16 +1,21 @@
 package com.f12.moitz.domain;
 
-public record FairnessScore(
-        int maxTravelTime,
-        int maxTransferCount,
-        int transferDiff,
-        int timeDiff,
-        int averageTravelTime
-) implements Comparable<FairnessScore> {
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+
+@Getter
+@RequiredArgsConstructor
+public class FairnessScore implements Comparable<FairnessScore> {
 
     private static final int MAX_TRAVEL_TIME_LIMIT = 60;
     private static final int MAX_TIME_DIFF_LIMIT = 25;
     private static final int MAX_TRANSFER_LIMIT = 2;
+
+    private final int maxTravelTime;
+    private final int maxTransferCount;
+    private final int transferDiff;
+    private final int timeDiff;
+    private final int averageTravelTime;
 
     public boolean isAcceptable() {
         return maxTravelTime <= MAX_TRAVEL_TIME_LIMIT
@@ -34,4 +39,5 @@ public record FairnessScore(
         }
         return Integer.compare(averageTravelTime, other.averageTravelTime);
     }
+
 }
