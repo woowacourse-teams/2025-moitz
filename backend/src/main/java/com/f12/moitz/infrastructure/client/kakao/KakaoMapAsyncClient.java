@@ -14,6 +14,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.time.Duration;
 import java.util.Base64;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -233,7 +234,7 @@ public class KakaoMapAsyncClient {
         }
 
         if (throwable instanceof java.util.concurrent.TimeoutException) {
-            log.error("Kakao API request timeout");
+            log.error("Kakao API request timeout after {}s", KakaoMapConstants.REQUEST_TIMEOUT_SECONDS);
             return new ExternalApiException(ExternalApiErrorCode.TEMPORARILY_INVALID_KAKAO_MAP_API_RESPONSE);
         }
 
@@ -243,17 +244,24 @@ public class KakaoMapAsyncClient {
 
     private ExternalApiException mapWebClientException(final WebClientResponseException wcre) {
         try {
-            final byte[] body = wcre.getResponseBodyAsString().getBytes();
+            final String responseBody = wcre.getResponseBodyAsString();
+            final byte[] body = responseBody.getBytes();
             final KakaoMapErrorResponse error = objectMapper.readValue(body, KakaoMapErrorResponse.class);
-            log.error("Kakao API error - code: {}, message: {}", error.code(), error.msg());
+            final String errorCode = error.code();
+            log.error(
+                    "Kakao API error - status: {}, code: {}, message: {}",
+                    wcre.getStatusCode().value(),
+                    errorCode,
+                    error.msg()
+            );
 
-            if (KakaoMapConstants.ERROR_CODE_CAN_RETRY.contains(error.code())) {
+            if (errorCode != null && KakaoMapConstants.ERROR_CODE_CAN_RETRY.contains(errorCode)) {
                 return new ExternalApiException(
                         ExternalApiErrorCode.TEMPORARILY_INVALID_KAKAO_MAP_API_RESPONSE
                 );
             }
 
-            if (KakaoMapConstants.ERROR_CODE_QUOTA_EXCEEDED.equals(error.code())) {
+            if (Objects.equals(KakaoMapConstants.ERROR_CODE_QUOTA_EXCEEDED, errorCode)) {
                 return new ExternalApiException(
                         ExternalApiErrorCode.EXCEEDED_KAKAO_MAP_API_TOKEN_QUOTA
                 );
@@ -261,7 +269,12 @@ public class KakaoMapAsyncClient {
 
             return new ExternalApiException(ExternalApiErrorCode.INVALID_KAKAO_MAP_API_RESPONSE);
         } catch (Exception e) {
-            log.error("Failed to parse Kakao API error response", e);
+            log.error(
+                    "Failed to parse Kakao API error response - status: {}, rawBody: {}",
+                    wcre.getStatusCode().value(),
+                    wcre.getResponseBodyAsString(),
+                    e
+            );
             return new ExternalApiException(ExternalApiErrorCode.INVALID_KAKAO_MAP_API_RESPONSE);
         }
     }
