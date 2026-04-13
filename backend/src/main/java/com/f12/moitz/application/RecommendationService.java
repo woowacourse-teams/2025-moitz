@@ -3,8 +3,7 @@ package com.f12.moitz.application;
 import com.f12.moitz.application.dto.RecommendationCreateResponse;
 import com.f12.moitz.application.dto.RecommendationRequest;
 import com.f12.moitz.application.dto.RecommendationResultResponse;
-import com.f12.moitz.application.dto.RecommendedLocationsResponse;
-import com.f12.moitz.application.port.LocationRecommender;
+import com.f12.moitz.application.port.LocationReasonGenerator;
 import com.f12.moitz.application.port.PlaceRecommender;
 import com.f12.moitz.application.port.RouteFinder;
 import com.f12.moitz.application.port.dto.ReasonAndDescription;
@@ -16,6 +15,7 @@ import com.f12.moitz.common.error.exception.NotFoundException;
 import com.f12.moitz.domain.CategorizedRecommendedPlaces;
 import com.f12.moitz.domain.Course;
 import com.f12.moitz.domain.Courses;
+import com.f12.moitz.domain.FairnessScore;
 import com.f12.moitz.domain.Place;
 import com.f12.moitz.domain.RecommendCondition;
 import com.f12.moitz.domain.Recommendation;
@@ -42,10 +42,13 @@ import org.springframework.util.StopWatch;
 public class RecommendationService {
 
     private static final int STARTING_VOTES = 0;
+    private static final int PLACE_SEARCH_BATCH_SIZE = 5;
+    private static final int PLACE_SEARCH_POOL_LIMIT = 30;
+    private static final int FINAL_CANDIDATE_TARGET_COUNT = 5;
 
     private final SubwayStationService subwayStationService;
     private final PlaceRecommender placeRecommender;
-    private final LocationRecommender locationRecommender;
+    private final LocationReasonGenerator locationReasonGenerator;
     private final RouteFinder routeFinder;
     private final RecommendationMapper recommendationMapper;
     private final RecommendResultRepository recommendResultRepository;
@@ -53,14 +56,14 @@ public class RecommendationService {
     public RecommendationService(
             @Autowired final SubwayStationService subwayStationService,
             @Qualifier("placeRecommenderParallelAdapter") final PlaceRecommender placeRecommender,
-            @Autowired final LocationRecommender locationRecommender,
+            @Autowired final LocationReasonGenerator locationReasonGenerator,
             @Qualifier("subwayRouteFinderAdapter") final RouteFinder routeFinder,
             @Autowired final RecommendationMapper recommendationMapper,
             @Autowired final RecommendResultRepository recommendResultRepository
     ) {
         this.subwayStationService = subwayStationService;
         this.placeRecommender = placeRecommender;
-        this.locationRecommender = locationRecommender;
+        this.locationReasonGenerator = locationReasonGenerator;
         this.routeFinder = routeFinder;
         this.recommendationMapper = recommendationMapper;
         this.recommendResultRepository = recommendResultRepository;
@@ -70,56 +73,68 @@ public class RecommendationService {
         final StopWatch stopWatch = new StopWatch("추천 서비스 전체");
         log.debug("추천 서비스 시작");
 
-        stopWatch.start("지역 추천");
+        stopWatch.start("공평한 후보역 선정");
         final List<RecommendCondition> recommendConditions = RecommendCondition.fromTitle(request.requirements());
         final List<SubwayStation> startingPlaces = getByNames(request.startingPlaceNames());
-        final List<SubwayStation> candidatePlaces = subwayStationService.generateCandidatePlace(startingPlaces);
-
-        final List<String> startingPlaceNames = getPlaceNames(startingPlaces);
-        final List<String> candidatePlaceNames = getPlaceNames(candidatePlaces);
-
-        final RecommendedLocationsResponse recommendedLocationsResponse = locationRecommender.recommendLocations(
-                startingPlaceNames,
-                candidatePlaceNames,
-                recommendConditions
-        );
-        final Map<Place, ReasonAndDescription> generatedPlacesWithReason = recommendedLocationsResponse.recommendations()
-                .stream()
-                .collect(Collectors.toMap(
-                        recommendation -> subwayStationService.getByName(recommendation.locationName()),
-                        recommendation -> new ReasonAndDescription(
-                                recommendation.reason(),
-                                recommendation.description()
-                        )
-                ));
-        stopWatch.stop();
-
-        stopWatch.start("모든 경로와 코스 찾기");
-        List<Place> generatedPlaces = generatedPlacesWithReason.keySet().stream().toList();
-
-        final List<StartEndPair> allPairs = createPairs(startingPlaces, generatedPlaces);
-
-        final Map<Place, Routes> placeRoutes = findRoutesForAll(allPairs);
-        final Map<Place, Courses> placeCourses = findCoursesForAll(allPairs);
-        stopWatch.stop();
-
-        stopWatch.start("기준 미달 경로 제거");
-        final Map<Place, ReasonAndDescription> filteredPlacesWithReason = removePlacesBeyondRange(placeRoutes, generatedPlacesWithReason);
-        generatedPlaces = filteredPlacesWithReason.keySet().stream().toList();
+        final List<Place> candidatePlaces = getAllCandidatePlaces(startingPlaces);
+        final List<StartEndPair> candidatePairs = createPairs(startingPlaces, candidatePlaces);
+        final Map<Place, Routes> candidateRoutes = findRoutesForAll(candidatePairs);
+        final List<Place> selectedPlaces = selectCandidatePlacesForPlaceSearch(candidatePlaces, candidateRoutes);
+        logCandidateSelection(startingPlaces, candidatePlaces, candidateRoutes, selectedPlaces);
         stopWatch.stop();
 
         stopWatch.start("장소 추천");
-        final Map<Place, CategorizedRecommendedPlaces> recommendedPlaces = placeRecommender.recommendPlaces(
-                generatedPlaces,
+        final PlaceSearchResult placeSearchResult = searchPlacesIncrementally(
+                selectedPlaces,
+                recommendConditions,
+                candidateRoutes
+        );
+        final Map<Place, CategorizedRecommendedPlaces> recommendedPlaces = placeSearchResult.recommendedPlaces();
+        log.debug(
+                "장소 추천 완료 - 탐색 대상 역 {}개 중 실제 조회 {}개, 결과 보유 역 {}개",
+                selectedPlaces.size(),
+                placeSearchResult.searchedPlaces().size(),
+                recommendedPlaces.size()
+        );
+        stopWatch.stop();
+
+        stopWatch.start("최종 후보 확정");
+        final List<Place> finalPlaces = filterByRequirements(
+                placeSearchResult.searchedPlaces(),
+                recommendedPlaces,
                 recommendConditions
         );
+        logFinalCandidateSelection(selectedPlaces, finalPlaces, candidateRoutes, recommendConditions);
+        validateRecommendationCandidates(finalPlaces);
+        final List<StartEndPair> finalPairs = createPairs(startingPlaces, finalPlaces);
+        final Map<Place, Courses> placeCourses = findCoursesForAll(finalPairs);
+        final Map<Place, Routes> finalPlaceRoutes = finalPlaces.stream()
+                .collect(Collectors.toMap(
+                        Function.identity(),
+                        candidateRoutes::get
+                ));
+        stopWatch.stop();
+
+        stopWatch.start("추천 이유 생성");
+        final List<String> startingPlaceNames = getPlaceNames(startingPlaces);
+        final List<String> finalPlaceNames = getPlaceNames(finalPlaces);
+        final Map<String, ReasonAndDescription> reasonsByPlaceName = locationReasonGenerator.generateReasons(
+                startingPlaceNames,
+                finalPlaceNames,
+                recommendConditions
+        );
+        final Map<Place, ReasonAndDescription> generatedPlacesWithReason = finalPlaces.stream()
+                .collect(Collectors.toMap(
+                        Function.identity(),
+                        place -> reasonsByPlaceName.get(place.getName())
+                ));
         stopWatch.stop();
 
         stopWatch.start("Recommendation으로 변환");
         final Recommendation recommendation = recommendationMapper.toRecommendation(
-                filteredPlacesWithReason,
+                generatedPlacesWithReason,
                 recommendedPlaces,
-                placeRoutes,
+                finalPlaceRoutes,
                 placeCourses,
                 STARTING_VOTES,
                 recommendConditions
@@ -147,6 +162,14 @@ public class RecommendationService {
         return names.stream()
                 .map(name -> subwayStationService.findByName(name)
                         .orElseThrow(() -> new BadRequestException(GeneralErrorCode.INPUT_INVALID_START_LOCATION)))
+                .toList();
+    }
+
+    private List<Place> getAllCandidatePlaces(final List<SubwayStation> startingPlaces) {
+        final List<String> startingPlaceNames = getPlaceNames(startingPlaces);
+        return subwayStationService.getAll().stream()
+                .filter(place -> !startingPlaceNames.contains(place.getName()))
+                .map(Place.class::cast)
                 .toList();
     }
 
@@ -191,16 +214,173 @@ public class RecommendationService {
                 ));
     }
 
-    private Map<Place, ReasonAndDescription> removePlacesBeyondRange(
-            final Map<Place, Routes> placeRoutes,
-            final Map<Place, ReasonAndDescription> generatedPlaces
+    private List<Place> selectCandidatePlacesForPlaceSearch(
+            final List<Place> candidatePlaces,
+            final Map<Place, Routes> candidateRoutes
     ) {
-        return generatedPlaces.entrySet().stream()
-                .filter(entry -> {
-                    Place place = entry.getKey();
-                    return placeRoutes.containsKey(place) && placeRoutes.get(place).isAcceptable();
-                })
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+        final List<Place> sortedCandidates = candidatePlaces.stream()
+                .filter(candidateRoutes::containsKey)
+                .sorted((left, right) -> compareFairness(candidateRoutes.get(left), candidateRoutes.get(right)))
+                .toList();
+
+        final List<Place> acceptableCandidates = sortedCandidates.stream()
+                .filter(place -> candidateRoutes.get(place).isAcceptable())
+                .toList();
+
+        final List<Place> placeSearchTargets = acceptableCandidates.isEmpty()
+                ? sortedCandidates
+                : acceptableCandidates;
+
+        return placeSearchTargets.stream()
+                .filter(candidateRoutes::containsKey)
+                .limit(PLACE_SEARCH_POOL_LIMIT)
+                .toList();
+    }
+
+    private void logCandidateSelection(
+            final List<SubwayStation> startingPlaces,
+            final List<Place> candidatePlaces,
+            final Map<Place, Routes> candidateRoutes,
+            final List<Place> selectedPlaces
+    ) {
+        final List<Place> sortableCandidates = candidatePlaces.stream()
+                .filter(candidateRoutes::containsKey)
+                .sorted((left, right) -> compareFairness(candidateRoutes.get(left), candidateRoutes.get(right)))
+                .toList();
+        final long acceptableCount = sortableCandidates.stream()
+                .filter(place -> candidateRoutes.get(place).isAcceptable())
+                .count();
+        final boolean fallbackToRelaxedPool = acceptableCount == 0;
+
+        log.debug(
+                "공평성 후보 선정 - 출발역={}, 전체 후보 {}개, 경로 계산 성공 {}개, 하드 필터 통과 {}개, 장소 탐색 대상 {}개, fallback={}",
+                getPlaceNames(startingPlaces),
+                candidatePlaces.size(),
+                sortableCandidates.size(),
+                acceptableCount,
+                selectedPlaces.size(),
+                fallbackToRelaxedPool
+        );
+        log.debug("공평성 상위 후보 - {}", summarizePlacesWithScore(selectedPlaces, candidateRoutes));
+    }
+
+    private int compareFairness(final Routes left, final Routes right) {
+        final FairnessScore leftScore = left.calculateFairnessScore();
+        final FairnessScore rightScore = right.calculateFairnessScore();
+        return leftScore.compareTo(rightScore);
+    }
+
+    private List<Place> filterByRequirements(
+            final List<Place> selectedPlaces,
+            final Map<Place, CategorizedRecommendedPlaces> recommendedPlaces,
+            final List<RecommendCondition> recommendConditions
+    ) {
+        return selectedPlaces.stream()
+                .filter(place -> recommendedPlaces.get(place) != null)
+                .filter(place -> hasAllRequiredPlaces(recommendedPlaces.get(place), recommendConditions))
+                .limit(FINAL_CANDIDATE_TARGET_COUNT)
+                .toList();
+    }
+
+    private boolean hasAllRequiredPlaces(
+            final CategorizedRecommendedPlaces categorizedRecommendedPlaces,
+            final List<RecommendCondition> recommendConditions
+    ) {
+        final Map<RecommendCondition, List<com.f12.moitz.domain.RecommendedPlace>> categoryMap =
+                categorizedRecommendedPlaces.getCategorizedPlaces();
+
+        return recommendConditions.stream()
+                .allMatch(condition -> categoryMap.containsKey(condition) && !categoryMap.get(condition).isEmpty());
+    }
+
+    private void logFinalCandidateSelection(
+            final List<Place> selectedPlaces,
+            final List<Place> finalPlaces,
+            final Map<Place, Routes> candidateRoutes,
+            final List<RecommendCondition> recommendConditions
+    ) {
+        log.debug(
+                "최종 후보 확정 - 장소 탐색 대상 {}개, 최종 후보 {}개, 요구 조건={}",
+                selectedPlaces.size(),
+                finalPlaces.size(),
+                recommendConditions.stream().map(RecommendCondition::getTitle).toList()
+        );
+
+        if (finalPlaces.isEmpty()) {
+            log.debug("최종 후보 없음 - 장소 탐색 대상 상위 후보 {}", summarizePlacesWithScore(selectedPlaces, candidateRoutes));
+            return;
+        }
+
+        log.debug("최종 후보 목록 - {}", summarizePlacesWithScore(finalPlaces, candidateRoutes));
+    }
+
+    private List<String> summarizePlacesWithScore(
+            final List<Place> places,
+            final Map<Place, Routes> candidateRoutes
+    ) {
+        return places.stream()
+                .limit(5)
+                .map(place -> place.getName() + "=" + candidateRoutes.get(place).calculateFairnessScore())
+                .toList();
+    }
+
+    private void validateRecommendationCandidates(final List<Place> finalPlaces) {
+        if (finalPlaces.isEmpty()) {
+            throw new BadRequestException(GeneralErrorCode.RECOMMENDATION_NOT_FOUND);
+        }
+    }
+
+    private PlaceSearchResult searchPlacesIncrementally(
+            final List<Place> selectedPlaces,
+            final List<RecommendCondition> recommendConditions,
+            final Map<Place, Routes> candidateRoutes
+    ) {
+        final Map<Place, CategorizedRecommendedPlaces> accumulatedRecommendedPlaces = new java.util.LinkedHashMap<>();
+        final List<Place> searchedPlaces = new java.util.ArrayList<>();
+
+        for (int start = 0; start < selectedPlaces.size(); start += PLACE_SEARCH_BATCH_SIZE) {
+            final int end = Math.min(start + PLACE_SEARCH_BATCH_SIZE, selectedPlaces.size());
+            final List<Place> batch = selectedPlaces.subList(start, end);
+
+            log.debug(
+                    "장소 추천 배치 시작 - batch={}~{}, 대상={}",
+                    start,
+                    end - 1,
+                    summarizePlacesWithScore(batch, candidateRoutes)
+            );
+
+            accumulatedRecommendedPlaces.putAll(placeRecommender.recommendPlaces(batch, recommendConditions));
+            searchedPlaces.addAll(batch);
+
+            final List<Place> currentFinalPlaces = filterByRequirements(
+                    searchedPlaces,
+                    accumulatedRecommendedPlaces,
+                    recommendConditions
+            );
+
+            log.debug(
+                    "장소 추천 배치 완료 - 누적 조회 {}개, 현재 최종 후보 {}개",
+                    searchedPlaces.size(),
+                    currentFinalPlaces.size()
+            );
+
+            if (currentFinalPlaces.size() >= FINAL_CANDIDATE_TARGET_COUNT) {
+                log.debug("장소 추천 조기 종료 - 목표 후보 {}개 확보", FINAL_CANDIDATE_TARGET_COUNT);
+                break;
+            }
+        }
+
+        return new PlaceSearchResult(
+                searchedPlaces,
+                accumulatedRecommendedPlaces
+        );
+    }
+
+    private record PlaceSearchResult(
+            List<Place> searchedPlaces,
+            Map<Place, CategorizedRecommendedPlaces> recommendedPlaces
+    ) {
+
     }
 
     public RecommendationResultResponse getById(final String id) {

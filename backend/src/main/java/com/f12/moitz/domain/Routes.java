@@ -6,8 +6,6 @@ import lombok.Getter;
 @Getter
 public class Routes {
 
-    private static final double FAIRNESS_FACTOR = 2.0;
-
     private final List<Route> routes;
 
     public Routes(final List<Route> routes) {
@@ -22,17 +20,31 @@ public class Routes {
     }
 
     public boolean isAcceptable() {
-        final int max = routes.stream()
+        return calculateFairnessScore().isAcceptable();
+    }
+
+    public FairnessScore calculateFairnessScore() {
+        return new FairnessScore(
+                calculateMaxTravelTime(),
+                calculateMaxTransferCount(),
+                calculateTransferDiff(),
+                calculateTimeDiff(),
+                calculateAverageTravelTime()
+        );
+    }
+
+    public int calculateMaxTravelTime() {
+        return routes.stream()
                 .mapToInt(Route::calculateTotalTravelTime)
                 .max()
                 .orElseThrow(() -> new IllegalStateException("경로 목록이 비어 있습니다."));
+    }
 
-        final int min = routes.stream()
+    public int calculateMinTravelTime() {
+        return routes.stream()
                 .mapToInt(Route::calculateTotalTravelTime)
                 .min()
                 .orElseThrow(() -> new IllegalStateException("경로 목록이 비어 있습니다."));
-
-        return max - min <= calculateAverageTravelTime() * FAIRNESS_FACTOR;
     }
 
     public int calculateAverageTravelTime() {
@@ -40,6 +52,28 @@ public class Routes {
                 .mapToInt(Route::calculateTotalTravelTime)
                 .average()
                 .orElseThrow(() -> new IllegalStateException("경로 목록이 비어 있습니다."));
+    }
+
+    public int calculateTimeDiff() {
+        return calculateMaxTravelTime() - calculateMinTravelTime();
+    }
+
+    public int calculateMaxTransferCount() {
+        return routes.stream()
+                .mapToInt(Route::calculateTransferCount)
+                .max()
+                .orElseThrow(() -> new IllegalStateException("경로 목록이 비어 있습니다."));
+    }
+
+    public int calculateMinTransferCount() {
+        return routes.stream()
+                .mapToInt(Route::calculateTransferCount)
+                .min()
+                .orElseThrow(() -> new IllegalStateException("경로 목록이 비어 있습니다."));
+    }
+
+    public int calculateTransferDiff() {
+        return calculateMaxTransferCount() - calculateMinTransferCount();
     }
 
 }

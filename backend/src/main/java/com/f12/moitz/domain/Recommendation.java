@@ -22,7 +22,7 @@ public class Recommendation {
 
     private List<Candidate> sort(final List<Candidate> candidates) {
         return candidates.stream()
-                .sorted(Comparator.comparingInt(Candidate::calculateAverageTravelTime))
+                .sorted(Comparator.comparing(candidate -> candidate.getRoutes().calculateFairnessScore()))
                 .toList();
     }
 
