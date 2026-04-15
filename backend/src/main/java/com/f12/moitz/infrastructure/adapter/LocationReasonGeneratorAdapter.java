@@ -7,19 +7,35 @@ import com.f12.moitz.common.error.exception.ExternalApiException;
 import com.f12.moitz.common.error.exception.RetryableApiException;
 import com.f12.moitz.domain.RecommendCondition;
 import com.f12.moitz.infrastructure.client.gemini.GoogleGeminiClient;
+import com.f12.moitz.infrastructure.client.perplexity.PerplexityClient;
 import io.github.resilience4j.circuitbreaker.CallNotPermittedException;
+import io.github.resilience4j.circuitbreaker.CircuitBreaker;
+import io.github.resilience4j.decorators.Decorators;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Supplier;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.retry.annotation.Recover;
+import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Component;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class LocationReasonGeneratorAdapter implements LocationReasonGenerator {
 
     private final GoogleGeminiClient googleGeminiClient;
+    private final PerplexityClient perplexityClient;
+    private final CircuitBreaker geminiBreaker;
+    private final CircuitBreaker geminiRetryableBreaker;
 
+    @Retryable(
+            retryFor = RetryableApiException.class,
+            maxAttempts = 2,
+            recover = "recoverGenerateReasons"
+    )
     @Override
     public Map<String, ReasonAndDescription> generateReasons(
             final List<String> startingPlaces,
@@ -31,16 +47,34 @@ public class LocationReasonGeneratorAdapter implements LocationReasonGenerator {
         }
 
         final List<String> requirementStrings = RecommendCondition.getRequirements(requirements);
-        try {
-            final RecommendedLocationsResponse response = googleGeminiClient.generateReasonsForSelectedLocations(
-                    startingPlaces,
-                    selectedPlaces,
-                    requirementStrings
-            );
-            return mergeWithFallback(selectedPlaces, response);
-        } catch (ExternalApiException | RetryableApiException | CallNotPermittedException e) {
-            return createFallbackReasons(selectedPlaces);
-        }
+        final Supplier<Map<String, ReasonAndDescription>> geminiCall = () -> mergeWithFallback(
+                selectedPlaces,
+                googleGeminiClient.generateReasonsForSelectedLocations(
+                        startingPlaces,
+                        selectedPlaces,
+                        requirementStrings
+                )
+        );
+
+        return Decorators.ofSupplier(geminiCall)
+                .withCircuitBreaker(geminiBreaker)
+                .withCircuitBreaker(geminiRetryableBreaker)
+                .withFallback(
+                        List.of(ExternalApiException.class, CallNotPermittedException.class),
+                        throwable -> fallback(startingPlaces, selectedPlaces, requirementStrings)
+                )
+                .decorate()
+                .get();
+    }
+
+    @Recover
+    public Map<String, ReasonAndDescription> recoverGenerateReasons(
+            final List<String> startingPlaces,
+            final List<String> selectedPlaces,
+            final List<RecommendCondition> requirements
+    ) {
+        final List<String> requirementStrings = RecommendCondition.getRequirements(requirements);
+        return fallback(startingPlaces, selectedPlaces, requirementStrings);
     }
 
     private Map<String, ReasonAndDescription> mergeWithFallback(
@@ -57,6 +91,25 @@ public class LocationReasonGeneratorAdapter implements LocationReasonGenerator {
                 ));
 
         return reasons;
+    }
+
+    private Map<String, ReasonAndDescription> fallback(
+            final List<String> startingPlaces,
+            final List<String> selectedPlaces,
+            final List<String> requirements
+    ) {
+        try {
+            log.debug("Gemini 추천 이유 생성 실패. Perplexity fallback을 시도합니다.");
+            final RecommendedLocationsResponse response = perplexityClient.generateReasonsForSelectedLocations(
+                    startingPlaces,
+                    selectedPlaces,
+                    requirements
+            );
+            return mergeWithFallback(selectedPlaces, response);
+        } catch (ExternalApiException | RetryableApiException e) {
+            log.warn("Perplexity 추천 이유 생성도 실패했습니다. 고정 fallback 문구를 사용합니다.", e);
+            return createFallbackReasons(selectedPlaces);
+        }
     }
 
     private Map<String, ReasonAndDescription> createFallbackReasons(final List<String> selectedPlaces) {

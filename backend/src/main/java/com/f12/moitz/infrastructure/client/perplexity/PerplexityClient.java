@@ -4,6 +4,7 @@ import com.f12.moitz.application.dto.RecommendedLocationsResponse;
 import com.f12.moitz.common.error.exception.ExternalApiErrorCode;
 import com.f12.moitz.common.error.exception.ExternalApiException;
 import com.f12.moitz.common.error.exception.RetryableApiException;
+import com.f12.moitz.infrastructure.PromptGenerator;
 import com.f12.moitz.infrastructure.client.perplexity.dto.PerplexityRequest;
 import com.f12.moitz.infrastructure.client.perplexity.dto.PerplexityResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -33,8 +34,25 @@ public class PerplexityClient {
             final String requirement
     ) {
         try {
-            final String content = generateContent(stationNames, requirement).choices().getFirst().message().content();
-            return objectMapper.readValue(content, RecommendedLocationsResponse.class);
+            return readValue(generateContent(stationNames, requirement).choices().getFirst().message().content());
+        } catch (IOException e) {
+            throw new ExternalApiException(ExternalApiErrorCode.INVALID_PERPLEXITY_API_RESPONSE);
+        }
+    }
+
+    public RecommendedLocationsResponse generateReasonsForSelectedLocations(
+            final List<String> startingPlaces,
+            final List<String> selectedPlaces,
+            final List<String> requirements
+    ) {
+        try {
+            return readValue(
+                    generateReasonContent(startingPlaces, selectedPlaces, requirements)
+                            .choices()
+                            .getFirst()
+                            .message()
+                            .content()
+            );
         } catch (IOException e) {
             throw new ExternalApiException(ExternalApiErrorCode.INVALID_PERPLEXITY_API_RESPONSE);
         }
@@ -91,7 +109,7 @@ public class PerplexityClient {
                         new PerplexityRequest.Message("user", userPrompt)
                 ),
                 Map.of("type", "json_schema", "json_schema", Map.of(
-                        "schema", getSchema()
+                        "schema", PromptGenerator.getSchema()
                 ))
         );
 
@@ -123,6 +141,64 @@ public class PerplexityClient {
                 .block();
     }
 
+    private PerplexityResponse generateReasonContent(
+            final List<String> startingPlaces,
+            final List<String> selectedPlaces,
+            final List<String> requirements
+    ) {
+        final String systemPrompt = """
+            당신은 서울 지하철역 기반 만남 장소에 대해 설명을 작성하는 AI 비서입니다.
+            서버가 이미 선정한 역 목록을 설명해야 하며, 새 장소를 추천하거나 역명을 바꾸면 안 됩니다.
+            반드시 JSON Schema를 엄격하게 준수하여 응답하세요.
+        """;
+
+        final String userPrompt = String.format(
+                PromptGenerator.FIXED_LOCATION_REASON_PROMPT,
+                startingPlaces,
+                selectedPlaces,
+                requirements
+        );
+
+        final PerplexityRequest requestPayload = new PerplexityRequest(
+                "sonar-pro",
+                List.of(
+                        new PerplexityRequest.Message("system", systemPrompt),
+                        new PerplexityRequest.Message("user", userPrompt)
+                ),
+                Map.of(
+                        "type", "json_schema",
+                        "json_schema", Map.of("schema", PromptGenerator.getSchema())
+                )
+        );
+
+        return perplexityWebClient.post()
+                .uri("/chat/completions")
+                .bodyValue(requestPayload)
+                .retrieve()
+                .onStatus(HttpStatusCode::isError, this::handleApiError)
+                .bodyToMono(PerplexityResponse.class)
+                .retryWhen(Retry.max(1)
+                        .filter(throwable -> throwable instanceof RetryableApiException || throwable instanceof TimeoutException)
+                        .doBeforeRetry(retrySignal ->
+                                log.warn(
+                                        "추천 이유 생성 API 호출 실패. 재시도 #{} 시작. 실패 원인: {}",
+                                        retrySignal.totalRetries() + 1,
+                                        retrySignal.failure().getMessage()
+                                )
+                        )
+                        .onRetryExhaustedThrow((retryBackoffSpec, retrySignal) ->
+                                new ExternalApiException(ExternalApiErrorCode.PERPLEXITY_API_SERVER_UNRESPONSIVE)
+                        )
+                )
+                .doOnSuccess(response -> {
+                            if (response != null && response.usage() != null) {
+                                log.debug("Perplexity 추천 이유 생성 성공 토큰 사용량: {}개", response.usage().totalTokens());
+                            }
+                        }
+                )
+                .block();
+    }
+
     private Mono<? extends Throwable> handleApiError(final ClientResponse response) {
         return response.bodyToMono(String.class)
                 .defaultIfEmpty("No Error Body")
@@ -140,27 +216,7 @@ public class PerplexityClient {
                 });
     }
 
-    private Map<String, Object> getSchema() {
-        return Map.of(
-                "type", "object",
-                "properties", Map.of(
-                        "recommendations", Map.of(
-                                "type", "array",
-                                "description", "추천 지하철역 리스트",
-                                "items", Map.of(
-                                        "type", "object",
-                                        "properties", Map.of(
-                                                "locationName", Map.of("type", "string", "description", "추천 장소 이름"),
-                                                "reason", Map.of("type", "string", "description", "20자 이내 추천 이유 + 이모지 ex) 주변 상권이 잘 발달되어 있고, 이동 소요 시간이 전체적으로 짧은 편이에요 :smile:", "maxLength", 20)
-                                        ),
-                                        "required", List.of("locationName", "reason")
-                                ),
-                                "minItems", 3,
-                                "maxItems", 5
-                        )
-                ),
-                "required", List.of("recommendations")
-        );
+    private RecommendedLocationsResponse readValue(final String content) throws IOException {
+        return objectMapper.readValue(content, RecommendedLocationsResponse.class);
     }
-
 }
