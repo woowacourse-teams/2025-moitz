@@ -196,16 +196,6 @@ public class RecommendationService {
     }
 
     private DispersionPolicy resolveDispersionPolicy(final List<SubwayStation> startingPlaces) {
-        if (startingPlaces.size() == 1) {
-            final DispersionPolicy dispersionPolicy = DispersionPolicy.resolve(1, 0, 0.0, 0);
-            log.debug(
-                    "출발지 분산도 판정 - 출발역={}, pairMax=0분, pairAvg=0.0분, longPairCount=0, policy={}",
-                    getPlaceNames(startingPlaces),
-                    dispersionPolicy
-            );
-            return dispersionPolicy;
-        }
-
         final List<StartEndPair> startingPairs = createStartingPlacePairs(startingPlaces);
         final List<Route> pairRoutes = routeFinder.findRoutes(startingPairs);
         final int pairMaxTravelTime = pairRoutes.stream()

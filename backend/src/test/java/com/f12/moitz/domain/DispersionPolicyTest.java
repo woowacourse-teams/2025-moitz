@@ -33,6 +33,14 @@ class DispersionPolicyTest {
     }
 
     @Test
+    @DisplayName("최소 출발지 수보다 적으면 분산도 정책을 판정할 수 없다")
+    void resolve_ThrowsException_WhenPartySizeIsLessThanLimit() {
+        assertThatThrownBy(() -> DispersionPolicy.resolve(1, 0, 0.0, 0))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("2개 이상");
+    }
+
+    @Test
     @DisplayName("최대 출발지 수를 초과하면 분산도 정책을 판정할 수 없다")
     void resolve_ThrowsException_WhenPartySizeExceedsLimit() {
         assertThatThrownBy(() -> DispersionPolicy.resolve(7, 100, 70.0, 3))

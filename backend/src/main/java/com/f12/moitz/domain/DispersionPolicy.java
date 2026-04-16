@@ -11,6 +11,7 @@ public enum DispersionPolicy {
     TIER_4(6, 140, 90.0, 5, 75, 47, 3, false),
     TIER_5(6, 0, 0.0, 0, 95, 68, 3, true);
 
+    public static final int MIN_STARTING_PLACE_COUNT = 2;
     public static final int MAX_STARTING_PLACE_COUNT = 6;
     public static final int LONG_PAIR_TRAVEL_TIME_MINUTES = 90;
 
@@ -63,8 +64,10 @@ public enum DispersionPolicy {
     }
 
     private static void validatePartySize(final int partySize) {
-        if (partySize <= 0 || partySize > MAX_STARTING_PLACE_COUNT) {
-            throw new IllegalArgumentException("출발지는 1개 이상 " + MAX_STARTING_PLACE_COUNT + "개 이하로 입력해야 합니다.");
+        if (partySize < MIN_STARTING_PLACE_COUNT || partySize > MAX_STARTING_PLACE_COUNT) {
+            throw new IllegalArgumentException(
+                    "출발지는 " + MIN_STARTING_PLACE_COUNT + "개 이상 " + MAX_STARTING_PLACE_COUNT + "개 이하로 입력해야 합니다."
+            );
         }
     }
 

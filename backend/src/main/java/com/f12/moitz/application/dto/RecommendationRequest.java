@@ -19,7 +19,7 @@ public record RecommendationRequest(
         }
 
         private void validate(final List<String> startingPlaceNames) {
-                if (startingPlaceNames == null || startingPlaceNames.isEmpty()) {
+                if (startingPlaceNames == null || startingPlaceNames.size() < DispersionPolicy.MIN_STARTING_PLACE_COUNT) {
                         throw new BadRequestException(GeneralErrorCode.INPUT_INVALID_START_LOCATION, startingPlaceNames);
                 }
                 if (startingPlaceNames.size() > DispersionPolicy.MAX_STARTING_PLACE_COUNT) {
