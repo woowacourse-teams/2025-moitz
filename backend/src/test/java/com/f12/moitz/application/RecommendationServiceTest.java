@@ -123,13 +123,16 @@ class RecommendationServiceTest {
         given(placeRecommender.recommendPlaces(anyList(), anyList()))
                 .willReturn(mockRecommendedPlaces);
 
+        List<Route> pairwiseRoutes = List.of(
+                new Route(List.of(new Path(gangnam, yeoksam, TravelMethod.SUBWAY, 2 * 60, SubwayLine.fromTitle("2호선"))))
+        );
         List<Route> mockRoutes = List.of(
                 new Route(List.of(new Path(gangnam, seolleung, TravelMethod.SUBWAY, 10 * 60, SubwayLine.fromTitle("2호선")))),
                 new Route(List.of(new Path(yeoksam, seolleung, TravelMethod.SUBWAY, 5 * 60, SubwayLine.fromTitle("2호선")))),
                 new Route(List.of(new Path(gangnam, samsung, TravelMethod.SUBWAY, 14 * 60, SubwayLine.fromTitle("2호선")))),
                 new Route(List.of(new Path(yeoksam, samsung, TravelMethod.SUBWAY, 10 * 60, SubwayLine.fromTitle("2호선"))))
         );
-        given(routeFinder.findRoutes(anyList())).willReturn(mockRoutes);
+        given(routeFinder.findRoutes(anyList())).willReturn(pairwiseRoutes, mockRoutes);
 
         List<Course> mockCourses = List.of(
                 new Course(List.of(gangnam.getPoint(), seolleung.getPoint())),
@@ -174,7 +177,9 @@ class RecommendationServiceTest {
         given(subwayStationService.findByName("역삼역")).willReturn(Optional.of(yeoksam));
         given(subwayStationService.getAll()).willReturn(List.of(gangnam, yeoksam, seolleung));
 
-        given(routeFinder.findRoutes(anyList())).willReturn(List.of(
+        given(routeFinder.findRoutes(anyList())).willReturn(
+                List.of(new Route(List.of(new Path(gangnam, yeoksam, TravelMethod.SUBWAY, 2 * 60, SubwayLine.fromTitle("2호선"))))),
+                List.of(
                 new Route(List.of(new Path(gangnam, seolleung, TravelMethod.SUBWAY, 10 * 60, SubwayLine.fromTitle("2호선")))),
                 new Route(List.of(new Path(yeoksam, seolleung, TravelMethod.SUBWAY, 5 * 60, SubwayLine.fromTitle("2호선"))))
         ));

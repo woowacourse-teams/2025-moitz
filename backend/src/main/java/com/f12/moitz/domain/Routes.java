@@ -23,6 +23,10 @@ public class Routes {
         return calculateFairnessScore().isAcceptable();
     }
 
+    public boolean isAcceptable(final DispersionPolicy dispersionPolicy) {
+        return calculateFairnessScore().isAcceptable(dispersionPolicy);
+    }
+
     public FairnessScore calculateFairnessScore() {
         return new FairnessScore(
                 calculateMaxTravelTime(),

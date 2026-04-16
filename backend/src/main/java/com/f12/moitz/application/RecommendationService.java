@@ -15,6 +15,7 @@ import com.f12.moitz.common.error.exception.NotFoundException;
 import com.f12.moitz.domain.CategorizedRecommendedPlaces;
 import com.f12.moitz.domain.Course;
 import com.f12.moitz.domain.Courses;
+import com.f12.moitz.domain.DispersionPolicy;
 import com.f12.moitz.domain.FairnessScore;
 import com.f12.moitz.domain.Place;
 import com.f12.moitz.domain.RecommendCondition;
@@ -76,11 +77,17 @@ public class RecommendationService {
         stopWatch.start("공평한 후보역 선정");
         final List<RecommendCondition> recommendConditions = RecommendCondition.fromTitle(request.requirements());
         final List<SubwayStation> startingPlaces = getByNames(request.startingPlaceNames());
+        final DispersionPolicy dispersionPolicy = resolveDispersionPolicy(startingPlaces);
         final List<Place> candidatePlaces = getAllCandidatePlaces(startingPlaces);
         final List<StartEndPair> candidatePairs = createPairs(startingPlaces, candidatePlaces);
         final Map<Place, Routes> candidateRoutes = findRoutesForAll(candidatePairs);
-        final List<Place> selectedPlaces = selectCandidatePlacesForPlaceSearch(candidatePlaces, candidateRoutes);
-        logCandidateSelection(startingPlaces, candidatePlaces, candidateRoutes, selectedPlaces);
+        final CandidateSelection candidateSelection = selectCandidatePlacesForPlaceSearch(
+                candidatePlaces,
+                candidateRoutes,
+                dispersionPolicy
+        );
+        final List<Place> selectedPlaces = candidateSelection.selectedPlaces();
+        logCandidateSelection(startingPlaces, candidatePlaces, candidateRoutes, candidateSelection);
         stopWatch.stop();
 
         stopWatch.start("장소 추천");
@@ -188,6 +195,57 @@ public class RecommendationService {
         return collectByPlace(allPairs, allRoutes, Routes::new);
     }
 
+    private DispersionPolicy resolveDispersionPolicy(final List<SubwayStation> startingPlaces) {
+        if (startingPlaces.size() == 1) {
+            final DispersionPolicy dispersionPolicy = DispersionPolicy.resolve(1, 0, 0.0, 0);
+            log.debug(
+                    "출발지 분산도 판정 - 출발역={}, pairMax=0분, pairAvg=0.0분, longPairCount=0, policy={}",
+                    getPlaceNames(startingPlaces),
+                    dispersionPolicy
+            );
+            return dispersionPolicy;
+        }
+
+        final List<StartEndPair> startingPairs = createStartingPlacePairs(startingPlaces);
+        final List<Route> pairRoutes = routeFinder.findRoutes(startingPairs);
+        final int pairMaxTravelTime = pairRoutes.stream()
+                .mapToInt(Route::calculateTotalTravelTime)
+                .max()
+                .orElse(0);
+        final double pairAverageTravelTime = pairRoutes.stream()
+                .mapToInt(Route::calculateTotalTravelTime)
+                .average()
+                .orElse(0.0);
+        final long longPairCount = pairRoutes.stream()
+                .mapToInt(Route::calculateTotalTravelTime)
+                .filter(minutes -> minutes >= DispersionPolicy.LONG_PAIR_TRAVEL_TIME_MINUTES)
+                .count();
+        final DispersionPolicy dispersionPolicy = DispersionPolicy.resolve(
+                startingPlaces.size(),
+                pairMaxTravelTime,
+                pairAverageTravelTime,
+                longPairCount
+        );
+
+        log.debug(
+                "출발지 분산도 판정 - 출발역={}, pairMax={}분, pairAvg={}분, longPairCount={}, policy={}",
+                getPlaceNames(startingPlaces),
+                pairMaxTravelTime,
+                String.format(java.util.Locale.US, "%.1f", pairAverageTravelTime),
+                longPairCount,
+                dispersionPolicy
+        );
+        return dispersionPolicy;
+    }
+
+    private List<StartEndPair> createStartingPlacePairs(final List<SubwayStation> startingPlaces) {
+        return IntStream.range(0, startingPlaces.size())
+                .boxed()
+                .flatMap(left -> IntStream.range(left + 1, startingPlaces.size())
+                        .mapToObj(right -> new StartEndPair(startingPlaces.get(left), startingPlaces.get(right))))
+                .toList();
+    }
+
     private Map<Place, Courses> findCoursesForAll(final List<StartEndPair> allPairs) {
         final List<Course> allCourses = routeFinder.findCourses(allPairs);
         return collectByPlace(allPairs, allCourses, Courses::new);
@@ -214,52 +272,67 @@ public class RecommendationService {
                 ));
     }
 
-    private List<Place> selectCandidatePlacesForPlaceSearch(
+    private CandidateSelection selectCandidatePlacesForPlaceSearch(
             final List<Place> candidatePlaces,
-            final Map<Place, Routes> candidateRoutes
+            final Map<Place, Routes> candidateRoutes,
+            final DispersionPolicy dispersionPolicy
     ) {
         final List<Place> sortedCandidates = candidatePlaces.stream()
                 .filter(candidateRoutes::containsKey)
                 .sorted((left, right) -> compareFairness(candidateRoutes.get(left), candidateRoutes.get(right)))
                 .toList();
 
-        final List<Place> acceptableCandidates = sortedCandidates.stream()
-                .filter(place -> candidateRoutes.get(place).isAcceptable())
-                .toList();
+        for (DispersionPolicy candidatePolicy : dispersionPolicy.relaxations()) {
+            final List<Place> acceptableCandidates = sortedCandidates.stream()
+                    .filter(place -> candidateRoutes.get(place).isAcceptable(candidatePolicy))
+                    .toList();
 
-        final List<Place> placeSearchTargets = acceptableCandidates.isEmpty()
-                ? sortedCandidates
-                : acceptableCandidates;
+            if (!acceptableCandidates.isEmpty()) {
+                return new CandidateSelection(
+                        acceptableCandidates.stream()
+                                .limit(PLACE_SEARCH_POOL_LIMIT)
+                                .toList(),
+                        dispersionPolicy,
+                        candidatePolicy,
+                        acceptableCandidates.size(),
+                        false
+                );
+            }
+        }
 
-        return placeSearchTargets.stream()
-                .filter(candidateRoutes::containsKey)
-                .limit(PLACE_SEARCH_POOL_LIMIT)
-                .toList();
+        return new CandidateSelection(
+                sortedCandidates.stream()
+                        .limit(PLACE_SEARCH_POOL_LIMIT)
+                        .toList(),
+                dispersionPolicy,
+                DispersionPolicy.TIER_5,
+                0,
+                true
+        );
     }
 
     private void logCandidateSelection(
             final List<SubwayStation> startingPlaces,
             final List<Place> candidatePlaces,
             final Map<Place, Routes> candidateRoutes,
-            final List<Place> selectedPlaces
+            final CandidateSelection candidateSelection
     ) {
+        final List<Place> selectedPlaces = candidateSelection.selectedPlaces();
         final List<Place> sortableCandidates = candidatePlaces.stream()
                 .filter(candidateRoutes::containsKey)
                 .sorted((left, right) -> compareFairness(candidateRoutes.get(left), candidateRoutes.get(right)))
                 .toList();
-        final long acceptableCount = sortableCandidates.stream()
-                .filter(place -> candidateRoutes.get(place).isAcceptable())
-                .count();
-        final boolean fallbackToRelaxedPool = acceptableCount == 0;
 
         log.debug(
-                "공평성 후보 선정 - 출발역={}, 전체 후보 {}개, 경로 계산 성공 {}개, 하드 필터 통과 {}개, 장소 탐색 대상 {}개, fallback={}",
+                "공평성 후보 선정 - 출발역={}, initialPolicy={}, effectivePolicy={}, 전체 후보 {}개, 경로 계산 성공 {}개, 하드 필터 통과 {}개, 장소 탐색 대상 {}개, fallback={}",
                 getPlaceNames(startingPlaces),
+                candidateSelection.initialPolicy(),
+                candidateSelection.effectivePolicy(),
                 candidatePlaces.size(),
                 sortableCandidates.size(),
-                acceptableCount,
+                candidateSelection.acceptableCount(),
                 selectedPlaces.size(),
-                fallbackToRelaxedPool
+                candidateSelection.fallbackToSortedCandidates()
         );
         log.debug("공평성 상위 후보 - {}", summarizePlacesWithScore(selectedPlaces, candidateRoutes));
     }
@@ -379,6 +452,16 @@ public class RecommendationService {
     private record PlaceSearchResult(
             List<Place> searchedPlaces,
             Map<Place, CategorizedRecommendedPlaces> recommendedPlaces
+    ) {
+
+    }
+
+    private record CandidateSelection(
+            List<Place> selectedPlaces,
+            DispersionPolicy initialPolicy,
+            DispersionPolicy effectivePolicy,
+            long acceptableCount,
+            boolean fallbackToSortedCandidates
     ) {
 
     }
