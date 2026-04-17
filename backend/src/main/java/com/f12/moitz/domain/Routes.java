@@ -28,12 +28,17 @@ public class Routes {
     }
 
     public FairnessScore calculateFairnessScore() {
+        final int minTravelTime = calculateMinTravelTime();
+        final double medianTravelTime = calculateMedianTravelTime();
+        final int maxTravelTime = calculateMaxTravelTime();
         return new FairnessScore(
-                calculateMaxTravelTime(),
+                maxTravelTime,
                 calculateMaxTransferCount(),
                 calculateTransferDiff(),
-                calculateTimeDiff(),
-                calculateAverageTravelTime()
+                maxTravelTime - minTravelTime,
+                calculateAverageTravelTime(),
+                medianTravelTime - minTravelTime,
+                maxTravelTime - medianTravelTime
         );
     }
 
@@ -60,6 +65,21 @@ public class Routes {
 
     public int calculateTimeDiff() {
         return calculateMaxTravelTime() - calculateMinTravelTime();
+    }
+
+    public double calculateMedianTravelTime() {
+        final List<Integer> sortedTravelTimes = routes.stream()
+                .map(Route::calculateTotalTravelTime)
+                .sorted()
+                .toList();
+        final int size = sortedTravelTimes.size();
+        if (size == 0) {
+            throw new IllegalStateException("경로 목록이 비어 있습니다.");
+        }
+        if (size % 2 == 1) {
+            return sortedTravelTimes.get(size / 2);
+        }
+        return (sortedTravelTimes.get(size / 2 - 1) + sortedTravelTimes.get(size / 2)) / 2.0;
     }
 
     public int calculateMaxTransferCount() {
