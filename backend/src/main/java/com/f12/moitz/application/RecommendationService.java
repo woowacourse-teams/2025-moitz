@@ -12,16 +12,19 @@ import com.f12.moitz.application.utils.RecommendationMapper;
 import com.f12.moitz.common.error.exception.BadRequestException;
 import com.f12.moitz.common.error.exception.GeneralErrorCode;
 import com.f12.moitz.common.error.exception.NotFoundException;
+import com.f12.moitz.domain.CandidateSelectionBucket;
+import com.f12.moitz.domain.CandidateSelectionResult;
 import com.f12.moitz.domain.CategorizedRecommendedPlaces;
 import com.f12.moitz.domain.Course;
 import com.f12.moitz.domain.Courses;
 import com.f12.moitz.domain.DispersionPolicy;
-import com.f12.moitz.domain.FairnessScore;
 import com.f12.moitz.domain.Place;
+import com.f12.moitz.domain.PlaceSearchCandidateSelector;
 import com.f12.moitz.domain.RecommendCondition;
 import com.f12.moitz.domain.Recommendation;
 import com.f12.moitz.domain.Result;
 import com.f12.moitz.domain.Route;
+import com.f12.moitz.domain.RouteCandidate;
 import com.f12.moitz.domain.Routes;
 import com.f12.moitz.domain.repository.RecommendResultRepository;
 import com.f12.moitz.domain.subway.SubwayStation;
@@ -53,6 +56,7 @@ public class RecommendationService {
     private final RouteFinder routeFinder;
     private final RecommendationMapper recommendationMapper;
     private final RecommendResultRepository recommendResultRepository;
+    private final PlaceSearchCandidateSelector placeSearchCandidateSelector = new PlaceSearchCandidateSelector();
 
     public RecommendationService(
             @Autowired final SubwayStationService subwayStationService,
@@ -81,12 +85,12 @@ public class RecommendationService {
         final List<Place> candidatePlaces = getAllCandidatePlaces(startingPlaces);
         final List<StartEndPair> candidatePairs = createPairs(startingPlaces, candidatePlaces);
         final Map<Place, Routes> candidateRoutes = findRoutesForAll(candidatePairs);
-        final CandidateSelection candidateSelection = selectCandidatePlacesForPlaceSearch(
-                candidatePlaces,
-                candidateRoutes,
-                dispersionPolicy
+        final CandidateSelectionResult candidateSelection = placeSearchCandidateSelector.select(
+                toRouteCandidates(candidatePlaces, candidateRoutes),
+                dispersionPolicy,
+                PLACE_SEARCH_POOL_LIMIT
         );
-        final List<Place> selectedPlaces = candidateSelection.selectedPlaces();
+        final List<Place> selectedPlaces = candidateSelection.getSelectedPlaces();
         logCandidateSelection(startingPlaces, candidatePlaces, candidateRoutes, candidateSelection);
         stopWatch.stop();
 
@@ -262,75 +266,59 @@ public class RecommendationService {
                 ));
     }
 
-    private CandidateSelection selectCandidatePlacesForPlaceSearch(
+    private List<RouteCandidate> toRouteCandidates(
             final List<Place> candidatePlaces,
-            final Map<Place, Routes> candidateRoutes,
-            final DispersionPolicy dispersionPolicy
+            final Map<Place, Routes> candidateRoutes
     ) {
-        final List<Place> sortedCandidates = candidatePlaces.stream()
+        return candidatePlaces.stream()
                 .filter(candidateRoutes::containsKey)
-                .sorted((left, right) -> compareFairness(candidateRoutes.get(left), candidateRoutes.get(right)))
+                .map(place -> new RouteCandidate(place, candidateRoutes.get(place)))
                 .toList();
-
-        for (DispersionPolicy candidatePolicy : dispersionPolicy.relaxations()) {
-            final List<Place> acceptableCandidates = sortedCandidates.stream()
-                    .filter(place -> candidateRoutes.get(place).isAcceptable(candidatePolicy))
-                    .toList();
-
-            if (!acceptableCandidates.isEmpty()) {
-                return new CandidateSelection(
-                        acceptableCandidates.stream()
-                                .limit(PLACE_SEARCH_POOL_LIMIT)
-                                .toList(),
-                        dispersionPolicy,
-                        candidatePolicy,
-                        acceptableCandidates.size(),
-                        false
-                );
-            }
-        }
-
-        return new CandidateSelection(
-                sortedCandidates.stream()
-                        .limit(PLACE_SEARCH_POOL_LIMIT)
-                        .toList(),
-                dispersionPolicy,
-                DispersionPolicy.TIER_5,
-                0,
-                true
-        );
     }
 
     private void logCandidateSelection(
             final List<SubwayStation> startingPlaces,
             final List<Place> candidatePlaces,
             final Map<Place, Routes> candidateRoutes,
-            final CandidateSelection candidateSelection
+            final CandidateSelectionResult candidateSelection
     ) {
-        final List<Place> selectedPlaces = candidateSelection.selectedPlaces();
-        final List<Place> sortableCandidates = candidatePlaces.stream()
+        final List<Place> selectedPlaces = candidateSelection.getSelectedPlaces();
+        final long routeCalculatedCount = candidatePlaces.stream()
                 .filter(candidateRoutes::containsKey)
-                .sorted((left, right) -> compareFairness(candidateRoutes.get(left), candidateRoutes.get(right)))
-                .toList();
+                .count();
 
         log.debug(
                 "공평성 후보 선정 - 출발역={}, initialPolicy={}, effectivePolicy={}, 전체 후보 {}개, 경로 계산 성공 {}개, 하드 필터 통과 {}개, 장소 탐색 대상 {}개, fallback={}",
                 getPlaceNames(startingPlaces),
-                candidateSelection.initialPolicy(),
-                candidateSelection.effectivePolicy(),
+                candidateSelection.getInitialPolicy(),
+                candidateSelection.getEffectivePolicy(),
                 candidatePlaces.size(),
-                sortableCandidates.size(),
-                candidateSelection.acceptableCount(),
+                routeCalculatedCount,
+                candidateSelection.getAcceptableCount(),
                 selectedPlaces.size(),
-                candidateSelection.fallbackToSortedCandidates()
+                candidateSelection.isFallbackToSortedCandidates()
         );
+        log.debug("공평성 후보 bucket - {}", summarizeBucketSelections(candidateSelection.getBucketSelections()));
         log.debug("공평성 상위 후보 - {}", summarizePlacesWithScore(selectedPlaces, candidateRoutes));
     }
 
-    private int compareFairness(final Routes left, final Routes right) {
-        final FairnessScore leftScore = left.calculateFairnessScore();
-        final FairnessScore rightScore = right.calculateFairnessScore();
-        return leftScore.compareTo(rightScore);
+    private Map<String, List<String>> summarizeBucketSelections(
+            final Map<CandidateSelectionBucket, List<RouteCandidate>> bucketSelections
+    ) {
+        return bucketSelections.entrySet().stream()
+                .collect(Collectors.toMap(
+                        entry -> entry.getKey().getDescription(),
+                        entry -> summarizeCandidatesWithScore(entry.getValue()),
+                        (left, right) -> left,
+                        java.util.LinkedHashMap::new
+                ));
+    }
+
+    private List<String> summarizeCandidatesWithScore(final List<RouteCandidate> candidates) {
+        return candidates.stream()
+                .limit(5)
+                .map(candidate -> candidate.getPlace().getName() + "=" + candidate.calculateFairnessScore())
+                .toList();
     }
 
     private List<Place> filterByRequirements(
@@ -442,16 +430,6 @@ public class RecommendationService {
     private record PlaceSearchResult(
             List<Place> searchedPlaces,
             Map<Place, CategorizedRecommendedPlaces> recommendedPlaces
-    ) {
-
-    }
-
-    private record CandidateSelection(
-            List<Place> selectedPlaces,
-            DispersionPolicy initialPolicy,
-            DispersionPolicy effectivePolicy,
-            long acceptableCount,
-            boolean fallbackToSortedCandidates
     ) {
 
     }
