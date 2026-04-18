@@ -9,6 +9,7 @@ public class Candidate {
     private final Routes routes;
     private final Courses courses;
     private final CategorizedRecommendedPlaces recommendedPlaces;
+    private final CandidateSelectionTag tag;
     private final String description;
     private final String reason;
     private final int votes;
@@ -18,6 +19,7 @@ public class Candidate {
             final Routes routes,
             final Courses courses,
             final CategorizedRecommendedPlaces recommendedPlaces,
+            final CandidateSelectionTag tag,
             final String description,
             final String reason,
             final int votes
@@ -27,6 +29,7 @@ public class Candidate {
         this.routes = routes;
         this.courses = courses;
         this.recommendedPlaces = recommendedPlaces;
+        this.tag = resolveTag(tag);
         this.description = description;
         this.reason = reason;
         this.votes = votes;
@@ -64,8 +67,22 @@ public class Candidate {
         }
     }
 
+    private CandidateSelectionTag resolveTag(final CandidateSelectionTag tag) {
+        if (tag == null) {
+            return CandidateSelectionTag.GENERAL;
+        }
+        return tag;
+    }
+
     public int calculateAverageTravelTime() {
         return routes.calculateAverageTravelTime();
+    }
+
+    public CandidateSelectionTag getTag() {
+        if (tag == null) {
+            return CandidateSelectionTag.GENERAL;
+        }
+        return tag;
     }
 
 }

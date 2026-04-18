@@ -22,12 +22,16 @@ public class Recommendation {
 
     private List<Candidate> sort(final List<Candidate> candidates) {
         return candidates.stream()
-                .sorted(Comparator.comparing(candidate -> candidate.getRoutes().calculateFairnessScore()))
+                .sorted(Comparator.comparing((Candidate candidate) -> candidate.getTag().ordinal())
+                        .thenComparing(candidate -> candidate.getRoutes().calculateFairnessScore()))
                 .toList();
     }
 
     public int getBestRecommendationTime() {
-        return candidates.getFirst().calculateAverageTravelTime();
+        return candidates.stream()
+                .mapToInt(Candidate::calculateAverageTravelTime)
+                .min()
+                .orElseThrow();
     }
 
     public int size() {

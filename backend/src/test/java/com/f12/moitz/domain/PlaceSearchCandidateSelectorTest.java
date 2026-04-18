@@ -13,7 +13,7 @@ class PlaceSearchCandidateSelectorTest {
 
     @Test
     @DisplayName("분산도가 큰 요청에서는 공평성 후보를 장소 검색 대상에 포함한다")
-    void select_IncludesFairnessBucketCandidateForDispersedRequest() {
+    void select_IncludesFairnessTagCandidateForDispersedRequest() {
         final Place start1 = place("수원역");
         final Place start2 = place("강동역");
         final Place start3 = place("숭의역");
@@ -31,12 +31,13 @@ class PlaceSearchCandidateSelectorTest {
                 5
         );
 
-        assertThat(result.getBucketSelections().keySet())
+        assertThat(result.getTagSelections().keySet())
                 .containsExactly(
-                        CandidateSelectionBucket.FAIRNESS,
-                        CandidateSelectionBucket.MAX_BURDEN_RELIEF,
-                        CandidateSelectionBucket.TRANSFER,
-                        CandidateSelectionBucket.EFFICIENCY
+                        CandidateSelectionTag.FAIRNESS,
+                        CandidateSelectionTag.MAX_BURDEN_RELIEF,
+                        CandidateSelectionTag.EFFICIENCY,
+                        CandidateSelectionTag.TRANSFER,
+                        CandidateSelectionTag.GENERAL
                 );
         assertThat(result.getSelectedPlaces())
                 .extracting(Place::getName)

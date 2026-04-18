@@ -40,7 +40,7 @@ class CandidateTest {
         final CategorizedRecommendedPlaces recommendedPlaces = new CategorizedRecommendedPlaces(categorizedRecommendedPlace);
 
         // When & Then
-        assertThatNoException().isThrownBy(() -> new Candidate(endPlace, routes, courses, recommendedPlaces, "123", "123", 0));
+        assertThatNoException().isThrownBy(() -> new Candidate(endPlace, routes, courses, recommendedPlaces, CandidateSelectionTag.GENERAL, "123", "123", 0));
     }
 
     @Test
@@ -70,25 +70,28 @@ class CandidateTest {
 
         // When & Then
         assertSoftly(softAssertions -> {
-            softAssertions.assertThatThrownBy(() -> new Candidate(null, routes, courses, recommendedPlaces, "123", "123", 0))
+            softAssertions.assertThatThrownBy(() -> new Candidate(null, routes, courses, recommendedPlaces, CandidateSelectionTag.GENERAL, "123", "123", 0))
                     .isInstanceOf(IllegalArgumentException.class)
                     .hasMessage("추천 지역은 필수입니다.");
 
-            softAssertions.assertThatThrownBy(() -> new Candidate(endPlace, null, courses, recommendedPlaces, "123", "123", 0))
+            softAssertions.assertThatThrownBy(() -> new Candidate(endPlace, null, courses, recommendedPlaces, CandidateSelectionTag.GENERAL, "123", "123", 0))
                     .isInstanceOf(IllegalArgumentException.class)
                     .hasMessage("경로 목록은 필수입니다.");
 
-            softAssertions.assertThatThrownBy(() -> new Candidate(endPlace, routes, null, recommendedPlaces, "123", "123", 0))
+            softAssertions.assertThatThrownBy(() -> new Candidate(endPlace, routes, null, recommendedPlaces, CandidateSelectionTag.GENERAL, "123", "123", 0))
                     .isInstanceOf(IllegalArgumentException.class)
                     .hasMessage("이동 코스 목록은 필수입니다.");
 
-            softAssertions.assertThatThrownBy(() -> new Candidate(endPlace, routes, courses, null, "123", "123", 0))
+            softAssertions.assertThatThrownBy(() -> new Candidate(endPlace, routes, courses, null, CandidateSelectionTag.GENERAL, "123", "123", 0))
                     .isInstanceOf(IllegalArgumentException.class)
                     .hasMessage("추천 장소 목록은 비어 있을 수 없습니다.");
 
-            softAssertions.assertThatThrownBy(() -> new Candidate(endPlace, routes, courses, new CategorizedRecommendedPlaces(Collections.emptyMap()), "123", "123", 0))
+            softAssertions.assertThatThrownBy(() -> new Candidate(endPlace, routes, courses, new CategorizedRecommendedPlaces(Collections.emptyMap()), CandidateSelectionTag.GENERAL, "123", "123", 0))
                     .isInstanceOf(IllegalArgumentException.class)
                     .hasMessage("추천 장소 목록은 비어 있을 수 없습니다.");
+
+            softAssertions.assertThat(new Candidate(endPlace, routes, courses, recommendedPlaces, null, "123", "123", 0).getTag())
+                    .isEqualTo(CandidateSelectionTag.GENERAL);
         });
     }
 
@@ -115,7 +118,7 @@ class CandidateTest {
         final RecommendedPlace recommendedPlace = new RecommendedPlace("스타벅스", DEFAULT_POINT, "카페", 5, "url","imageUrl");
         Map<RecommendCondition, List<RecommendedPlace>> categorizedRecommendedPlace = Map.of(RecommendCondition.CAFE, List.of(recommendedPlace));
         final CategorizedRecommendedPlaces recommendedPlaces = new CategorizedRecommendedPlaces(categorizedRecommendedPlace);
-        final Candidate candidate = new Candidate(endPlace, routes, courses, recommendedPlaces, "123", "123", 0);
+        final Candidate candidate = new Candidate(endPlace, routes, courses, recommendedPlaces, CandidateSelectionTag.GENERAL, "123", "123", 0);
 
         // When
         final int averageTravelTime = candidate.calculateAverageTravelTime();

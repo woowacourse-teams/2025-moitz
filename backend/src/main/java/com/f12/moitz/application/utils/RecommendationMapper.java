@@ -9,6 +9,7 @@ import com.f12.moitz.application.dto.RouteResponse;
 import com.f12.moitz.application.dto.StartingPlaceResponse;
 import com.f12.moitz.application.port.dto.ReasonAndDescription;
 import com.f12.moitz.domain.Candidate;
+import com.f12.moitz.domain.CandidateSelectionTag;
 import com.f12.moitz.domain.CategorizedRecommendedPlaces;
 import com.f12.moitz.domain.Course;
 import com.f12.moitz.domain.Courses;
@@ -61,6 +62,7 @@ public class RecommendationMapper {
             final Map<Place, CategorizedRecommendedPlaces> placeListMap,
             final Map<Place, Routes> placeRoutes,
             final Map<Place, Courses> placeCourses,
+            final Map<Place, CandidateSelectionTag> placeTags,
             final int votes,
             final List<RecommendCondition> recommendConditions
     ) {
@@ -82,6 +84,7 @@ public class RecommendationMapper {
                                 placeRoutes.get(place.getKey()),
                                 placeCourses.get(place.getKey()),
                                 placeListMap.get(place.getKey()),
+                                placeTags.getOrDefault(place.getKey(), CandidateSelectionTag.GENERAL),
                                 place.getValue().description(),
                                 place.getValue().reason(),
                                 votes
@@ -133,6 +136,8 @@ public class RecommendationMapper {
                 targetPlace.getName(),
                 totalTime,
                 totalTime == minTime,
+                candidate.getTag().name(),
+                candidate.getTag().getDescription(),
                 candidate.getDescription(),
                 candidate.getReason(),
                 recommendedPlaces,

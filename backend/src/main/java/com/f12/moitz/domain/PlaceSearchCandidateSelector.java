@@ -26,32 +26,32 @@ public class PlaceSearchCandidateSelector {
                     .toList();
 
             if (!acceptableCandidates.isEmpty()) {
-                final Map<CandidateSelectionBucket, List<RouteCandidate>> bucketSelections = selectBucketCandidates(
+                final Map<CandidateSelectionTag, List<RouteCandidate>> tagSelections = selectTagCandidates(
                         acceptableCandidates,
                         candidatePolicy
                 );
                 return new CandidateSelectionResult(
-                        mergeBucketCandidates(bucketSelections, acceptableCandidates, limit),
+                        mergeTagCandidates(tagSelections, acceptableCandidates, limit),
                         dispersionPolicy,
                         candidatePolicy,
                         acceptableCandidates.size(),
                         false,
-                        bucketSelections
+                        tagSelections
                 );
             }
         }
 
-        final Map<CandidateSelectionBucket, List<RouteCandidate>> bucketSelections = selectBucketCandidates(
+        final Map<CandidateSelectionTag, List<RouteCandidate>> tagSelections = selectTagCandidates(
                 sortedCandidates,
                 DispersionPolicy.TIER_5
         );
         return new CandidateSelectionResult(
-                mergeBucketCandidates(bucketSelections, sortedCandidates, limit),
+                mergeTagCandidates(tagSelections, sortedCandidates, limit),
                 dispersionPolicy,
                 DispersionPolicy.TIER_5,
                 0,
                 true,
-                bucketSelections
+                tagSelections
         );
     }
 
@@ -71,78 +71,82 @@ public class PlaceSearchCandidateSelector {
         }
     }
 
-    private Map<CandidateSelectionBucket, List<RouteCandidate>> selectBucketCandidates(
+    private Map<CandidateSelectionTag, List<RouteCandidate>> selectTagCandidates(
             final List<RouteCandidate> candidates,
             final DispersionPolicy dispersionPolicy
     ) {
-        final Map<CandidateSelectionBucket, Integer> bucketQuotas = resolveBucketQuotas(dispersionPolicy);
-        final Map<CandidateSelectionBucket, List<RouteCandidate>> bucketSelections = new LinkedHashMap<>();
+        final Map<CandidateSelectionTag, Integer> tagQuotas = resolveTagQuotas(dispersionPolicy);
+        final Map<CandidateSelectionTag, List<RouteCandidate>> tagSelections = new LinkedHashMap<>();
 
-        bucketQuotas.forEach((bucket, quota) -> bucketSelections.put(
-                bucket,
+        tagQuotas.forEach((tag, quota) -> tagSelections.put(
+                tag,
                 candidates.stream()
-                        .sorted(routeCandidateComparators.getByBucket(bucket))
+                        .sorted(routeCandidateComparators.getByTag(tag))
                         .limit(quota)
                         .toList()
         ));
-        return bucketSelections;
+        return tagSelections;
     }
 
-    private Map<CandidateSelectionBucket, Integer> resolveBucketQuotas(final DispersionPolicy dispersionPolicy) {
+    private Map<CandidateSelectionTag, Integer> resolveTagQuotas(final DispersionPolicy dispersionPolicy) {
         return switch (dispersionPolicy) {
-            case TIER_1, TIER_2 -> createBucketQuotas(List.of(
-                    CandidateSelectionBucket.EFFICIENCY,
-                    CandidateSelectionBucket.FAIRNESS,
-                    CandidateSelectionBucket.MAX_BURDEN_RELIEF,
-                    CandidateSelectionBucket.TRANSFER
-            ), 12, 7, 6, 5);
-            case TIER_3 -> createBucketQuotas(List.of(
-                    CandidateSelectionBucket.FAIRNESS,
-                    CandidateSelectionBucket.EFFICIENCY,
-                    CandidateSelectionBucket.MAX_BURDEN_RELIEF,
-                    CandidateSelectionBucket.TRANSFER
-            ), 9, 9, 7, 5);
-            case TIER_4, TIER_5 -> createBucketQuotas(List.of(
-                    CandidateSelectionBucket.FAIRNESS,
-                    CandidateSelectionBucket.MAX_BURDEN_RELIEF,
-                    CandidateSelectionBucket.TRANSFER,
-                    CandidateSelectionBucket.EFFICIENCY
-            ), 12, 7, 5, 6);
+            case TIER_1, TIER_2 -> createTagQuotas(List.of(
+                    CandidateSelectionTag.FAIRNESS,
+                    CandidateSelectionTag.MAX_BURDEN_RELIEF,
+                    CandidateSelectionTag.EFFICIENCY,
+                    CandidateSelectionTag.TRANSFER,
+                    CandidateSelectionTag.GENERAL
+            ), 7, 6, 12, 5, 5);
+            case TIER_3 -> createTagQuotas(List.of(
+                    CandidateSelectionTag.FAIRNESS,
+                    CandidateSelectionTag.MAX_BURDEN_RELIEF,
+                    CandidateSelectionTag.EFFICIENCY,
+                    CandidateSelectionTag.TRANSFER,
+                    CandidateSelectionTag.GENERAL
+            ), 9, 7, 9, 5, 5);
+            case TIER_4, TIER_5 -> createTagQuotas(List.of(
+                    CandidateSelectionTag.FAIRNESS,
+                    CandidateSelectionTag.MAX_BURDEN_RELIEF,
+                    CandidateSelectionTag.EFFICIENCY,
+                    CandidateSelectionTag.TRANSFER,
+                    CandidateSelectionTag.GENERAL
+            ), 12, 7, 6, 5, 5);
         };
     }
 
-    private Map<CandidateSelectionBucket, Integer> createBucketQuotas(
-            final List<CandidateSelectionBucket> bucketOrder,
+    private Map<CandidateSelectionTag, Integer> createTagQuotas(
+            final List<CandidateSelectionTag> tagOrder,
             final int firstQuota,
             final int secondQuota,
             final int thirdQuota,
-            final int fourthQuota
+            final int fourthQuota,
+            final int fifthQuota
     ) {
-        final List<Integer> quotas = List.of(firstQuota, secondQuota, thirdQuota, fourthQuota);
-        final Map<CandidateSelectionBucket, Integer> bucketQuotas = new LinkedHashMap<>();
-        for (int index = 0; index < bucketOrder.size(); index++) {
-            bucketQuotas.put(bucketOrder.get(index), quotas.get(index));
+        final List<Integer> quotas = List.of(firstQuota, secondQuota, thirdQuota, fourthQuota, fifthQuota);
+        final Map<CandidateSelectionTag, Integer> tagQuotas = new LinkedHashMap<>();
+        for (int index = 0; index < tagOrder.size(); index++) {
+            tagQuotas.put(tagOrder.get(index), quotas.get(index));
         }
-        return bucketQuotas;
+        return tagQuotas;
     }
 
-    private List<RouteCandidate> mergeBucketCandidates(
-            final Map<CandidateSelectionBucket, List<RouteCandidate>> bucketSelections,
+    private List<RouteCandidate> mergeTagCandidates(
+            final Map<CandidateSelectionTag, List<RouteCandidate>> tagSelections,
             final List<RouteCandidate> fallbackCandidates,
             final int limit
     ) {
         final Map<String, RouteCandidate> selectedCandidates = new LinkedHashMap<>();
-        final int maxBucketSize = bucketSelections.values().stream()
+        final int maxTagSize = tagSelections.values().stream()
                 .mapToInt(List::size)
                 .max()
                 .orElse(0);
 
-        for (int index = 0; index < maxBucketSize && selectedCandidates.size() < limit; index++) {
-            for (List<RouteCandidate> bucketCandidates : bucketSelections.values()) {
-                if (index >= bucketCandidates.size()) {
+        for (int index = 0; index < maxTagSize && selectedCandidates.size() < limit; index++) {
+            for (List<RouteCandidate> tagCandidates : tagSelections.values()) {
+                if (index >= tagCandidates.size()) {
                     continue;
                 }
-                final RouteCandidate candidate = bucketCandidates.get(index);
+                final RouteCandidate candidate = tagCandidates.get(index);
                 selectedCandidates.putIfAbsent(candidate.getPlace().getName(), candidate);
                 if (selectedCandidates.size() >= limit) {
                     break;

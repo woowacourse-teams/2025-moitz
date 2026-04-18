@@ -15,7 +15,7 @@ public class CandidateSelectionResult {
     private final DispersionPolicy effectivePolicy;
     private final long acceptableCount;
     private final boolean fallbackToSortedCandidates;
-    private final Map<CandidateSelectionBucket, List<RouteCandidate>> bucketSelections;
+    private final Map<CandidateSelectionTag, List<RouteCandidate>> tagSelections;
 
     public CandidateSelectionResult(
             final List<RouteCandidate> selectedCandidates,
@@ -23,20 +23,20 @@ public class CandidateSelectionResult {
             final DispersionPolicy effectivePolicy,
             final long acceptableCount,
             final boolean fallbackToSortedCandidates,
-            final Map<CandidateSelectionBucket, List<RouteCandidate>> bucketSelections
+            final Map<CandidateSelectionTag, List<RouteCandidate>> tagSelections
     ) {
         this.selectedCandidates = List.copyOf(selectedCandidates);
         this.initialPolicy = initialPolicy;
         this.effectivePolicy = effectivePolicy;
         this.acceptableCount = acceptableCount;
         this.fallbackToSortedCandidates = fallbackToSortedCandidates;
-        this.bucketSelections = copyBucketSelections(bucketSelections);
+        this.tagSelections = copyTagSelections(tagSelections);
     }
 
-    private Map<CandidateSelectionBucket, List<RouteCandidate>> copyBucketSelections(
-            final Map<CandidateSelectionBucket, List<RouteCandidate>> bucketSelections
+    private Map<CandidateSelectionTag, List<RouteCandidate>> copyTagSelections(
+            final Map<CandidateSelectionTag, List<RouteCandidate>> tagSelections
     ) {
-        return Collections.unmodifiableMap(bucketSelections.entrySet().stream()
+        return Collections.unmodifiableMap(tagSelections.entrySet().stream()
                 .collect(Collectors.toMap(
                         Map.Entry::getKey,
                         entry -> List.copyOf(entry.getValue()),

@@ -162,7 +162,11 @@ class RecommendationServiceTest {
         assertThat(savedResult.getRecommendedLocations().getCandidates().stream()
                 .map(recommendedLocation -> recommendedLocation.getDestination().getName())
                 .collect(Collectors.toList()))
-                .containsExactly("선릉역", "삼성역");
+                .containsExactly("삼성역", "선릉역");
+        assertThat(savedResult.getRecommendedLocations().getCandidates().stream()
+                .map(recommendedLocation -> recommendedLocation.getTag().name())
+                .collect(Collectors.toList()))
+                .containsExactly("FAIRNESS", "MAX_BURDEN_RELIEF");
     }
 
     @Test

@@ -4,17 +4,18 @@ import java.util.Comparator;
 
 public class RouteCandidateComparators {
 
-    public Comparator<RouteCandidate> getByBucket(final CandidateSelectionBucket bucket) {
-        return switch (bucket) {
+    public Comparator<RouteCandidate> getByTag(final CandidateSelectionTag tag) {
+        return switch (tag) {
             case EFFICIENCY -> byEfficiency();
             case FAIRNESS -> byFairness();
             case MAX_BURDEN_RELIEF -> byMaxBurdenRelief();
             case TRANSFER -> byTransfer();
+            case GENERAL -> byGeneral();
         };
     }
 
     private Comparator<RouteCandidate> byEfficiency() {
-                return Comparator.comparingInt((RouteCandidate candidate) -> candidate.calculateFairnessScore()
+        return Comparator.comparingInt((RouteCandidate candidate) -> candidate.calculateFairnessScore()
                         .getAverageTravelTime())
                 .thenComparingInt(candidate -> candidate.calculateFairnessScore().getMaxTravelTime())
                 .thenComparing(RouteCandidate::calculateFairnessScore);
@@ -40,6 +41,10 @@ public class RouteCandidateComparators {
                 .thenComparingInt(candidate -> candidate.calculateFairnessScore().getTransferDiff())
                 .thenComparing(RouteCandidate::calculateFairnessScore)
                 .thenComparingInt(candidate -> candidate.calculateFairnessScore().getMaxTravelTime());
+    }
+
+    private Comparator<RouteCandidate> byGeneral() {
+        return Comparator.comparing(RouteCandidate::calculateFairnessScore);
     }
 
 }
