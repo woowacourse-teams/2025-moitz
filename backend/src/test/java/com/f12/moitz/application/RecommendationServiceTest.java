@@ -3,6 +3,7 @@ package com.f12.moitz.application;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.times;
@@ -88,7 +89,8 @@ class RecommendationServiceTest {
 
         final SubwayStation seolleung = new SubwayStation("선릉역", new Point(127.048, 37.504));
         final SubwayStation samsung = new SubwayStation("삼성역", new Point(127.063, 37.508));
-        given(subwayStationService.getAll()).willReturn(List.of(gangnam, yeoksam, seolleung, samsung));
+        given(subwayStationService.generateCandidatePlace(anyList(), anyInt()))
+                .willReturn(List.of(gangnam, yeoksam, seolleung, samsung));
 
         Map<Place, CategorizedRecommendedPlaces> mockRecommendedPlaces = Map.of(
                 seolleung, new CategorizedRecommendedPlaces(
@@ -179,7 +181,8 @@ class RecommendationServiceTest {
 
         given(subwayStationService.findByName("강남역")).willReturn(Optional.of(gangnam));
         given(subwayStationService.findByName("역삼역")).willReturn(Optional.of(yeoksam));
-        given(subwayStationService.getAll()).willReturn(List.of(gangnam, yeoksam, seolleung));
+        given(subwayStationService.generateCandidatePlace(anyList(), anyInt()))
+                .willReturn(List.of(gangnam, yeoksam, seolleung));
 
         given(routeFinder.findRoutes(anyList())).willReturn(
                 List.of(new Route(List.of(new Path(gangnam, yeoksam, TravelMethod.SUBWAY, 2 * 60, SubwayLine.fromTitle("2호선"))))),

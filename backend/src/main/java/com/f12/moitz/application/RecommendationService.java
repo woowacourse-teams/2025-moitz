@@ -85,7 +85,7 @@ public class RecommendationService {
         final List<RecommendCondition> recommendConditions = RecommendCondition.fromTitle(request.requirements());
         final List<SubwayStation> startingPlaces = getByNames(request.startingPlaceNames());
         final DispersionPolicy dispersionPolicy = resolveDispersionPolicy(startingPlaces);
-        final List<Place> candidatePlaces = getAllCandidatePlaces(startingPlaces);
+        final List<Place> candidatePlaces = getCandidatePlaces(startingPlaces, dispersionPolicy);
         final List<StartEndPair> candidatePairs = createPairs(startingPlaces, candidatePlaces);
         final Map<Place, Routes> candidateRoutes = findRoutesForAll(candidatePairs);
         final CandidateSelectionResult candidateSelection = placeSearchCandidateSelector.select(
@@ -182,12 +182,36 @@ public class RecommendationService {
                 .toList();
     }
 
-    private List<Place> getAllCandidatePlaces(final List<SubwayStation> startingPlaces) {
+    private List<Place> getCandidatePlaces(
+            final List<SubwayStation> startingPlaces,
+            final DispersionPolicy dispersionPolicy
+    ) {
+        final int radiusKilometers = resolveCandidatePrefilterRadius(dispersionPolicy);
         final List<String> startingPlaceNames = getPlaceNames(startingPlaces);
-        return subwayStationService.getAll().stream()
+        final List<Place> candidatePlaces = subwayStationService.generateCandidatePlace(
+                        startingPlaces,
+                        radiusKilometers
+                ).stream()
                 .filter(place -> !startingPlaceNames.contains(place.getName()))
                 .map(Place.class::cast)
                 .toList();
+
+        log.debug(
+                "후보역 1차 필터 완료 - policy={}, radius={}km, 후보 {}개",
+                dispersionPolicy,
+                radiusKilometers,
+                candidatePlaces.size()
+        );
+        return candidatePlaces;
+    }
+
+    private int resolveCandidatePrefilterRadius(final DispersionPolicy dispersionPolicy) {
+        return switch (dispersionPolicy) {
+            case TIER_1, TIER_2 -> 10;
+            case TIER_3 -> 20;
+            case TIER_4 -> 30;
+            case TIER_5 -> 40;
+        };
     }
 
     private List<StartEndPair> createPairs(

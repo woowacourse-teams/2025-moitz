@@ -69,6 +69,13 @@ public class SubwayStationService {
     }
 
     public List<SubwayStation> generateCandidatePlace(final List<SubwayStation> startingStations) {
+        return generateCandidatePlace(startingStations, DISTANCE_VALUE);
+    }
+
+    public List<SubwayStation> generateCandidatePlace(
+            final List<SubwayStation> startingStations,
+            final int distanceValue
+    ) {
         final List<SubwayStationEntity> stationEntities = startingStations.stream()
                 .map(SubwayStationEntity::fromSubwayStation)
                 .toList();
@@ -76,7 +83,7 @@ public class SubwayStationService {
         final Coordinate[] coordinateArr = getCoordinates(stationEntities);
 
         final org.springframework.data.geo.Point center = getCenterPoint(coordinateArr);
-        final Distance distance = new Distance(DISTANCE_VALUE, Metrics.KILOMETERS);
+        final Distance distance = new Distance(distanceValue, Metrics.KILOMETERS);
 
         return subwayStationRepository.findByPointNear(center, distance).stream()
                 .map(SubwayStationEntity::toSubwayStation)
