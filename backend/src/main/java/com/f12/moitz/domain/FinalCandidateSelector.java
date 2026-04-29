@@ -3,6 +3,7 @@ package com.f12.moitz.domain;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -16,14 +17,16 @@ public class FinalCandidateSelector {
             final Predicate<Place> placeCondition,
             final int limit
     ) {
-        final Map<CandidateSelectionTag, Place> taggedPlaces = selectTaggedPlaces(
+        final TaggedPlaceSelection taggedPlaceSelection = selectTaggedPlaces(
                 candidateSelectionResult,
                 searchedPlaces,
                 placeCondition
         );
-        final List<Place> selectedPlaces = new ArrayList<>(taggedPlaces.values());
+        final List<Place> selectedPlaces = new ArrayList<>(taggedPlaceSelection.selectedPlaces());
         final Set<String> selectedPlaceNames = toPlaceNames(selectedPlaces);
-        final Map<Place, CandidateSelectionTag> tagsByPlace = createTagsByPlace(taggedPlaces);
+        final Map<Place, List<CandidateSelectionTag>> tagsByPlace = new LinkedHashMap<>(
+                taggedPlaceSelection.tagsByPlace()
+        );
 
         for (Place place : searchedPlaces) {
             if (selectedPlaces.size() >= limit) {
@@ -34,7 +37,7 @@ public class FinalCandidateSelector {
             }
             selectedPlaces.add(place);
             selectedPlaceNames.add(place.getName());
-            tagsByPlace.put(place, CandidateSelectionTag.GENERAL);
+            tagsByPlace.put(place, List.of(CandidateSelectionTag.GENERAL));
         }
 
         final List<Place> limitedSelectedPlaces = selectedPlaces.stream()
@@ -56,7 +59,7 @@ public class FinalCandidateSelector {
                 candidateSelectionResult,
                 searchedPlaces,
                 placeCondition
-        );
+        ).selectedByTag();
         final Set<String> searchedPlaceNames = toPlaceNames(searchedPlaces);
         final Set<String> selectedPlaceNames = toPlaceNames(new ArrayList<>(selectedByTag.values()));
         final Map<String, Place> nextSearchPlaces = new LinkedHashMap<>();
@@ -97,7 +100,7 @@ public class FinalCandidateSelector {
                 .toList();
     }
 
-    private Map<CandidateSelectionTag, Place> selectTaggedPlaces(
+    private TaggedPlaceSelection selectTaggedPlaces(
             final CandidateSelectionResult candidateSelectionResult,
             final List<Place> searchedPlaces,
             final Predicate<Place> placeCondition
@@ -105,38 +108,60 @@ public class FinalCandidateSelector {
         final Set<String> searchedPlaceNames = toPlaceNames(searchedPlaces);
         final Set<String> selectedPlaceNames = new HashSet<>();
         final Map<CandidateSelectionTag, Place> selectedByTag = new LinkedHashMap<>();
+        final Map<Place, Set<CandidateSelectionTag>> tagsByPlace = new LinkedHashMap<>();
 
         for (CandidateSelectionTag tag : CandidateSelectionTag.values()) {
             final List<RouteCandidate> tagCandidates = candidateSelectionResult.getTagSelections()
                     .getOrDefault(tag, List.of());
             for (RouteCandidate candidate : tagCandidates) {
                 final Place place = candidate.getPlace();
-                if (!searchedPlaceNames.contains(place.getName())
-                        || selectedPlaceNames.contains(place.getName())
-                        || !placeCondition.test(place)) {
+                if (!searchedPlaceNames.contains(place.getName()) || !placeCondition.test(place)) {
+                    continue;
+                }
+                if (selectedPlaceNames.contains(place.getName())) {
+                    addTag(tagsByPlace, place, tag);
                     continue;
                 }
                 selectedByTag.put(tag, place);
                 selectedPlaceNames.add(place.getName());
+                addTag(tagsByPlace, place, tag);
                 break;
             }
         }
 
-        return selectedByTag;
+        return new TaggedPlaceSelection(
+                new ArrayList<>(selectedByTag.values()),
+                selectedByTag,
+                copyTagsByPlace(tagsByPlace)
+        );
     }
 
-    private Map<Place, CandidateSelectionTag> createTagsByPlace(final Map<CandidateSelectionTag, Place> taggedPlaces) {
-        final Map<Place, CandidateSelectionTag> tagsByPlace = new LinkedHashMap<>();
-        taggedPlaces.forEach((tag, place) -> tagsByPlace.put(place, tag));
-        return tagsByPlace;
+    private void addTag(
+            final Map<Place, Set<CandidateSelectionTag>> tagsByPlace,
+            final Place place,
+            final CandidateSelectionTag tag
+    ) {
+        tagsByPlace.computeIfAbsent(place, ignored -> new LinkedHashSet<>())
+                .add(tag);
     }
 
-    private Map<Place, CandidateSelectionTag> filterTagsBySelectedPlaces(
-            final Map<Place, CandidateSelectionTag> tagsByPlace,
+    private Map<Place, List<CandidateSelectionTag>> copyTagsByPlace(
+            final Map<Place, Set<CandidateSelectionTag>> tagsByPlace
+    ) {
+        final Map<Place, List<CandidateSelectionTag>> copiedTagsByPlace = new LinkedHashMap<>();
+        tagsByPlace.forEach((place, tags) -> copiedTagsByPlace.put(place, List.copyOf(tags)));
+        return copiedTagsByPlace;
+    }
+
+    private Map<Place, List<CandidateSelectionTag>> filterTagsBySelectedPlaces(
+            final Map<Place, List<CandidateSelectionTag>> tagsByPlace,
             final List<Place> selectedPlaces
     ) {
-        final Map<Place, CandidateSelectionTag> filteredTagsByPlace = new LinkedHashMap<>();
-        selectedPlaces.forEach(place -> filteredTagsByPlace.put(place, tagsByPlace.get(place)));
+        final Map<Place, List<CandidateSelectionTag>> filteredTagsByPlace = new LinkedHashMap<>();
+        selectedPlaces.forEach(place -> filteredTagsByPlace.put(
+                place,
+                tagsByPlace.getOrDefault(place, List.of(CandidateSelectionTag.GENERAL))
+        ));
         return filteredTagsByPlace;
     }
 
@@ -144,6 +169,14 @@ public class FinalCandidateSelector {
         final Set<String> placeNames = new HashSet<>();
         places.forEach(place -> placeNames.add(place.getName()));
         return placeNames;
+    }
+
+    private record TaggedPlaceSelection(
+            List<Place> selectedPlaces,
+            Map<CandidateSelectionTag, Place> selectedByTag,
+            Map<Place, List<CandidateSelectionTag>> tagsByPlace
+    ) {
+
     }
 
 }

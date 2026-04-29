@@ -11,25 +11,31 @@ import lombok.Getter;
 public class FinalCandidateSelectionResult {
 
     private final List<Place> selectedPlaces;
-    private final Map<Place, CandidateSelectionTag> tagsByPlace;
+    private final Map<Place, List<CandidateSelectionTag>> tagsByPlace;
 
     public FinalCandidateSelectionResult(
             final List<Place> selectedPlaces,
-            final Map<Place, CandidateSelectionTag> tagsByPlace
+            final Map<Place, List<CandidateSelectionTag>> tagsByPlace
     ) {
         this.selectedPlaces = List.copyOf(selectedPlaces);
         this.tagsByPlace = copyTagsByPlace(tagsByPlace);
     }
 
     public CandidateSelectionTag getTag(final Place place) {
-        return tagsByPlace.getOrDefault(place, CandidateSelectionTag.GENERAL);
+        return getTags(place).get(0);
     }
 
-    private Map<Place, CandidateSelectionTag> copyTagsByPlace(final Map<Place, CandidateSelectionTag> tagsByPlace) {
+    public List<CandidateSelectionTag> getTags(final Place place) {
+        return tagsByPlace.getOrDefault(place, List.of(CandidateSelectionTag.GENERAL));
+    }
+
+    private Map<Place, List<CandidateSelectionTag>> copyTagsByPlace(
+            final Map<Place, List<CandidateSelectionTag>> tagsByPlace
+    ) {
         return Collections.unmodifiableMap(tagsByPlace.entrySet().stream()
                 .collect(Collectors.toMap(
                         Map.Entry::getKey,
-                        Map.Entry::getValue,
+                        entry -> List.copyOf(entry.getValue()),
                         (left, right) -> left,
                         LinkedHashMap::new
                 )));

@@ -1,5 +1,6 @@
 package com.f12.moitz.domain;
 
+import java.util.List;
 import lombok.Getter;
 
 @Getter
@@ -9,7 +10,7 @@ public class Candidate {
     private final Routes routes;
     private final Courses courses;
     private final CategorizedRecommendedPlaces recommendedPlaces;
-    private final CandidateSelectionTag tag;
+    private final List<CandidateSelectionTag> tags;
     private final String description;
     private final String reason;
     private final int votes;
@@ -24,12 +25,25 @@ public class Candidate {
             final String reason,
             final int votes
     ) {
+        this(destination, routes, courses, recommendedPlaces, List.of(resolveNullableTag(tag)), description, reason, votes);
+    }
+
+    public Candidate(
+            final Place destination,
+            final Routes routes,
+            final Courses courses,
+            final CategorizedRecommendedPlaces recommendedPlaces,
+            final List<CandidateSelectionTag> tags,
+            final String description,
+            final String reason,
+            final int votes
+    ) {
         validate(destination, routes, courses, recommendedPlaces, description, reason, votes);
         this.destination = destination;
         this.routes = routes;
         this.courses = courses;
         this.recommendedPlaces = recommendedPlaces;
-        this.tag = resolveTag(tag);
+        this.tags = resolveTags(tags);
         this.description = description;
         this.reason = reason;
         this.votes = votes;
@@ -67,11 +81,25 @@ public class Candidate {
         }
     }
 
-    private CandidateSelectionTag resolveTag(final CandidateSelectionTag tag) {
+    private static CandidateSelectionTag resolveNullableTag(final CandidateSelectionTag tag) {
         if (tag == null) {
             return CandidateSelectionTag.GENERAL;
         }
         return tag;
+    }
+
+    private List<CandidateSelectionTag> resolveTags(final List<CandidateSelectionTag> tags) {
+        if (tags == null || tags.isEmpty()) {
+            return List.of(CandidateSelectionTag.GENERAL);
+        }
+        final List<CandidateSelectionTag> resolvedTags = tags.stream()
+                .map(Candidate::resolveNullableTag)
+                .distinct()
+                .toList();
+        if (resolvedTags.isEmpty()) {
+            return List.of(CandidateSelectionTag.GENERAL);
+        }
+        return resolvedTags;
     }
 
     public int calculateAverageTravelTime() {
@@ -79,10 +107,7 @@ public class Candidate {
     }
 
     public CandidateSelectionTag getTag() {
-        if (tag == null) {
-            return CandidateSelectionTag.GENERAL;
-        }
-        return tag;
+        return tags.get(0);
     }
 
 }

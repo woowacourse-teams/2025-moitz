@@ -14,8 +14,8 @@ class FinalCandidateSelectorTest {
     private final FinalCandidateSelector finalCandidateSelector = new FinalCandidateSelector();
 
     @Test
-    @DisplayName("최종 후보는 태그 순서대로 선택하고 이미 선택된 후보는 다음 태그가 가져가지 않는다")
-    void select_AssignsCandidatesByTagOrderWithoutDuplication() {
+    @DisplayName("최종 후보는 역 기준으로 중복 제거하고 선택된 후보가 속한 태그를 모두 부여한다")
+    void select_AssignsAllMatchedTagsWithoutDuplicatingPlaces() {
         final RouteCandidate shared = routeCandidate("공통후보역");
         final RouteCandidate maxBurden = routeCandidate("최장후보역");
         final RouteCandidate efficiency = routeCandidate("평균후보역");
@@ -41,11 +41,11 @@ class FinalCandidateSelectorTest {
                 .extracting(Place::getName)
                 .containsExactly("공통후보역", "최장후보역", "평균후보역", "환승후보역", "일반후보역");
         assertThat(selectionResult.getTagsByPlace())
-                .containsEntry(shared.getPlace(), CandidateSelectionTag.FAIRNESS)
-                .containsEntry(maxBurden.getPlace(), CandidateSelectionTag.MAX_BURDEN_RELIEF)
-                .containsEntry(efficiency.getPlace(), CandidateSelectionTag.EFFICIENCY)
-                .containsEntry(transfer.getPlace(), CandidateSelectionTag.TRANSFER)
-                .containsEntry(general.getPlace(), CandidateSelectionTag.GENERAL);
+                .containsEntry(shared.getPlace(), List.of(CandidateSelectionTag.FAIRNESS, CandidateSelectionTag.EFFICIENCY))
+                .containsEntry(maxBurden.getPlace(), List.of(CandidateSelectionTag.MAX_BURDEN_RELIEF))
+                .containsEntry(efficiency.getPlace(), List.of(CandidateSelectionTag.EFFICIENCY))
+                .containsEntry(transfer.getPlace(), List.of(CandidateSelectionTag.TRANSFER))
+                .containsEntry(general.getPlace(), List.of(CandidateSelectionTag.GENERAL));
     }
 
     @Test
@@ -74,6 +74,8 @@ class FinalCandidateSelectorTest {
                 .containsExactly("대체후보역");
         assertThat(selectionResult.getTag(nextFairness.getPlace()))
                 .isEqualTo(CandidateSelectionTag.FAIRNESS);
+        assertThat(selectionResult.getTags(nextFairness.getPlace()))
+                .containsExactly(CandidateSelectionTag.FAIRNESS);
     }
 
     @Test

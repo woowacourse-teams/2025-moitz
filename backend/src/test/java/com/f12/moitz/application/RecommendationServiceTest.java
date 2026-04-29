@@ -166,9 +166,14 @@ class RecommendationServiceTest {
                 .collect(Collectors.toList()))
                 .containsExactly("삼성역", "선릉역");
         assertThat(savedResult.getRecommendedLocations().getCandidates().stream()
-                .map(recommendedLocation -> recommendedLocation.getTag().name())
+                .map(recommendedLocation -> recommendedLocation.getTags().stream()
+                        .map(Enum::name)
+                        .toList())
                 .collect(Collectors.toList()))
-                .containsExactly("FAIRNESS", "MAX_BURDEN_RELIEF");
+                .containsExactly(
+                        List.of("FAIRNESS", "EFFICIENCY", "TRANSFER", "GENERAL"),
+                        List.of("MAX_BURDEN_RELIEF", "EFFICIENCY", "TRANSFER", "GENERAL")
+                );
     }
 
     @Test

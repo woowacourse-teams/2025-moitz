@@ -90,9 +90,64 @@ class CandidateTest {
                     .isInstanceOf(IllegalArgumentException.class)
                     .hasMessage("추천 장소 목록은 비어 있을 수 없습니다.");
 
-            softAssertions.assertThat(new Candidate(endPlace, routes, courses, recommendedPlaces, null, "123", "123", 0).getTag())
+            softAssertions.assertThat(new Candidate(
+                            endPlace,
+                            routes,
+                            courses,
+                            recommendedPlaces,
+                            (CandidateSelectionTag) null,
+                            "123",
+                            "123",
+                            0
+                    ).getTag())
                     .isEqualTo(CandidateSelectionTag.GENERAL);
+            softAssertions.assertThat(new Candidate(
+                            endPlace,
+                            routes,
+                            courses,
+                            recommendedPlaces,
+                            (CandidateSelectionTag) null,
+                            "123",
+                            "123",
+                            0
+                    ).getTags())
+                    .containsExactly(CandidateSelectionTag.GENERAL);
         });
+    }
+
+    @Test
+    @DisplayName("후보는 여러 추천 태그를 가질 수 있다")
+    void createWithMultipleTags() {
+        final Place startPlace = new Place("잠실역", new Point(127.0, 37.0));
+        final Place endPlace = new Place("강남역", new Point(127.2, 37.2));
+        final Route route = new Route(List.of(new Path(
+                startPlace,
+                endPlace,
+                TravelMethod.SUBWAY,
+                600,
+                SubwayLine.fromTitle("2호선")
+        )));
+        final Routes routes = new Routes(List.of(route));
+        final Courses courses = new Courses(List.of(new Course(List.of(startPlace.getPoint(), endPlace.getPoint()))));
+        final RecommendedPlace recommendedPlace = new RecommendedPlace("스타벅스", DEFAULT_POINT, "카페", 5, "url", "imageUrl");
+        final CategorizedRecommendedPlaces recommendedPlaces = new CategorizedRecommendedPlaces(
+                Map.of(RecommendCondition.CAFE, List.of(recommendedPlace))
+        );
+
+        final Candidate candidate = new Candidate(
+                endPlace,
+                routes,
+                courses,
+                recommendedPlaces,
+                List.of(CandidateSelectionTag.FAIRNESS, CandidateSelectionTag.EFFICIENCY),
+                "123",
+                "123",
+                0
+        );
+
+        assertThat(candidate.getTags())
+                .containsExactly(CandidateSelectionTag.FAIRNESS, CandidateSelectionTag.EFFICIENCY);
+        assertThat(candidate.getTag()).isEqualTo(CandidateSelectionTag.FAIRNESS);
     }
 
     @Test

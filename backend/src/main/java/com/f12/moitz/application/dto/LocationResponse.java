@@ -21,10 +21,10 @@ public record LocationResponse(
         int avgMinutes,
         @Schema(description = "최적의 추천 여부", example = "true", requiredMode = Schema.RequiredMode.REQUIRED)
         boolean isBest,
-        @Schema(description = "추천 태그 코드", example = "FAIRNESS", requiredMode = Schema.RequiredMode.REQUIRED)
-        String tag,
-        @Schema(description = "추천 태그 설명", example = "이동시간 편차 최소", requiredMode = Schema.RequiredMode.REQUIRED)
-        String tagDescription,
+        @Schema(description = "추천 태그 코드 목록", example = "[\"FAIRNESS\", \"EFFICIENCY\"]", requiredMode = Schema.RequiredMode.REQUIRED)
+        List<String> tags,
+        @Schema(description = "추천 태그 설명 목록", example = "[\"이동 시간이 고르게 분포한 추천\", \"전체 평균 이동 시간이 짧은 추천\"]", requiredMode = Schema.RequiredMode.REQUIRED)
+        List<String> tagDescriptions,
         @Schema(description = "AI 추천 한 마디", example = "역세권, 편의시설 풍부! \uD83D\uDC4D\uD83D\uDE0B", requiredMode = Schema.RequiredMode.REQUIRED)
         String description,
         @Schema(description = "지역 추천 이유", example = "유명한 곱창집이 있고, 전체적으로 환승을 하지 않는 최적의 지역입니다!", requiredMode = Schema.RequiredMode.REQUIRED)
@@ -86,5 +86,37 @@ public record LocationResponse(
         @Schema(description = "각 출발지로부터 이동 경로", requiredMode = Schema.RequiredMode.REQUIRED)
         List<RouteResponse> routes
 ) {
+
+    public LocationResponse(
+            final Long id,
+            final int index,
+            final double y,
+            final double x,
+            final String name,
+            final int avgMinutes,
+            final boolean isBest,
+            final String tag,
+            final String tagDescription,
+            final String description,
+            final String reason,
+            final Map<RecommendCondition, List<PlaceRecommendResponse>> places,
+            final List<RouteResponse> routes
+    ) {
+        this(
+                id,
+                index,
+                y,
+                x,
+                name,
+                avgMinutes,
+                isBest,
+                List.of(tag),
+                List.of(tagDescription),
+                description,
+                reason,
+                places,
+                routes
+        );
+    }
 
 }

@@ -62,7 +62,7 @@ public class RecommendationMapper {
             final Map<Place, CategorizedRecommendedPlaces> placeListMap,
             final Map<Place, Routes> placeRoutes,
             final Map<Place, Courses> placeCourses,
-            final Map<Place, CandidateSelectionTag> placeTags,
+            final Map<Place, List<CandidateSelectionTag>> placeTags,
             final int votes,
             final List<RecommendCondition> recommendConditions
     ) {
@@ -84,7 +84,7 @@ public class RecommendationMapper {
                                 placeRoutes.get(place.getKey()),
                                 placeCourses.get(place.getKey()),
                                 placeListMap.get(place.getKey()),
-                                placeTags.getOrDefault(place.getKey(), CandidateSelectionTag.GENERAL),
+                                placeTags.getOrDefault(place.getKey(), List.of(CandidateSelectionTag.GENERAL)),
                                 place.getValue().description(),
                                 place.getValue().reason(),
                                 votes
@@ -136,8 +136,12 @@ public class RecommendationMapper {
                 targetPlace.getName(),
                 totalTime,
                 totalTime == minTime,
-                candidate.getTag().name(),
-                candidate.getTag().getDescription(),
+                candidate.getTags().stream()
+                        .map(CandidateSelectionTag::name)
+                        .toList(),
+                candidate.getTags().stream()
+                        .map(CandidateSelectionTag::getDescription)
+                        .toList(),
                 candidate.getDescription(),
                 candidate.getReason(),
                 recommendedPlaces,
