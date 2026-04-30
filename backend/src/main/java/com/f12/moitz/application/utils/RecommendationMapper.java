@@ -32,8 +32,9 @@ import org.springframework.stereotype.Component;
 @Component
 public class RecommendationMapper {
 
+    private static final boolean BEST_RECOMMENDATION_DISABLED = false;
+
     public RecommendationResultResponse toResponse(final Result result) {
-        final int minTime = result.getBestRecommendationTime();
         final List<String> condition = getCondition(result);
         return new RecommendationResultResponse(
                 condition,
@@ -43,7 +44,7 @@ public class RecommendationMapper {
                 IntStream.range(0, result.getRecommendedLocationsCount())
                         .mapToObj(index -> {
                             Candidate currentCandidate = result.getRecommendedLocations().get(index);
-                            return toLocationRecommendResponse(currentCandidate, index, minTime);
+                            return toLocationRecommendResponse(currentCandidate, index);
                         })
                         .toList()
         );
@@ -117,8 +118,7 @@ public class RecommendationMapper {
 
     private LocationResponse toLocationRecommendResponse(
             final Candidate candidate,
-            final int index,
-            final int minTime
+            final int index
     ) {
         final Place targetPlace = candidate.getDestination();
         final int totalTime = candidate.calculateAverageTravelTime();
@@ -135,7 +135,8 @@ public class RecommendationMapper {
                 targetPlace.getPoint().getX(),
                 targetPlace.getName(),
                 totalTime,
-                totalTime == minTime,
+                // 추천 방식 변경으로 기존 평균 이동시간 기준 best 표시는 임시 비활성화한다.
+                BEST_RECOMMENDATION_DISABLED,
                 candidate.getTags().stream()
                         .map(CandidateSelectionTag::name)
                         .toList(),

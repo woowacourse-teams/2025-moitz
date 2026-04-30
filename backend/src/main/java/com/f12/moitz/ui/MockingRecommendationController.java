@@ -49,7 +49,7 @@ public class MockingRecommendationController implements SwaggerMockingRecommenda
                         new StartingPlaceResponse(3L, 3, 126.952713197762, 37.4812845080678, "서울대입구역")
                 ),
                 List.of(
-                        new LocationResponse(1L, 1, 37.54040751726388, 127.06920291650829, "건대입구역", 18, true,
+                        new LocationResponse(1L, 1, 37.54040751726388, 127.06920291650829, "건대입구역", 18, false,
                                 "GENERAL", "일반 추천",
                                 "다양한 즐길거리가 가득! 🥳 (식당, 카페, PC방, 노래방, 오락시설)",
                                 "어디에서 출발해도 교통이 좋은 중심지이며, 다양한 만남 장소가 존재하는 최적의 장소 중 하나입니다.",
@@ -130,7 +130,7 @@ public class MockingRecommendationController implements SwaggerMockingRecommenda
                                         ))
                                 )
                         ),
-                        new LocationResponse(2L, 2, 37.47656223234824, 126.98155858357366, "사당역", 18, true,
+                        new LocationResponse(2L, 2, 37.47656223234824, 126.98155858357366, "사당역", 18, false,
                                 "GENERAL", "일반 추천",
                                 "만남의 광장, 맛집도 다양! 😋 (식당, 카페, PC방)",
                                 "다양한 장소에서 접근하기 편하며, 주어진 카테고리에 대한 요건을 만족하는 가장 추천드리는 선택지입니다.",
@@ -207,7 +207,7 @@ public class MockingRecommendationController implements SwaggerMockingRecommenda
                                         ))
                                 )
                         ),
-                        new LocationResponse(3L, 3, 37.561268363317176, 127.03710337610202, "왕십리역", 18, true,
+                        new LocationResponse(3L, 3, 37.561268363317176, 127.03710337610202, "왕십리역", 18, false,
                                 "GENERAL", "일반 추천",
                                 "교통 요충지, 엔터-식사 해결! ✨ (식당, 카페, PC방, 노래방, 오락시설)",
                                 "어디에서 출발해도 교통이 좋은 중심지이며, 다양한 만남 장소가 존재하는 최적의 장소 중 하나입니다.",
