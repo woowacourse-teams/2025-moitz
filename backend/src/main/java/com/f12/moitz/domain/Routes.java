@@ -34,6 +34,7 @@ public class Routes {
         return new FairnessScore(
                 maxTravelTime,
                 calculateMaxTransferCount(),
+                calculateAverageTransferCount(),
                 calculateTransferDiff(),
                 maxTravelTime - minTravelTime,
                 calculateAverageTravelTime(),
@@ -93,6 +94,13 @@ public class Routes {
         return routes.stream()
                 .mapToInt(Route::calculateTransferCount)
                 .min()
+                .orElseThrow(() -> new IllegalStateException("경로 목록이 비어 있습니다."));
+    }
+
+    public double calculateAverageTransferCount() {
+        return routes.stream()
+                .mapToInt(Route::calculateTransferCount)
+                .average()
                 .orElseThrow(() -> new IllegalStateException("경로 목록이 비어 있습니다."));
     }
 

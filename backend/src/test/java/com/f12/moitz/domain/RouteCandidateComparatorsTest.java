@@ -41,6 +41,22 @@ class RouteCandidateComparatorsTest {
                 .containsExactly("완전공평장거리역", "불공평단거리역");
     }
 
+    @Test
+    @DisplayName("최소 환승 후보는 평균 환승 횟수가 적은 후보를 우선한다")
+    void transferComparator_PrioritizesAverageTransferCount() {
+        final RouteCandidate lowAverage = routeCandidateWithTransfers("낮은평균환승역", List.of(0, 1));
+        final RouteCandidate lowMax = routeCandidateWithTransfers("낮은최대환승역", List.of(1, 1));
+        final RouteCandidate highMax = routeCandidateWithTransfers("높은최대환승역", List.of(0, 2));
+
+        final List<RouteCandidate> sortedCandidates = List.of(highMax, lowMax, lowAverage).stream()
+                .sorted(comparators.getByTag(CandidateSelectionTag.TRANSFER))
+                .toList();
+
+        assertThat(sortedCandidates)
+                .extracting(candidate -> candidate.getPlace().getName())
+                .containsExactly("낮은평균환승역", "낮은최대환승역", "높은최대환승역");
+    }
+
     private RouteCandidate routeCandidate(final String name, final int firstTravelTimeMinutes, final int secondTravelTimeMinutes) {
         final Place start1 = new Place("출발1역", new Point(127.0, 37.0));
         final Place start2 = new Place("출발2역", new Point(127.1, 37.1));
@@ -63,5 +79,33 @@ class RouteCandidateComparatorsTest {
                 travelTimeMinutes * 60,
                 SubwayLine.fromTitle("2호선")
         )));
+    }
+
+    private RouteCandidate routeCandidateWithTransfers(final String name, final List<Integer> transferCounts) {
+        final Place end = new Place(name, new Point(127.2, 37.2));
+        final List<Route> routes = java.util.stream.IntStream.range(0, transferCounts.size())
+                .mapToObj(index -> routeWithTransfers(
+                        new Place("출발" + index + "역", new Point(127.0 + index, 37.0 + index)),
+                        end,
+                        transferCounts.get(index)
+                ))
+                .toList();
+        return new RouteCandidate(end, new Routes(routes));
+    }
+
+    private Route routeWithTransfers(final Place start, final Place end, final int transferCount) {
+        final List<Path> paths = new java.util.ArrayList<>();
+        Place currentStart = start;
+        for (int index = 0; index < transferCount; index++) {
+            final Place transferStation = new Place(
+                    start.getName() + "환승" + index,
+                    new Point(127.4 + index, 37.4 + index)
+            );
+            paths.add(new Path(currentStart, transferStation, TravelMethod.SUBWAY, 0, SubwayLine.fromTitle("2호선")));
+            paths.add(new Path(transferStation, transferStation, TravelMethod.TRANSFER, 0, null));
+            currentStart = transferStation;
+        }
+        paths.add(new Path(currentStart, end, TravelMethod.SUBWAY, 20 * 60, SubwayLine.fromTitle("3호선")));
+        return new Route(paths);
     }
 }

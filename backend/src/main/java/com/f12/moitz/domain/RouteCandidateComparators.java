@@ -89,10 +89,13 @@ public class RouteCandidateComparators {
     }
 
     private Comparator<RouteCandidate> byTransfer() {
-        return Comparator.comparingInt((RouteCandidate candidate) -> candidate.calculateFairnessScore().getMaxTransferCount())
+        return Comparator.comparingDouble((RouteCandidate candidate) -> candidate.calculateFairnessScore()
+                        .getAverageTransferCount())
+                .thenComparingInt(candidate -> candidate.calculateFairnessScore().getMaxTransferCount())
                 .thenComparingInt(candidate -> candidate.calculateFairnessScore().getTransferDiff())
-                .thenComparing(RouteCandidate::calculateFairnessScore)
-                .thenComparingInt(candidate -> candidate.calculateFairnessScore().getMaxTravelTime());
+                .thenComparingInt(candidate -> candidate.calculateFairnessScore().getAverageTravelTime())
+                .thenComparingInt(candidate -> candidate.calculateFairnessScore().getMaxTravelTime())
+                .thenComparing(RouteCandidate::calculateFairnessScore);
     }
 
     private Comparator<RouteCandidate> byGeneral() {

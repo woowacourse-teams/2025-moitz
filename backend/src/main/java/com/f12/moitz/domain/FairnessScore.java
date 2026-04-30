@@ -14,6 +14,7 @@ public class FairnessScore implements Comparable<FairnessScore> {
 
     private final int maxTravelTime;
     private final int maxTransferCount;
+    private final double averageTransferCount;
     private final int transferDiff;
     private final int timeDiff;
     private final int averageTravelTime;
@@ -33,6 +34,7 @@ public class FairnessScore implements Comparable<FairnessScore> {
         this(
                 maxTravelTime,
                 maxTransferCount,
+                maxTransferCount,
                 transferDiff,
                 timeDiff,
                 averageTravelTime,
@@ -44,6 +46,7 @@ public class FairnessScore implements Comparable<FairnessScore> {
     public FairnessScore(
             final int maxTravelTime,
             final int maxTransferCount,
+            final double averageTransferCount,
             final int transferDiff,
             final int timeDiff,
             final int averageTravelTime,
@@ -52,6 +55,7 @@ public class FairnessScore implements Comparable<FairnessScore> {
     ) {
         this.maxTravelTime = maxTravelTime;
         this.maxTransferCount = maxTransferCount;
+        this.averageTransferCount = averageTransferCount;
         this.transferDiff = transferDiff;
         this.timeDiff = timeDiff;
         this.averageTravelTime = averageTravelTime;
