@@ -24,7 +24,7 @@ class LocationReasonGeneratorAdapterTest {
         assertThat(result.get("서울역"))
                 .extracting(ReasonAndDescription::description, ReasonAndDescription::reason)
                 .containsExactly(
-                        "#최소환승 #최소평균",
+                        "#최소환승 #평균최소",
                         "서울역은 환승 부담이 적은 기준, 전체 참여자의 평균 이동 시간이 짧은 기준을 반영해 추천된 만남 장소입니다."
                 );
     }

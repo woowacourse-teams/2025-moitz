@@ -23,7 +23,7 @@ public record LocationResponse(
         boolean isBest,
         @Schema(description = "추천 태그 코드 목록", example = "[\"FAIRNESS\", \"EFFICIENCY\"]", requiredMode = Schema.RequiredMode.REQUIRED)
         List<String> tags,
-        @Schema(description = "추천 이유 해시태그", example = "#최소환승 #최소평균", requiredMode = Schema.RequiredMode.REQUIRED)
+        @Schema(description = "추천 이유 해시태그", example = "#최소환승 #평균최소", requiredMode = Schema.RequiredMode.REQUIRED)
         String description,
         @Schema(description = "지역 추천 이유 문장", example = "서울역은 환승 부담이 적은 기준, 전체 참여자의 평균 이동 시간이 짧은 기준을 반영해 추천된 만남 장소입니다.", requiredMode = Schema.RequiredMode.REQUIRED)
         String reason,
