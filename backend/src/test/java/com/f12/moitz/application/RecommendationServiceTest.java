@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -143,9 +144,9 @@ class RecommendationServiceTest {
                 new Course(List.of(yeoksam.getPoint(), samsung.getPoint()))
         );
         given(routeFinder.findCourses(anyList())).willReturn(mockCourses);
-        given(locationReasonGenerator.generateReasons(anyList(), anyList(), anyList())).willReturn(Map.of(
-                "선릉역", new ReasonAndDescription("이유1", "설명1"),
-                "삼성역", new ReasonAndDescription("이유2", "설명2")
+        given(locationReasonGenerator.generateReasons(anyList(), anyMap())).willReturn(Map.of(
+                "선릉역", new ReasonAndDescription("설명1", "이유1"),
+                "삼성역", new ReasonAndDescription("설명2", "이유2")
         ));
 
         given(recommendResultRepository.saveAndReturnId(any(Result.class))).willReturn(new ObjectId());
@@ -171,8 +172,8 @@ class RecommendationServiceTest {
                         .toList())
                 .collect(Collectors.toList()))
                 .containsExactly(
-                        List.of("FAIRNESS", "EFFICIENCY", "TRANSFER", "GENERAL"),
-                        List.of("MAX_BURDEN_RELIEF", "EFFICIENCY", "TRANSFER", "GENERAL")
+                        List.of("FAIRNESS", "EFFICIENCY", "TRANSFER"),
+                        List.of("MAX_BURDEN_RELIEF", "EFFICIENCY", "TRANSFER")
                 );
     }
 

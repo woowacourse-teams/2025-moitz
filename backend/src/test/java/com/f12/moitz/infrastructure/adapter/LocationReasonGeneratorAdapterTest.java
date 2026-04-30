@@ -1,109 +1,63 @@
 package com.f12.moitz.infrastructure.adapter;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.BDDMockito.given;
 
-import com.f12.moitz.application.dto.RecommendedLocationsResponse;
 import com.f12.moitz.application.port.dto.ReasonAndDescription;
-import com.f12.moitz.common.error.exception.ExternalApiErrorCode;
-import com.f12.moitz.common.error.exception.ExternalApiException;
-import com.f12.moitz.domain.RecommendCondition;
-import com.f12.moitz.infrastructure.client.gemini.GoogleGeminiClient;
-import com.f12.moitz.infrastructure.client.gemini.dto.RecommendedLocationResponse;
-import com.f12.moitz.infrastructure.client.perplexity.PerplexityClient;
-import io.github.resilience4j.circuitbreaker.CircuitBreaker;
+import com.f12.moitz.domain.CandidateSelectionTag;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
 
-@ExtendWith(MockitoExtension.class)
 class LocationReasonGeneratorAdapterTest {
 
-    @Mock
-    private GoogleGeminiClient googleGeminiClient;
-
-    @Mock
-    private PerplexityClient perplexityClient;
-
-    private final CircuitBreaker geminiBreaker = CircuitBreaker.ofDefaults("gemini");
-    private final CircuitBreaker geminiRetryableBreaker = CircuitBreaker.ofDefaults("geminiRetryable");
+    private final LocationReasonGeneratorAdapter adapter = new LocationReasonGeneratorAdapter();
 
     @Test
-    @DisplayName("Gemini 호출 실패 시 Perplexity fallback 결과를 사용한다")
-    void generateReasons_UsesPerplexityFallbackWhenGeminiFails() {
-        final LocationReasonGeneratorAdapter adapter = new LocationReasonGeneratorAdapter(
-                googleGeminiClient,
-                perplexityClient,
-                geminiBreaker,
-                geminiRetryableBreaker
-        );
-        final List<String> startingPlaces = List.of("강남역", "합정역");
-        final List<String> selectedPlaces = List.of("서울역");
-        final List<RecommendCondition> requirements = List.of(RecommendCondition.CAFE);
-
-        given(googleGeminiClient.generateReasonsForSelectedLocations(
-                startingPlaces,
-                selectedPlaces,
-                List.of("카페")
-        )).willThrow(new ExternalApiException(ExternalApiErrorCode.INVALID_GEMINI_API_RESPONSE));
-        given(perplexityClient.generateReasonsForSelectedLocations(
-                startingPlaces,
-                selectedPlaces,
-                List.of("카페")
-        )).willReturn(new RecommendedLocationsResponse(List.of(
-                new RecommendedLocationResponse("서울역", "상권과 접근성이 균형적입니다.", "균형 잡힌 선택 📍")
-        )));
-
+    @DisplayName("추천 태그를 해시태그 설명과 문장 이유로 변환한다")
+    void generateReasons_CreatesReasonAndDescriptionFromTags() {
         final Map<String, ReasonAndDescription> result = adapter.generateReasons(
-                startingPlaces,
-                selectedPlaces,
-                requirements
+                List.of("서울역"),
+                Map.of("서울역", List.of(CandidateSelectionTag.TRANSFER, CandidateSelectionTag.EFFICIENCY))
         );
 
         assertThat(result.get("서울역"))
-                .extracting(ReasonAndDescription::reason, ReasonAndDescription::description)
-                .containsExactly("상권과 접근성이 균형적입니다.", "균형 잡힌 선택 📍");
+                .extracting(ReasonAndDescription::description, ReasonAndDescription::reason)
+                .containsExactly(
+                        "#최소환승 #최소평균",
+                        "서울역은 환승 부담이 적은 기준, 전체 참여자의 평균 이동 시간이 짧은 기준을 반영해 추천된 만남 장소입니다."
+                );
     }
 
     @Test
-    @DisplayName("Gemini와 Perplexity가 모두 실패하면 고정 fallback 문구를 사용한다")
-    void generateReasons_UsesFixedFallbackWhenAllApisFail() {
-        final LocationReasonGeneratorAdapter adapter = new LocationReasonGeneratorAdapter(
-                googleGeminiClient,
-                perplexityClient,
-                geminiBreaker,
-                geminiRetryableBreaker
-        );
-        final List<String> startingPlaces = List.of("강남역", "합정역");
-        final List<String> selectedPlaces = List.of("서울역");
-        final List<RecommendCondition> requirements = List.of(RecommendCondition.CAFE);
-
-        given(googleGeminiClient.generateReasonsForSelectedLocations(
-                startingPlaces,
-                selectedPlaces,
-                List.of("카페")
-        )).willThrow(new ExternalApiException(ExternalApiErrorCode.INVALID_GEMINI_API_RESPONSE));
-        given(perplexityClient.generateReasonsForSelectedLocations(
-                startingPlaces,
-                selectedPlaces,
-                List.of("카페")
-        )).willThrow(new ExternalApiException(ExternalApiErrorCode.INVALID_PERPLEXITY_API_RESPONSE));
-
+    @DisplayName("추천 태그가 없으면 종합 추천 이유를 생성한다")
+    void generateReasons_UsesGeneralReasonWhenTagsAreMissing() {
         final Map<String, ReasonAndDescription> result = adapter.generateReasons(
-                startingPlaces,
-                selectedPlaces,
-                requirements
+                List.of("시청역"),
+                Map.of()
+        );
+
+        assertThat(result.get("시청역"))
+                .extracting(ReasonAndDescription::description, ReasonAndDescription::reason)
+                .containsExactly(
+                        "#종합추천",
+                        "시청역은 이동 시간, 환승, 균형을 종합한 기준을 반영해 추천된 만남 장소입니다."
+                );
+    }
+
+    @Test
+    @DisplayName("종합 추천 태그는 다른 추천 태그가 없는 경우에만 이유에 포함한다")
+    void generateReasons_RemovesGeneralReasonWhenOtherTagsExist() {
+        final Map<String, ReasonAndDescription> result = adapter.generateReasons(
+                List.of("서울역"),
+                Map.of("서울역", List.of(CandidateSelectionTag.TRANSFER, CandidateSelectionTag.GENERAL))
         );
 
         assertThat(result.get("서울역"))
-                .extracting(ReasonAndDescription::reason, ReasonAndDescription::description)
+                .extracting(ReasonAndDescription::description, ReasonAndDescription::reason)
                 .containsExactly(
-                        "이동시간과 환승 부담을 함께 고려했을 때 균형이 좋은 만남 장소입니다.",
-                        "공평한 만남 장소 📍"
+                        "#최소환승",
+                        "서울역은 환승 부담이 적은 기준을 반영해 추천된 만남 장소입니다."
                 );
     }
 }

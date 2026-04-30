@@ -132,12 +132,10 @@ public class RecommendationService {
         stopWatch.stop();
 
         stopWatch.start("추천 이유 생성");
-        final List<String> startingPlaceNames = getPlaceNames(startingPlaces);
         final List<String> finalPlaceNames = getPlaceNames(finalPlaces);
         final Map<String, ReasonAndDescription> reasonsByPlaceName = locationReasonGenerator.generateReasons(
-                startingPlaceNames,
                 finalPlaceNames,
-                recommendConditions
+                toTagsByPlaceName(finalCandidateSelection)
         );
         final Map<Place, ReasonAndDescription> generatedPlacesWithReason = finalPlaces.stream()
                 .collect(Collectors.toMap(
@@ -173,6 +171,18 @@ public class RecommendationService {
         return places.stream()
                 .map(Place::getName)
                 .toList();
+    }
+
+    private Map<String, List<CandidateSelectionTag>> toTagsByPlaceName(
+            final FinalCandidateSelectionResult finalCandidateSelection
+    ) {
+        return finalCandidateSelection.getTagsByPlace().entrySet().stream()
+                .collect(Collectors.toMap(
+                        entry -> entry.getKey().getName(),
+                        Entry::getValue,
+                        (left, right) -> left,
+                        java.util.LinkedHashMap::new
+                ));
     }
 
     private List<SubwayStation> getByNames(final List<String> names) {

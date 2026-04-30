@@ -141,8 +141,15 @@ public class FinalCandidateSelector {
             final Place place,
             final CandidateSelectionTag tag
     ) {
-        tagsByPlace.computeIfAbsent(place, ignored -> new LinkedHashSet<>())
-                .add(tag);
+        final Set<CandidateSelectionTag> tags = tagsByPlace.computeIfAbsent(place, ignored -> new LinkedHashSet<>());
+        if (tag != CandidateSelectionTag.GENERAL) {
+            tags.add(tag);
+            return;
+        }
+
+        if (tags.isEmpty()) {
+            tags.add(CandidateSelectionTag.GENERAL);
+        }
     }
 
     private Map<Place, List<CandidateSelectionTag>> copyTagsByPlace(

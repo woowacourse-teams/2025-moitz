@@ -40,24 +40,6 @@ public class PerplexityClient {
         }
     }
 
-    public RecommendedLocationsResponse generateReasonsForSelectedLocations(
-            final List<String> startingPlaces,
-            final List<String> selectedPlaces,
-            final List<String> requirements
-    ) {
-        try {
-            return readValue(
-                    generateReasonContent(startingPlaces, selectedPlaces, requirements)
-                            .choices()
-                            .getFirst()
-                            .message()
-                            .content()
-            );
-        } catch (IOException e) {
-            throw new ExternalApiException(ExternalApiErrorCode.INVALID_PERPLEXITY_API_RESPONSE);
-        }
-    }
-
     private PerplexityResponse generateContent(
             final List<String> stationNames,
             final String requirement
@@ -135,64 +117,6 @@ public class PerplexityClient {
                 .doOnSuccess(response -> {
                             if (response != null && response.usage() != null) {
                                 log.debug("Perplexity API 호출 성공 토큰 사용량: {}개", response.usage().totalTokens());
-                            }
-                        }
-                )
-                .block();
-    }
-
-    private PerplexityResponse generateReasonContent(
-            final List<String> startingPlaces,
-            final List<String> selectedPlaces,
-            final List<String> requirements
-    ) {
-        final String systemPrompt = """
-            당신은 서울 지하철역 기반 만남 장소에 대해 설명을 작성하는 AI 비서입니다.
-            서버가 이미 선정한 역 목록을 설명해야 하며, 새 장소를 추천하거나 역명을 바꾸면 안 됩니다.
-            반드시 JSON Schema를 엄격하게 준수하여 응답하세요.
-        """;
-
-        final String userPrompt = String.format(
-                PromptGenerator.FIXED_LOCATION_REASON_PROMPT,
-                startingPlaces,
-                selectedPlaces,
-                requirements
-        );
-
-        final PerplexityRequest requestPayload = new PerplexityRequest(
-                "sonar-pro",
-                List.of(
-                        new PerplexityRequest.Message("system", systemPrompt),
-                        new PerplexityRequest.Message("user", userPrompt)
-                ),
-                Map.of(
-                        "type", "json_schema",
-                        "json_schema", Map.of("schema", PromptGenerator.getSchema())
-                )
-        );
-
-        return perplexityWebClient.post()
-                .uri("/chat/completions")
-                .bodyValue(requestPayload)
-                .retrieve()
-                .onStatus(HttpStatusCode::isError, this::handleApiError)
-                .bodyToMono(PerplexityResponse.class)
-                .retryWhen(Retry.max(1)
-                        .filter(throwable -> throwable instanceof RetryableApiException || throwable instanceof TimeoutException)
-                        .doBeforeRetry(retrySignal ->
-                                log.warn(
-                                        "추천 이유 생성 API 호출 실패. 재시도 #{} 시작. 실패 원인: {}",
-                                        retrySignal.totalRetries() + 1,
-                                        retrySignal.failure().getMessage()
-                                )
-                        )
-                        .onRetryExhaustedThrow((retryBackoffSpec, retrySignal) ->
-                                new ExternalApiException(ExternalApiErrorCode.PERPLEXITY_API_SERVER_UNRESPONSIVE)
-                        )
-                )
-                .doOnSuccess(response -> {
-                            if (response != null && response.usage() != null) {
-                                log.debug("Perplexity 추천 이유 생성 성공 토큰 사용량: {}개", response.usage().totalTokens());
                             }
                         }
                 )

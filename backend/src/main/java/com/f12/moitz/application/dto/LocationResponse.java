@@ -23,11 +23,9 @@ public record LocationResponse(
         boolean isBest,
         @Schema(description = "추천 태그 코드 목록", example = "[\"FAIRNESS\", \"EFFICIENCY\"]", requiredMode = Schema.RequiredMode.REQUIRED)
         List<String> tags,
-        @Schema(description = "추천 태그 설명 목록", example = "[\"이동 시간이 고르게 분포한 추천\", \"전체 평균 이동 시간이 짧은 추천\"]", requiredMode = Schema.RequiredMode.REQUIRED)
-        List<String> tagDescriptions,
-        @Schema(description = "AI 추천 한 마디", example = "역세권, 편의시설 풍부! \uD83D\uDC4D\uD83D\uDE0B", requiredMode = Schema.RequiredMode.REQUIRED)
+        @Schema(description = "추천 이유 해시태그", example = "#최소환승 #최소평균", requiredMode = Schema.RequiredMode.REQUIRED)
         String description,
-        @Schema(description = "지역 추천 이유", example = "유명한 곱창집이 있고, 전체적으로 환승을 하지 않는 최적의 지역입니다!", requiredMode = Schema.RequiredMode.REQUIRED)
+        @Schema(description = "지역 추천 이유 문장", example = "서울역은 환승 부담이 적은 기준, 전체 참여자의 평균 이동 시간이 짧은 기준을 반영해 추천된 만남 장소입니다.", requiredMode = Schema.RequiredMode.REQUIRED)
         String reason,
         @Schema(
                 description = "카테고리별 추천 장소 목록",
@@ -96,7 +94,6 @@ public record LocationResponse(
             final int avgMinutes,
             final boolean isBest,
             final String tag,
-            final String tagDescription,
             final String description,
             final String reason,
             final Map<RecommendCondition, List<PlaceRecommendResponse>> places,
@@ -111,7 +108,6 @@ public record LocationResponse(
                 avgMinutes,
                 isBest,
                 List.of(tag),
-                List.of(tagDescription),
                 description,
                 reason,
                 places,

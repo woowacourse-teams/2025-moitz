@@ -26,7 +26,7 @@ public class FinalCandidateSelectionResult {
     }
 
     public List<CandidateSelectionTag> getTags(final Place place) {
-        return tagsByPlace.getOrDefault(place, List.of(CandidateSelectionTag.GENERAL));
+        return CandidateSelectionTag.normalize(tagsByPlace.get(place));
     }
 
     private Map<Place, List<CandidateSelectionTag>> copyTagsByPlace(
@@ -35,7 +35,7 @@ public class FinalCandidateSelectionResult {
         return Collections.unmodifiableMap(tagsByPlace.entrySet().stream()
                 .collect(Collectors.toMap(
                         Map.Entry::getKey,
-                        entry -> List.copyOf(entry.getValue()),
+                        entry -> CandidateSelectionTag.normalize(entry.getValue()),
                         (left, right) -> left,
                         LinkedHashMap::new
                 )));

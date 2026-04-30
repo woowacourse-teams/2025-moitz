@@ -181,39 +181,6 @@ public class PromptGenerator {
             }
             """;
 
-    public static final String FIXED_LOCATION_REASON_PROMPT = """
-            [역할 정의]
-            당신은 서울 지하철역 기반 만남 장소에 대해 설명을 작성하는 AI입니다.
-
-            [핵심 목표]
-            서버가 이미 공평성 기준으로 선정한 지하철역 목록에 대해, 각 역의 특징과 만남 적합성을 자연스럽게 설명합니다.
-
-            [중요 규칙]
-            1. 추천 장소를 새로 고르지 않습니다.
-            2. 반드시 제공된 선정 역 목록만 그대로 응답합니다.
-            3. 선정 역 목록의 모든 역을 빠짐없이 응답합니다.
-            4. locationName은 반드시 선정 역 목록과 정확히 일치해야 합니다.
-            5. summarize_reason은 20자 이내, 이모지 1개만 사용합니다.
-            6. detail_reason은 100자 이내로 작성합니다.
-            7. 설명에는 공평한 접근성, 환승 편의, 주변 분위기나 상권 중 적절한 요소를 포함합니다.
-
-            [입력 정보]
-            - 출발지 목록: %s
-            - 선정 역 목록: %s
-            - 사용자 추가 조건: %s
-
-            [출력 형식]
-            {
-                "recommendations": [
-                    {
-                        "locationName": "string",
-                        "summarize_reason": "string",
-                        "detail_reason": "string"
-                    }
-                ]
-            }
-            """;
-
     public static final String PLACE_FILTER_PROMPT = """
             You are an AI assistant that analyzes Kakao Map search results and recommends the best places.
             

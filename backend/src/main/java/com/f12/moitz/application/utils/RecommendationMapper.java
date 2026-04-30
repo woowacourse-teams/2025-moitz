@@ -140,9 +140,6 @@ public class RecommendationMapper {
                 candidate.getTags().stream()
                         .map(CandidateSelectionTag::name)
                         .toList(),
-                candidate.getTags().stream()
-                        .map(CandidateSelectionTag::getDescription)
-                        .toList(),
                 candidate.getDescription(),
                 candidate.getReason(),
                 recommendedPlaces,

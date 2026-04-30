@@ -5,11 +5,13 @@ import static org.assertj.core.api.Assertions.assertThatNoException;
 import static org.assertj.core.api.SoftAssertions.assertSoftly;
 
 import com.f12.moitz.domain.subway.SubwayLine;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.test.util.ReflectionTestUtils;
 
 class CandidateTest {
 
@@ -147,6 +149,49 @@ class CandidateTest {
 
         assertThat(candidate.getTags())
                 .containsExactly(CandidateSelectionTag.FAIRNESS, CandidateSelectionTag.EFFICIENCY);
+        assertThat(candidate.getTag()).isEqualTo(CandidateSelectionTag.FAIRNESS);
+    }
+
+    @Test
+    @DisplayName("저장 문서에 태그 정보가 없거나 비어있으면 종합 추천 태그로 보정한다")
+    void getTags_UsesGeneralWhenTagsAndLegacyTagAreMissing() throws Exception {
+        final var constructor = Candidate.class.getDeclaredConstructor();
+        constructor.setAccessible(true);
+        final Candidate candidate = constructor.newInstance();
+
+        assertThat(candidate.getTags()).containsExactly(CandidateSelectionTag.GENERAL);
+        assertThat(candidate.getTag()).isEqualTo(CandidateSelectionTag.GENERAL);
+    }
+
+    @Test
+    @DisplayName("저장 문서의 태그 목록에 null이 포함되어도 유효한 태그만 조회한다")
+    void getTags_FiltersNullTags() throws Exception {
+        final var constructor = Candidate.class.getDeclaredConstructor();
+        constructor.setAccessible(true);
+        final Candidate candidate = constructor.newInstance();
+        ReflectionTestUtils.setField(
+                candidate,
+                "tags",
+                Arrays.asList(CandidateSelectionTag.FAIRNESS, null, CandidateSelectionTag.FAIRNESS)
+        );
+
+        assertThat(candidate.getTags()).containsExactly(CandidateSelectionTag.FAIRNESS);
+        assertThat(candidate.getTag()).isEqualTo(CandidateSelectionTag.FAIRNESS);
+    }
+
+    @Test
+    @DisplayName("종합 추천 태그는 다른 태그가 없는 경우에만 조회한다")
+    void getTags_RemovesGeneralWhenOtherTagsExist() throws Exception {
+        final var constructor = Candidate.class.getDeclaredConstructor();
+        constructor.setAccessible(true);
+        final Candidate candidate = constructor.newInstance();
+        ReflectionTestUtils.setField(
+                candidate,
+                "tags",
+                List.of(CandidateSelectionTag.FAIRNESS, CandidateSelectionTag.GENERAL)
+        );
+
+        assertThat(candidate.getTags()).containsExactly(CandidateSelectionTag.FAIRNESS);
         assertThat(candidate.getTag()).isEqualTo(CandidateSelectionTag.FAIRNESS);
     }
 

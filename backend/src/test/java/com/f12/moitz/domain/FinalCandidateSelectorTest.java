@@ -160,7 +160,7 @@ class FinalCandidateSelectorTest {
         tagSelections.put(CandidateSelectionTag.MAX_BURDEN_RELIEF, List.of(maxBurden));
         tagSelections.put(CandidateSelectionTag.EFFICIENCY, List.of(shared, efficiency));
         tagSelections.put(CandidateSelectionTag.TRANSFER, List.of(transfer));
-        tagSelections.put(CandidateSelectionTag.GENERAL, List.of(general));
+        tagSelections.put(CandidateSelectionTag.GENERAL, List.of(shared, general));
         return tagSelections;
     }
 

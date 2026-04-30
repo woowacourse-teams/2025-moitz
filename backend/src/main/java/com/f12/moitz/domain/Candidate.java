@@ -1,19 +1,22 @@
 package com.f12.moitz.domain;
 
 import java.util.List;
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Candidate {
 
-    private final Place destination;
-    private final Routes routes;
-    private final Courses courses;
-    private final CategorizedRecommendedPlaces recommendedPlaces;
-    private final List<CandidateSelectionTag> tags;
-    private final String description;
-    private final String reason;
-    private final int votes;
+    private Place destination;
+    private Routes routes;
+    private Courses courses;
+    private CategorizedRecommendedPlaces recommendedPlaces;
+    private List<CandidateSelectionTag> tags;
+    private String description;
+    private String reason;
+    private int votes;
 
     public Candidate(
             final Place destination,
@@ -89,17 +92,7 @@ public class Candidate {
     }
 
     private List<CandidateSelectionTag> resolveTags(final List<CandidateSelectionTag> tags) {
-        if (tags == null || tags.isEmpty()) {
-            return List.of(CandidateSelectionTag.GENERAL);
-        }
-        final List<CandidateSelectionTag> resolvedTags = tags.stream()
-                .map(Candidate::resolveNullableTag)
-                .distinct()
-                .toList();
-        if (resolvedTags.isEmpty()) {
-            return List.of(CandidateSelectionTag.GENERAL);
-        }
-        return resolvedTags;
+        return CandidateSelectionTag.normalize(tags);
     }
 
     public int calculateAverageTravelTime() {
@@ -107,7 +100,11 @@ public class Candidate {
     }
 
     public CandidateSelectionTag getTag() {
-        return tags.get(0);
+        return getTags().getFirst();
+    }
+
+    public List<CandidateSelectionTag> getTags() {
+        return resolveTags(tags);
     }
 
 }

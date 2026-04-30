@@ -1,7 +1,6 @@
 package com.f12.moitz.infrastructure.client.gemini;
 
 import static com.f12.moitz.infrastructure.PromptGenerator.ADDITIONAL_WITH_CANDIDATE_PROMPT;
-import static com.f12.moitz.infrastructure.PromptGenerator.FIXED_LOCATION_REASON_PROMPT;
 import static com.f12.moitz.infrastructure.PromptGenerator.RECOMMENDATION_COUNT;
 
 import com.f12.moitz.application.dto.RecommendedLocationsResponse;
@@ -49,31 +48,6 @@ public class GoogleGeminiClient {
                         requirements,
                         PromptGenerator.getSchema()
                 ).text(),
-                RecommendedLocationsResponse.class
-        );
-    }
-
-    public RecommendedLocationsResponse generateReasonsForSelectedLocations(
-            final List<String> startingPlaces,
-            final List<String> selectedPlaces,
-            final List<String> requirements
-    ) {
-        final String prompt = String.format(
-                FIXED_LOCATION_REASON_PROMPT,
-                startingPlaces,
-                selectedPlaces,
-                requirements
-        );
-
-        final GenerateContentConfig config = GenerateContentConfig.builder()
-                .temperature(0.4F)
-                .maxOutputTokens(3000)
-                .responseMimeType("application/json")
-                .responseJsonSchema(PromptGenerator.getSchema())
-                .build();
-
-        return readValue(
-                generateWith(prompt, config).text(),
                 RecommendedLocationsResponse.class
         );
     }

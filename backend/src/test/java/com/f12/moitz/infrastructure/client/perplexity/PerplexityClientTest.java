@@ -76,40 +76,6 @@ class PerplexityClientTest {
     }
 
     @Test
-    @DisplayName("선정된 장소 설명 생성 응답을 올바르게 파싱한다")
-    void generateReasonsForSelectedLocationsSuccess() throws JsonProcessingException {
-        var recommendedLocationResponse = new RecommendedLocationsResponse(
-                List.of(new RecommendedLocationResponse("서울역", "접근성과 상권이 좋습니다.", "공평한 선택 📍"))
-        );
-        final String content = objectMapper.writeValueAsString(recommendedLocationResponse);
-        final String escapedContent = content.replace("\"", "\\\"");
-
-        final String mockResponseJson = String.format(
-                """
-                {
-                  "choices": [ { "message": { "content": "%s" } } ],
-                  "usage": { "prompt_tokens": 10, "completion_tokens": 20, "total_tokens": 30 }
-                }
-                """, escapedContent);
-
-        mockWebServer.enqueue(
-                new MockResponse()
-                        .setResponseCode(200)
-                        .setHeader("Content-Type", "application/json")
-                        .setBody(mockResponseJson)
-        );
-
-        final RecommendedLocationsResponse actualResponse = perplexityClient.generateReasonsForSelectedLocations(
-                List.of("강남역", "합정역"),
-                List.of("서울역"),
-                List.of("카페")
-        );
-
-        assertThat(actualResponse.recommendations()).hasSize(1);
-        assertThat(actualResponse.recommendations().getFirst().locationName()).isEqualTo("서울역");
-    }
-
-    @Test
     @DisplayName("API 응답이 비정상적인 JSON 포맷일 경우, INVALID_PERPLEXITY_API_RESPONSE 예외를 던진다")
     void invalidJsonResponse() {
         // Given
