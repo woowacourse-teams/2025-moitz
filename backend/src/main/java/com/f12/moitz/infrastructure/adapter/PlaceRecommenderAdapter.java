@@ -1,5 +1,7 @@
 package com.f12.moitz.infrastructure.adapter;
 
+import static com.f12.moitz.infrastructure.PromptGenerator.PLACE_RECOMMENDATION_COUNT;
+
 import com.f12.moitz.application.port.PlaceRecommender;
 import com.f12.moitz.domain.CategorizedRecommendedPlaces;
 import com.f12.moitz.domain.Place;
@@ -97,7 +99,7 @@ public class PlaceRecommenderAdapter implements PlaceRecommender {
                                 place.getPoint().getX(),
                                 place.getPoint().getY(),
                                 800,
-                                3
+                                PLACE_RECOMMENDATION_COUNT
                         )
                 );
                 allResponses.add(response);

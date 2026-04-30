@@ -1,5 +1,7 @@
 package com.f12.moitz.infrastructure.adapter;
 
+import static com.f12.moitz.infrastructure.PromptGenerator.PLACE_RECOMMENDATION_COUNT;
+
 import com.f12.moitz.application.port.PlaceRecommender;
 import com.f12.moitz.common.error.exception.ExternalApiErrorCode;
 import com.f12.moitz.common.error.exception.ExternalApiException;
@@ -104,7 +106,7 @@ public class PlaceRecommenderParallelAdapter implements PlaceRecommender {
                                 place.getPoint().getX(),
                                 place.getPoint().getY(),
                                 800,
-                                3
+                                PLACE_RECOMMENDATION_COUNT
                         )
                 )
                 .retry(2)
