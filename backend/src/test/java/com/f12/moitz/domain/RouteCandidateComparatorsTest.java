@@ -1,0 +1,67 @@
+package com.f12.moitz.domain;
+
+import static org.assertj.core.api.Assertions.assertThat;
+
+import com.f12.moitz.domain.subway.SubwayLine;
+import java.util.List;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+
+class RouteCandidateComparatorsTest {
+
+    private final RouteCandidateComparators comparators = new RouteCandidateComparators();
+
+    @Test
+    @DisplayName("공평 후보는 이동 시간 차이가 허용 범위 안이면 평균 이동 시간이 짧은 후보를 우선한다")
+    void fairnessComparator_PrioritizesShortAverageWithinTolerance() {
+        final RouteCandidate exactButLong = routeCandidate("완전공평장거리역", 28, 28);
+        final RouteCandidate shortAndTolerablyFair = routeCandidate("실용공평단거리역", 2, 4);
+
+        final List<RouteCandidate> sortedCandidates = List.of(exactButLong, shortAndTolerablyFair).stream()
+                .sorted(comparators.getByTag(CandidateSelectionTag.FAIRNESS))
+                .toList();
+
+        assertThat(sortedCandidates)
+                .extracting(candidate -> candidate.getPlace().getName())
+                .containsExactly("실용공평단거리역", "완전공평장거리역");
+    }
+
+    @Test
+    @DisplayName("공평 후보는 이동 시간 차이가 허용 범위를 벗어나면 기존 공평성 기준으로 비교한다")
+    void fairnessComparator_UsesStrictFairnessOutsideTolerance() {
+        final RouteCandidate unfairButShort = routeCandidate("불공평단거리역", 1, 20);
+        final RouteCandidate exactButLong = routeCandidate("완전공평장거리역", 28, 28);
+
+        final List<RouteCandidate> sortedCandidates = List.of(unfairButShort, exactButLong).stream()
+                .sorted(comparators.getByTag(CandidateSelectionTag.FAIRNESS))
+                .toList();
+
+        assertThat(sortedCandidates)
+                .extracting(candidate -> candidate.getPlace().getName())
+                .containsExactly("완전공평장거리역", "불공평단거리역");
+    }
+
+    private RouteCandidate routeCandidate(final String name, final int firstTravelTimeMinutes, final int secondTravelTimeMinutes) {
+        final Place start1 = new Place("출발1역", new Point(127.0, 37.0));
+        final Place start2 = new Place("출발2역", new Point(127.1, 37.1));
+        final Place end = new Place(name, new Point(127.2, 37.2));
+
+        return new RouteCandidate(
+                end,
+                new Routes(List.of(
+                        route(start1, end, firstTravelTimeMinutes),
+                        route(start2, end, secondTravelTimeMinutes)
+                ))
+        );
+    }
+
+    private Route route(final Place start, final Place end, final int travelTimeMinutes) {
+        return new Route(List.of(new Path(
+                start,
+                end,
+                TravelMethod.SUBWAY,
+                travelTimeMinutes * 60,
+                SubwayLine.fromTitle("2호선")
+        )));
+    }
+}
