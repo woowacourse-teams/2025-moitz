@@ -70,7 +70,7 @@ class RecommendationServiceTest {
     void setUp() {
         recommendationMapper = new RecommendationMapper();
         recommendationService = new RecommendationService(
-                subwayStationService,
+                new RouteOriginPreparationService(subwayStationService),
                 new RecommendedCandidateReasonService(locationReasonGenerator),
                 new RouteOriginDispersionService(routeFinder),
                 new RouteCandidatePreparationService(subwayStationService, routeFinder),

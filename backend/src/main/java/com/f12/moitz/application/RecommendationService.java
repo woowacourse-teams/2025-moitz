@@ -40,7 +40,7 @@ public class RecommendationService {
     private static final int PLACE_SEARCH_POOL_LIMIT = 50;
     private static final int FINAL_CANDIDATE_TARGET_COUNT = 5;
 
-    private final SubwayStationService subwayStationService;
+    private final RouteOriginPreparationService routeOriginPreparationService;
     private final RecommendedCandidateReasonService recommendedCandidateReasonService;
     private final RouteOriginDispersionService routeOriginDispersionService;
     private final RouteCandidatePreparationService routeCandidatePreparationService;
@@ -51,7 +51,7 @@ public class RecommendationService {
     private final CandidateSelectionPolicy candidateSelectionPolicy = new CandidateSelectionPolicy();
 
     public RecommendationService(
-            @Autowired final SubwayStationService subwayStationService,
+            @Autowired final RouteOriginPreparationService routeOriginPreparationService,
             @Autowired final RecommendedCandidateReasonService recommendedCandidateReasonService,
             @Autowired final RouteOriginDispersionService routeOriginDispersionService,
             @Autowired final RouteCandidatePreparationService routeCandidatePreparationService,
@@ -60,7 +60,7 @@ public class RecommendationService {
             @Autowired final RecommendationMapper recommendationMapper,
             @Autowired final RecommendResultRepository recommendResultRepository
     ) {
-        this.subwayStationService = subwayStationService;
+        this.routeOriginPreparationService = routeOriginPreparationService;
         this.recommendedCandidateReasonService = recommendedCandidateReasonService;
         this.routeOriginDispersionService = routeOriginDispersionService;
         this.routeCandidatePreparationService = routeCandidatePreparationService;
@@ -76,8 +76,11 @@ public class RecommendationService {
 
         stopWatch.start("공평한 후보역 선정");
         final List<RecommendCondition> recommendConditions = RecommendCondition.fromTitle(request.requirements());
-        final List<SubwayStation> startingPlaces = getByNames(request.startingPlaceNames());
-        final RouteOrigins routeOrigins = createRouteOrigins(startingPlaces);
+        final RouteOriginPreparationResult routeOriginPreparationResult = routeOriginPreparationService.prepare(
+                request.startingPlaceNames()
+        );
+        final List<SubwayStation> startingPlaces = routeOriginPreparationResult.getStartingPlaces();
+        final RouteOrigins routeOrigins = routeOriginPreparationResult.getRouteOrigins();
         final DispersionPolicy dispersionPolicy = routeOriginDispersionService.resolve(routeOrigins);
         final RouteCandidatePreparationResult routeCandidatePreparationResult = routeCandidatePreparationService.prepare(
                 startingPlaces,
@@ -156,21 +159,6 @@ public class RecommendationService {
         return places.stream()
                 .map(Place::getName)
                 .toList();
-    }
-
-    private List<SubwayStation> getByNames(final List<String> names) {
-        return names.stream()
-                .map(name -> subwayStationService.findByName(name)
-                        .orElseThrow(() -> new BadRequestException(GeneralErrorCode.INPUT_INVALID_START_LOCATION)))
-                .toList();
-    }
-
-    private RouteOrigins createRouteOrigins(final List<SubwayStation> startingPlaces) {
-        try {
-            return new RouteOrigins(startingPlaces);
-        } catch (IllegalArgumentException e) {
-            throw new BadRequestException(GeneralErrorCode.INPUT_INVALID_START_LOCATION, getPlaceNames(startingPlaces));
-        }
     }
 
     private void logCandidateSelection(
