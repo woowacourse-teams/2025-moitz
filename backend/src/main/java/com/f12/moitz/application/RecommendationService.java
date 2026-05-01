@@ -4,7 +4,6 @@ import com.f12.moitz.application.dto.RecommendationCreateResponse;
 import com.f12.moitz.application.dto.RecommendationRequest;
 import com.f12.moitz.application.dto.RecommendationResultResponse;
 import com.f12.moitz.application.port.LocationReasonGenerator;
-import com.f12.moitz.application.port.RouteFinder;
 import com.f12.moitz.application.port.dto.ReasonAndDescription;
 import com.f12.moitz.application.utils.RecommendationMapper;
 import com.f12.moitz.common.error.exception.BadRequestException;
@@ -13,8 +12,6 @@ import com.f12.moitz.common.error.exception.NotFoundException;
 import com.f12.moitz.domain.CandidateSelectionTag;
 import com.f12.moitz.domain.CandidateSelectionResult;
 import com.f12.moitz.domain.CategorizedRecommendedPlaces;
-import com.f12.moitz.domain.Course;
-import com.f12.moitz.domain.Courses;
 import com.f12.moitz.domain.DispersionPolicy;
 import com.f12.moitz.domain.FinalCandidateSelectionResult;
 import com.f12.moitz.domain.Place;
@@ -22,7 +19,6 @@ import com.f12.moitz.domain.PlaceSearchCandidateSelector;
 import com.f12.moitz.domain.RecommendCondition;
 import com.f12.moitz.domain.Recommendation;
 import com.f12.moitz.domain.Result;
-import com.f12.moitz.domain.OriginDestination;
 import com.f12.moitz.domain.RouteCandidate;
 import com.f12.moitz.domain.RouteOrigins;
 import com.f12.moitz.domain.Routes;
@@ -33,11 +29,9 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StopWatch;
 
@@ -51,10 +45,10 @@ public class RecommendationService {
 
     private final SubwayStationService subwayStationService;
     private final LocationReasonGenerator locationReasonGenerator;
-    private final RouteFinder routeFinder;
     private final RouteOriginDispersionResolver routeOriginDispersionResolver;
     private final RouteCandidateAssembler routeCandidateAssembler;
     private final PlaceSearchCoordinator placeSearchCoordinator;
+    private final FinalPlaceTravelAssembler finalPlaceTravelAssembler;
     private final RecommendationMapper recommendationMapper;
     private final RecommendResultRepository recommendResultRepository;
     private final PlaceSearchCandidateSelector placeSearchCandidateSelector = new PlaceSearchCandidateSelector();
@@ -62,19 +56,19 @@ public class RecommendationService {
     public RecommendationService(
             @Autowired final SubwayStationService subwayStationService,
             @Autowired final LocationReasonGenerator locationReasonGenerator,
-            @Qualifier("subwayRouteFinderAdapter") final RouteFinder routeFinder,
             @Autowired final RouteOriginDispersionResolver routeOriginDispersionResolver,
             @Autowired final RouteCandidateAssembler routeCandidateAssembler,
             @Autowired final PlaceSearchCoordinator placeSearchCoordinator,
+            @Autowired final FinalPlaceTravelAssembler finalPlaceTravelAssembler,
             @Autowired final RecommendationMapper recommendationMapper,
             @Autowired final RecommendResultRepository recommendResultRepository
     ) {
         this.subwayStationService = subwayStationService;
         this.locationReasonGenerator = locationReasonGenerator;
-        this.routeFinder = routeFinder;
         this.routeOriginDispersionResolver = routeOriginDispersionResolver;
         this.routeCandidateAssembler = routeCandidateAssembler;
         this.placeSearchCoordinator = placeSearchCoordinator;
+        this.finalPlaceTravelAssembler = finalPlaceTravelAssembler;
         this.recommendationMapper = recommendationMapper;
         this.recommendResultRepository = recommendResultRepository;
     }
@@ -126,13 +120,11 @@ public class RecommendationService {
         final List<Place> finalPlaces = finalCandidateSelection.getSelectedPlaces();
         logFinalCandidateSelection(selectedPlaces, finalPlaces, candidateRoutes, recommendConditions);
         validateRecommendationCandidates(finalPlaces);
-        final List<OriginDestination> finalOriginDestinations = routeOrigins.createOriginDestinationsTo(finalPlaces);
-        final Map<Place, Courses> placeCourses = findCoursesForAll(finalOriginDestinations);
-        final Map<Place, Routes> finalPlaceRoutes = finalPlaces.stream()
-                .collect(Collectors.toMap(
-                        Function.identity(),
-                        candidateRoutes::get
-                ));
+        final FinalPlaceTravelAssembly finalPlaceTravelAssembly = finalPlaceTravelAssembler.assemble(
+                routeOrigins,
+                finalPlaces,
+                candidateRoutes
+        );
         stopWatch.stop();
 
         stopWatch.start("추천 이유 생성");
@@ -151,8 +143,8 @@ public class RecommendationService {
         final Recommendation recommendation = recommendationMapper.toRecommendation(
                 generatedPlacesWithReason,
                 recommendedPlaces,
-                finalPlaceRoutes,
-                placeCourses,
+                finalPlaceTravelAssembly.getRoutesByPlace(),
+                finalPlaceTravelAssembly.getCoursesByPlace(),
                 finalCandidateSelection.getTagsByPlace(),
                 STARTING_VOTES,
                 recommendConditions
@@ -226,32 +218,6 @@ public class RecommendationService {
         } catch (IllegalArgumentException e) {
             throw new BadRequestException(GeneralErrorCode.INPUT_INVALID_START_LOCATION, getPlaceNames(startingPlaces));
         }
-    }
-
-    private Map<Place, Courses> findCoursesForAll(final List<OriginDestination> originDestinations) {
-        final List<Course> allCourses = routeFinder.findCourses(originDestinations);
-        return collectByPlace(originDestinations, allCourses, Courses::new);
-    }
-
-    private <T, U> Map<Place, U> collectByPlace(
-            final List<OriginDestination> originDestinations,
-            final List<T> elements,
-            final Function<List<T>, U> creator
-    ) {
-        return IntStream.range(0, originDestinations.size())
-                .boxed()
-                .collect(Collectors.groupingBy(
-                        i -> originDestinations.get(i).getDestination(),
-                        Collectors.mapping(
-                                elements::get,
-                                Collectors.toList()
-                        )
-                ))
-                .entrySet().stream()
-                .collect(Collectors.toMap(
-                        Entry::getKey,
-                        entry -> creator.apply(entry.getValue())
-                ));
     }
 
     private void logCandidateSelection(

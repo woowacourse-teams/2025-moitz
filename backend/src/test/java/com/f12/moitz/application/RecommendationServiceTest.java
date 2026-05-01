@@ -72,10 +72,10 @@ class RecommendationServiceTest {
         recommendationService = new RecommendationService(
                 subwayStationService,
                 locationReasonGenerator,
-                routeFinder,
                 new RouteOriginDispersionResolver(routeFinder),
                 new RouteCandidateAssembler(subwayStationService, routeFinder),
                 new PlaceSearchCoordinator(placeRecommender),
+                new FinalPlaceTravelAssembler(routeFinder),
                 recommendationMapper,
                 recommendResultRepository
         );
