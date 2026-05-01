@@ -181,7 +181,7 @@ class RecommendationServiceTest {
     }
 
     @Test
-    @DisplayName("장소 조건을 만족하는 최종 후보가 없으면 제어된 예외를 반환한다")
+    @DisplayName("장소 조건을 만족하는 추천 후보가 없으면 제어된 예외를 반환한다")
     void recommendLocation_ThrowsBadRequestWhenNoRecommendationMatches() {
         final RecommendationRequest request = new RecommendationRequest(List.of("강남역", "역삼역"), List.of("CAFE"));
         final SubwayStation gangnam = new SubwayStation("강남역", new Point(127.027, 37.497));

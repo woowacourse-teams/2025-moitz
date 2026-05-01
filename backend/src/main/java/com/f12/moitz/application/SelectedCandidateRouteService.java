@@ -29,21 +29,21 @@ public class SelectedCandidateRouteService {
 
     public SelectedCandidateRouteResult prepare(
             final RouteOrigins routeOrigins,
-            final List<Place> finalPlaces,
+            final List<Place> selectedCandidatePlaces,
             final Map<Place, Routes> candidateRoutes
     ) {
-        final List<OriginDestination> originDestinations = routeOrigins.createOriginDestinationsTo(finalPlaces);
+        final List<OriginDestination> originDestinations = routeOrigins.createOriginDestinationsTo(selectedCandidatePlaces);
         return new SelectedCandidateRouteResult(
-                collectRoutes(finalPlaces, candidateRoutes),
+                collectRoutes(selectedCandidatePlaces, candidateRoutes),
                 findCoursesByDestination(originDestinations)
         );
     }
 
     private Map<Place, Routes> collectRoutes(
-            final List<Place> finalPlaces,
+            final List<Place> selectedCandidatePlaces,
             final Map<Place, Routes> candidateRoutes
     ) {
-        return finalPlaces.stream()
+        return selectedCandidatePlaces.stream()
                 .collect(Collectors.toMap(
                         Function.identity(),
                         candidateRoutes::get

@@ -14,7 +14,7 @@ class CandidatePlaceSearchPolicyTest {
     private final CandidatePlaceSearchPolicy candidatePlaceSearchPolicy = new CandidatePlaceSearchPolicy();
 
     @Test
-    @DisplayName("최종 후보는 역 기준으로 중복 제거하고 선택된 후보가 속한 태그를 모두 부여한다")
+    @DisplayName("추천 후보는 역 기준으로 중복 제거하고 선택된 후보가 속한 태그를 모두 부여한다")
     void select_AssignsAllMatchedTagsWithoutDuplicatingPlaces() {
         final RouteCandidate shared = routeCandidate("공통후보역");
         final RouteCandidate maxBurden = routeCandidate("최장후보역");

@@ -36,7 +36,7 @@ class RecommendationPlaceSearchServiceTest {
     private PlaceRecommender placeRecommender;
 
     @Test
-    @DisplayName("장소 검색 결과가 조건을 만족하면 최종 후보를 함께 반환한다")
+    @DisplayName("장소 검색 결과가 조건을 만족하면 추천 후보를 함께 반환한다")
     void search() {
         final RecommendationPlaceSearchService service = new RecommendationPlaceSearchService(placeRecommender);
         final Place gangnam = new Place("강남역", new Point(127.027, 37.497));

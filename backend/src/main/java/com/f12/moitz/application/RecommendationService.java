@@ -115,26 +115,26 @@ public class RecommendationService {
         );
         stopWatch.stop();
 
-        stopWatch.start("최종 후보 확정");
+        stopWatch.start("추천 후보 확정");
         final SelectedCandidates selectedCandidates = recommendationPlaceSearchResult.getSelectedCandidates();
-        final List<Place> finalPlaces = selectedCandidates.getSelectedPlaces();
-        logSelectedCandidates(selectedPlaces, finalPlaces, candidateRoutes, recommendConditions);
-        validateRecommendationCandidates(finalPlaces);
+        final List<Place> recommendedCandidatePlaces = selectedCandidates.getSelectedPlaces();
+        logSelectedCandidates(selectedPlaces, recommendedCandidatePlaces, candidateRoutes, recommendConditions);
+        validateRecommendationCandidates(recommendedCandidatePlaces);
         final SelectedCandidateRouteResult selectedCandidateRouteResult = selectedCandidateRouteService.prepare(
                 routeOrigins,
-                finalPlaces,
+                recommendedCandidatePlaces,
                 candidateRoutes
         );
         stopWatch.stop();
 
         stopWatch.start("추천 이유 생성");
-        final List<String> finalPlaceNames = getPlaceNames(finalPlaces);
+        final List<String> recommendedCandidatePlaceNames = getPlaceNames(recommendedCandidatePlaces);
         final Map<String, ReasonAndDescription> reasonsByPlaceName = locationReasonGenerator.generateReasons(
-                finalPlaceNames,
+                recommendedCandidatePlaceNames,
                 toTagsByPlaceName(selectedCandidates)
         );
         final Map<Place, ReasonAndDescription> generatedPlacesWithReason = mapReasonsByPlace(
-                finalPlaces,
+                recommendedCandidatePlaces,
                 reasonsByPlaceName
         );
         stopWatch.stop();
@@ -267,23 +267,23 @@ public class RecommendationService {
 
     private void logSelectedCandidates(
             final List<Place> selectedPlaces,
-            final List<Place> finalPlaces,
+            final List<Place> recommendedCandidatePlaces,
             final Map<Place, Routes> candidateRoutes,
             final List<RecommendCondition> recommendConditions
     ) {
         log.debug(
-                "최종 후보 확정 - 장소 탐색 대상 {}개, 최종 후보 {}개, 요구 조건={}",
+                "추천 후보 확정 - 장소 탐색 대상 {}개, 추천 후보 {}개, 요구 조건={}",
                 selectedPlaces.size(),
-                finalPlaces.size(),
+                recommendedCandidatePlaces.size(),
                 recommendConditions.stream().map(RecommendCondition::getTitle).toList()
         );
 
-        if (finalPlaces.isEmpty()) {
-            log.debug("최종 후보 없음 - 장소 탐색 대상 상위 후보 {}", summarizePlacesWithScore(selectedPlaces, candidateRoutes));
+        if (recommendedCandidatePlaces.isEmpty()) {
+            log.debug("추천 후보 없음 - 장소 탐색 대상 상위 후보 {}", summarizePlacesWithScore(selectedPlaces, candidateRoutes));
             return;
         }
 
-        log.debug("최종 후보 목록 - {}", summarizePlacesWithScore(finalPlaces, candidateRoutes));
+        log.debug("추천 후보 목록 - {}", summarizePlacesWithScore(recommendedCandidatePlaces, candidateRoutes));
     }
 
     private List<String> summarizePlacesWithScore(
@@ -296,8 +296,8 @@ public class RecommendationService {
                 .toList();
     }
 
-    private void validateRecommendationCandidates(final List<Place> finalPlaces) {
-        if (finalPlaces.isEmpty()) {
+    private void validateRecommendationCandidates(final List<Place> recommendedCandidatePlaces) {
+        if (recommendedCandidatePlaces.isEmpty()) {
             throw new BadRequestException(GeneralErrorCode.RECOMMENDATION_NOT_FOUND);
         }
     }

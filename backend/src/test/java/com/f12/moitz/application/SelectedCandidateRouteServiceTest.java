@@ -32,7 +32,7 @@ class SelectedCandidateRouteServiceTest {
     private RouteFinder routeFinder;
 
     @Test
-    @DisplayName("최종 후보의 경로와 코스를 장소별로 조립한다")
+    @DisplayName("선택된 추천 후보의 경로와 코스를 장소별로 조립한다")
     void assemble() {
         final SelectedCandidateRouteService service = new SelectedCandidateRouteService(routeFinder);
         final Place gangnam = new Place("강남역", new Point(127.027, 37.497));
