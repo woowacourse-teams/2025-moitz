@@ -30,7 +30,7 @@ import org.springframework.stereotype.Component;
 @Slf4j
 public class GoogleGeminiClient {
 
-    private static final String GEMINI_MODEL = "gemini-2.0-flash";
+    private static final String GEMINI_MODEL = "gemini-2.5-flash";
 
     private final JsonParser jsonParser;
     private final Client geminiClient;

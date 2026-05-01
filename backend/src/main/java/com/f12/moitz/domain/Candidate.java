@@ -1,23 +1,42 @@
 package com.f12.moitz.domain;
 
+import java.util.List;
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Candidate {
 
-    private final Place destination;
-    private final Routes routes;
-    private final Courses courses;
-    private final CategorizedRecommendedPlaces recommendedPlaces;
-    private final String description;
-    private final String reason;
-    private final int votes;
+    private Place destination;
+    private Routes routes;
+    private Courses courses;
+    private CategorizedRecommendedPlaces recommendedPlaces;
+    private List<CandidateSelectionTag> tags;
+    private String description;
+    private String reason;
+    private int votes;
 
     public Candidate(
             final Place destination,
             final Routes routes,
             final Courses courses,
             final CategorizedRecommendedPlaces recommendedPlaces,
+            final CandidateSelectionTag tag,
+            final String description,
+            final String reason,
+            final int votes
+    ) {
+        this(destination, routes, courses, recommendedPlaces, List.of(resolveNullableTag(tag)), description, reason, votes);
+    }
+
+    public Candidate(
+            final Place destination,
+            final Routes routes,
+            final Courses courses,
+            final CategorizedRecommendedPlaces recommendedPlaces,
+            final List<CandidateSelectionTag> tags,
             final String description,
             final String reason,
             final int votes
@@ -27,6 +46,7 @@ public class Candidate {
         this.routes = routes;
         this.courses = courses;
         this.recommendedPlaces = recommendedPlaces;
+        this.tags = resolveTags(tags);
         this.description = description;
         this.reason = reason;
         this.votes = votes;
@@ -64,8 +84,27 @@ public class Candidate {
         }
     }
 
+    private static CandidateSelectionTag resolveNullableTag(final CandidateSelectionTag tag) {
+        if (tag == null) {
+            return CandidateSelectionTag.GENERAL;
+        }
+        return tag;
+    }
+
+    private List<CandidateSelectionTag> resolveTags(final List<CandidateSelectionTag> tags) {
+        return CandidateSelectionTag.normalize(tags);
+    }
+
     public int calculateAverageTravelTime() {
         return routes.calculateAverageTravelTime();
+    }
+
+    public CandidateSelectionTag getTag() {
+        return getTags().getFirst();
+    }
+
+    public List<CandidateSelectionTag> getTags() {
+        return resolveTags(tags);
     }
 
 }
