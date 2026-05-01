@@ -9,9 +9,9 @@ import java.util.Map;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-class FinalCandidateSelectorTest {
+class CandidatePlaceSearchPolicyTest {
 
-    private final FinalCandidateSelector finalCandidateSelector = new FinalCandidateSelector();
+    private final CandidatePlaceSearchPolicy candidatePlaceSearchPolicy = new CandidatePlaceSearchPolicy();
 
     @Test
     @DisplayName("최종 후보는 역 기준으로 중복 제거하고 선택된 후보가 속한 태그를 모두 부여한다")
@@ -30,7 +30,7 @@ class FinalCandidateSelectorTest {
                 createTagSelections(shared, maxBurden, efficiency, transfer, general)
         );
 
-        final SelectedCandidates selectionResult = finalCandidateSelector.select(
+        final SelectedCandidates selectionResult = candidatePlaceSearchPolicy.select(
                 candidateSelection,
                 candidateSelection.getSelectedPlaces(),
                 ignored -> true,
@@ -62,7 +62,7 @@ class FinalCandidateSelectorTest {
                 Map.of(CandidateSelectionTag.FAIRNESS, List.of(failedFairness, nextFairness))
         );
 
-        final SelectedCandidates selectionResult = finalCandidateSelector.select(
+        final SelectedCandidates selectionResult = candidatePlaceSearchPolicy.select(
                 candidateSelection,
                 candidateSelection.getSelectedPlaces(),
                 place -> !place.getName().equals("실패후보역"),
@@ -101,7 +101,7 @@ class FinalCandidateSelectorTest {
                 tagSelections
         );
 
-        final List<Place> nextSearchPlaces = finalCandidateSelector.selectNextSearchPlaces(
+        final List<Place> nextSearchPlaces = candidatePlaceSearchPolicy.selectNextSearchPlaces(
                 candidateSelection,
                 List.of(fairness.getPlace()),
                 ignored -> true,
@@ -136,7 +136,7 @@ class FinalCandidateSelectorTest {
                 tagSelections
         );
 
-        final List<Place> nextSearchPlaces = finalCandidateSelector.selectNextSearchPlaces(
+        final List<Place> nextSearchPlaces = candidatePlaceSearchPolicy.selectNextSearchPlaces(
                 candidateSelection,
                 List.of(fairness.getPlace(), efficiency.getPlace(), general.getPlace()),
                 ignored -> true,

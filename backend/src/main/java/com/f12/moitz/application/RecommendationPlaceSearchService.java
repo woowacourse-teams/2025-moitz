@@ -4,7 +4,7 @@ import com.f12.moitz.application.port.PlaceRecommender;
 import com.f12.moitz.domain.CandidateSelection;
 import com.f12.moitz.domain.CategorizedRecommendedPlaces;
 import com.f12.moitz.domain.SelectedCandidates;
-import com.f12.moitz.domain.FinalCandidateSelector;
+import com.f12.moitz.domain.CandidatePlaceSearchPolicy;
 import com.f12.moitz.domain.Place;
 import com.f12.moitz.domain.RecommendCondition;
 import com.f12.moitz.domain.RecommendedPlace;
@@ -24,7 +24,7 @@ public class RecommendationPlaceSearchService {
     private static final int PLACE_SEARCH_BATCH_SIZE = 5;
 
     private final PlaceRecommender placeRecommender;
-    private final FinalCandidateSelector finalCandidateSelector = new FinalCandidateSelector();
+    private final CandidatePlaceSearchPolicy candidatePlaceSearchPolicy = new CandidatePlaceSearchPolicy();
 
     public RecommendationPlaceSearchService(
             @Qualifier("placeRecommenderParallelAdapter") final PlaceRecommender placeRecommender
@@ -41,7 +41,7 @@ public class RecommendationPlaceSearchService {
     ) {
         final Map<Place, CategorizedRecommendedPlaces> accumulatedRecommendedPlaces = new LinkedHashMap<>();
         final List<Place> searchedPlaces = new ArrayList<>();
-        SelectedCandidates selectedCandidates = selectFinalPlaces(
+        SelectedCandidates selectedCandidates = selectRecommendedCandidates(
                 candidateSelection,
                 searchedPlaces,
                 accumulatedRecommendedPlaces,
@@ -51,7 +51,7 @@ public class RecommendationPlaceSearchService {
 
         while (searchedPlaces.size() < searchLimit) {
             if (selectedCandidates.getSelectedPlaces().size() >= targetCount) {
-                log.debug("장소 추천 조기 종료 - 최종 후보 {}개 확보", targetCount);
+                log.debug("장소 추천 조기 종료 - 추천 후보 {}개 확보", targetCount);
                 break;
             }
 
@@ -59,7 +59,7 @@ public class RecommendationPlaceSearchService {
                     PLACE_SEARCH_BATCH_SIZE,
                     searchLimit - searchedPlaces.size()
             );
-            final List<Place> batch = finalCandidateSelector.selectNextSearchPlaces(
+            final List<Place> batch = candidatePlaceSearchPolicy.selectNextSearchPlaces(
                     candidateSelection,
                     searchedPlaces,
                     place -> satisfiesPlaceRequirements(place, accumulatedRecommendedPlaces, recommendConditions),
@@ -79,7 +79,7 @@ public class RecommendationPlaceSearchService {
             accumulatedRecommendedPlaces.putAll(placeRecommender.recommendPlaces(batch, recommendConditions));
             searchedPlaces.addAll(batch);
 
-            selectedCandidates = selectFinalPlaces(
+            selectedCandidates = selectRecommendedCandidates(
                     candidateSelection,
                     searchedPlaces,
                     accumulatedRecommendedPlaces,
@@ -88,7 +88,7 @@ public class RecommendationPlaceSearchService {
             );
 
             log.debug(
-                    "장소 추천 배치 완료 - 누적 조회 {}개, 현재 최종 후보 {}개",
+                    "장소 추천 배치 완료 - 누적 조회 {}개, 현재 추천 후보 {}개",
                     searchedPlaces.size(),
                     selectedCandidates.getSelectedPlaces().size()
             );
@@ -101,14 +101,14 @@ public class RecommendationPlaceSearchService {
         );
     }
 
-    private SelectedCandidates selectFinalPlaces(
+    private SelectedCandidates selectRecommendedCandidates(
             final CandidateSelection candidateSelection,
             final List<Place> selectedPlaces,
             final Map<Place, CategorizedRecommendedPlaces> recommendedPlaces,
             final List<RecommendCondition> recommendConditions,
             final int targetCount
     ) {
-        return finalCandidateSelector.select(
+        return candidatePlaceSearchPolicy.select(
                 candidateSelection,
                 selectedPlaces,
                 place -> satisfiesPlaceRequirements(place, recommendedPlaces, recommendConditions),
