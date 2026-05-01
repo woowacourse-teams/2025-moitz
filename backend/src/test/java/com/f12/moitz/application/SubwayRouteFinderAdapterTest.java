@@ -3,10 +3,10 @@ package com.f12.moitz.application;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.f12.moitz.application.adapter.SubwayRouteFinderAdapter;
-import com.f12.moitz.application.port.dto.StartEndPair;
 import com.f12.moitz.domain.Place;
 import com.f12.moitz.domain.Point;
 import com.f12.moitz.domain.Route;
+import com.f12.moitz.domain.OriginDestination;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.Disabled;
@@ -39,13 +39,13 @@ class SubwayRouteFinderAdapterTest {
         generatedPlaces.add(new Place("석촌역", new Point(125, 34)));
         generatedPlaces.add(new Place("합정역", new Point(125, 34)));
 
-        final List<StartEndPair> allPairs = generatedPlaces.stream()
+        final List<OriginDestination> originDestinations = generatedPlaces.stream()
                 .flatMap(endPlace -> startingPlaces.stream()
-                        .map(startPlace -> new StartEndPair(startPlace, endPlace)))
+                        .map(startPlace -> new OriginDestination(startPlace, endPlace)))
                 .toList();
 
         // When
-        List<Route> routes = routeFinder.findRoutes(allPairs);
+        List<Route> routes = routeFinder.findRoutes(originDestinations);
 
         // Then
         assertThat(routes).hasSize(15);

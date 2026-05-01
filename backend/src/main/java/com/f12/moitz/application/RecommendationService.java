@@ -7,7 +7,6 @@ import com.f12.moitz.application.port.LocationReasonGenerator;
 import com.f12.moitz.application.port.PlaceRecommender;
 import com.f12.moitz.application.port.RouteFinder;
 import com.f12.moitz.application.port.dto.ReasonAndDescription;
-import com.f12.moitz.application.port.dto.StartEndPair;
 import com.f12.moitz.application.utils.RecommendationMapper;
 import com.f12.moitz.common.error.exception.BadRequestException;
 import com.f12.moitz.common.error.exception.GeneralErrorCode;
@@ -27,6 +26,7 @@ import com.f12.moitz.domain.Recommendation;
 import com.f12.moitz.domain.Result;
 import com.f12.moitz.domain.Route;
 import com.f12.moitz.domain.RouteCandidate;
+import com.f12.moitz.domain.OriginDestination;
 import com.f12.moitz.domain.Routes;
 import com.f12.moitz.domain.repository.RecommendResultRepository;
 import com.f12.moitz.domain.subway.SubwayStation;
@@ -87,8 +87,11 @@ public class RecommendationService {
         validateUniqueStartingPlaces(startingPlaces);
         final DispersionPolicy dispersionPolicy = resolveDispersionPolicy(startingPlaces);
         final List<Place> candidatePlaces = getCandidatePlaces(startingPlaces, dispersionPolicy);
-        final List<StartEndPair> candidatePairs = createPairs(startingPlaces, candidatePlaces);
-        final Map<Place, Routes> candidateRoutes = findRoutesForAll(candidatePairs);
+        final List<OriginDestination> candidateOriginDestinations = createOriginDestinations(
+                startingPlaces,
+                candidatePlaces
+        );
+        final Map<Place, Routes> candidateRoutes = findRoutesForAll(candidateOriginDestinations);
         final CandidateSelectionResult candidateSelection = placeSearchCandidateSelector.select(
                 toRouteCandidates(candidatePlaces, candidateRoutes),
                 dispersionPolicy,
@@ -123,8 +126,11 @@ public class RecommendationService {
         final List<Place> finalPlaces = finalCandidateSelection.getSelectedPlaces();
         logFinalCandidateSelection(selectedPlaces, finalPlaces, candidateRoutes, recommendConditions);
         validateRecommendationCandidates(finalPlaces);
-        final List<StartEndPair> finalPairs = createPairs(startingPlaces, finalPlaces);
-        final Map<Place, Courses> placeCourses = findCoursesForAll(finalPairs);
+        final List<OriginDestination> finalOriginDestinations = createOriginDestinations(
+                startingPlaces,
+                finalPlaces
+        );
+        final Map<Place, Courses> placeCourses = findCoursesForAll(finalOriginDestinations);
         final Map<Place, Routes> finalPlaceRoutes = finalPlaces.stream()
                 .collect(Collectors.toMap(
                         Function.identity(),
@@ -258,24 +264,26 @@ public class RecommendationService {
         };
     }
 
-    private List<StartEndPair> createPairs(
+    private List<OriginDestination> createOriginDestinations(
             final List<? extends Place> startingPlaces,
             final List<Place> generatedPlaces
     ) {
         return generatedPlaces.stream()
                 .flatMap(endPlace -> startingPlaces.stream()
-                        .map(startPlace -> new StartEndPair(startPlace, endPlace)))
+                        .map(startPlace -> new OriginDestination(startPlace, endPlace)))
                 .toList();
     }
 
-    private Map<Place, Routes> findRoutesForAll(final List<StartEndPair> allPairs) {
-        final List<Route> allRoutes = routeFinder.findRoutes(allPairs);
-        return collectByPlace(allPairs, allRoutes, Routes::new);
+    private Map<Place, Routes> findRoutesForAll(final List<OriginDestination> originDestinations) {
+        final List<Route> allRoutes = routeFinder.findRoutes(originDestinations);
+        return collectByPlace(originDestinations, allRoutes, Routes::new);
     }
 
     private DispersionPolicy resolveDispersionPolicy(final List<SubwayStation> startingPlaces) {
-        final List<StartEndPair> startingPairs = createStartingPlacePairs(startingPlaces);
-        final List<Route> pairRoutes = routeFinder.findRoutes(startingPairs);
+        final List<OriginDestination> originDestinations = createStartingPlaceOriginDestinations(
+                startingPlaces
+        );
+        final List<Route> pairRoutes = routeFinder.findRoutes(originDestinations);
         final int pairMaxTravelTime = pairRoutes.stream()
                 .mapToInt(Route::calculateTotalTravelTime)
                 .max()
@@ -306,28 +314,30 @@ public class RecommendationService {
         return dispersionPolicy;
     }
 
-    private List<StartEndPair> createStartingPlacePairs(final List<SubwayStation> startingPlaces) {
+    private List<OriginDestination> createStartingPlaceOriginDestinations(
+            final List<SubwayStation> startingPlaces
+    ) {
         return IntStream.range(0, startingPlaces.size())
                 .boxed()
                 .flatMap(left -> IntStream.range(left + 1, startingPlaces.size())
-                        .mapToObj(right -> new StartEndPair(startingPlaces.get(left), startingPlaces.get(right))))
+                        .mapToObj(right -> new OriginDestination(startingPlaces.get(left), startingPlaces.get(right))))
                 .toList();
     }
 
-    private Map<Place, Courses> findCoursesForAll(final List<StartEndPair> allPairs) {
-        final List<Course> allCourses = routeFinder.findCourses(allPairs);
-        return collectByPlace(allPairs, allCourses, Courses::new);
+    private Map<Place, Courses> findCoursesForAll(final List<OriginDestination> originDestinations) {
+        final List<Course> allCourses = routeFinder.findCourses(originDestinations);
+        return collectByPlace(originDestinations, allCourses, Courses::new);
     }
 
     private <T, U> Map<Place, U> collectByPlace(
-            final List<StartEndPair> allPairs,
+            final List<OriginDestination> originDestinations,
             final List<T> elements,
             final Function<List<T>, U> creator
     ) {
-        return IntStream.range(0, allPairs.size())
+        return IntStream.range(0, originDestinations.size())
                 .boxed()
                 .collect(Collectors.groupingBy(
-                        i -> allPairs.get(i).end(),
+                        i -> originDestinations.get(i).getDestination(),
                         Collectors.mapping(
                                 elements::get,
                                 Collectors.toList()
