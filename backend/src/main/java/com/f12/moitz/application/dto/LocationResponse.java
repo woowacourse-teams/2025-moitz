@@ -107,12 +107,19 @@ public record LocationResponse(
                 name,
                 avgMinutes,
                 isBest,
-                List.of(tag),
+                List.of(validateTag(tag)),
                 description,
                 reason,
                 places,
                 routes
         );
+    }
+
+    private static String validateTag(final String tag) {
+        if (tag == null || tag.isBlank()) {
+            throw new IllegalArgumentException("추천 태그는 비어 있을 수 없습니다.");
+        }
+        return tag;
     }
 
 }
