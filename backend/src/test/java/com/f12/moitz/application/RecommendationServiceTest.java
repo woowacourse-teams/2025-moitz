@@ -75,6 +75,7 @@ class RecommendationServiceTest {
                 locationReasonGenerator,
                 routeFinder,
                 new RouteOriginDispersionResolver(routeFinder),
+                new RouteCandidateAssembler(subwayStationService, routeFinder),
                 recommendationMapper,
                 recommendResultRepository
         );

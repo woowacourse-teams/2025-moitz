@@ -25,7 +25,6 @@ import com.f12.moitz.domain.RecommendCondition;
 import com.f12.moitz.domain.Recommendation;
 import com.f12.moitz.domain.Result;
 import com.f12.moitz.domain.OriginDestination;
-import com.f12.moitz.domain.Route;
 import com.f12.moitz.domain.RouteCandidate;
 import com.f12.moitz.domain.RouteOrigins;
 import com.f12.moitz.domain.Routes;
@@ -58,6 +57,7 @@ public class RecommendationService {
     private final LocationReasonGenerator locationReasonGenerator;
     private final RouteFinder routeFinder;
     private final RouteOriginDispersionResolver routeOriginDispersionResolver;
+    private final RouteCandidateAssembler routeCandidateAssembler;
     private final RecommendationMapper recommendationMapper;
     private final RecommendResultRepository recommendResultRepository;
     private final PlaceSearchCandidateSelector placeSearchCandidateSelector = new PlaceSearchCandidateSelector();
@@ -69,6 +69,7 @@ public class RecommendationService {
             @Autowired final LocationReasonGenerator locationReasonGenerator,
             @Qualifier("subwayRouteFinderAdapter") final RouteFinder routeFinder,
             @Autowired final RouteOriginDispersionResolver routeOriginDispersionResolver,
+            @Autowired final RouteCandidateAssembler routeCandidateAssembler,
             @Autowired final RecommendationMapper recommendationMapper,
             @Autowired final RecommendResultRepository recommendResultRepository
     ) {
@@ -77,6 +78,7 @@ public class RecommendationService {
         this.locationReasonGenerator = locationReasonGenerator;
         this.routeFinder = routeFinder;
         this.routeOriginDispersionResolver = routeOriginDispersionResolver;
+        this.routeCandidateAssembler = routeCandidateAssembler;
         this.recommendationMapper = recommendationMapper;
         this.recommendResultRepository = recommendResultRepository;
     }
@@ -90,13 +92,15 @@ public class RecommendationService {
         final List<SubwayStation> startingPlaces = getByNames(request.startingPlaceNames());
         final RouteOrigins routeOrigins = createRouteOrigins(startingPlaces);
         final DispersionPolicy dispersionPolicy = routeOriginDispersionResolver.resolve(routeOrigins);
-        final List<Place> candidatePlaces = getCandidatePlaces(startingPlaces, routeOrigins, dispersionPolicy);
-        final List<OriginDestination> candidateOriginDestinations = routeOrigins.createOriginDestinationsTo(
-                candidatePlaces
+        final RouteCandidateAssembly routeCandidateAssembly = routeCandidateAssembler.assemble(
+                startingPlaces,
+                routeOrigins,
+                dispersionPolicy
         );
-        final Map<Place, Routes> candidateRoutes = findRoutesForAll(candidateOriginDestinations);
+        final List<Place> candidatePlaces = routeCandidateAssembly.getCandidatePlaces();
+        final Map<Place, Routes> candidateRoutes = routeCandidateAssembly.getCandidateRoutes();
         final CandidateSelectionResult candidateSelection = placeSearchCandidateSelector.select(
-                toRouteCandidates(candidatePlaces, candidateRoutes),
+                routeCandidateAssembly.getRouteCandidates(),
                 dispersionPolicy,
                 PLACE_SEARCH_POOL_LIMIT
         );
@@ -231,44 +235,6 @@ public class RecommendationService {
         }
     }
 
-    private List<Place> getCandidatePlaces(
-            final List<SubwayStation> startingPlaces,
-            final RouteOrigins routeOrigins,
-            final DispersionPolicy dispersionPolicy
-    ) {
-        final int radiusKilometers = resolveCandidatePrefilterRadius(dispersionPolicy);
-        final List<String> startingPlaceNames = routeOrigins.getNames();
-        final List<Place> candidatePlaces = subwayStationService.generateCandidatePlace(
-                        startingPlaces,
-                        radiusKilometers
-                ).stream()
-                .filter(place -> !startingPlaceNames.contains(place.getName()))
-                .map(Place.class::cast)
-                .toList();
-
-        log.debug(
-                "후보역 1차 필터 완료 - policy={}, radius={}km, 후보 {}개",
-                dispersionPolicy,
-                radiusKilometers,
-                candidatePlaces.size()
-        );
-        return candidatePlaces;
-    }
-
-    private int resolveCandidatePrefilterRadius(final DispersionPolicy dispersionPolicy) {
-        return switch (dispersionPolicy) {
-            case TIER_1, TIER_2 -> 10;
-            case TIER_3 -> 20;
-            case TIER_4 -> 30;
-            case TIER_5 -> 40;
-        };
-    }
-
-    private Map<Place, Routes> findRoutesForAll(final List<OriginDestination> originDestinations) {
-        final List<Route> allRoutes = routeFinder.findRoutes(originDestinations);
-        return collectByPlace(originDestinations, allRoutes, Routes::new);
-    }
-
     private Map<Place, Courses> findCoursesForAll(final List<OriginDestination> originDestinations) {
         final List<Course> allCourses = routeFinder.findCourses(originDestinations);
         return collectByPlace(originDestinations, allCourses, Courses::new);
@@ -293,16 +259,6 @@ public class RecommendationService {
                         Entry::getKey,
                         entry -> creator.apply(entry.getValue())
                 ));
-    }
-
-    private List<RouteCandidate> toRouteCandidates(
-            final List<Place> candidatePlaces,
-            final Map<Place, Routes> candidateRoutes
-    ) {
-        return candidatePlaces.stream()
-                .filter(candidateRoutes::containsKey)
-                .map(place -> new RouteCandidate(place, candidateRoutes.get(place)))
-                .toList();
     }
 
     private void logCandidateSelection(
