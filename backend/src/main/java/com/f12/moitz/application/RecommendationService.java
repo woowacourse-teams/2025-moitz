@@ -24,9 +24,10 @@ import com.f12.moitz.domain.PlaceSearchCandidateSelector;
 import com.f12.moitz.domain.RecommendCondition;
 import com.f12.moitz.domain.Recommendation;
 import com.f12.moitz.domain.Result;
+import com.f12.moitz.domain.OriginDestination;
 import com.f12.moitz.domain.Route;
 import com.f12.moitz.domain.RouteCandidate;
-import com.f12.moitz.domain.OriginDestination;
+import com.f12.moitz.domain.RouteOrigins;
 import com.f12.moitz.domain.Routes;
 import com.f12.moitz.domain.repository.RecommendResultRepository;
 import com.f12.moitz.domain.subway.SubwayStation;
@@ -84,11 +85,10 @@ public class RecommendationService {
         stopWatch.start("공평한 후보역 선정");
         final List<RecommendCondition> recommendConditions = RecommendCondition.fromTitle(request.requirements());
         final List<SubwayStation> startingPlaces = getByNames(request.startingPlaceNames());
-        validateUniqueStartingPlaces(startingPlaces);
-        final DispersionPolicy dispersionPolicy = resolveDispersionPolicy(startingPlaces);
-        final List<Place> candidatePlaces = getCandidatePlaces(startingPlaces, dispersionPolicy);
-        final List<OriginDestination> candidateOriginDestinations = createOriginDestinations(
-                startingPlaces,
+        final RouteOrigins routeOrigins = createRouteOrigins(startingPlaces);
+        final DispersionPolicy dispersionPolicy = resolveDispersionPolicy(routeOrigins);
+        final List<Place> candidatePlaces = getCandidatePlaces(startingPlaces, routeOrigins, dispersionPolicy);
+        final List<OriginDestination> candidateOriginDestinations = routeOrigins.createOriginDestinationsTo(
                 candidatePlaces
         );
         final Map<Place, Routes> candidateRoutes = findRoutesForAll(candidateOriginDestinations);
@@ -126,10 +126,7 @@ public class RecommendationService {
         final List<Place> finalPlaces = finalCandidateSelection.getSelectedPlaces();
         logFinalCandidateSelection(selectedPlaces, finalPlaces, candidateRoutes, recommendConditions);
         validateRecommendationCandidates(finalPlaces);
-        final List<OriginDestination> finalOriginDestinations = createOriginDestinations(
-                startingPlaces,
-                finalPlaces
-        );
+        final List<OriginDestination> finalOriginDestinations = routeOrigins.createOriginDestinationsTo(finalPlaces);
         final Map<Place, Courses> placeCourses = findCoursesForAll(finalOriginDestinations);
         final Map<Place, Routes> finalPlaceRoutes = finalPlaces.stream()
                 .collect(Collectors.toMap(
@@ -223,21 +220,21 @@ public class RecommendationService {
                 .toList();
     }
 
-    private void validateUniqueStartingPlaces(final List<SubwayStation> startingPlaces) {
-        final long distinctCount = startingPlaces.stream()
-                .distinct()
-                .count();
-        if (distinctCount != startingPlaces.size()) {
+    private RouteOrigins createRouteOrigins(final List<SubwayStation> startingPlaces) {
+        try {
+            return new RouteOrigins(startingPlaces);
+        } catch (IllegalArgumentException e) {
             throw new BadRequestException(GeneralErrorCode.INPUT_INVALID_START_LOCATION, getPlaceNames(startingPlaces));
         }
     }
 
     private List<Place> getCandidatePlaces(
             final List<SubwayStation> startingPlaces,
+            final RouteOrigins routeOrigins,
             final DispersionPolicy dispersionPolicy
     ) {
         final int radiusKilometers = resolveCandidatePrefilterRadius(dispersionPolicy);
-        final List<String> startingPlaceNames = getPlaceNames(startingPlaces);
+        final List<String> startingPlaceNames = routeOrigins.getNames();
         final List<Place> candidatePlaces = subwayStationService.generateCandidatePlace(
                         startingPlaces,
                         radiusKilometers
@@ -264,25 +261,13 @@ public class RecommendationService {
         };
     }
 
-    private List<OriginDestination> createOriginDestinations(
-            final List<? extends Place> startingPlaces,
-            final List<Place> generatedPlaces
-    ) {
-        return generatedPlaces.stream()
-                .flatMap(endPlace -> startingPlaces.stream()
-                        .map(startPlace -> new OriginDestination(startPlace, endPlace)))
-                .toList();
-    }
-
     private Map<Place, Routes> findRoutesForAll(final List<OriginDestination> originDestinations) {
         final List<Route> allRoutes = routeFinder.findRoutes(originDestinations);
         return collectByPlace(originDestinations, allRoutes, Routes::new);
     }
 
-    private DispersionPolicy resolveDispersionPolicy(final List<SubwayStation> startingPlaces) {
-        final List<OriginDestination> originDestinations = createStartingPlaceOriginDestinations(
-                startingPlaces
-        );
+    private DispersionPolicy resolveDispersionPolicy(final RouteOrigins routeOrigins) {
+        final List<OriginDestination> originDestinations = routeOrigins.createOriginDestinationsBetweenOrigins();
         final List<Route> pairRoutes = routeFinder.findRoutes(originDestinations);
         final int pairMaxTravelTime = pairRoutes.stream()
                 .mapToInt(Route::calculateTotalTravelTime)
@@ -297,7 +282,7 @@ public class RecommendationService {
                 .filter(minutes -> minutes >= DispersionPolicy.LONG_PAIR_TRAVEL_TIME_MINUTES)
                 .count();
         final DispersionPolicy dispersionPolicy = DispersionPolicy.resolve(
-                startingPlaces.size(),
+                routeOrigins.size(),
                 pairMaxTravelTime,
                 pairAverageTravelTime,
                 longPairCount
@@ -305,23 +290,13 @@ public class RecommendationService {
 
         log.debug(
                 "출발지 분산도 판정 - 출발역={}, pairMax={}분, pairAvg={}분, longPairCount={}, policy={}",
-                getPlaceNames(startingPlaces),
+                routeOrigins.getNames(),
                 pairMaxTravelTime,
                 String.format(java.util.Locale.US, "%.1f", pairAverageTravelTime),
                 longPairCount,
                 dispersionPolicy
         );
         return dispersionPolicy;
-    }
-
-    private List<OriginDestination> createStartingPlaceOriginDestinations(
-            final List<SubwayStation> startingPlaces
-    ) {
-        return IntStream.range(0, startingPlaces.size())
-                .boxed()
-                .flatMap(left -> IntStream.range(left + 1, startingPlaces.size())
-                        .mapToObj(right -> new OriginDestination(startingPlaces.get(left), startingPlaces.get(right))))
-                .toList();
     }
 
     private Map<Place, Courses> findCoursesForAll(final List<OriginDestination> originDestinations) {
