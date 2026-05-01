@@ -252,8 +252,6 @@ public class PromptGenerator {
         return sb.toString();
     }
 
-    public static final int PLACE_RECOMMENDATION_COUNT = 5;
-
     public static Map<String, Object> getSchema() {
         return Map.of(
                 "type", "object",

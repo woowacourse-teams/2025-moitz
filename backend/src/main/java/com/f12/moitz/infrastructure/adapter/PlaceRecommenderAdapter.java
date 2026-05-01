@@ -1,7 +1,5 @@
 package com.f12.moitz.infrastructure.adapter;
 
-import static com.f12.moitz.infrastructure.PromptGenerator.PLACE_RECOMMENDATION_COUNT;
-
 import com.f12.moitz.application.port.PlaceRecommender;
 import com.f12.moitz.domain.CategorizedRecommendedPlaces;
 import com.f12.moitz.domain.Place;
@@ -25,6 +23,8 @@ import org.springframework.stereotype.Component;
 @Component
 @RequiredArgsConstructor
 public class PlaceRecommenderAdapter implements PlaceRecommender {
+
+    private static final int PLACE_RECOMMENDATION_COUNT = 5;
 
     private final KakaoMapClient kakaoMapClient;
     private final KakaoPlaceMapper kakaoPlaceMapper;

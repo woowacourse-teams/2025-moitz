@@ -1,7 +1,5 @@
 package com.f12.moitz.infrastructure.adapter;
 
-import static com.f12.moitz.infrastructure.PromptGenerator.PLACE_RECOMMENDATION_COUNT;
-
 import com.f12.moitz.application.port.PlaceRecommender;
 import com.f12.moitz.common.error.exception.ExternalApiErrorCode;
 import com.f12.moitz.common.error.exception.ExternalApiException;
@@ -28,6 +26,8 @@ import reactor.core.publisher.Mono;
 @Component
 @RequiredArgsConstructor
 public class PlaceRecommenderParallelAdapter implements PlaceRecommender {
+
+    private static final int PLACE_RECOMMENDATION_COUNT = 5;
 
     private final KakaoMapAsyncClient kakaoMapAsyncClient;
     private final KakaoPlaceMapper kakaoPlaceMapper;
