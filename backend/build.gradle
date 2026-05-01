@@ -63,5 +63,5 @@ tasks.withType(Test).configureEach {
 	systemProperty "spring.profiles.active",
 			System.getProperty("spring.profiles.active")
 					?: System.getenv("SPRING_PROFILES_ACTIVE")
-					?: "local"
+					?: "test"
 }
