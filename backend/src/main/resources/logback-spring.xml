@@ -12,7 +12,7 @@
     <springProperty scope="context" name="ERROR_LOG_PATH" source="prod.logging.file.error.path"/>
 
     <!-- 개발 환경용 설정 -->
-    <springProfile name="dev">
+    <springProfile name="dev | local">
         <!-- 콘솔 전용 Appender -->
         <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
             <encoder>

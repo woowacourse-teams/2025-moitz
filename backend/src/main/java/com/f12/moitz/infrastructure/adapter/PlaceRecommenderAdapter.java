@@ -24,6 +24,8 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class PlaceRecommenderAdapter implements PlaceRecommender {
 
+    private static final int PLACE_RECOMMENDATION_COUNT = 5;
+
     private final KakaoMapClient kakaoMapClient;
     private final KakaoPlaceMapper kakaoPlaceMapper;
 
@@ -97,7 +99,7 @@ public class PlaceRecommenderAdapter implements PlaceRecommender {
                                 place.getPoint().getX(),
                                 place.getPoint().getY(),
                                 800,
-                                3
+                                PLACE_RECOMMENDATION_COUNT
                         )
                 );
                 allResponses.add(response);

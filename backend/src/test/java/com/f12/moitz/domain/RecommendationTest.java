@@ -44,27 +44,29 @@ class RecommendationTest {
     }
 
     @Test
-    @DisplayName("후보지들을 평균 소요 시간 순으로 정렬한다")
+    @DisplayName("후보지들을 태그 순서 우선으로 정렬한다")
     void sortCandidates() {
         // Given
-        final Candidate candidate1 = createCandidate(1500, 600);
-        final Candidate candidate2 = createCandidate(1200, 600);
-        final List<Candidate> candidates = List.of(candidate1, candidate2);
+        final Candidate generalCandidate = createCandidate(1200, 600, CandidateSelectionTag.GENERAL);
+        final Candidate transferCandidate = createCandidate(1500, 600, CandidateSelectionTag.TRANSFER);
+        final Candidate fairnessCandidate = createCandidate(1800, 600, CandidateSelectionTag.FAIRNESS);
+        final List<Candidate> candidates = List.of(generalCandidate, transferCandidate, fairnessCandidate);
 
         // When
         final Recommendation recommendation = new Recommendation(candidates);
 
         // Then
-        assertThat(recommendation.get(0)).isEqualTo(candidate2);
-        assertThat(recommendation.get(1)).isEqualTo(candidate1);
+        assertThat(recommendation.get(0)).isEqualTo(fairnessCandidate);
+        assertThat(recommendation.get(1)).isEqualTo(transferCandidate);
+        assertThat(recommendation.get(2)).isEqualTo(generalCandidate);
     }
 
     @Test
     @DisplayName("최적의 추천 시간을 올바르게 반환한다")
     void getBestRecommendationTime() {
         // Given
-        final Candidate candidate1 = createCandidate(1200, 600);
-        final Candidate candidate2 = createCandidate(1800, 600);
+        final Candidate candidate1 = createCandidate(1200, 600, CandidateSelectionTag.GENERAL);
+        final Candidate candidate2 = createCandidate(1800, 600, CandidateSelectionTag.FAIRNESS);
         final List<Candidate> candidates = List.of(candidate1, candidate2);
         final Recommendation recommendation = new Recommendation(candidates);
 
@@ -76,6 +78,14 @@ class RecommendationTest {
     }
 
     private Candidate createCandidate(int path1TravelTime, int path2TravelTime) {
+        return createCandidate(path1TravelTime, path2TravelTime, CandidateSelectionTag.GENERAL);
+    }
+
+    private Candidate createCandidate(
+            final int path1TravelTime,
+            final int path2TravelTime,
+            final CandidateSelectionTag tag
+    ) {
         final Place startPlace = new Place("잠실역", new Point(127.0, 37.0));
         final Place intermediatePlace = new Place("선릉역", new Point(127.1, 37.1));
         final Place endPlace = new Place("강남역", new Point(127.2, 37.2));
@@ -95,7 +105,7 @@ class RecommendationTest {
         final RecommendedPlace recommendedPlace = new RecommendedPlace("스타벅스", new Point(127.2, 37.21), "카페", 5, "url","imageUrl");
         Map<RecommendCondition, List<RecommendedPlace>> categorizedRecommendedPlace = Map.of(RecommendCondition.CAFE, List.of(recommendedPlace));
         final CategorizedRecommendedPlaces recommendedPlaces = new CategorizedRecommendedPlaces(categorizedRecommendedPlace);
-        return new Candidate(endPlace, routes, courses, recommendedPlaces, "123", "123", 0);
+        return new Candidate(endPlace, routes, courses, recommendedPlaces, tag, "123", "123", 0);
     }
 
 }

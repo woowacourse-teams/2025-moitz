@@ -27,6 +27,8 @@ import reactor.core.publisher.Mono;
 @RequiredArgsConstructor
 public class PlaceRecommenderParallelAdapter implements PlaceRecommender {
 
+    private static final int PLACE_RECOMMENDATION_COUNT = 5;
+
     private final KakaoMapAsyncClient kakaoMapAsyncClient;
     private final KakaoPlaceMapper kakaoPlaceMapper;
 
@@ -104,7 +106,7 @@ public class PlaceRecommenderParallelAdapter implements PlaceRecommender {
                                 place.getPoint().getX(),
                                 place.getPoint().getY(),
                                 800,
-                                3
+                                PLACE_RECOMMENDATION_COUNT
                         )
                 )
                 .retry(2)

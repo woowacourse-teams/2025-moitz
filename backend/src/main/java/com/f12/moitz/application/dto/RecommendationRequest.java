@@ -2,6 +2,7 @@ package com.f12.moitz.application.dto;
 
 import com.f12.moitz.common.error.exception.BadRequestException;
 import com.f12.moitz.common.error.exception.GeneralErrorCode;
+import com.f12.moitz.domain.DispersionPolicy;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
 
@@ -18,7 +19,13 @@ public record RecommendationRequest(
         }
 
         private void validate(final List<String> startingPlaceNames) {
-                if (startingPlaceNames == null || startingPlaceNames.isEmpty()) {
+                if (startingPlaceNames == null || startingPlaceNames.size() < DispersionPolicy.MIN_STARTING_PLACE_COUNT) {
+                        throw new BadRequestException(GeneralErrorCode.INPUT_INVALID_START_LOCATION, startingPlaceNames);
+                }
+                if (startingPlaceNames.size() > DispersionPolicy.MAX_STARTING_PLACE_COUNT) {
+                        throw new BadRequestException(GeneralErrorCode.INPUT_INVALID_START_LOCATION, startingPlaceNames);
+                }
+                if (startingPlaceNames.stream().anyMatch(name -> name == null || name.isBlank())) {
                         throw new BadRequestException(GeneralErrorCode.INPUT_INVALID_START_LOCATION, startingPlaceNames);
                 }
         }

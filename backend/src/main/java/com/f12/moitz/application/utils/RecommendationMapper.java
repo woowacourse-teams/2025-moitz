@@ -9,6 +9,7 @@ import com.f12.moitz.application.dto.RouteResponse;
 import com.f12.moitz.application.dto.StartingPlaceResponse;
 import com.f12.moitz.application.port.dto.ReasonAndDescription;
 import com.f12.moitz.domain.Candidate;
+import com.f12.moitz.domain.CandidateSelectionTag;
 import com.f12.moitz.domain.CategorizedRecommendedPlaces;
 import com.f12.moitz.domain.Course;
 import com.f12.moitz.domain.Courses;
@@ -31,8 +32,9 @@ import org.springframework.stereotype.Component;
 @Component
 public class RecommendationMapper {
 
+    private static final boolean BEST_RECOMMENDATION_DISABLED = false;
+
     public RecommendationResultResponse toResponse(final Result result) {
-        final int minTime = result.getBestRecommendationTime();
         final List<String> condition = getCondition(result);
         return new RecommendationResultResponse(
                 condition,
@@ -42,7 +44,7 @@ public class RecommendationMapper {
                 IntStream.range(0, result.getRecommendedLocationsCount())
                         .mapToObj(index -> {
                             Candidate currentCandidate = result.getRecommendedLocations().get(index);
-                            return toLocationRecommendResponse(currentCandidate, index, minTime);
+                            return toLocationRecommendResponse(currentCandidate, index);
                         })
                         .toList()
         );
@@ -61,6 +63,7 @@ public class RecommendationMapper {
             final Map<Place, CategorizedRecommendedPlaces> placeListMap,
             final Map<Place, Routes> placeRoutes,
             final Map<Place, Courses> placeCourses,
+            final Map<Place, List<CandidateSelectionTag>> placeTags,
             final int votes,
             final List<RecommendCondition> recommendConditions
     ) {
@@ -82,6 +85,7 @@ public class RecommendationMapper {
                                 placeRoutes.get(place.getKey()),
                                 placeCourses.get(place.getKey()),
                                 placeListMap.get(place.getKey()),
+                                placeTags.getOrDefault(place.getKey(), List.of(CandidateSelectionTag.GENERAL)),
                                 place.getValue().description(),
                                 place.getValue().reason(),
                                 votes
@@ -114,8 +118,7 @@ public class RecommendationMapper {
 
     private LocationResponse toLocationRecommendResponse(
             final Candidate candidate,
-            final int index,
-            final int minTime
+            final int index
     ) {
         final Place targetPlace = candidate.getDestination();
         final int totalTime = candidate.calculateAverageTravelTime();
@@ -132,7 +135,11 @@ public class RecommendationMapper {
                 targetPlace.getPoint().getX(),
                 targetPlace.getName(),
                 totalTime,
-                totalTime == minTime,
+                // 추천 방식 변경으로 기존 평균 이동시간 기준 best 표시는 임시 비활성화한다.
+                BEST_RECOMMENDATION_DISABLED,
+                candidate.getTags().stream()
+                        .map(CandidateSelectionTag::name)
+                        .toList(),
                 candidate.getDescription(),
                 candidate.getReason(),
                 recommendedPlaces,

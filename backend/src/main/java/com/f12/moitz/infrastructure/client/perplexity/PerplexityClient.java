@@ -4,6 +4,7 @@ import com.f12.moitz.application.dto.RecommendedLocationsResponse;
 import com.f12.moitz.common.error.exception.ExternalApiErrorCode;
 import com.f12.moitz.common.error.exception.ExternalApiException;
 import com.f12.moitz.common.error.exception.RetryableApiException;
+import com.f12.moitz.infrastructure.PromptGenerator;
 import com.f12.moitz.infrastructure.client.perplexity.dto.PerplexityRequest;
 import com.f12.moitz.infrastructure.client.perplexity.dto.PerplexityResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -33,8 +34,7 @@ public class PerplexityClient {
             final String requirement
     ) {
         try {
-            final String content = generateContent(stationNames, requirement).choices().getFirst().message().content();
-            return objectMapper.readValue(content, RecommendedLocationsResponse.class);
+            return readValue(generateContent(stationNames, requirement).choices().getFirst().message().content());
         } catch (IOException e) {
             throw new ExternalApiException(ExternalApiErrorCode.INVALID_PERPLEXITY_API_RESPONSE);
         }
@@ -91,7 +91,7 @@ public class PerplexityClient {
                         new PerplexityRequest.Message("user", userPrompt)
                 ),
                 Map.of("type", "json_schema", "json_schema", Map.of(
-                        "schema", getSchema()
+                        "schema", PromptGenerator.getSchema()
                 ))
         );
 
@@ -140,27 +140,7 @@ public class PerplexityClient {
                 });
     }
 
-    private Map<String, Object> getSchema() {
-        return Map.of(
-                "type", "object",
-                "properties", Map.of(
-                        "recommendations", Map.of(
-                                "type", "array",
-                                "description", "추천 지하철역 리스트",
-                                "items", Map.of(
-                                        "type", "object",
-                                        "properties", Map.of(
-                                                "locationName", Map.of("type", "string", "description", "추천 장소 이름"),
-                                                "reason", Map.of("type", "string", "description", "20자 이내 추천 이유 + 이모지 ex) 주변 상권이 잘 발달되어 있고, 이동 소요 시간이 전체적으로 짧은 편이에요 :smile:", "maxLength", 20)
-                                        ),
-                                        "required", List.of("locationName", "reason")
-                                ),
-                                "minItems", 3,
-                                "maxItems", 5
-                        )
-                ),
-                "required", List.of("recommendations")
-        );
+    private RecommendedLocationsResponse readValue(final String content) throws IOException {
+        return objectMapper.readValue(content, RecommendedLocationsResponse.class);
     }
-
 }

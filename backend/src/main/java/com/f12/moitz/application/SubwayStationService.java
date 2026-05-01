@@ -69,6 +69,15 @@ public class SubwayStationService {
     }
 
     public List<SubwayStation> generateCandidatePlace(final List<SubwayStation> startingStations) {
+        return generateCandidatePlace(startingStations, DISTANCE_VALUE);
+    }
+
+    public List<SubwayStation> generateCandidatePlace(
+            final List<SubwayStation> startingStations,
+            final int distanceValue
+    ) {
+        validateCandidatePlaceSearch(startingStations, distanceValue);
+
         final List<SubwayStationEntity> stationEntities = startingStations.stream()
                 .map(SubwayStationEntity::fromSubwayStation)
                 .toList();
@@ -76,11 +85,23 @@ public class SubwayStationService {
         final Coordinate[] coordinateArr = getCoordinates(stationEntities);
 
         final org.springframework.data.geo.Point center = getCenterPoint(coordinateArr);
-        final Distance distance = new Distance(DISTANCE_VALUE, Metrics.KILOMETERS);
+        final Distance distance = new Distance(distanceValue, Metrics.KILOMETERS);
 
         return subwayStationRepository.findByPointNear(center, distance).stream()
                 .map(SubwayStationEntity::toSubwayStation)
                 .toList();
+    }
+
+    private void validateCandidatePlaceSearch(
+            final List<SubwayStation> startingStations,
+            final int distanceValue
+    ) {
+        if (startingStations == null || startingStations.isEmpty()) {
+            throw new IllegalArgumentException("출발 지하철역 목록은 비어있거나 null일 수 없습니다.");
+        }
+        if (distanceValue <= 0) {
+            throw new IllegalArgumentException("후보역 검색 반경은 0보다 커야 합니다.");
+        }
     }
 
     private Coordinate[] getCoordinates(final List<SubwayStationEntity> stationEntities) {
