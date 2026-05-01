@@ -45,10 +45,10 @@ public class RecommendationService {
 
     private final SubwayStationService subwayStationService;
     private final LocationReasonGenerator locationReasonGenerator;
-    private final RouteOriginDispersionResolver routeOriginDispersionResolver;
-    private final RouteCandidateAssembler routeCandidateAssembler;
-    private final PlaceSearchCoordinator placeSearchCoordinator;
-    private final FinalPlaceTravelAssembler finalPlaceTravelAssembler;
+    private final RouteOriginDispersionService routeOriginDispersionService;
+    private final RouteCandidatePreparationService routeCandidatePreparationService;
+    private final RecommendationPlaceSearchService recommendationPlaceSearchService;
+    private final SelectedCandidateRouteService selectedCandidateRouteService;
     private final RecommendationMapper recommendationMapper;
     private final RecommendResultRepository recommendResultRepository;
     private final PlaceSearchCandidateSelector placeSearchCandidateSelector = new PlaceSearchCandidateSelector();
@@ -56,19 +56,19 @@ public class RecommendationService {
     public RecommendationService(
             @Autowired final SubwayStationService subwayStationService,
             @Autowired final LocationReasonGenerator locationReasonGenerator,
-            @Autowired final RouteOriginDispersionResolver routeOriginDispersionResolver,
-            @Autowired final RouteCandidateAssembler routeCandidateAssembler,
-            @Autowired final PlaceSearchCoordinator placeSearchCoordinator,
-            @Autowired final FinalPlaceTravelAssembler finalPlaceTravelAssembler,
+            @Autowired final RouteOriginDispersionService routeOriginDispersionService,
+            @Autowired final RouteCandidatePreparationService routeCandidatePreparationService,
+            @Autowired final RecommendationPlaceSearchService recommendationPlaceSearchService,
+            @Autowired final SelectedCandidateRouteService selectedCandidateRouteService,
             @Autowired final RecommendationMapper recommendationMapper,
             @Autowired final RecommendResultRepository recommendResultRepository
     ) {
         this.subwayStationService = subwayStationService;
         this.locationReasonGenerator = locationReasonGenerator;
-        this.routeOriginDispersionResolver = routeOriginDispersionResolver;
-        this.routeCandidateAssembler = routeCandidateAssembler;
-        this.placeSearchCoordinator = placeSearchCoordinator;
-        this.finalPlaceTravelAssembler = finalPlaceTravelAssembler;
+        this.routeOriginDispersionService = routeOriginDispersionService;
+        this.routeCandidatePreparationService = routeCandidatePreparationService;
+        this.recommendationPlaceSearchService = recommendationPlaceSearchService;
+        this.selectedCandidateRouteService = selectedCandidateRouteService;
         this.recommendationMapper = recommendationMapper;
         this.recommendResultRepository = recommendResultRepository;
     }
@@ -81,16 +81,16 @@ public class RecommendationService {
         final List<RecommendCondition> recommendConditions = RecommendCondition.fromTitle(request.requirements());
         final List<SubwayStation> startingPlaces = getByNames(request.startingPlaceNames());
         final RouteOrigins routeOrigins = createRouteOrigins(startingPlaces);
-        final DispersionPolicy dispersionPolicy = routeOriginDispersionResolver.resolve(routeOrigins);
-        final RouteCandidateAssembly routeCandidateAssembly = routeCandidateAssembler.assemble(
+        final DispersionPolicy dispersionPolicy = routeOriginDispersionService.resolve(routeOrigins);
+        final RouteCandidatePreparationResult routeCandidatePreparationResult = routeCandidatePreparationService.prepare(
                 startingPlaces,
                 routeOrigins,
                 dispersionPolicy
         );
-        final List<Place> candidatePlaces = routeCandidateAssembly.getCandidatePlaces();
-        final Map<Place, Routes> candidateRoutes = routeCandidateAssembly.getCandidateRoutes();
+        final List<Place> candidatePlaces = routeCandidatePreparationResult.getCandidatePlaces();
+        final Map<Place, Routes> candidateRoutes = routeCandidatePreparationResult.getCandidateRoutes();
         final CandidateSelectionResult candidateSelection = placeSearchCandidateSelector.select(
-                routeCandidateAssembly.getRouteCandidates(),
+                routeCandidatePreparationResult.getRouteCandidates(),
                 dispersionPolicy,
                 PLACE_SEARCH_POOL_LIMIT
         );
@@ -99,28 +99,28 @@ public class RecommendationService {
         stopWatch.stop();
 
         stopWatch.start("장소 추천");
-        final PlaceSearchResult placeSearchResult = placeSearchCoordinator.search(
+        final RecommendationPlaceSearchResult recommendationPlaceSearchResult = recommendationPlaceSearchService.search(
                 candidateSelection,
                 recommendConditions,
                 candidateRoutes,
                 PLACE_SEARCH_POOL_LIMIT,
                 FINAL_CANDIDATE_TARGET_COUNT
         );
-        final Map<Place, CategorizedRecommendedPlaces> recommendedPlaces = placeSearchResult.getRecommendedPlaces();
+        final Map<Place, CategorizedRecommendedPlaces> recommendedPlaces = recommendationPlaceSearchResult.getRecommendedPlaces();
         log.debug(
                 "장소 추천 완료 - 탐색 대상 역 {}개 중 실제 조회 {}개, 결과 보유 역 {}개",
                 selectedPlaces.size(),
-                placeSearchResult.getSearchedPlaces().size(),
+                recommendationPlaceSearchResult.getSearchedPlaces().size(),
                 recommendedPlaces.size()
         );
         stopWatch.stop();
 
         stopWatch.start("최종 후보 확정");
-        final FinalCandidateSelectionResult finalCandidateSelection = placeSearchResult.getFinalCandidateSelection();
+        final FinalCandidateSelectionResult finalCandidateSelection = recommendationPlaceSearchResult.getFinalCandidateSelection();
         final List<Place> finalPlaces = finalCandidateSelection.getSelectedPlaces();
         logFinalCandidateSelection(selectedPlaces, finalPlaces, candidateRoutes, recommendConditions);
         validateRecommendationCandidates(finalPlaces);
-        final FinalPlaceTravelAssembly finalPlaceTravelAssembly = finalPlaceTravelAssembler.assemble(
+        final SelectedCandidateRouteResult selectedCandidateRouteResult = selectedCandidateRouteService.prepare(
                 routeOrigins,
                 finalPlaces,
                 candidateRoutes
@@ -143,8 +143,8 @@ public class RecommendationService {
         final Recommendation recommendation = recommendationMapper.toRecommendation(
                 generatedPlacesWithReason,
                 recommendedPlaces,
-                finalPlaceTravelAssembly.getRoutesByPlace(),
-                finalPlaceTravelAssembly.getCoursesByPlace(),
+                selectedCandidateRouteResult.getRoutesByPlace(),
+                selectedCandidateRouteResult.getCoursesByPlace(),
                 finalCandidateSelection.getTagsByPlace(),
                 STARTING_VOTES,
                 recommendConditions

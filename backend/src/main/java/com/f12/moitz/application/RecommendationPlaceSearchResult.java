@@ -8,13 +8,13 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-public class PlaceSearchResult {
+public class RecommendationPlaceSearchResult {
 
     private final List<Place> searchedPlaces;
     private final Map<Place, CategorizedRecommendedPlaces> recommendedPlaces;
     private final FinalCandidateSelectionResult finalCandidateSelection;
 
-    public PlaceSearchResult(
+    public RecommendationPlaceSearchResult(
             final List<Place> searchedPlaces,
             final Map<Place, CategorizedRecommendedPlaces> recommendedPlaces,
             final FinalCandidateSelectionResult finalCandidateSelection

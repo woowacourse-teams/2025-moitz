@@ -19,20 +19,20 @@ import org.springframework.stereotype.Component;
 
 @Slf4j
 @Component
-public class PlaceSearchCoordinator {
+public class RecommendationPlaceSearchService {
 
     private static final int PLACE_SEARCH_BATCH_SIZE = 5;
 
     private final PlaceRecommender placeRecommender;
     private final FinalCandidateSelector finalCandidateSelector = new FinalCandidateSelector();
 
-    public PlaceSearchCoordinator(
+    public RecommendationPlaceSearchService(
             @Qualifier("placeRecommenderParallelAdapter") final PlaceRecommender placeRecommender
     ) {
         this.placeRecommender = placeRecommender;
     }
 
-    public PlaceSearchResult search(
+    public RecommendationPlaceSearchResult search(
             final CandidateSelectionResult candidateSelection,
             final List<RecommendCondition> recommendConditions,
             final Map<Place, Routes> candidateRoutes,
@@ -94,7 +94,7 @@ public class PlaceSearchCoordinator {
             );
         }
 
-        return new PlaceSearchResult(
+        return new RecommendationPlaceSearchResult(
                 searchedPlaces,
                 accumulatedRecommendedPlaces,
                 finalCandidateSelection

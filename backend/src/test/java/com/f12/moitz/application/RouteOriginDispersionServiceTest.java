@@ -24,7 +24,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
-class RouteOriginDispersionResolverTest {
+class RouteOriginDispersionServiceTest {
 
     @Mock
     private RouteFinder routeFinder;
@@ -32,7 +32,7 @@ class RouteOriginDispersionResolverTest {
     @Test
     @DisplayName("출발지 간 경로의 이동시간으로 분산도 정책을 결정한다")
     void resolve() {
-        final RouteOriginDispersionResolver resolver = new RouteOriginDispersionResolver(routeFinder);
+        final RouteOriginDispersionService service = new RouteOriginDispersionService(routeFinder);
         final Place gangnam = new Place("강남역", new Point(127.027, 37.497));
         final Place yeoksam = new Place("역삼역", new Point(127.036, 37.501));
         final RouteOrigins routeOrigins = new RouteOrigins(List.of(gangnam, yeoksam));
@@ -40,7 +40,7 @@ class RouteOriginDispersionResolverTest {
                 new Route(List.of(new Path(gangnam, yeoksam, TravelMethod.SUBWAY, 10 * 60, SubwayLine.fromTitle("2호선"))))
         ));
 
-        final DispersionPolicy dispersionPolicy = resolver.resolve(routeOrigins);
+        final DispersionPolicy dispersionPolicy = service.resolve(routeOrigins);
 
         assertThat(dispersionPolicy).isEqualTo(DispersionPolicy.TIER_1);
         final ArgumentCaptor<List<OriginDestination>> captor = ArgumentCaptor.forClass(List.class);

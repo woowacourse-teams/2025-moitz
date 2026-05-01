@@ -17,23 +17,23 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 @Component
-public class FinalPlaceTravelAssembler {
+public class SelectedCandidateRouteService {
 
     private final RouteFinder routeFinder;
 
-    public FinalPlaceTravelAssembler(
+    public SelectedCandidateRouteService(
             @Qualifier("subwayRouteFinderAdapter") final RouteFinder routeFinder
     ) {
         this.routeFinder = routeFinder;
     }
 
-    public FinalPlaceTravelAssembly assemble(
+    public SelectedCandidateRouteResult prepare(
             final RouteOrigins routeOrigins,
             final List<Place> finalPlaces,
             final Map<Place, Routes> candidateRoutes
     ) {
         final List<OriginDestination> originDestinations = routeOrigins.createOriginDestinationsTo(finalPlaces);
-        return new FinalPlaceTravelAssembly(
+        return new SelectedCandidateRouteResult(
                 collectRoutes(finalPlaces, candidateRoutes),
                 findCoursesByDestination(originDestinations)
         );

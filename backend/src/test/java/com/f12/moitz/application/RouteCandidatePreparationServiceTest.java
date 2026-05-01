@@ -26,7 +26,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
-class RouteCandidateAssemblerTest {
+class RouteCandidatePreparationServiceTest {
 
     @Mock
     private SubwayStationService subwayStationService;
@@ -37,7 +37,10 @@ class RouteCandidateAssemblerTest {
     @Test
     @DisplayName("출발지를 제외한 후보 지역과 후보별 경로를 조립한다")
     void assemble() {
-        final RouteCandidateAssembler assembler = new RouteCandidateAssembler(subwayStationService, routeFinder);
+        final RouteCandidatePreparationService service = new RouteCandidatePreparationService(
+                subwayStationService,
+                routeFinder
+        );
         final SubwayStation gangnam = new SubwayStation("강남역", new Point(127.027, 37.497));
         final SubwayStation yeoksam = new SubwayStation("역삼역", new Point(127.036, 37.501));
         final SubwayStation seolleung = new SubwayStation("선릉역", new Point(127.048, 37.504));
@@ -53,18 +56,18 @@ class RouteCandidateAssemblerTest {
                 createRoute(yeoksam, samsung, 10)
         ));
 
-        final RouteCandidateAssembly assembly = assembler.assemble(
+        final RouteCandidatePreparationResult result = service.prepare(
                 originStations,
                 routeOrigins,
                 DispersionPolicy.TIER_1
         );
 
-        assertThat(assembly.getCandidatePlaces()).containsExactly(seolleung, samsung);
-        assertThat(assembly.getCandidateRoutes()).containsOnlyKeys(seolleung, samsung);
-        assertThat(assembly.getRouteCandidates())
+        assertThat(result.getCandidatePlaces()).containsExactly(seolleung, samsung);
+        assertThat(result.getCandidateRoutes()).containsOnlyKeys(seolleung, samsung);
+        assertThat(result.getRouteCandidates())
                 .extracting(RouteCandidate::getPlace)
                 .containsExactly(seolleung, samsung);
-        assertThat(assembly.getRouteCandidates())
+        assertThat(result.getRouteCandidates())
                 .allSatisfy(candidate -> assertThat(candidate.getRoutes().getRoutes()).hasSize(2));
 
         final ArgumentCaptor<List<OriginDestination>> captor = ArgumentCaptor.forClass(List.class);

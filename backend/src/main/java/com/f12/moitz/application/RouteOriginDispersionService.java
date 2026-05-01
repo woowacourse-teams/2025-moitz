@@ -13,11 +13,11 @@ import org.springframework.stereotype.Component;
 
 @Slf4j
 @Component
-public class RouteOriginDispersionResolver {
+public class RouteOriginDispersionService {
 
     private final RouteFinder routeFinder;
 
-    public RouteOriginDispersionResolver(
+    public RouteOriginDispersionService(
             @Qualifier("subwayRouteFinderAdapter") final RouteFinder routeFinder
     ) {
         this.routeFinder = routeFinder;

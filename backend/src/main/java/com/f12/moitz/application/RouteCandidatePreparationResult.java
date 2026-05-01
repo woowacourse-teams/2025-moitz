@@ -6,13 +6,13 @@ import com.f12.moitz.domain.Routes;
 import java.util.List;
 import java.util.Map;
 
-public class RouteCandidateAssembly {
+public class RouteCandidatePreparationResult {
 
     private final List<Place> candidatePlaces;
     private final Map<Place, Routes> candidateRoutes;
     private final List<RouteCandidate> routeCandidates;
 
-    public RouteCandidateAssembly(
+    public RouteCandidatePreparationResult(
             final List<Place> candidatePlaces,
             final Map<Place, Routes> candidateRoutes,
             final List<RouteCandidate> routeCandidates

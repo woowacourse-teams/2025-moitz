@@ -7,12 +7,12 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-public class FinalPlaceTravelAssembly {
+public class SelectedCandidateRouteResult {
 
     private final Map<Place, Routes> routesByPlace;
     private final Map<Place, Courses> coursesByPlace;
 
-    public FinalPlaceTravelAssembly(
+    public SelectedCandidateRouteResult(
             final Map<Place, Routes> routesByPlace,
             final Map<Place, Courses> coursesByPlace
     ) {

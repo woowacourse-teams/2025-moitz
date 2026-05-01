@@ -26,7 +26,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
-class FinalPlaceTravelAssemblerTest {
+class SelectedCandidateRouteServiceTest {
 
     @Mock
     private RouteFinder routeFinder;
@@ -34,7 +34,7 @@ class FinalPlaceTravelAssemblerTest {
     @Test
     @DisplayName("최종 후보의 경로와 코스를 장소별로 조립한다")
     void assemble() {
-        final FinalPlaceTravelAssembler assembler = new FinalPlaceTravelAssembler(routeFinder);
+        final SelectedCandidateRouteService service = new SelectedCandidateRouteService(routeFinder);
         final Place gangnam = new Place("강남역", new Point(127.027, 37.497));
         final Place yeoksam = new Place("역삼역", new Point(127.036, 37.501));
         final Place seolleung = new Place("선릉역", new Point(127.048, 37.504));
@@ -53,17 +53,17 @@ class FinalPlaceTravelAssemblerTest {
                 new Course(List.of(yeoksam.getPoint(), samsung.getPoint()))
         ));
 
-        final FinalPlaceTravelAssembly assembly = assembler.assemble(
+        final SelectedCandidateRouteResult result = service.prepare(
                 routeOrigins,
                 List.of(seolleung, samsung),
                 candidateRoutes
         );
 
-        assertThat(assembly.getRoutesByPlace()).containsEntry(seolleung, seolleungRoutes)
+        assertThat(result.getRoutesByPlace()).containsEntry(seolleung, seolleungRoutes)
                 .containsEntry(samsung, samsungRoutes);
-        assertThat(assembly.getCoursesByPlace()).containsOnlyKeys(seolleung, samsung);
-        assertThat(assembly.getCoursesByPlace().get(seolleung).getCourses()).hasSize(2);
-        assertThat(assembly.getCoursesByPlace().get(samsung).getCourses()).hasSize(2);
+        assertThat(result.getCoursesByPlace()).containsOnlyKeys(seolleung, samsung);
+        assertThat(result.getCoursesByPlace().get(seolleung).getCourses()).hasSize(2);
+        assertThat(result.getCoursesByPlace().get(samsung).getCourses()).hasSize(2);
 
         final ArgumentCaptor<List<OriginDestination>> captor = ArgumentCaptor.forClass(List.class);
         verify(routeFinder).findCourses(captor.capture());

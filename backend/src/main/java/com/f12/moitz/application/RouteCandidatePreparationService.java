@@ -20,12 +20,12 @@ import org.springframework.stereotype.Component;
 
 @Slf4j
 @Component
-public class RouteCandidateAssembler {
+public class RouteCandidatePreparationService {
 
     private final SubwayStationService subwayStationService;
     private final RouteFinder routeFinder;
 
-    public RouteCandidateAssembler(
+    public RouteCandidatePreparationService(
             final SubwayStationService subwayStationService,
             @Qualifier("subwayRouteFinderAdapter") final RouteFinder routeFinder
     ) {
@@ -33,7 +33,7 @@ public class RouteCandidateAssembler {
         this.routeFinder = routeFinder;
     }
 
-    public RouteCandidateAssembly assemble(
+    public RouteCandidatePreparationResult prepare(
             final List<SubwayStation> originStations,
             final RouteOrigins routeOrigins,
             final DispersionPolicy dispersionPolicy
@@ -42,7 +42,7 @@ public class RouteCandidateAssembler {
         final List<OriginDestination> originDestinations = routeOrigins.createOriginDestinationsTo(candidatePlaces);
         final Map<Place, Routes> candidateRoutes = findRoutesByDestination(originDestinations);
         final List<RouteCandidate> routeCandidates = toRouteCandidates(candidatePlaces, candidateRoutes);
-        return new RouteCandidateAssembly(candidatePlaces, candidateRoutes, routeCandidates);
+        return new RouteCandidatePreparationResult(candidatePlaces, candidateRoutes, routeCandidates);
     }
 
     private List<Place> getCandidatePlaces(

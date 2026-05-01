@@ -30,7 +30,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
-class PlaceSearchCoordinatorTest {
+class RecommendationPlaceSearchServiceTest {
 
     @Mock
     private PlaceRecommender placeRecommender;
@@ -38,7 +38,7 @@ class PlaceSearchCoordinatorTest {
     @Test
     @DisplayName("장소 검색 결과가 조건을 만족하면 최종 후보를 함께 반환한다")
     void search() {
-        final PlaceSearchCoordinator coordinator = new PlaceSearchCoordinator(placeRecommender);
+        final RecommendationPlaceSearchService service = new RecommendationPlaceSearchService(placeRecommender);
         final Place gangnam = new Place("강남역", new Point(127.027, 37.497));
         final Place seolleung = new Place("선릉역", new Point(127.048, 37.504));
         final Place samsung = new Place("삼성역", new Point(127.063, 37.508));
@@ -65,7 +65,7 @@ class PlaceSearchCoordinatorTest {
         );
         given(placeRecommender.recommendPlaces(anyList(), anyList())).willReturn(recommendedPlaces);
 
-        final PlaceSearchResult result = coordinator.search(
+        final RecommendationPlaceSearchResult result = service.search(
                 candidateSelection,
                 List.of(RecommendCondition.CAFE),
                 candidateRoutes,
