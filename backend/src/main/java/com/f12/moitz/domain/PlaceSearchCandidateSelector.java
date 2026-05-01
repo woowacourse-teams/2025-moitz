@@ -1,9 +1,12 @@
 package com.f12.moitz.domain;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 public class PlaceSearchCandidateSelector {
 
@@ -16,19 +19,22 @@ public class PlaceSearchCandidateSelector {
     ) {
         validate(candidates, dispersionPolicy, limit);
 
+        final Map<RouteCandidate, FairnessScore> scoresByCandidate = calculateFairnessScores(candidates);
+        final Function<RouteCandidate, FairnessScore> scoreResolver = scoresByCandidate::get;
         final List<RouteCandidate> sortedCandidates = candidates.stream()
-                .sorted((left, right) -> left.calculateFairnessScore().compareTo(right.calculateFairnessScore()))
+                .sorted(Comparator.comparing(scoreResolver))
                 .toList();
 
         for (DispersionPolicy candidatePolicy : dispersionPolicy.relaxations()) {
             final List<RouteCandidate> acceptableCandidates = sortedCandidates.stream()
-                    .filter(candidate -> candidate.isAcceptable(candidatePolicy))
+                    .filter(candidate -> scoreResolver.apply(candidate).isAcceptable(candidatePolicy))
                     .toList();
 
             if (!acceptableCandidates.isEmpty()) {
                 final Map<CandidateSelectionTag, List<RouteCandidate>> tagSelections = selectTagCandidates(
                         acceptableCandidates,
-                        candidatePolicy
+                        candidatePolicy,
+                        scoreResolver
                 );
                 return new CandidateSelectionResult(
                         mergeTagCandidates(tagSelections, acceptableCandidates, limit),
@@ -43,7 +49,8 @@ public class PlaceSearchCandidateSelector {
 
         final Map<CandidateSelectionTag, List<RouteCandidate>> tagSelections = selectTagCandidates(
                 sortedCandidates,
-                DispersionPolicy.TIER_5
+                DispersionPolicy.TIER_5,
+                scoreResolver
         );
         return new CandidateSelectionResult(
                 mergeTagCandidates(tagSelections, sortedCandidates, limit),
@@ -53,6 +60,16 @@ public class PlaceSearchCandidateSelector {
                 true,
                 tagSelections
         );
+    }
+
+    private Map<RouteCandidate, FairnessScore> calculateFairnessScores(final List<RouteCandidate> candidates) {
+        return candidates.stream()
+                .collect(Collectors.toMap(
+                        Function.identity(),
+                        RouteCandidate::calculateFairnessScore,
+                        (left, right) -> left,
+                        LinkedHashMap::new
+                ));
     }
 
     private void validate(
@@ -73,7 +90,8 @@ public class PlaceSearchCandidateSelector {
 
     private Map<CandidateSelectionTag, List<RouteCandidate>> selectTagCandidates(
             final List<RouteCandidate> candidates,
-            final DispersionPolicy dispersionPolicy
+            final DispersionPolicy dispersionPolicy,
+            final Function<RouteCandidate, FairnessScore> scoreResolver
     ) {
         final Map<CandidateSelectionTag, Integer> tagQuotas = resolveTagQuotas(dispersionPolicy);
         final Map<CandidateSelectionTag, List<RouteCandidate>> tagSelections = new LinkedHashMap<>();
@@ -81,7 +99,7 @@ public class PlaceSearchCandidateSelector {
         tagQuotas.forEach((tag, quota) -> tagSelections.put(
                 tag,
                 candidates.stream()
-                        .sorted(routeCandidateComparators.getByTag(tag))
+                        .sorted(routeCandidateComparators.getByTag(tag, scoreResolver))
                         .limit(quota)
                         .toList()
         ));

@@ -1,6 +1,7 @@
 package com.f12.moitz.domain;
 
 import java.util.Comparator;
+import java.util.function.Function;
 
 public class RouteCandidateComparators {
 
@@ -10,27 +11,29 @@ public class RouteCandidateComparators {
     private static final double MEDIUM_TRAVEL_TIME_TOLERANCE_RATIO = 0.3;
     private static final double LONG_TRAVEL_TIME_TOLERANCE_RATIO = 0.2;
 
-    public Comparator<RouteCandidate> getByTag(final CandidateSelectionTag tag) {
+    public Comparator<RouteCandidate> getByTag(
+            final CandidateSelectionTag tag,
+            final Function<RouteCandidate, FairnessScore> scoreResolver
+    ) {
         return switch (tag) {
-            case EFFICIENCY -> byEfficiency();
-            case FAIRNESS -> byFairness();
-            case MAX_BURDEN_RELIEF -> byMaxBurdenRelief();
-            case TRANSFER -> byTransfer();
-            case GENERAL -> byGeneral();
+            case EFFICIENCY -> byEfficiency(scoreResolver);
+            case FAIRNESS -> byFairness(scoreResolver);
+            case MAX_BURDEN_RELIEF -> byMaxBurdenRelief(scoreResolver);
+            case TRANSFER -> byTransfer(scoreResolver);
+            case GENERAL -> byGeneral(scoreResolver);
         };
     }
 
-    private Comparator<RouteCandidate> byEfficiency() {
-        return Comparator.comparingInt((RouteCandidate candidate) -> candidate.calculateFairnessScore()
-                        .getAverageTravelTime())
-                .thenComparingInt(candidate -> candidate.calculateFairnessScore().getMaxTravelTime())
-                .thenComparing(RouteCandidate::calculateFairnessScore);
+    private Comparator<RouteCandidate> byEfficiency(final Function<RouteCandidate, FairnessScore> scoreResolver) {
+        return Comparator.comparingInt((RouteCandidate candidate) -> scoreResolver.apply(candidate).getAverageTravelTime())
+                .thenComparingInt(candidate -> scoreResolver.apply(candidate).getMaxTravelTime())
+                .thenComparing(scoreResolver);
     }
 
-    private Comparator<RouteCandidate> byFairness() {
+    private Comparator<RouteCandidate> byFairness(final Function<RouteCandidate, FairnessScore> scoreResolver) {
         return (left, right) -> {
-            final FairnessScore leftScore = left.calculateFairnessScore();
-            final FairnessScore rightScore = right.calculateFairnessScore();
+            final FairnessScore leftScore = scoreResolver.apply(left);
+            final FairnessScore rightScore = scoreResolver.apply(right);
             final boolean leftTolerable = isTolerablyFair(leftScore);
             final boolean rightTolerable = isTolerablyFair(rightScore);
 
@@ -81,25 +84,25 @@ public class RouteCandidateComparators {
                 .compare(left, right);
     }
 
-    private Comparator<RouteCandidate> byMaxBurdenRelief() {
-        return Comparator.comparingInt((RouteCandidate candidate) -> candidate.calculateFairnessScore().getMaxTravelTime())
-                .thenComparingInt(candidate -> candidate.calculateFairnessScore().getTimeDiff())
-                .thenComparingInt(candidate -> candidate.calculateFairnessScore().getAverageTravelTime())
-                .thenComparing(RouteCandidate::calculateFairnessScore);
+    private Comparator<RouteCandidate> byMaxBurdenRelief(final Function<RouteCandidate, FairnessScore> scoreResolver) {
+        return Comparator.comparingInt((RouteCandidate candidate) -> scoreResolver.apply(candidate).getMaxTravelTime())
+                .thenComparingInt(candidate -> scoreResolver.apply(candidate).getTimeDiff())
+                .thenComparingInt(candidate -> scoreResolver.apply(candidate).getAverageTravelTime())
+                .thenComparing(scoreResolver);
     }
 
-    private Comparator<RouteCandidate> byTransfer() {
-        return Comparator.comparingDouble((RouteCandidate candidate) -> candidate.calculateFairnessScore()
+    private Comparator<RouteCandidate> byTransfer(final Function<RouteCandidate, FairnessScore> scoreResolver) {
+        return Comparator.comparingDouble((RouteCandidate candidate) -> scoreResolver.apply(candidate)
                         .getAverageTransferCount())
-                .thenComparingInt(candidate -> candidate.calculateFairnessScore().getMaxTransferCount())
-                .thenComparingInt(candidate -> candidate.calculateFairnessScore().getTransferDiff())
-                .thenComparingInt(candidate -> candidate.calculateFairnessScore().getAverageTravelTime())
-                .thenComparingInt(candidate -> candidate.calculateFairnessScore().getMaxTravelTime())
-                .thenComparing(RouteCandidate::calculateFairnessScore);
+                .thenComparingInt(candidate -> scoreResolver.apply(candidate).getMaxTransferCount())
+                .thenComparingInt(candidate -> scoreResolver.apply(candidate).getTransferDiff())
+                .thenComparingInt(candidate -> scoreResolver.apply(candidate).getAverageTravelTime())
+                .thenComparingInt(candidate -> scoreResolver.apply(candidate).getMaxTravelTime())
+                .thenComparing(scoreResolver);
     }
 
-    private Comparator<RouteCandidate> byGeneral() {
-        return Comparator.comparing(RouteCandidate::calculateFairnessScore);
+    private Comparator<RouteCandidate> byGeneral(final Function<RouteCandidate, FairnessScore> scoreResolver) {
+        return Comparator.comparing(scoreResolver);
     }
 
 }

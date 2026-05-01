@@ -3,6 +3,7 @@ package com.f12.moitz.domain;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.f12.moitz.domain.subway.SubwayLine;
+import java.util.Comparator;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -18,7 +19,7 @@ class RouteCandidateComparatorsTest {
         final RouteCandidate shortAndTolerablyFair = routeCandidate("실용공평단거리역", 2, 4);
 
         final List<RouteCandidate> sortedCandidates = List.of(exactButLong, shortAndTolerablyFair).stream()
-                .sorted(comparators.getByTag(CandidateSelectionTag.FAIRNESS))
+                .sorted(comparator(CandidateSelectionTag.FAIRNESS))
                 .toList();
 
         assertThat(sortedCandidates)
@@ -33,7 +34,7 @@ class RouteCandidateComparatorsTest {
         final RouteCandidate exactButLong = routeCandidate("완전공평장거리역", 28, 28);
 
         final List<RouteCandidate> sortedCandidates = List.of(unfairButShort, exactButLong).stream()
-                .sorted(comparators.getByTag(CandidateSelectionTag.FAIRNESS))
+                .sorted(comparator(CandidateSelectionTag.FAIRNESS))
                 .toList();
 
         assertThat(sortedCandidates)
@@ -49,12 +50,16 @@ class RouteCandidateComparatorsTest {
         final RouteCandidate highMax = routeCandidateWithTransfers("높은최대환승역", List.of(0, 2));
 
         final List<RouteCandidate> sortedCandidates = List.of(highMax, lowMax, lowAverage).stream()
-                .sorted(comparators.getByTag(CandidateSelectionTag.TRANSFER))
+                .sorted(comparator(CandidateSelectionTag.TRANSFER))
                 .toList();
 
         assertThat(sortedCandidates)
                 .extracting(candidate -> candidate.getPlace().getName())
                 .containsExactly("낮은평균환승역", "낮은최대환승역", "높은최대환승역");
+    }
+
+    private Comparator<RouteCandidate> comparator(final CandidateSelectionTag tag) {
+        return comparators.getByTag(tag, RouteCandidate::calculateFairnessScore);
     }
 
     private RouteCandidate routeCandidate(final String name, final int firstTravelTimeMinutes, final int secondTravelTimeMinutes) {
