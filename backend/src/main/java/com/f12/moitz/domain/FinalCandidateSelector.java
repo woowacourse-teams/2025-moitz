@@ -12,13 +12,13 @@ import java.util.function.Predicate;
 public class FinalCandidateSelector {
 
     public FinalCandidateSelectionResult select(
-            final CandidateSelectionResult candidateSelectionResult,
+            final CandidateSelection candidateSelection,
             final List<Place> searchedPlaces,
             final Predicate<Place> placeCondition,
             final int limit
     ) {
         final TaggedPlaceSelection taggedPlaceSelection = selectTaggedPlaces(
-                candidateSelectionResult,
+                candidateSelection,
                 searchedPlaces,
                 placeCondition
         );
@@ -50,13 +50,13 @@ public class FinalCandidateSelector {
     }
 
     public List<Place> selectNextSearchPlaces(
-            final CandidateSelectionResult candidateSelectionResult,
+            final CandidateSelection candidateSelection,
             final List<Place> searchedPlaces,
             final Predicate<Place> placeCondition,
             final int limit
     ) {
         final Map<CandidateSelectionTag, Place> selectedByTag = selectTaggedPlaces(
-                candidateSelectionResult,
+                candidateSelection,
                 searchedPlaces,
                 placeCondition
         ).selectedByTag();
@@ -68,7 +68,7 @@ public class FinalCandidateSelector {
             if (selectedByTag.containsKey(tag)) {
                 continue;
             }
-            candidateSelectionResult.getTagSelections()
+            candidateSelection.getTagSelections()
                     .getOrDefault(tag, List.of())
                     .stream()
                     .map(RouteCandidate::getPlace)
@@ -84,7 +84,7 @@ public class FinalCandidateSelector {
                     .toList();
         }
 
-        for (RouteCandidate candidate : candidateSelectionResult.getSelectedCandidates()) {
+        for (RouteCandidate candidate : candidateSelection.getSelectedCandidates()) {
             if (nextSearchPlaces.size() >= limit) {
                 break;
             }
@@ -101,7 +101,7 @@ public class FinalCandidateSelector {
     }
 
     private TaggedPlaceSelection selectTaggedPlaces(
-            final CandidateSelectionResult candidateSelectionResult,
+            final CandidateSelection candidateSelection,
             final List<Place> searchedPlaces,
             final Predicate<Place> placeCondition
     ) {
@@ -111,7 +111,7 @@ public class FinalCandidateSelector {
         final Map<Place, Set<CandidateSelectionTag>> tagsByPlace = new LinkedHashMap<>();
 
         for (CandidateSelectionTag tag : CandidateSelectionTag.orderedValues()) {
-            final List<RouteCandidate> tagCandidates = candidateSelectionResult.getTagSelections()
+            final List<RouteCandidate> tagCandidates = candidateSelection.getTagSelections()
                     .getOrDefault(tag, List.of());
             for (RouteCandidate candidate : tagCandidates) {
                 final Place place = candidate.getPlace();

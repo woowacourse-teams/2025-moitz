@@ -8,7 +8,7 @@ import java.util.stream.Collectors;
 import lombok.Getter;
 
 @Getter
-public class CandidateSelectionResult {
+public class CandidateSelection {
 
     private final List<RouteCandidate> selectedCandidates;
     private final DispersionPolicy initialPolicy;
@@ -17,7 +17,7 @@ public class CandidateSelectionResult {
     private final boolean fallbackToSortedCandidates;
     private final Map<CandidateSelectionTag, List<RouteCandidate>> tagSelections;
 
-    public CandidateSelectionResult(
+    public CandidateSelection(
             final List<RouteCandidate> selectedCandidates,
             final DispersionPolicy initialPolicy,
             final DispersionPolicy effectivePolicy,

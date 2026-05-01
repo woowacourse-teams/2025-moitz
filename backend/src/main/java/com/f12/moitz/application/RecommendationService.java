@@ -10,7 +10,7 @@ import com.f12.moitz.common.error.exception.BadRequestException;
 import com.f12.moitz.common.error.exception.GeneralErrorCode;
 import com.f12.moitz.common.error.exception.NotFoundException;
 import com.f12.moitz.domain.CandidateSelectionTag;
-import com.f12.moitz.domain.CandidateSelectionResult;
+import com.f12.moitz.domain.CandidateSelection;
 import com.f12.moitz.domain.CategorizedRecommendedPlaces;
 import com.f12.moitz.domain.DispersionPolicy;
 import com.f12.moitz.domain.FinalCandidateSelectionResult;
@@ -89,7 +89,7 @@ public class RecommendationService {
         );
         final List<Place> candidatePlaces = routeCandidatePreparationResult.getCandidatePlaces();
         final Map<Place, Routes> candidateRoutes = routeCandidatePreparationResult.getCandidateRoutes();
-        final CandidateSelectionResult candidateSelection = placeSearchCandidateSelector.select(
+        final CandidateSelection candidateSelection = placeSearchCandidateSelector.select(
                 routeCandidatePreparationResult.getRouteCandidates(),
                 dispersionPolicy,
                 PLACE_SEARCH_POOL_LIMIT
@@ -224,7 +224,7 @@ public class RecommendationService {
             final List<SubwayStation> startingPlaces,
             final List<Place> candidatePlaces,
             final Map<Place, Routes> candidateRoutes,
-            final CandidateSelectionResult candidateSelection
+            final CandidateSelection candidateSelection
     ) {
         final List<Place> selectedPlaces = candidateSelection.getSelectedPlaces();
         final long routeCalculatedCount = candidatePlaces.stream()

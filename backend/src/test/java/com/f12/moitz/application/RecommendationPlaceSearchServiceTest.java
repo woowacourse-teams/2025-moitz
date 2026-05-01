@@ -6,7 +6,7 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 
 import com.f12.moitz.application.port.PlaceRecommender;
-import com.f12.moitz.domain.CandidateSelectionResult;
+import com.f12.moitz.domain.CandidateSelection;
 import com.f12.moitz.domain.CandidateSelectionTag;
 import com.f12.moitz.domain.CategorizedRecommendedPlaces;
 import com.f12.moitz.domain.DispersionPolicy;
@@ -44,7 +44,7 @@ class RecommendationPlaceSearchServiceTest {
         final Place samsung = new Place("삼성역", new Point(127.063, 37.508));
         final RouteCandidate seolleungCandidate = new RouteCandidate(seolleung, createRoutes(gangnam, seolleung));
         final RouteCandidate samsungCandidate = new RouteCandidate(samsung, createRoutes(gangnam, samsung));
-        final CandidateSelectionResult candidateSelection = new CandidateSelectionResult(
+        final CandidateSelection candidateSelection = new CandidateSelection(
                 List.of(seolleungCandidate, samsungCandidate),
                 DispersionPolicy.TIER_1,
                 DispersionPolicy.TIER_1,

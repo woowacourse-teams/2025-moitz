@@ -25,7 +25,7 @@ class PlaceSearchCandidateSelectorTest {
         final RouteCandidate fairnessCandidate = routeCandidate("공평후보역", start1, start2, start3, 70, 71, 72);
         final RouteCandidate candidate6 = routeCandidate("후보6역", start1, start2, start3, 40, 53, 65);
 
-        final CandidateSelectionResult result = selector.select(
+        final CandidateSelection result = selector.select(
                 List.of(candidate1, candidate2, candidate3, candidate4, candidate5, fairnessCandidate, candidate6),
                 DispersionPolicy.TIER_4,
                 5

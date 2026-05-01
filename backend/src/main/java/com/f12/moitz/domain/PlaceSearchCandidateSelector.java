@@ -12,7 +12,7 @@ public class PlaceSearchCandidateSelector {
 
     private final RouteCandidateComparators routeCandidateComparators = new RouteCandidateComparators();
 
-    public CandidateSelectionResult select(
+    public CandidateSelection select(
             final List<RouteCandidate> candidates,
             final DispersionPolicy dispersionPolicy,
             final int limit
@@ -36,7 +36,7 @@ public class PlaceSearchCandidateSelector {
                         candidatePolicy,
                         scoreResolver
                 );
-                return new CandidateSelectionResult(
+                return new CandidateSelection(
                         mergeTagCandidates(tagSelections, acceptableCandidates, limit),
                         dispersionPolicy,
                         candidatePolicy,
@@ -52,7 +52,7 @@ public class PlaceSearchCandidateSelector {
                 DispersionPolicy.TIER_5,
                 scoreResolver
         );
-        return new CandidateSelectionResult(
+        return new CandidateSelection(
                 mergeTagCandidates(tagSelections, sortedCandidates, limit),
                 dispersionPolicy,
                 DispersionPolicy.TIER_5,

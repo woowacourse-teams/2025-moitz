@@ -1,7 +1,7 @@
 package com.f12.moitz.application;
 
 import com.f12.moitz.application.port.PlaceRecommender;
-import com.f12.moitz.domain.CandidateSelectionResult;
+import com.f12.moitz.domain.CandidateSelection;
 import com.f12.moitz.domain.CategorizedRecommendedPlaces;
 import com.f12.moitz.domain.FinalCandidateSelectionResult;
 import com.f12.moitz.domain.FinalCandidateSelector;
@@ -33,7 +33,7 @@ public class RecommendationPlaceSearchService {
     }
 
     public RecommendationPlaceSearchResult search(
-            final CandidateSelectionResult candidateSelection,
+            final CandidateSelection candidateSelection,
             final List<RecommendCondition> recommendConditions,
             final Map<Place, Routes> candidateRoutes,
             final int searchLimit,
@@ -102,7 +102,7 @@ public class RecommendationPlaceSearchService {
     }
 
     private FinalCandidateSelectionResult selectFinalPlaces(
-            final CandidateSelectionResult candidateSelection,
+            final CandidateSelection candidateSelection,
             final List<Place> selectedPlaces,
             final Map<Place, CategorizedRecommendedPlaces> recommendedPlaces,
             final List<RecommendCondition> recommendConditions,

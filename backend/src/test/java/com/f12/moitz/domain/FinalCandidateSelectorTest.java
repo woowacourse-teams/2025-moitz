@@ -21,7 +21,7 @@ class FinalCandidateSelectorTest {
         final RouteCandidate efficiency = routeCandidate("평균후보역");
         final RouteCandidate transfer = routeCandidate("환승후보역");
         final RouteCandidate general = routeCandidate("일반후보역");
-        final CandidateSelectionResult candidateSelectionResult = new CandidateSelectionResult(
+        final CandidateSelection candidateSelection = new CandidateSelection(
                 List.of(shared, maxBurden, efficiency, transfer, general),
                 DispersionPolicy.TIER_4,
                 DispersionPolicy.TIER_4,
@@ -31,8 +31,8 @@ class FinalCandidateSelectorTest {
         );
 
         final FinalCandidateSelectionResult selectionResult = finalCandidateSelector.select(
-                candidateSelectionResult,
-                candidateSelectionResult.getSelectedPlaces(),
+                candidateSelection,
+                candidateSelection.getSelectedPlaces(),
                 ignored -> true,
                 5
         );
@@ -53,7 +53,7 @@ class FinalCandidateSelectorTest {
     void select_UsesNextCandidateWhenFirstTaggedCandidateDoesNotSatisfyCondition() {
         final RouteCandidate failedFairness = routeCandidate("실패후보역");
         final RouteCandidate nextFairness = routeCandidate("대체후보역");
-        final CandidateSelectionResult candidateSelectionResult = new CandidateSelectionResult(
+        final CandidateSelection candidateSelection = new CandidateSelection(
                 List.of(failedFairness, nextFairness),
                 DispersionPolicy.TIER_4,
                 DispersionPolicy.TIER_4,
@@ -63,8 +63,8 @@ class FinalCandidateSelectorTest {
         );
 
         final FinalCandidateSelectionResult selectionResult = finalCandidateSelector.select(
-                candidateSelectionResult,
-                candidateSelectionResult.getSelectedPlaces(),
+                candidateSelection,
+                candidateSelection.getSelectedPlaces(),
                 place -> !place.getName().equals("실패후보역"),
                 1
         );
@@ -92,7 +92,7 @@ class FinalCandidateSelectorTest {
         tagSelections.put(CandidateSelectionTag.EFFICIENCY, List.of(efficiency));
         tagSelections.put(CandidateSelectionTag.TRANSFER, List.of());
         tagSelections.put(CandidateSelectionTag.GENERAL, List.of(general));
-        final CandidateSelectionResult candidateSelectionResult = new CandidateSelectionResult(
+        final CandidateSelection candidateSelection = new CandidateSelection(
                 List.of(fairness, efficiency, general, filler1, filler2),
                 DispersionPolicy.TIER_4,
                 DispersionPolicy.TIER_4,
@@ -102,7 +102,7 @@ class FinalCandidateSelectorTest {
         );
 
         final List<Place> nextSearchPlaces = finalCandidateSelector.selectNextSearchPlaces(
-                candidateSelectionResult,
+                candidateSelection,
                 List.of(fairness.getPlace()),
                 ignored -> true,
                 4
@@ -127,7 +127,7 @@ class FinalCandidateSelectorTest {
         tagSelections.put(CandidateSelectionTag.EFFICIENCY, List.of(efficiency));
         tagSelections.put(CandidateSelectionTag.TRANSFER, List.of());
         tagSelections.put(CandidateSelectionTag.GENERAL, List.of(general));
-        final CandidateSelectionResult candidateSelectionResult = new CandidateSelectionResult(
+        final CandidateSelection candidateSelection = new CandidateSelection(
                 List.of(fairness, efficiency, general, filler1, filler2),
                 DispersionPolicy.TIER_4,
                 DispersionPolicy.TIER_4,
@@ -137,7 +137,7 @@ class FinalCandidateSelectorTest {
         );
 
         final List<Place> nextSearchPlaces = finalCandidateSelector.selectNextSearchPlaces(
-                candidateSelectionResult,
+                candidateSelection,
                 List.of(fairness.getPlace(), efficiency.getPlace(), general.getPlace()),
                 ignored -> true,
                 4
