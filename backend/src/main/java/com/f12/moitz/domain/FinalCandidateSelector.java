@@ -64,7 +64,7 @@ public class FinalCandidateSelector {
         final Set<String> selectedPlaceNames = toPlaceNames(new ArrayList<>(selectedByTag.values()));
         final Map<String, Place> nextSearchPlaces = new LinkedHashMap<>();
 
-        for (CandidateSelectionTag tag : CandidateSelectionTag.values()) {
+        for (CandidateSelectionTag tag : CandidateSelectionTag.orderedValues()) {
             if (selectedByTag.containsKey(tag)) {
                 continue;
             }
@@ -110,7 +110,7 @@ public class FinalCandidateSelector {
         final Map<CandidateSelectionTag, Place> selectedByTag = new LinkedHashMap<>();
         final Map<Place, Set<CandidateSelectionTag>> tagsByPlace = new LinkedHashMap<>();
 
-        for (CandidateSelectionTag tag : CandidateSelectionTag.values()) {
+        for (CandidateSelectionTag tag : CandidateSelectionTag.orderedValues()) {
             final List<RouteCandidate> tagCandidates = candidateSelectionResult.getTagSelections()
                     .getOrDefault(tag, List.of());
             for (RouteCandidate candidate : tagCandidates) {

@@ -22,7 +22,7 @@ public class Recommendation {
 
     private List<Candidate> sort(final List<Candidate> candidates) {
         return candidates.stream()
-                .sorted(Comparator.comparing((Candidate candidate) -> candidate.getTag().ordinal())
+                .sorted(Comparator.comparingInt((Candidate candidate) -> candidate.getTag().getPriority())
                         .thenComparing(candidate -> candidate.getRoutes().calculateFairnessScore()))
                 .toList();
     }
