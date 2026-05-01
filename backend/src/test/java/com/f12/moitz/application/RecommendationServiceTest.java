@@ -74,6 +74,7 @@ class RecommendationServiceTest {
                 placeRecommender,
                 locationReasonGenerator,
                 routeFinder,
+                new RouteOriginDispersionResolver(routeFinder),
                 recommendationMapper,
                 recommendResultRepository
         );

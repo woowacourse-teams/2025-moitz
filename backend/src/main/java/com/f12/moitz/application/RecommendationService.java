@@ -57,6 +57,7 @@ public class RecommendationService {
     private final PlaceRecommender placeRecommender;
     private final LocationReasonGenerator locationReasonGenerator;
     private final RouteFinder routeFinder;
+    private final RouteOriginDispersionResolver routeOriginDispersionResolver;
     private final RecommendationMapper recommendationMapper;
     private final RecommendResultRepository recommendResultRepository;
     private final PlaceSearchCandidateSelector placeSearchCandidateSelector = new PlaceSearchCandidateSelector();
@@ -67,6 +68,7 @@ public class RecommendationService {
             @Qualifier("placeRecommenderParallelAdapter") final PlaceRecommender placeRecommender,
             @Autowired final LocationReasonGenerator locationReasonGenerator,
             @Qualifier("subwayRouteFinderAdapter") final RouteFinder routeFinder,
+            @Autowired final RouteOriginDispersionResolver routeOriginDispersionResolver,
             @Autowired final RecommendationMapper recommendationMapper,
             @Autowired final RecommendResultRepository recommendResultRepository
     ) {
@@ -74,6 +76,7 @@ public class RecommendationService {
         this.placeRecommender = placeRecommender;
         this.locationReasonGenerator = locationReasonGenerator;
         this.routeFinder = routeFinder;
+        this.routeOriginDispersionResolver = routeOriginDispersionResolver;
         this.recommendationMapper = recommendationMapper;
         this.recommendResultRepository = recommendResultRepository;
     }
@@ -86,7 +89,7 @@ public class RecommendationService {
         final List<RecommendCondition> recommendConditions = RecommendCondition.fromTitle(request.requirements());
         final List<SubwayStation> startingPlaces = getByNames(request.startingPlaceNames());
         final RouteOrigins routeOrigins = createRouteOrigins(startingPlaces);
-        final DispersionPolicy dispersionPolicy = resolveDispersionPolicy(routeOrigins);
+        final DispersionPolicy dispersionPolicy = routeOriginDispersionResolver.resolve(routeOrigins);
         final List<Place> candidatePlaces = getCandidatePlaces(startingPlaces, routeOrigins, dispersionPolicy);
         final List<OriginDestination> candidateOriginDestinations = routeOrigins.createOriginDestinationsTo(
                 candidatePlaces
@@ -264,39 +267,6 @@ public class RecommendationService {
     private Map<Place, Routes> findRoutesForAll(final List<OriginDestination> originDestinations) {
         final List<Route> allRoutes = routeFinder.findRoutes(originDestinations);
         return collectByPlace(originDestinations, allRoutes, Routes::new);
-    }
-
-    private DispersionPolicy resolveDispersionPolicy(final RouteOrigins routeOrigins) {
-        final List<OriginDestination> originDestinations = routeOrigins.createOriginDestinationsBetweenOrigins();
-        final List<Route> pairRoutes = routeFinder.findRoutes(originDestinations);
-        final int pairMaxTravelTime = pairRoutes.stream()
-                .mapToInt(Route::calculateTotalTravelTime)
-                .max()
-                .orElse(0);
-        final double pairAverageTravelTime = pairRoutes.stream()
-                .mapToInt(Route::calculateTotalTravelTime)
-                .average()
-                .orElse(0.0);
-        final long longPairCount = pairRoutes.stream()
-                .mapToInt(Route::calculateTotalTravelTime)
-                .filter(minutes -> minutes >= DispersionPolicy.LONG_PAIR_TRAVEL_TIME_MINUTES)
-                .count();
-        final DispersionPolicy dispersionPolicy = DispersionPolicy.resolve(
-                routeOrigins.size(),
-                pairMaxTravelTime,
-                pairAverageTravelTime,
-                longPairCount
-        );
-
-        log.debug(
-                "출발지 분산도 판정 - 출발역={}, pairMax={}분, pairAvg={}분, longPairCount={}, policy={}",
-                routeOrigins.getNames(),
-                pairMaxTravelTime,
-                String.format(java.util.Locale.US, "%.1f", pairAverageTravelTime),
-                longPairCount,
-                dispersionPolicy
-        );
-        return dispersionPolicy;
     }
 
     private Map<Place, Courses> findCoursesForAll(final List<OriginDestination> originDestinations) {
