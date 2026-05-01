@@ -49,7 +49,7 @@ public class RecommendationService {
 
     private static final int STARTING_VOTES = 0;
     private static final int PLACE_SEARCH_BATCH_SIZE = 5;
-    private static final int PLACE_SEARCH_POOL_LIMIT = 30;
+    private static final int PLACE_SEARCH_POOL_LIMIT = 50;
     private static final int FINAL_CANDIDATE_TARGET_COUNT = 5;
 
     private final SubwayStationService subwayStationService;
