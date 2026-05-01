@@ -71,7 +71,7 @@ class RecommendationServiceTest {
         recommendationMapper = new RecommendationMapper();
         recommendationService = new RecommendationService(
                 subwayStationService,
-                locationReasonGenerator,
+                new RecommendedCandidateReasonService(locationReasonGenerator),
                 new RouteOriginDispersionService(routeFinder),
                 new RouteCandidatePreparationService(subwayStationService, routeFinder),
                 new RecommendationPlaceSearchService(placeRecommender),
