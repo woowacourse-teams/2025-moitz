@@ -1,10 +1,13 @@
 package com.f12.moitz.application;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import com.f12.moitz.domain.Point;
 import com.f12.moitz.domain.repository.SubwayStationRepository;
 import com.f12.moitz.domain.subway.SubwayStation;
 import com.f12.moitz.infrastructure.persistence.SubwayStationEntity;
+import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -42,6 +45,30 @@ class SubwayStationServiceTest {
         assertThat(station1.get().getName()).isEqualTo(expectedName);
         assertThat(station2).contains(expectedStation.toSubwayStation());
         assertThat(station2.get().getName()).isEqualTo(expectedName);
+    }
+
+    @DisplayName("후보역 생성 시 출발역 목록은 비어있거나 null일 수 없다")
+    @Test
+    void generateCandidatePlace_ValidateStartingStations() {
+        assertThatThrownBy(() -> subwayStationService.generateCandidatePlace(null, 10))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("출발 지하철역 목록은 비어있거나 null일 수 없습니다.");
+        assertThatThrownBy(() -> subwayStationService.generateCandidatePlace(List.of(), 10))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("출발 지하철역 목록은 비어있거나 null일 수 없습니다.");
+    }
+
+    @DisplayName("후보역 생성 시 검색 반경은 0보다 커야 한다")
+    @Test
+    void generateCandidatePlace_ValidateDistanceValue() {
+        final SubwayStation station = new SubwayStation("강남역", new Point(127.0, 37.0));
+
+        assertThatThrownBy(() -> subwayStationService.generateCandidatePlace(List.of(station), 0))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("후보역 검색 반경은 0보다 커야 합니다.");
+        assertThatThrownBy(() -> subwayStationService.generateCandidatePlace(List.of(station), -1))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("후보역 검색 반경은 0보다 커야 합니다.");
     }
 
 }
