@@ -25,6 +25,9 @@ public record RecommendationRequest(
                 if (startingPlaceNames.size() > DispersionPolicy.MAX_STARTING_PLACE_COUNT) {
                         throw new BadRequestException(GeneralErrorCode.INPUT_INVALID_START_LOCATION, startingPlaceNames);
                 }
+                if (startingPlaceNames.stream().anyMatch(name -> name == null || name.isBlank())) {
+                        throw new BadRequestException(GeneralErrorCode.INPUT_INVALID_START_LOCATION, startingPlaceNames);
+                }
         }
 
 }
