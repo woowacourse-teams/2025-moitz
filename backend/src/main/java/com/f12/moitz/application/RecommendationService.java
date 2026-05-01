@@ -137,11 +137,10 @@ public class RecommendationService {
                 finalPlaceNames,
                 toTagsByPlaceName(finalCandidateSelection)
         );
-        final Map<Place, ReasonAndDescription> generatedPlacesWithReason = finalPlaces.stream()
-                .collect(Collectors.toMap(
-                        Function.identity(),
-                        place -> reasonsByPlaceName.get(place.getName())
-                ));
+        final Map<Place, ReasonAndDescription> generatedPlacesWithReason = mapReasonsByPlace(
+                finalPlaces,
+                reasonsByPlaceName
+        );
         stopWatch.stop();
 
         stopWatch.start("Recommendation으로 변환");
@@ -165,6 +164,31 @@ public class RecommendationService {
                 )
         ).toHexString().toUpperCase();
         return new RecommendationCreateResponse(id);
+    }
+
+    private Map<Place, ReasonAndDescription> mapReasonsByPlace(
+            final List<Place> places,
+            final Map<String, ReasonAndDescription> reasonsByPlaceName
+    ) {
+        if (reasonsByPlaceName == null) {
+            throw new IllegalStateException("추천 이유 생성 결과가 null입니다.");
+        }
+        return places.stream()
+                .collect(Collectors.toMap(
+                        Function.identity(),
+                        place -> getReason(place, reasonsByPlaceName)
+                ));
+    }
+
+    private ReasonAndDescription getReason(
+            final Place place,
+            final Map<String, ReasonAndDescription> reasonsByPlaceName
+    ) {
+        final ReasonAndDescription reason = reasonsByPlaceName.get(place.getName());
+        if (reason == null) {
+            throw new IllegalStateException("추천 이유 생성 결과가 누락되었습니다. placeName=" + place.getName());
+        }
+        return reason;
     }
 
     private List<String> getPlaceNames(final List<? extends Place> places) {
