@@ -71,11 +71,11 @@ class RecommendationServiceTest {
         recommendationMapper = new RecommendationMapper();
         recommendationService = new RecommendationService(
                 subwayStationService,
-                placeRecommender,
                 locationReasonGenerator,
                 routeFinder,
                 new RouteOriginDispersionResolver(routeFinder),
                 new RouteCandidateAssembler(subwayStationService, routeFinder),
+                new PlaceSearchCoordinator(placeRecommender),
                 recommendationMapper,
                 recommendResultRepository
         );
