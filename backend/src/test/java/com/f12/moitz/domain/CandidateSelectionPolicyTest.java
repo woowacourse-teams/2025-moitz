@@ -7,9 +7,9 @@ import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-class PlaceSearchCandidateSelectorTest {
+class CandidateSelectionPolicyTest {
 
-    private final PlaceSearchCandidateSelector selector = new PlaceSearchCandidateSelector();
+    private final CandidateSelectionPolicy policy = new CandidateSelectionPolicy();
 
     @Test
     @DisplayName("분산도가 큰 요청에서는 공평성 후보를 장소 검색 대상에 포함한다")
@@ -25,7 +25,7 @@ class PlaceSearchCandidateSelectorTest {
         final RouteCandidate fairnessCandidate = routeCandidate("공평후보역", start1, start2, start3, 70, 71, 72);
         final RouteCandidate candidate6 = routeCandidate("후보6역", start1, start2, start3, 40, 53, 65);
 
-        final CandidateSelection result = selector.select(
+        final CandidateSelection result = policy.select(
                 List.of(candidate1, candidate2, candidate3, candidate4, candidate5, fairnessCandidate, candidate6),
                 DispersionPolicy.TIER_4,
                 5

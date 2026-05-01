@@ -8,7 +8,7 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-public class PlaceSearchCandidateSelector {
+public class CandidateSelectionPolicy {
 
     private final RouteCandidateComparators routeCandidateComparators = new RouteCandidateComparators();
 

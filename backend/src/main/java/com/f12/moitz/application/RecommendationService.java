@@ -15,7 +15,7 @@ import com.f12.moitz.domain.CategorizedRecommendedPlaces;
 import com.f12.moitz.domain.DispersionPolicy;
 import com.f12.moitz.domain.SelectedCandidates;
 import com.f12.moitz.domain.Place;
-import com.f12.moitz.domain.PlaceSearchCandidateSelector;
+import com.f12.moitz.domain.CandidateSelectionPolicy;
 import com.f12.moitz.domain.RecommendCondition;
 import com.f12.moitz.domain.Recommendation;
 import com.f12.moitz.domain.Result;
@@ -51,7 +51,7 @@ public class RecommendationService {
     private final SelectedCandidateRouteService selectedCandidateRouteService;
     private final RecommendationMapper recommendationMapper;
     private final RecommendResultRepository recommendResultRepository;
-    private final PlaceSearchCandidateSelector placeSearchCandidateSelector = new PlaceSearchCandidateSelector();
+    private final CandidateSelectionPolicy candidateSelectionPolicy = new CandidateSelectionPolicy();
 
     public RecommendationService(
             @Autowired final SubwayStationService subwayStationService,
@@ -89,7 +89,7 @@ public class RecommendationService {
         );
         final List<Place> candidatePlaces = routeCandidatePreparationResult.getCandidatePlaces();
         final Map<Place, Routes> candidateRoutes = routeCandidatePreparationResult.getCandidateRoutes();
-        final CandidateSelection candidateSelection = placeSearchCandidateSelector.select(
+        final CandidateSelection candidateSelection = candidateSelectionPolicy.select(
                 routeCandidatePreparationResult.getRouteCandidates(),
                 dispersionPolicy,
                 PLACE_SEARCH_POOL_LIMIT
