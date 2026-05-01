@@ -1,7 +1,7 @@
 package com.f12.moitz.application;
 
 import com.f12.moitz.domain.CategorizedRecommendedPlaces;
-import com.f12.moitz.domain.FinalCandidateSelectionResult;
+import com.f12.moitz.domain.SelectedCandidates;
 import com.f12.moitz.domain.Place;
 import java.util.Collections;
 import java.util.LinkedHashMap;
@@ -12,16 +12,16 @@ public class RecommendationPlaceSearchResult {
 
     private final List<Place> searchedPlaces;
     private final Map<Place, CategorizedRecommendedPlaces> recommendedPlaces;
-    private final FinalCandidateSelectionResult finalCandidateSelection;
+    private final SelectedCandidates selectedCandidates;
 
     public RecommendationPlaceSearchResult(
             final List<Place> searchedPlaces,
             final Map<Place, CategorizedRecommendedPlaces> recommendedPlaces,
-            final FinalCandidateSelectionResult finalCandidateSelection
+            final SelectedCandidates selectedCandidates
     ) {
         this.searchedPlaces = List.copyOf(searchedPlaces);
         this.recommendedPlaces = Collections.unmodifiableMap(new LinkedHashMap<>(recommendedPlaces));
-        this.finalCandidateSelection = finalCandidateSelection;
+        this.selectedCandidates = selectedCandidates;
     }
 
     public List<Place> getSearchedPlaces() {
@@ -32,8 +32,8 @@ public class RecommendationPlaceSearchResult {
         return recommendedPlaces;
     }
 
-    public FinalCandidateSelectionResult getFinalCandidateSelection() {
-        return finalCandidateSelection;
+    public SelectedCandidates getSelectedCandidates() {
+        return selectedCandidates;
     }
 
 }

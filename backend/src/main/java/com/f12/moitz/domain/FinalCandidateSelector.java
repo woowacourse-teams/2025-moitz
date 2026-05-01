@@ -11,7 +11,7 @@ import java.util.function.Predicate;
 
 public class FinalCandidateSelector {
 
-    public FinalCandidateSelectionResult select(
+    public SelectedCandidates select(
             final CandidateSelection candidateSelection,
             final List<Place> searchedPlaces,
             final Predicate<Place> placeCondition,
@@ -43,7 +43,7 @@ public class FinalCandidateSelector {
         final List<Place> limitedSelectedPlaces = selectedPlaces.stream()
                 .limit(limit)
                 .toList();
-        return new FinalCandidateSelectionResult(
+        return new SelectedCandidates(
                 limitedSelectedPlaces,
                 filterTagsBySelectedPlaces(tagsByPlace, limitedSelectedPlaces)
         );

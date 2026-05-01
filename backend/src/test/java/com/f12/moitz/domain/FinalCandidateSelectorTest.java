@@ -30,7 +30,7 @@ class FinalCandidateSelectorTest {
                 createTagSelections(shared, maxBurden, efficiency, transfer, general)
         );
 
-        final FinalCandidateSelectionResult selectionResult = finalCandidateSelector.select(
+        final SelectedCandidates selectionResult = finalCandidateSelector.select(
                 candidateSelection,
                 candidateSelection.getSelectedPlaces(),
                 ignored -> true,
@@ -62,7 +62,7 @@ class FinalCandidateSelectorTest {
                 Map.of(CandidateSelectionTag.FAIRNESS, List.of(failedFairness, nextFairness))
         );
 
-        final FinalCandidateSelectionResult selectionResult = finalCandidateSelector.select(
+        final SelectedCandidates selectionResult = finalCandidateSelector.select(
                 candidateSelection,
                 candidateSelection.getSelectedPlaces(),
                 place -> !place.getName().equals("실패후보역"),

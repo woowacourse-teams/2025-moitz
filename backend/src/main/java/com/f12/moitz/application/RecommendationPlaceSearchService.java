@@ -3,7 +3,7 @@ package com.f12.moitz.application;
 import com.f12.moitz.application.port.PlaceRecommender;
 import com.f12.moitz.domain.CandidateSelection;
 import com.f12.moitz.domain.CategorizedRecommendedPlaces;
-import com.f12.moitz.domain.FinalCandidateSelectionResult;
+import com.f12.moitz.domain.SelectedCandidates;
 import com.f12.moitz.domain.FinalCandidateSelector;
 import com.f12.moitz.domain.Place;
 import com.f12.moitz.domain.RecommendCondition;
@@ -41,7 +41,7 @@ public class RecommendationPlaceSearchService {
     ) {
         final Map<Place, CategorizedRecommendedPlaces> accumulatedRecommendedPlaces = new LinkedHashMap<>();
         final List<Place> searchedPlaces = new ArrayList<>();
-        FinalCandidateSelectionResult finalCandidateSelection = selectFinalPlaces(
+        SelectedCandidates selectedCandidates = selectFinalPlaces(
                 candidateSelection,
                 searchedPlaces,
                 accumulatedRecommendedPlaces,
@@ -50,7 +50,7 @@ public class RecommendationPlaceSearchService {
         );
 
         while (searchedPlaces.size() < searchLimit) {
-            if (finalCandidateSelection.getSelectedPlaces().size() >= targetCount) {
+            if (selectedCandidates.getSelectedPlaces().size() >= targetCount) {
                 log.debug("장소 추천 조기 종료 - 최종 후보 {}개 확보", targetCount);
                 break;
             }
@@ -79,7 +79,7 @@ public class RecommendationPlaceSearchService {
             accumulatedRecommendedPlaces.putAll(placeRecommender.recommendPlaces(batch, recommendConditions));
             searchedPlaces.addAll(batch);
 
-            finalCandidateSelection = selectFinalPlaces(
+            selectedCandidates = selectFinalPlaces(
                     candidateSelection,
                     searchedPlaces,
                     accumulatedRecommendedPlaces,
@@ -90,18 +90,18 @@ public class RecommendationPlaceSearchService {
             log.debug(
                     "장소 추천 배치 완료 - 누적 조회 {}개, 현재 최종 후보 {}개",
                     searchedPlaces.size(),
-                    finalCandidateSelection.getSelectedPlaces().size()
+                    selectedCandidates.getSelectedPlaces().size()
             );
         }
 
         return new RecommendationPlaceSearchResult(
                 searchedPlaces,
                 accumulatedRecommendedPlaces,
-                finalCandidateSelection
+                selectedCandidates
         );
     }
 
-    private FinalCandidateSelectionResult selectFinalPlaces(
+    private SelectedCandidates selectFinalPlaces(
             final CandidateSelection candidateSelection,
             final List<Place> selectedPlaces,
             final Map<Place, CategorizedRecommendedPlaces> recommendedPlaces,

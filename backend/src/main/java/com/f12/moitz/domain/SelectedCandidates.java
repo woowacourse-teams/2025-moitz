@@ -8,12 +8,12 @@ import java.util.stream.Collectors;
 import lombok.Getter;
 
 @Getter
-public class FinalCandidateSelectionResult {
+public class SelectedCandidates {
 
     private final List<Place> selectedPlaces;
     private final Map<Place, List<CandidateSelectionTag>> tagsByPlace;
 
-    public FinalCandidateSelectionResult(
+    public SelectedCandidates(
             final List<Place> selectedPlaces,
             final Map<Place, List<CandidateSelectionTag>> tagsByPlace
     ) {

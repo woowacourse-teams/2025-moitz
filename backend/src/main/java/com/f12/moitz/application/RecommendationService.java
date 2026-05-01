@@ -13,7 +13,7 @@ import com.f12.moitz.domain.CandidateSelectionTag;
 import com.f12.moitz.domain.CandidateSelection;
 import com.f12.moitz.domain.CategorizedRecommendedPlaces;
 import com.f12.moitz.domain.DispersionPolicy;
-import com.f12.moitz.domain.FinalCandidateSelectionResult;
+import com.f12.moitz.domain.SelectedCandidates;
 import com.f12.moitz.domain.Place;
 import com.f12.moitz.domain.PlaceSearchCandidateSelector;
 import com.f12.moitz.domain.RecommendCondition;
@@ -116,9 +116,9 @@ public class RecommendationService {
         stopWatch.stop();
 
         stopWatch.start("최종 후보 확정");
-        final FinalCandidateSelectionResult finalCandidateSelection = recommendationPlaceSearchResult.getFinalCandidateSelection();
-        final List<Place> finalPlaces = finalCandidateSelection.getSelectedPlaces();
-        logFinalCandidateSelection(selectedPlaces, finalPlaces, candidateRoutes, recommendConditions);
+        final SelectedCandidates selectedCandidates = recommendationPlaceSearchResult.getSelectedCandidates();
+        final List<Place> finalPlaces = selectedCandidates.getSelectedPlaces();
+        logSelectedCandidates(selectedPlaces, finalPlaces, candidateRoutes, recommendConditions);
         validateRecommendationCandidates(finalPlaces);
         final SelectedCandidateRouteResult selectedCandidateRouteResult = selectedCandidateRouteService.prepare(
                 routeOrigins,
@@ -131,7 +131,7 @@ public class RecommendationService {
         final List<String> finalPlaceNames = getPlaceNames(finalPlaces);
         final Map<String, ReasonAndDescription> reasonsByPlaceName = locationReasonGenerator.generateReasons(
                 finalPlaceNames,
-                toTagsByPlaceName(finalCandidateSelection)
+                toTagsByPlaceName(selectedCandidates)
         );
         final Map<Place, ReasonAndDescription> generatedPlacesWithReason = mapReasonsByPlace(
                 finalPlaces,
@@ -145,7 +145,7 @@ public class RecommendationService {
                 recommendedPlaces,
                 selectedCandidateRouteResult.getRoutesByPlace(),
                 selectedCandidateRouteResult.getCoursesByPlace(),
-                finalCandidateSelection.getTagsByPlace(),
+                selectedCandidates.getTagsByPlace(),
                 STARTING_VOTES,
                 recommendConditions
         );
@@ -194,9 +194,9 @@ public class RecommendationService {
     }
 
     private Map<String, List<CandidateSelectionTag>> toTagsByPlaceName(
-            final FinalCandidateSelectionResult finalCandidateSelection
+            final SelectedCandidates selectedCandidates
     ) {
-        return finalCandidateSelection.getTagsByPlace().entrySet().stream()
+        return selectedCandidates.getTagsByPlace().entrySet().stream()
                 .collect(Collectors.toMap(
                         entry -> entry.getKey().getName(),
                         Entry::getValue,
@@ -265,7 +265,7 @@ public class RecommendationService {
                 .toList();
     }
 
-    private void logFinalCandidateSelection(
+    private void logSelectedCandidates(
             final List<Place> selectedPlaces,
             final List<Place> finalPlaces,
             final Map<Place, Routes> candidateRoutes,
