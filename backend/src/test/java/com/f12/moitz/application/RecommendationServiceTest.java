@@ -17,6 +17,7 @@ import com.f12.moitz.application.port.dto.ReasonAndDescription;
 import com.f12.moitz.application.port.RouteFinder;
 import com.f12.moitz.application.utils.RecommendationMapper;
 import com.f12.moitz.common.error.exception.BadRequestException;
+import com.f12.moitz.common.error.exception.GeneralErrorCode;
 import com.f12.moitz.domain.CategorizedRecommendedPlaces;
 import com.f12.moitz.domain.Course;
 import com.f12.moitz.domain.Path;
@@ -201,8 +202,9 @@ class RecommendationServiceTest {
         ));
 
         assertThatThrownBy(() -> recommendationService.recommendLocation(request))
-                .isInstanceOf(BadRequestException.class)
-                .hasMessageContaining("조건에 맞는 추천 결과를 찾지 못했습니다.");
+                .isInstanceOfSatisfying(BadRequestException.class,
+                        exception -> assertThat(exception.getErrorCode())
+                                .isEqualTo(GeneralErrorCode.RECOMMENDATION_NOT_FOUND));
     }
 
 }

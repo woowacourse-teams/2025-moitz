@@ -270,9 +270,8 @@ public class KakaoMapAsyncClient {
             return new ExternalApiException(ExternalApiErrorCode.INVALID_KAKAO_MAP_API_RESPONSE);
         } catch (Exception e) {
             log.error(
-                    "Failed to parse Kakao API error response - status: {}, rawBody: {}",
+                    "Failed to parse Kakao API error response - status: {}",
                     wcre.getStatusCode().value(),
-                    wcre.getResponseBodyAsString(),
                     e
             );
             return new ExternalApiException(ExternalApiErrorCode.INVALID_KAKAO_MAP_API_RESPONSE);
