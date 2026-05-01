@@ -207,4 +207,20 @@ class RecommendationServiceTest {
                                 .isEqualTo(GeneralErrorCode.RECOMMENDATION_NOT_FOUND));
     }
 
+    @Test
+    @DisplayName("출발지명이 같은 역으로 해석되면 제어된 예외를 반환한다")
+    void recommendLocation_ThrowsBadRequestWhenResolvedStartingPlacesAreDuplicated() {
+        final RecommendationRequest request = new RecommendationRequest(List.of("이수역", "총신대입구역"), List.of("CAFE"));
+        final SubwayStation isu = new SubwayStation("이수역", new Point(126.982, 37.486));
+
+        given(subwayStationService.findByName("이수역")).willReturn(Optional.of(isu));
+        given(subwayStationService.findByName("총신대입구역")).willReturn(Optional.of(isu));
+
+        assertThatThrownBy(() -> recommendationService.recommendLocation(request))
+                .isInstanceOfSatisfying(BadRequestException.class,
+                        exception -> assertThat(exception.getErrorCode())
+                                .isEqualTo(GeneralErrorCode.INPUT_INVALID_START_LOCATION));
+        verify(routeFinder, times(0)).findRoutes(anyList());
+    }
+
 }

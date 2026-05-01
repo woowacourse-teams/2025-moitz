@@ -84,6 +84,7 @@ public class RecommendationService {
         stopWatch.start("공평한 후보역 선정");
         final List<RecommendCondition> recommendConditions = RecommendCondition.fromTitle(request.requirements());
         final List<SubwayStation> startingPlaces = getByNames(request.startingPlaceNames());
+        validateUniqueStartingPlaces(startingPlaces);
         final DispersionPolicy dispersionPolicy = resolveDispersionPolicy(startingPlaces);
         final List<Place> candidatePlaces = getCandidatePlaces(startingPlaces, dispersionPolicy);
         final List<StartEndPair> candidatePairs = createPairs(startingPlaces, candidatePlaces);
@@ -214,6 +215,15 @@ public class RecommendationService {
                 .map(name -> subwayStationService.findByName(name)
                         .orElseThrow(() -> new BadRequestException(GeneralErrorCode.INPUT_INVALID_START_LOCATION)))
                 .toList();
+    }
+
+    private void validateUniqueStartingPlaces(final List<SubwayStation> startingPlaces) {
+        final long distinctCount = startingPlaces.stream()
+                .distinct()
+                .count();
+        if (distinctCount != startingPlaces.size()) {
+            throw new BadRequestException(GeneralErrorCode.INPUT_INVALID_START_LOCATION, getPlaceNames(startingPlaces));
+        }
     }
 
     private List<Place> getCandidatePlaces(
