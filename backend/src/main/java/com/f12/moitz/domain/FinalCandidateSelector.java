@@ -6,6 +6,7 @@ import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.function.Predicate;
 
@@ -43,9 +44,13 @@ public class FinalCandidateSelector {
         final List<Place> limitedSelectedPlaces = selectedPlaces.stream()
                 .limit(limit)
                 .toList();
+        final Map<Place, List<CandidateSelectionTag>> filteredTagsByPlace = filterTagsBySelectedPlaces(
+                tagsByPlace,
+                limitedSelectedPlaces
+        );
         return new FinalCandidateSelectionResult(
                 limitedSelectedPlaces,
-                filterTagsBySelectedPlaces(tagsByPlace, limitedSelectedPlaces)
+                normalizeTransferTags(candidateSelectionResult, limitedSelectedPlaces, filteredTagsByPlace)
         );
     }
 
@@ -176,6 +181,106 @@ public class FinalCandidateSelector {
         final Set<String> placeNames = new HashSet<>();
         places.forEach(place -> placeNames.add(place.getName()));
         return placeNames;
+    }
+
+    private Map<Place, List<CandidateSelectionTag>> normalizeTransferTags(
+            final CandidateSelectionResult candidateSelectionResult,
+            final List<Place> selectedPlaces,
+            final Map<Place, List<CandidateSelectionTag>> tagsByPlace
+    ) {
+        final Map<String, RouteCandidate> candidatesByPlaceName = candidatesByPlaceName(candidateSelectionResult);
+        final List<TransferScore> transferScores = selectedPlaces.stream()
+                .map(place -> candidatesByPlaceName.get(place.getName()))
+                .filter(Objects::nonNull)
+                .map(candidate -> TransferScore.from(candidate.calculateFairnessScore()))
+                .toList();
+
+        if (transferScores.isEmpty()) {
+            return tagsByPlace;
+        }
+
+        final TransferScore bestTransferScore = transferScores.stream()
+                .min(TransferScore::compareTo)
+                .orElseThrow();
+        final Set<String> transferCandidateNames = transferCandidateNames(candidateSelectionResult);
+        final Map<Place, List<CandidateSelectionTag>> normalizedTagsByPlace = new LinkedHashMap<>();
+        selectedPlaces.forEach(place -> normalizedTagsByPlace.put(
+                place,
+                normalizeTransferTag(place, tagsByPlace, candidatesByPlaceName, transferCandidateNames, bestTransferScore)
+        ));
+        return normalizedTagsByPlace;
+    }
+
+    private Set<String> transferCandidateNames(final CandidateSelectionResult candidateSelectionResult) {
+        final Set<String> transferCandidateNames = new HashSet<>();
+        candidateSelectionResult.getTagSelections()
+                .getOrDefault(CandidateSelectionTag.TRANSFER, List.of())
+                .forEach(candidate -> transferCandidateNames.add(candidate.getPlace().getName()));
+        return transferCandidateNames;
+    }
+
+    private Map<String, RouteCandidate> candidatesByPlaceName(final CandidateSelectionResult candidateSelectionResult) {
+        final Map<String, RouteCandidate> candidatesByPlaceName = new LinkedHashMap<>();
+        candidateSelectionResult.getSelectedCandidates()
+                .forEach(candidate -> candidatesByPlaceName.putIfAbsent(candidate.getPlace().getName(), candidate));
+        candidateSelectionResult.getTagSelections()
+                .values()
+                .forEach(candidates -> candidates.forEach(candidate ->
+                        candidatesByPlaceName.putIfAbsent(candidate.getPlace().getName(), candidate)));
+        return candidatesByPlaceName;
+    }
+
+    private List<CandidateSelectionTag> normalizeTransferTag(
+            final Place place,
+            final Map<Place, List<CandidateSelectionTag>> tagsByPlace,
+            final Map<String, RouteCandidate> candidatesByPlaceName,
+            final Set<String> transferCandidateNames,
+            final TransferScore bestTransferScore
+    ) {
+        final List<CandidateSelectionTag> tags = tagsByPlace.getOrDefault(place, List.of(CandidateSelectionTag.GENERAL));
+        final RouteCandidate candidate = candidatesByPlaceName.get(place.getName());
+        final boolean isBestTransfer = candidate != null
+                && TransferScore.from(candidate.calculateFairnessScore()).compareTo(bestTransferScore) == 0;
+
+        if (isBestTransfer && transferCandidateNames.contains(place.getName())) {
+            if (tags.contains(CandidateSelectionTag.TRANSFER)) {
+                return tags;
+            }
+            final List<CandidateSelectionTag> tagsWithTransfer = new ArrayList<>(tags);
+            tagsWithTransfer.add(CandidateSelectionTag.TRANSFER);
+            return tagsWithTransfer;
+        }
+        return tags.stream()
+                .filter(tag -> tag != CandidateSelectionTag.TRANSFER)
+                .toList();
+    }
+
+    private record TransferScore(
+            double averageTransferCount,
+            int maxTransferCount,
+            int transferDiff
+    ) implements Comparable<TransferScore> {
+
+        private static TransferScore from(final FairnessScore fairnessScore) {
+            return new TransferScore(
+                    fairnessScore.getAverageTransferCount(),
+                    fairnessScore.getMaxTransferCount(),
+                    fairnessScore.getTransferDiff()
+            );
+        }
+
+        @Override
+        public int compareTo(final TransferScore other) {
+            final int averageComparison = Double.compare(averageTransferCount, other.averageTransferCount);
+            if (averageComparison != 0) {
+                return averageComparison;
+            }
+            if (maxTransferCount != other.maxTransferCount) {
+                return Integer.compare(maxTransferCount, other.maxTransferCount);
+            }
+            return Integer.compare(transferDiff, other.transferDiff);
+        }
+
     }
 
     private record TaggedPlaceSelection(
