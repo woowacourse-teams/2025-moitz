@@ -3,7 +3,7 @@ package com.f12.moitz.application;
 import com.f12.moitz.application.dto.RecommendationCreateResponse;
 import com.f12.moitz.application.dto.RecommendationRequest;
 import com.f12.moitz.application.dto.RecommendationResultResponse;
-import com.f12.moitz.application.utils.RecommendationMapper;
+import com.f12.moitz.application.utils.RecommendationResponseMapper;
 import com.f12.moitz.common.error.exception.BadRequestException;
 import com.f12.moitz.common.error.exception.GeneralErrorCode;
 import com.f12.moitz.common.error.exception.NotFoundException;
@@ -46,7 +46,7 @@ public class RecommendationService {
     private final RouteCandidatePreparationService routeCandidatePreparationService;
     private final RecommendationPlaceSearchService recommendationPlaceSearchService;
     private final RecommendedCandidateRouteService recommendedCandidateRouteService;
-    private final RecommendationMapper recommendationMapper;
+    private final RecommendationResponseMapper recommendationResponseMapper;
     private final RecommendResultRepository recommendResultRepository;
     private final CandidateSelectionPolicy candidateSelectionPolicy = new CandidateSelectionPolicy();
 
@@ -57,7 +57,7 @@ public class RecommendationService {
             @Autowired final RouteCandidatePreparationService routeCandidatePreparationService,
             @Autowired final RecommendationPlaceSearchService recommendationPlaceSearchService,
             @Autowired final RecommendedCandidateRouteService recommendedCandidateRouteService,
-            @Autowired final RecommendationMapper recommendationMapper,
+            @Autowired final RecommendationResponseMapper recommendationResponseMapper,
             @Autowired final RecommendResultRepository recommendResultRepository
     ) {
         this.routeOriginPreparationService = routeOriginPreparationService;
@@ -66,7 +66,7 @@ public class RecommendationService {
         this.routeCandidatePreparationService = routeCandidatePreparationService;
         this.recommendationPlaceSearchService = recommendationPlaceSearchService;
         this.recommendedCandidateRouteService = recommendedCandidateRouteService;
-        this.recommendationMapper = recommendationMapper;
+        this.recommendationResponseMapper = recommendationResponseMapper;
         this.recommendResultRepository = recommendResultRepository;
     }
 
@@ -246,7 +246,7 @@ public class RecommendationService {
     public RecommendationResultResponse getById(final String id) {
         final Result result = recommendResultRepository.findById(parseObjectId(id))
                 .orElseThrow(() -> new NotFoundException(GeneralErrorCode.INPUT_INVALID_RESULT));
-        return recommendationMapper.toResponse(result);
+        return recommendationResponseMapper.toResponse(result);
     }
 
     private ObjectId parseObjectId(final String id) {

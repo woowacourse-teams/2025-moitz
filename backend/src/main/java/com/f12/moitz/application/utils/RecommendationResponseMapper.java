@@ -28,7 +28,7 @@ import java.util.stream.IntStream;
 import org.springframework.stereotype.Component;
 
 @Component
-public class RecommendationMapper {
+public class RecommendationResponseMapper {
 
     private static final boolean BEST_RECOMMENDATION_DISABLED = false;
 

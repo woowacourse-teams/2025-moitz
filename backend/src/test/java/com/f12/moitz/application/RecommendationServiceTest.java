@@ -15,7 +15,7 @@ import com.f12.moitz.application.port.LocationReasonGenerator;
 import com.f12.moitz.application.port.PlaceRecommender;
 import com.f12.moitz.application.port.dto.ReasonAndDescription;
 import com.f12.moitz.application.port.RouteFinder;
-import com.f12.moitz.application.utils.RecommendationMapper;
+import com.f12.moitz.application.utils.RecommendationResponseMapper;
 import com.f12.moitz.common.error.exception.BadRequestException;
 import com.f12.moitz.common.error.exception.GeneralErrorCode;
 import com.f12.moitz.domain.CategorizedRecommendedPlaces;
@@ -64,11 +64,11 @@ class RecommendationServiceTest {
     @Mock
     private RecommendResultRepository recommendResultRepository;
 
-    private RecommendationMapper recommendationMapper;
+    private RecommendationResponseMapper recommendationResponseMapper;
 
     @BeforeEach
     void setUp() {
-        recommendationMapper = new RecommendationMapper();
+        recommendationResponseMapper = new RecommendationResponseMapper();
         recommendationService = new RecommendationService(
                 new RouteOriginPreparationService(subwayStationService),
                 new RecommendedCandidateReasonService(locationReasonGenerator),
@@ -76,7 +76,7 @@ class RecommendationServiceTest {
                 new RouteCandidatePreparationService(subwayStationService, routeFinder),
                 new RecommendationPlaceSearchService(placeRecommender),
                 new RecommendedCandidateRouteService(routeFinder),
-                recommendationMapper,
+                recommendationResponseMapper,
                 recommendResultRepository
         );
     }
