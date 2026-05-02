@@ -44,6 +44,103 @@ class RecommendationTest {
     }
 
     @Test
+    @DisplayName("추천 생성 재료가 유효하지 않으면 추천을 생성할 수 없다")
+    void create_IsThrownByInvalidCreationInputs() {
+        final Place startPlace = new Place("잠실역", new Point(127.0, 37.0));
+        final Place recommendedPlace = new Place("선릉역", new Point(127.1, 37.1));
+        final Map<Place, RecommendationReason> reasonsByPlace = Map.of(
+                recommendedPlace,
+                new RecommendationReason("#공평", "이동 시간이 고른 후보입니다.")
+        );
+        final Map<Place, CategorizedRecommendedPlaces> recommendedPlacesByPlace = Map.of(
+                recommendedPlace,
+                createRecommendedPlaces(RecommendCondition.CAFE)
+        );
+        final Map<Place, Routes> routesByPlace = Map.of(
+                recommendedPlace,
+                createRoutes(startPlace, recommendedPlace, 10 * 60)
+        );
+        final Map<Place, Courses> coursesByPlace = Map.of(
+                recommendedPlace,
+                createCourses(startPlace, recommendedPlace)
+        );
+        final Map<Place, List<CandidateSelectionTag>> tagsByPlace = Map.of(
+                recommendedPlace,
+                List.of(CandidateSelectionTag.FAIRNESS)
+        );
+        final List<RecommendCondition> recommendConditions = List.of(RecommendCondition.CAFE);
+
+        assertSoftly(softAssertions -> {
+            softAssertions.assertThatThrownBy(() -> Recommendation.create(
+                            null,
+                            recommendedPlacesByPlace,
+                            routesByPlace,
+                            coursesByPlace,
+                            tagsByPlace,
+                            0,
+                            recommendConditions
+                    ))
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessage("추천 이유는 비어있거나 null일 수 없습니다.");
+            softAssertions.assertThatThrownBy(() -> Recommendation.create(
+                            reasonsByPlace,
+                            null,
+                            routesByPlace,
+                            coursesByPlace,
+                            tagsByPlace,
+                            0,
+                            recommendConditions
+                    ))
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessage("추천 장소 목록은 null일 수 없습니다.");
+            softAssertions.assertThatThrownBy(() -> Recommendation.create(
+                            reasonsByPlace,
+                            recommendedPlacesByPlace,
+                            null,
+                            coursesByPlace,
+                            tagsByPlace,
+                            0,
+                            recommendConditions
+                    ))
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessage("추천 후보 경로는 null일 수 없습니다.");
+            softAssertions.assertThatThrownBy(() -> Recommendation.create(
+                            reasonsByPlace,
+                            recommendedPlacesByPlace,
+                            routesByPlace,
+                            null,
+                            tagsByPlace,
+                            0,
+                            recommendConditions
+                    ))
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessage("추천 후보 이동 코스는 null일 수 없습니다.");
+            softAssertions.assertThatThrownBy(() -> Recommendation.create(
+                            reasonsByPlace,
+                            recommendedPlacesByPlace,
+                            routesByPlace,
+                            coursesByPlace,
+                            null,
+                            0,
+                            recommendConditions
+                    ))
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessage("추천 후보 태그는 null일 수 없습니다.");
+            softAssertions.assertThatThrownBy(() -> Recommendation.create(
+                            reasonsByPlace,
+                            recommendedPlacesByPlace,
+                            routesByPlace,
+                            coursesByPlace,
+                            tagsByPlace,
+                            0,
+                            List.of()
+                    ))
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessage("추천 조건은 비어있거나 null일 수 없습니다.");
+        });
+    }
+
+    @Test
     @DisplayName("후보지들을 태그 순서 우선으로 정렬한다")
     void sortCandidates() {
         // Given
