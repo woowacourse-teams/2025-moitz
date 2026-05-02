@@ -11,7 +11,7 @@ import java.util.function.Predicate;
 
 public class CandidatePlaceSearchPolicy {
 
-    public SelectedCandidates select(
+    public RecommendedCandidates select(
             final CandidateSelection candidateSelection,
             final List<Place> searchedPlaces,
             final Predicate<Place> placeCondition,
@@ -22,30 +22,30 @@ public class CandidatePlaceSearchPolicy {
                 searchedPlaces,
                 placeCondition
         );
-        final List<Place> selectedPlaces = new ArrayList<>(taggedPlaceSelection.selectedPlaces());
-        final Set<String> selectedPlaceNames = toPlaceNames(selectedPlaces);
+        final List<Place> recommendedCandidatePlaces = new ArrayList<>(taggedPlaceSelection.recommendedCandidatePlaces());
+        final Set<String> recommendedCandidatePlaceNames = toPlaceNames(recommendedCandidatePlaces);
         final Map<Place, List<CandidateSelectionTag>> tagsByPlace = new LinkedHashMap<>(
                 taggedPlaceSelection.tagsByPlace()
         );
 
         for (Place place : searchedPlaces) {
-            if (selectedPlaces.size() >= limit) {
+            if (recommendedCandidatePlaces.size() >= limit) {
                 break;
             }
-            if (selectedPlaceNames.contains(place.getName()) || !placeCondition.test(place)) {
+            if (recommendedCandidatePlaceNames.contains(place.getName()) || !placeCondition.test(place)) {
                 continue;
             }
-            selectedPlaces.add(place);
-            selectedPlaceNames.add(place.getName());
+            recommendedCandidatePlaces.add(place);
+            recommendedCandidatePlaceNames.add(place.getName());
             tagsByPlace.put(place, List.of(CandidateSelectionTag.GENERAL));
         }
 
-        final List<Place> limitedSelectedPlaces = selectedPlaces.stream()
+        final List<Place> limitedRecommendedCandidatePlaces = recommendedCandidatePlaces.stream()
                 .limit(limit)
                 .toList();
-        return new SelectedCandidates(
-                limitedSelectedPlaces,
-                filterTagsBySelectedPlaces(tagsByPlace, limitedSelectedPlaces)
+        return new RecommendedCandidates(
+                limitedRecommendedCandidatePlaces,
+                filterTagsByRecommendedCandidatePlaces(tagsByPlace, limitedRecommendedCandidatePlaces)
         );
     }
 
@@ -160,12 +160,12 @@ public class CandidatePlaceSearchPolicy {
         return copiedTagsByPlace;
     }
 
-    private Map<Place, List<CandidateSelectionTag>> filterTagsBySelectedPlaces(
+    private Map<Place, List<CandidateSelectionTag>> filterTagsByRecommendedCandidatePlaces(
             final Map<Place, List<CandidateSelectionTag>> tagsByPlace,
-            final List<Place> selectedPlaces
+            final List<Place> recommendedCandidatePlaces
     ) {
         final Map<Place, List<CandidateSelectionTag>> filteredTagsByPlace = new LinkedHashMap<>();
-        selectedPlaces.forEach(place -> filteredTagsByPlace.put(
+        recommendedCandidatePlaces.forEach(place -> filteredTagsByPlace.put(
                 place,
                 tagsByPlace.getOrDefault(place, List.of(CandidateSelectionTag.GENERAL))
         ));
@@ -179,7 +179,7 @@ public class CandidatePlaceSearchPolicy {
     }
 
     private record TaggedPlaceSelection(
-            List<Place> selectedPlaces,
+            List<Place> recommendedCandidatePlaces,
             Map<CandidateSelectionTag, Place> selectedByTag,
             Map<Place, List<CandidateSelectionTag>> tagsByPlace
     ) {

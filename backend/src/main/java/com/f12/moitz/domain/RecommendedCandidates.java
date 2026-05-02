@@ -8,16 +8,16 @@ import java.util.stream.Collectors;
 import lombok.Getter;
 
 @Getter
-public class SelectedCandidates {
+public class RecommendedCandidates {
 
-    private final List<Place> selectedPlaces;
+    private final List<Place> recommendedCandidatePlaces;
     private final Map<Place, List<CandidateSelectionTag>> tagsByPlace;
 
-    public SelectedCandidates(
-            final List<Place> selectedPlaces,
+    public RecommendedCandidates(
+            final List<Place> recommendedCandidatePlaces,
             final Map<Place, List<CandidateSelectionTag>> tagsByPlace
     ) {
-        this.selectedPlaces = List.copyOf(selectedPlaces);
+        this.recommendedCandidatePlaces = List.copyOf(recommendedCandidatePlaces);
         this.tagsByPlace = copyTagsByPlace(tagsByPlace);
     }
 

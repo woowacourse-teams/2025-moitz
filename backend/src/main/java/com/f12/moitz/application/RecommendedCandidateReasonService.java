@@ -4,7 +4,7 @@ import com.f12.moitz.application.port.LocationReasonGenerator;
 import com.f12.moitz.application.port.dto.ReasonAndDescription;
 import com.f12.moitz.domain.CandidateSelectionTag;
 import com.f12.moitz.domain.Place;
-import com.f12.moitz.domain.SelectedCandidates;
+import com.f12.moitz.domain.RecommendedCandidates;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -22,11 +22,11 @@ public class RecommendedCandidateReasonService {
         this.locationReasonGenerator = locationReasonGenerator;
     }
 
-    public Map<Place, ReasonAndDescription> generate(final SelectedCandidates selectedCandidates) {
-        final List<Place> places = selectedCandidates.getSelectedPlaces();
+    public Map<Place, ReasonAndDescription> generate(final RecommendedCandidates recommendedCandidates) {
+        final List<Place> places = recommendedCandidates.getRecommendedCandidatePlaces();
         final Map<String, ReasonAndDescription> reasonsByPlaceName = locationReasonGenerator.generateReasons(
                 getPlaceNames(places),
-                toTagsByPlaceName(selectedCandidates)
+                toTagsByPlaceName(recommendedCandidates)
         );
         return mapReasonsByPlace(places, reasonsByPlaceName);
     }
@@ -65,9 +65,9 @@ public class RecommendedCandidateReasonService {
     }
 
     private Map<String, List<CandidateSelectionTag>> toTagsByPlaceName(
-            final SelectedCandidates selectedCandidates
+            final RecommendedCandidates recommendedCandidates
     ) {
-        return selectedCandidates.getTagsByPlace().entrySet().stream()
+        return recommendedCandidates.getTagsByPlace().entrySet().stream()
                 .collect(Collectors.toMap(
                         entry -> entry.getKey().getName(),
                         Entry::getValue,

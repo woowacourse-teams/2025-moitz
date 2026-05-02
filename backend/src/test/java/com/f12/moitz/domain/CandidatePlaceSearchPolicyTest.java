@@ -30,17 +30,17 @@ class CandidatePlaceSearchPolicyTest {
                 createTagSelections(shared, maxBurden, efficiency, transfer, general)
         );
 
-        final SelectedCandidates selectionResult = candidatePlaceSearchPolicy.select(
+        final RecommendedCandidates recommendedCandidates = candidatePlaceSearchPolicy.select(
                 candidateSelection,
                 candidateSelection.getSearchCandidatePlaces(),
                 ignored -> true,
                 5
         );
 
-        assertThat(selectionResult.getSelectedPlaces())
+        assertThat(recommendedCandidates.getRecommendedCandidatePlaces())
                 .extracting(Place::getName)
                 .containsExactly("공통후보역", "최장후보역", "평균후보역", "환승후보역", "일반후보역");
-        assertThat(selectionResult.getTagsByPlace())
+        assertThat(recommendedCandidates.getTagsByPlace())
                 .containsEntry(shared.getPlace(), List.of(CandidateSelectionTag.FAIRNESS, CandidateSelectionTag.EFFICIENCY))
                 .containsEntry(maxBurden.getPlace(), List.of(CandidateSelectionTag.MAX_BURDEN_RELIEF))
                 .containsEntry(efficiency.getPlace(), List.of(CandidateSelectionTag.EFFICIENCY))
@@ -62,19 +62,19 @@ class CandidatePlaceSearchPolicyTest {
                 Map.of(CandidateSelectionTag.FAIRNESS, List.of(failedFairness, nextFairness))
         );
 
-        final SelectedCandidates selectionResult = candidatePlaceSearchPolicy.select(
+        final RecommendedCandidates recommendedCandidates = candidatePlaceSearchPolicy.select(
                 candidateSelection,
                 candidateSelection.getSearchCandidatePlaces(),
                 place -> !place.getName().equals("실패후보역"),
                 1
         );
 
-        assertThat(selectionResult.getSelectedPlaces())
+        assertThat(recommendedCandidates.getRecommendedCandidatePlaces())
                 .extracting(Place::getName)
                 .containsExactly("대체후보역");
-        assertThat(selectionResult.getTag(nextFairness.getPlace()))
+        assertThat(recommendedCandidates.getTag(nextFairness.getPlace()))
                 .isEqualTo(CandidateSelectionTag.FAIRNESS);
-        assertThat(selectionResult.getTags(nextFairness.getPlace()))
+        assertThat(recommendedCandidates.getTags(nextFairness.getPlace()))
                 .containsExactly(CandidateSelectionTag.FAIRNESS);
     }
 

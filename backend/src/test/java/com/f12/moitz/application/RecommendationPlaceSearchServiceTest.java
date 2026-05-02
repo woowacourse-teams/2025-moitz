@@ -75,7 +75,7 @@ class RecommendationPlaceSearchServiceTest {
 
         assertThat(result.getSearchedPlaces()).containsExactly(seolleung, samsung);
         assertThat(result.getRecommendedPlaces()).isEqualTo(recommendedPlaces);
-        assertThat(result.getSelectedCandidates().getSelectedPlaces()).containsExactly(seolleung, samsung);
+        assertThat(result.getRecommendedCandidates().getRecommendedCandidatePlaces()).containsExactly(seolleung, samsung);
 
         final ArgumentCaptor<List<Place>> captor = ArgumentCaptor.forClass(List.class);
         verify(placeRecommender).recommendPlaces(captor.capture(), anyList());

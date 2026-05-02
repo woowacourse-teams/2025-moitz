@@ -11,7 +11,7 @@ import com.f12.moitz.application.port.dto.ReasonAndDescription;
 import com.f12.moitz.domain.CandidateSelectionTag;
 import com.f12.moitz.domain.Place;
 import com.f12.moitz.domain.Point;
-import com.f12.moitz.domain.SelectedCandidates;
+import com.f12.moitz.domain.RecommendedCandidates;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.DisplayName;
@@ -33,7 +33,7 @@ class RecommendedCandidateReasonServiceTest {
         final RecommendedCandidateReasonService service = new RecommendedCandidateReasonService(locationReasonGenerator);
         final Place seolleung = place("선릉역");
         final Place samsung = place("삼성역");
-        final SelectedCandidates selectedCandidates = new SelectedCandidates(
+        final RecommendedCandidates recommendedCandidates = new RecommendedCandidates(
                 List.of(seolleung, samsung),
                 Map.of(
                         seolleung, List.of(CandidateSelectionTag.FAIRNESS),
@@ -53,7 +53,7 @@ class RecommendedCandidateReasonServiceTest {
                 "삼성역", samsungReason
         ));
 
-        final Map<Place, ReasonAndDescription> result = service.generate(selectedCandidates);
+        final Map<Place, ReasonAndDescription> result = service.generate(recommendedCandidates);
 
         assertThat(result)
                 .containsEntry(seolleung, seolleungReason)
@@ -69,7 +69,7 @@ class RecommendedCandidateReasonServiceTest {
     void generate_ThrowsExceptionWhenReasonIsMissing() {
         final RecommendedCandidateReasonService service = new RecommendedCandidateReasonService(locationReasonGenerator);
         final Place seolleung = place("선릉역");
-        final SelectedCandidates selectedCandidates = new SelectedCandidates(
+        final RecommendedCandidates recommendedCandidates = new RecommendedCandidates(
                 List.of(seolleung),
                 Map.of(seolleung, List.of(CandidateSelectionTag.FAIRNESS))
         );
@@ -78,7 +78,7 @@ class RecommendedCandidateReasonServiceTest {
                 Map.of("선릉역", List.of(CandidateSelectionTag.FAIRNESS))
         )).willReturn(Map.of());
 
-        assertThatThrownBy(() -> service.generate(selectedCandidates))
+        assertThatThrownBy(() -> service.generate(recommendedCandidates))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessageContaining("placeName=선릉역");
     }
@@ -88,7 +88,7 @@ class RecommendedCandidateReasonServiceTest {
     void generate_ThrowsExceptionWhenReasonsAreNull() {
         final RecommendedCandidateReasonService service = new RecommendedCandidateReasonService(locationReasonGenerator);
         final Place seolleung = place("선릉역");
-        final SelectedCandidates selectedCandidates = new SelectedCandidates(
+        final RecommendedCandidates recommendedCandidates = new RecommendedCandidates(
                 List.of(seolleung),
                 Map.of(seolleung, List.of(CandidateSelectionTag.FAIRNESS))
         );
@@ -97,7 +97,7 @@ class RecommendedCandidateReasonServiceTest {
                 Map.of("선릉역", List.of(CandidateSelectionTag.FAIRNESS))
         )).willReturn(null);
 
-        assertThatThrownBy(() -> service.generate(selectedCandidates))
+        assertThatThrownBy(() -> service.generate(recommendedCandidates))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessage("추천 이유 생성 결과가 null입니다.");
     }
