@@ -76,6 +76,29 @@ public class Recommendation {
         if (recommendConditions == null || recommendConditions.isEmpty()) {
             throw new IllegalArgumentException("추천 조건은 비어있거나 null일 수 없습니다.");
         }
+        reasonsByPlace.keySet().stream()
+                .filter(place -> hasRequiredRecommendedPlaces(
+                        recommendedPlacesByPlace.get(place),
+                        recommendConditions
+                ))
+                .forEach(place -> validateCandidateMaterials(place, routesByPlace, coursesByPlace, tagsByPlace));
+    }
+
+    private static void validateCandidateMaterials(
+            final Place place,
+            final Map<Place, Routes> routesByPlace,
+            final Map<Place, Courses> coursesByPlace,
+            final Map<Place, List<CandidateSelectionTag>> tagsByPlace
+    ) {
+        if (!routesByPlace.containsKey(place) || routesByPlace.get(place) == null) {
+            throw new IllegalArgumentException("추천 후보 경로가 누락되었습니다. 추천 지역: " + place.getName());
+        }
+        if (!coursesByPlace.containsKey(place) || coursesByPlace.get(place) == null) {
+            throw new IllegalArgumentException("추천 후보 이동 코스가 누락되었습니다. 추천 지역: " + place.getName());
+        }
+        if (!tagsByPlace.containsKey(place) || tagsByPlace.get(place) == null) {
+            throw new IllegalArgumentException("추천 후보 태그가 누락되었습니다. 추천 지역: " + place.getName());
+        }
     }
 
     private static boolean hasRequiredRecommendedPlaces(

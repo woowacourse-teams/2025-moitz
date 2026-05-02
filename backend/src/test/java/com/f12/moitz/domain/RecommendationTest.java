@@ -201,6 +201,70 @@ class RecommendationTest {
     }
 
     @Test
+    @DisplayName("추천 후보 생성에 필요한 재료가 누락되면 추천을 생성할 수 없다")
+    void create_IsThrownByMissingCandidateMaterials() {
+        final Place startPlace = new Place("잠실역", new Point(127.0, 37.0));
+        final Place recommendedPlace = new Place("선릉역", new Point(127.1, 37.1));
+        final Map<Place, RecommendationReason> reasonsByPlace = Map.of(
+                recommendedPlace,
+                new RecommendationReason("#공평", "이동 시간이 고른 후보입니다.")
+        );
+        final Map<Place, CategorizedRecommendedPlaces> recommendedPlacesByPlace = Map.of(
+                recommendedPlace,
+                createRecommendedPlaces(RecommendCondition.CAFE)
+        );
+        final Map<Place, Routes> routesByPlace = Map.of(
+                recommendedPlace,
+                createRoutes(startPlace, recommendedPlace, 10 * 60)
+        );
+        final Map<Place, Courses> coursesByPlace = Map.of(
+                recommendedPlace,
+                createCourses(startPlace, recommendedPlace)
+        );
+        final Map<Place, List<CandidateSelectionTag>> tagsByPlace = Map.of(
+                recommendedPlace,
+                List.of(CandidateSelectionTag.FAIRNESS)
+        );
+        final List<RecommendCondition> recommendConditions = List.of(RecommendCondition.CAFE);
+
+        assertSoftly(softAssertions -> {
+            softAssertions.assertThatThrownBy(() -> Recommendation.create(
+                            reasonsByPlace,
+                            recommendedPlacesByPlace,
+                            Map.of(),
+                            coursesByPlace,
+                            tagsByPlace,
+                            0,
+                            recommendConditions
+                    ))
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessage("추천 후보 경로가 누락되었습니다. 추천 지역: 선릉역");
+            softAssertions.assertThatThrownBy(() -> Recommendation.create(
+                            reasonsByPlace,
+                            recommendedPlacesByPlace,
+                            routesByPlace,
+                            Map.of(),
+                            tagsByPlace,
+                            0,
+                            recommendConditions
+                    ))
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessage("추천 후보 이동 코스가 누락되었습니다. 추천 지역: 선릉역");
+            softAssertions.assertThatThrownBy(() -> Recommendation.create(
+                            reasonsByPlace,
+                            recommendedPlacesByPlace,
+                            routesByPlace,
+                            coursesByPlace,
+                            Map.of(),
+                            0,
+                            recommendConditions
+                    ))
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessage("추천 후보 태그가 누락되었습니다. 추천 지역: 선릉역");
+        });
+    }
+
+    @Test
     @DisplayName("요구 조건의 추천 장소가 부족한 후보는 추천 생성에서 제외한다")
     void create_FiltersPlacesWithoutRequiredRecommendedPlaces() {
         final Place startPlace = new Place("잠실역", new Point(127.0, 37.0));
