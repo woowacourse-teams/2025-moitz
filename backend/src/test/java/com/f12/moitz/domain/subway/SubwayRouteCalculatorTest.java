@@ -1,6 +1,7 @@
 package com.f12.moitz.domain.subway;
 
 import com.f12.moitz.domain.Point;
+import com.f12.moitz.domain.Path;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -59,13 +60,13 @@ class SubwayRouteCalculatorTest {
     @Test
     void findShortest() {
         // When
-        final List<SubwayPath> paths = subwayRouteCalculator.findShortestTimePath(station1, station2).groupByLine();
+        final List<Path> paths = subwayRouteCalculator.findShortestTimePath(station1, station2).groupByLine();
 
         // Then
         SoftAssertions.assertSoftly(softly -> {
             softly.assertThat(paths).hasSize(1);
-            softly.assertThat(paths.getFirst().totalTime()).isEqualTo(180);
-            softly.assertThat(paths.getFirst().line()).isEqualTo(SubwayLine.fromTitle("1호선"));
+            softly.assertThat(paths.getFirst().getTravelTime().getSeconds()).isEqualTo(180);
+            softly.assertThat(paths.getFirst().getSubwayLine()).isEqualTo(SubwayLine.fromTitle("1호선"));
         });
     }
 

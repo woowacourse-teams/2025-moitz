@@ -3,11 +3,9 @@ package com.f12.moitz.application.adapter;
 import com.f12.moitz.application.SubwayStationService;
 import com.f12.moitz.application.port.RouteFinder;
 import com.f12.moitz.domain.Course;
-import com.f12.moitz.domain.Path;
 import com.f12.moitz.domain.Route;
 import com.f12.moitz.domain.OriginDestination;
 import com.f12.moitz.domain.subway.StationSequence;
-import com.f12.moitz.domain.subway.SubwayPath;
 import com.f12.moitz.domain.subway.SubwayRouteCalculator;
 import com.f12.moitz.domain.subway.SubwayStation;
 import java.util.List;
@@ -32,7 +30,7 @@ public class SubwayRouteFinderAdapter implements RouteFinder {
     @Override
     public List<Route> findRoutes(final List<OriginDestination> originDestinations) {
         return findStationSequences(originDestinations).stream()
-                .map(sequence -> new Route(convertPath(sequence.groupByLine())))
+                .map(sequence -> new Route(sequence.groupByLine()))
                 .toList();
     }
 
@@ -55,19 +53,6 @@ public class SubwayRouteFinderAdapter implements RouteFinder {
                 originDestination.getDestination().getName()
         );
         return subwayRouteCalculator.findShortestTimePath(startStation, endStation);
-    }
-
-    private List<Path> convertPath(final List<SubwayPath> subwayPaths) {
-        return subwayPaths.stream()
-                // TODO: SubwayPath, Path 두 객체의 필드가 동일한데, 둘을 통합할 수 있을지 고민하기
-                .map(subwayPath -> new Path(
-                        subwayPath.from(),
-                        subwayPath.to(),
-                        subwayPath.travelMethod(),
-                        subwayPath.totalTime(),
-                        subwayPath.line()
-                ))
-                .toList();
     }
 
 }

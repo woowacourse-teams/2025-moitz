@@ -1,5 +1,6 @@
 package com.f12.moitz.domain.subway;
 
+import com.f12.moitz.domain.Path;
 import com.f12.moitz.domain.Point;
 import com.f12.moitz.domain.TravelMethod;
 import java.util.ArrayList;
@@ -20,8 +21,8 @@ public class StationSequence {
         }
     }
 
-    public List<SubwayPath> groupByLine() {
-        final List<SubwayPath> paths = new ArrayList<>();
+    public List<Path> groupByLine() {
+        final List<Path> paths = new ArrayList<>();
 
         SubwayLine currentLine = segments.getFirst().getLine();
         SubwayStation startStation = segments.getFirst().getStation();
@@ -39,7 +40,7 @@ public class StationSequence {
             if (current.isTransfer() || segments.getLast().equals(current)) {
                 final SubwayStation endStation = current.getStation();
 
-                final SubwayPath path = new SubwayPath(
+                final Path path = new Path(
                         startStation,
                         endStation,
                         TravelMethod.SUBWAY,
@@ -53,7 +54,7 @@ public class StationSequence {
                     // 환승 시간 계산: 환승 Edge의 시간 직접 활용
                     final int transferTime = current.getTimeInSeconds();
 
-                    final SubwayPath transferPath = new SubwayPath(
+                    final Path transferPath = new Path(
                             endStation,
                             endStation,
                             TravelMethod.TRANSFER,

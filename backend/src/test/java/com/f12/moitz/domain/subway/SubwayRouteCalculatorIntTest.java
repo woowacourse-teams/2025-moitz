@@ -1,6 +1,7 @@
 package com.f12.moitz.domain.subway;
 
 import com.f12.moitz.application.SubwayStationService;
+import com.f12.moitz.domain.Path;
 import com.f12.moitz.domain.Point;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
@@ -38,17 +39,17 @@ public class SubwayRouteCalculatorIntTest {
         final SubwayStation end = subwayStationService.getByName("판교역");
 
         // When
-        final List<SubwayPath> paths = subwayRouteCalculator.findShortestTimePath(start, end).groupByLine();
-        for (SubwayPath path : paths) {
-            log.debug("출발: {}, 도착: {}, 호선: {}", path.from().getName(), path.to().getName(),
-                    path.line() == null ? "null" : path.line().getTitle());
+        final List<Path> paths = subwayRouteCalculator.findShortestTimePath(start, end).groupByLine();
+        for (Path path : paths) {
+            log.debug("출발: {}, 도착: {}, 호선: {}", path.getStart().getName(), path.getEnd().getName(),
+                    path.getSubwayLine() == null ? "null" : path.getSubwayLine().getTitle());
         }
 
         // Then
         SoftAssertions.assertSoftly(softly -> {
             softly.assertThat(paths).hasSize(1);
-            softly.assertThat(paths.getFirst().totalTime()).isEqualTo(355);
-            softly.assertThat(paths.getFirst().line()).isEqualTo(SubwayLine.fromTitle("신분당선"));
+            softly.assertThat(paths.getFirst().getTravelTime().getSeconds()).isEqualTo(355);
+            softly.assertThat(paths.getFirst().getSubwayLine()).isEqualTo(SubwayLine.fromTitle("신분당선"));
         });
     }
 
@@ -60,18 +61,18 @@ public class SubwayRouteCalculatorIntTest {
         final SubwayStation end = subwayStationService.getByName("정자역");
 
         // When
-        final List<SubwayPath> paths = subwayRouteCalculator.findShortestTimePath(start, end).groupByLine();
-        for (SubwayPath path : paths) {
-            log.debug("출발: {}, 도착: {}, 호선: {}", path.from().getName(), path.to().getName(),
-                    path.line() == null ? "null" : path.line().getTitle());
+        final List<Path> paths = subwayRouteCalculator.findShortestTimePath(start, end).groupByLine();
+        for (Path path : paths) {
+            log.debug("출발: {}, 도착: {}, 호선: {}", path.getStart().getName(), path.getEnd().getName(),
+                    path.getSubwayLine() == null ? "null" : path.getSubwayLine().getTitle());
         }
 
         // Then
         SoftAssertions.assertSoftly(softly -> {
             softly.assertThat(paths).hasSize(1);
-            softly.assertThat(paths.getFirst().totalTime()).isEqualTo(150);
+            softly.assertThat(paths.getFirst().getTravelTime().getSeconds()).isEqualTo(150);
             softly.assertThat(List.of(SubwayLine.fromTitle("신분당선"), SubwayLine.fromTitle("수인분당선")))
-                    .contains(paths.getFirst().line());
+                    .contains(paths.getFirst().getSubwayLine());
         });
     }
 
@@ -83,16 +84,16 @@ public class SubwayRouteCalculatorIntTest {
         final SubwayStation end = subwayStationService.getByName("사리역");
 
         // When
-        final List<SubwayPath> paths = subwayRouteCalculator.findShortestTimePath(start, end).groupByLine();
-        for (SubwayPath path : paths) {
-            log.debug("출발: {}, 도착: {}, 호선: {}", path.from().getName(), path.to().getName(),
-                    path.line() == null ? "null" : path.line().getTitle());
+        final List<Path> paths = subwayRouteCalculator.findShortestTimePath(start, end).groupByLine();
+        for (Path path : paths) {
+            log.debug("출발: {}, 도착: {}, 호선: {}", path.getStart().getName(), path.getEnd().getName(),
+                    path.getSubwayLine() == null ? "null" : path.getSubwayLine().getTitle());
         }
 
         // Then
         SoftAssertions.assertSoftly(softly -> {
             softly.assertThat(paths).hasSize(1);
-            softly.assertThat(paths.getFirst().line()).isEqualTo(SubwayLine.fromTitle("수인분당선"));
+            softly.assertThat(paths.getFirst().getSubwayLine()).isEqualTo(SubwayLine.fromTitle("수인분당선"));
         });
     }
 
@@ -104,16 +105,16 @@ public class SubwayRouteCalculatorIntTest {
         final SubwayStation end = subwayStationService.getByName("상록수역");
 
         // When
-        final List<SubwayPath> paths = subwayRouteCalculator.findShortestTimePath(start, end).groupByLine();
-        for (SubwayPath path : paths) {
-            log.debug("출발: {}, 도착: {}, 호선: {}", path.from().getName(), path.to().getName(),
-                    path.line() == null ? "null" : path.line().getTitle());
+        final List<Path> paths = subwayRouteCalculator.findShortestTimePath(start, end).groupByLine();
+        for (Path path : paths) {
+            log.debug("출발: {}, 도착: {}, 호선: {}", path.getStart().getName(), path.getEnd().getName(),
+                    path.getSubwayLine() == null ? "null" : path.getSubwayLine().getTitle());
         }
 
         // Then
         SoftAssertions.assertSoftly(softly -> {
             softly.assertThat(paths).hasSize(1);
-            softly.assertThat(paths.getFirst().line()).isEqualTo(SubwayLine.fromTitle("4호선"));
+            softly.assertThat(paths.getFirst().getSubwayLine()).isEqualTo(SubwayLine.fromTitle("4호선"));
         });
     }
 
@@ -125,16 +126,16 @@ public class SubwayRouteCalculatorIntTest {
         final SubwayStation end = subwayStationService.getByName("광화문역");
 
         // When
-        final List<SubwayPath> paths = subwayRouteCalculator.findShortestTimePath(start, end).groupByLine();
-        for (SubwayPath path : paths) {
-            log.debug("출발: {}, 도착: {}, 호선: {}", path.from().getName(), path.to().getName(),
-                    path.line() == null ? "null" : path.line().getTitle());
+        final List<Path> paths = subwayRouteCalculator.findShortestTimePath(start, end).groupByLine();
+        for (Path path : paths) {
+            log.debug("출발: {}, 도착: {}, 호선: {}", path.getStart().getName(), path.getEnd().getName(),
+                    path.getSubwayLine() == null ? "null" : path.getSubwayLine().getTitle());
         }
 
         // Then
         SoftAssertions.assertSoftly(softly -> {
             softly.assertThat(paths).hasSize(3);
-            softly.assertThat(paths.getFirst().line()).isEqualTo(SubwayLine.fromTitle("공항철도"));
+            softly.assertThat(paths.getFirst().getSubwayLine()).isEqualTo(SubwayLine.fromTitle("공항철도"));
         });
     }
 
@@ -146,16 +147,16 @@ public class SubwayRouteCalculatorIntTest {
         final SubwayStation end = subwayStationService.getByName("올림픽공원역");
 
         // When
-        final List<SubwayPath> paths = subwayRouteCalculator.findShortestTimePath(start, end).groupByLine();
-        for (SubwayPath path : paths) {
-            log.debug("출발: {}, 도착: {}, 호선: {}", path.from().getName(), path.to().getName(),
-                    path.line() == null ? "null" : path.line().getTitle());
+        final List<Path> paths = subwayRouteCalculator.findShortestTimePath(start, end).groupByLine();
+        for (Path path : paths) {
+            log.debug("출발: {}, 도착: {}, 호선: {}", path.getStart().getName(), path.getEnd().getName(),
+                    path.getSubwayLine() == null ? "null" : path.getSubwayLine().getTitle());
         }
 
         // Then
         SoftAssertions.assertSoftly(softly -> {
             softly.assertThat(paths).hasSize(5);
-            softly.assertThat(paths.getFirst().line()).isEqualTo(SubwayLine.fromTitle("2호선"));
+            softly.assertThat(paths.getFirst().getSubwayLine()).isEqualTo(SubwayLine.fromTitle("2호선"));
         });
     }
 
@@ -169,16 +170,16 @@ public class SubwayRouteCalculatorIntTest {
         // When
         final StationSequence stationSequence = subwayRouteCalculator.findShortestTimePath(start, end);
         log.debug("");
-        final List<SubwayPath> paths = stationSequence.groupByLine();
-        for (SubwayPath path : paths) {
-            log.debug("출발: {}, 도착: {}, 호선: {}", path.from().getName(), path.to().getName(),
-                    path.line() == null ? "null" : path.line().getTitle());
+        final List<Path> paths = stationSequence.groupByLine();
+        for (Path path : paths) {
+            log.debug("출발: {}, 도착: {}, 호선: {}", path.getStart().getName(), path.getEnd().getName(),
+                    path.getSubwayLine() == null ? "null" : path.getSubwayLine().getTitle());
         }
 
         // Then
         SoftAssertions.assertSoftly(softly -> {
             softly.assertThat(paths).hasSize(1);
-            softly.assertThat(paths.getFirst().line()).isEqualTo(SubwayLine.fromTitle("2호선"));
+            softly.assertThat(paths.getFirst().getSubwayLine()).isEqualTo(SubwayLine.fromTitle("2호선"));
         });
     }
 
