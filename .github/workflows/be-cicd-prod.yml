@@ -63,7 +63,7 @@ jobs:
 
       - name: 애플리케이션을 실행한다
         env:
-          LOGS_DIRECTORY: "/var/snap/amazon-ssm-agent/11798/app-logs"
+          LOGS_DIRECTORY: "/home/ubuntu/app-logs"
         run: |
           JAR_PATH=$(ls ./build/libs/*SNAPSHOT.jar | head -n 1)
 
