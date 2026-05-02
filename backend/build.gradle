@@ -61,7 +61,5 @@ dependencies {
 tasks.withType(Test).configureEach {
 	useJUnitPlatform()
 	systemProperty "spring.profiles.active",
-			System.getProperty("spring.profiles.active")
-					?: System.getenv("SPRING_PROFILES_ACTIVE")
-					?: "test"
+			System.getProperty("spring.profiles.active") ?: "test"
 }
