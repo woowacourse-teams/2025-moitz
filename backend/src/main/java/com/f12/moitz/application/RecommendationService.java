@@ -38,7 +38,7 @@ public class RecommendationService {
 
     private static final int STARTING_VOTES = 0;
     private static final int PLACE_SEARCH_POOL_LIMIT = 50;
-    private static final int FINAL_CANDIDATE_TARGET_COUNT = 5;
+    private static final int RECOMMENDED_CANDIDATE_TARGET_COUNT = 5;
 
     private final RouteOriginPreparationService routeOriginPreparationService;
     private final RecommendedCandidateReasonService recommendedCandidateReasonService;
@@ -104,7 +104,7 @@ public class RecommendationService {
                 recommendConditions,
                 candidateRoutes,
                 PLACE_SEARCH_POOL_LIMIT,
-                FINAL_CANDIDATE_TARGET_COUNT
+                RECOMMENDED_CANDIDATE_TARGET_COUNT
         );
         final Map<Place, CategorizedRecommendedPlaces> recommendedPlaces = recommendationPlaceSearchResult.getRecommendedPlaces();
         log.debug(
