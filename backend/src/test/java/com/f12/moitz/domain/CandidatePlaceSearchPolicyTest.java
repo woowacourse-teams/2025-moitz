@@ -154,6 +154,39 @@ class CandidatePlaceSearchPolicyTest {
     }
 
     @Test
+    @DisplayName("최소 환승 후보가 기존 태그 수집에서 누락되어도 최종 태그 정규화에서 최소 환승 태그를 부여한다")
+    void select_AddsTransferTagWhenBestTransferPlaceWasNotCollectedAsTransferTag() {
+        final RouteCandidate bestTransfer = routeCandidateWithTransfers("최소환승역", List.of(0, 1));
+        final RouteCandidate taggedTransfer = routeCandidateWithTransfers("태그수집환승역", List.of(1, 1));
+        final Map<CandidateSelectionTag, List<RouteCandidate>> tagSelections = new LinkedHashMap<>();
+        tagSelections.put(CandidateSelectionTag.FAIRNESS, List.of(bestTransfer));
+        tagSelections.put(CandidateSelectionTag.MAX_BURDEN_RELIEF, List.of());
+        tagSelections.put(CandidateSelectionTag.EFFICIENCY, List.of());
+        tagSelections.put(CandidateSelectionTag.TRANSFER, List.of(taggedTransfer, bestTransfer));
+        tagSelections.put(CandidateSelectionTag.GENERAL, List.of());
+        final CandidateSelection candidateSelection = new CandidateSelection(
+                List.of(bestTransfer, taggedTransfer),
+                DispersionPolicy.TIER_4,
+                DispersionPolicy.TIER_4,
+                2,
+                false,
+                tagSelections
+        );
+
+        final RecommendedCandidates recommendedCandidates = candidatePlaceSearchPolicy.select(
+                candidateSelection,
+                candidateSelection.getSearchCandidatePlaces(),
+                ignored -> true,
+                2
+        );
+
+        assertThat(recommendedCandidates.getTags(bestTransfer.getPlace()))
+                .containsExactly(CandidateSelectionTag.FAIRNESS, CandidateSelectionTag.TRANSFER);
+        assertThat(recommendedCandidates.getTags(taggedTransfer.getPlace()))
+                .containsExactly(CandidateSelectionTag.GENERAL);
+    }
+
+    @Test
     @DisplayName("다음 장소 검색 대상은 비어있는 태그 후보를 우선하고 이 후보가 남아있다면 일반 후보로 채우지 않는다")
     void selectNextSearchPlaces_PrioritizesMissingTagsWithoutGeneralFillWhenTagCandidatesRemain() {
         final RouteCandidate fairness = routeCandidate("공평후보역");
