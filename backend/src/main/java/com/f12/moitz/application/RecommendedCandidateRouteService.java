@@ -17,33 +17,33 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 @Component
-public class SelectedCandidateRouteService {
+public class RecommendedCandidateRouteService {
 
     private final RouteFinder routeFinder;
 
-    public SelectedCandidateRouteService(
+    public RecommendedCandidateRouteService(
             @Qualifier("subwayRouteFinderAdapter") final RouteFinder routeFinder
     ) {
         this.routeFinder = routeFinder;
     }
 
-    public SelectedCandidateRouteResult prepare(
+    public RecommendedCandidateRouteResult prepare(
             final RouteOrigins routeOrigins,
-            final List<Place> selectedCandidatePlaces,
+            final List<Place> recommendedCandidatePlaces,
             final Map<Place, Routes> candidateRoutes
     ) {
-        final List<OriginDestination> originDestinations = routeOrigins.createOriginDestinationsTo(selectedCandidatePlaces);
-        return new SelectedCandidateRouteResult(
-                collectRoutes(selectedCandidatePlaces, candidateRoutes),
+        final List<OriginDestination> originDestinations = routeOrigins.createOriginDestinationsTo(recommendedCandidatePlaces);
+        return new RecommendedCandidateRouteResult(
+                collectRoutes(recommendedCandidatePlaces, candidateRoutes),
                 findCoursesByDestination(originDestinations)
         );
     }
 
     private Map<Place, Routes> collectRoutes(
-            final List<Place> selectedCandidatePlaces,
+            final List<Place> recommendedCandidatePlaces,
             final Map<Place, Routes> candidateRoutes
     ) {
-        return selectedCandidatePlaces.stream()
+        return recommendedCandidatePlaces.stream()
                 .collect(Collectors.toMap(
                         Function.identity(),
                         candidateRoutes::get

@@ -26,7 +26,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
-class SelectedCandidateRouteServiceTest {
+class RecommendedCandidateRouteServiceTest {
 
     @Mock
     private RouteFinder routeFinder;
@@ -34,7 +34,7 @@ class SelectedCandidateRouteServiceTest {
     @Test
     @DisplayName("선택된 추천 후보의 경로와 코스를 장소별로 조립한다")
     void assemble() {
-        final SelectedCandidateRouteService service = new SelectedCandidateRouteService(routeFinder);
+        final RecommendedCandidateRouteService service = new RecommendedCandidateRouteService(routeFinder);
         final Place gangnam = new Place("강남역", new Point(127.027, 37.497));
         final Place yeoksam = new Place("역삼역", new Point(127.036, 37.501));
         final Place seolleung = new Place("선릉역", new Point(127.048, 37.504));
@@ -53,7 +53,7 @@ class SelectedCandidateRouteServiceTest {
                 new Course(List.of(yeoksam.getPoint(), samsung.getPoint()))
         ));
 
-        final SelectedCandidateRouteResult result = service.prepare(
+        final RecommendedCandidateRouteResult result = service.prepare(
                 routeOrigins,
                 List.of(seolleung, samsung),
                 candidateRoutes

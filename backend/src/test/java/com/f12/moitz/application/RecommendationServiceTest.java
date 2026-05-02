@@ -75,7 +75,7 @@ class RecommendationServiceTest {
                 new RouteOriginDispersionService(routeFinder),
                 new RouteCandidatePreparationService(subwayStationService, routeFinder),
                 new RecommendationPlaceSearchService(placeRecommender),
-                new SelectedCandidateRouteService(routeFinder),
+                new RecommendedCandidateRouteService(routeFinder),
                 recommendationMapper,
                 recommendResultRepository
         );
