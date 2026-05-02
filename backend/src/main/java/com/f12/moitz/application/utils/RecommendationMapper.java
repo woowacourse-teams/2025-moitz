@@ -16,7 +16,6 @@ import com.f12.moitz.domain.Path;
 import com.f12.moitz.domain.Place;
 import com.f12.moitz.domain.Point;
 import com.f12.moitz.domain.RecommendCondition;
-import com.f12.moitz.domain.Recommendation;
 import com.f12.moitz.domain.RecommendedPlace;
 import com.f12.moitz.domain.Result;
 import com.f12.moitz.domain.Route;
@@ -55,18 +54,6 @@ public class RecommendationMapper {
         return recommendConditions.stream()
                 .map(RecommendCondition::getTitle)
                 .toList();
-    }
-
-    public Result toResult(
-            final List<RecommendCondition> recommendCondition,
-            final List<? extends Place> startingPlaces,
-            final Recommendation recommendation
-    ) {
-        return new Result(
-                recommendCondition,
-                startingPlaces,
-                recommendation
-        );
     }
 
     private StartingPlaceResponse toStartingPlaceResponse(final int index, final Place startingPlace) {

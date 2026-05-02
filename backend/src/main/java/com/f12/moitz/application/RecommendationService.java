@@ -146,7 +146,7 @@ public class RecommendationService {
         log.debug("추천 서비스 완료. {}", stopWatch.shortSummary());
 
         final String id = recommendResultRepository.saveAndReturnId(
-                recommendationMapper.toResult(
+                new Result(
                         recommendConditions,
                         startingPlaces,
                         recommendation
