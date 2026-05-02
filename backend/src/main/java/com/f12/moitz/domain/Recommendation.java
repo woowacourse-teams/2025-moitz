@@ -32,14 +32,22 @@ public class Recommendation {
                 tagsByPlace,
                 recommendConditions
         );
+        final List<Place> placesReadyForCandidateCreation = findPlacesReadyForCandidateCreation(
+                reasonsByPlace,
+                recommendedPlacesByPlace,
+                recommendConditions
+        );
+        validateCandidateMaterials(
+                placesReadyForCandidateCreation,
+                routesByPlace,
+                coursesByPlace,
+                tagsByPlace
+        );
         return new Recommendation(
-                reasonsByPlace.entrySet().stream()
-                        .filter(entry -> hasRequiredRecommendedPlaces(
-                                recommendedPlacesByPlace.get(entry.getKey()),
-                                recommendConditions
-                        ))
-                        .map(entry -> toCandidate(
-                                entry,
+                placesReadyForCandidateCreation.stream()
+                        .map(place -> toCandidate(
+                                place,
+                                reasonsByPlace,
                                 recommendedPlacesByPlace,
                                 routesByPlace,
                                 coursesByPlace,
@@ -76,12 +84,33 @@ public class Recommendation {
         if (recommendConditions == null || recommendConditions.isEmpty()) {
             throw new IllegalArgumentException("추천 조건은 비어있거나 null일 수 없습니다.");
         }
-        reasonsByPlace.keySet().stream()
+    }
+
+    private static List<Place> findPlacesReadyForCandidateCreation(
+            final Map<Place, RecommendationReason> reasonsByPlace,
+            final Map<Place, CategorizedRecommendedPlaces> recommendedPlacesByPlace,
+            final List<RecommendCondition> recommendConditions
+    ) {
+        return reasonsByPlace.keySet().stream()
                 .filter(place -> hasRequiredRecommendedPlaces(
                         recommendedPlacesByPlace.get(place),
                         recommendConditions
                 ))
-                .forEach(place -> validateCandidateMaterials(place, routesByPlace, coursesByPlace, tagsByPlace));
+                .toList();
+    }
+
+    private static void validateCandidateMaterials(
+            final List<Place> placesReadyForCandidateCreation,
+            final Map<Place, Routes> routesByPlace,
+            final Map<Place, Courses> coursesByPlace,
+            final Map<Place, List<CandidateSelectionTag>> tagsByPlace
+    ) {
+        placesReadyForCandidateCreation.forEach(place -> validateCandidateMaterials(
+                place,
+                routesByPlace,
+                coursesByPlace,
+                tagsByPlace
+        ));
     }
 
     private static void validateCandidateMaterials(
@@ -112,18 +141,17 @@ public class Recommendation {
     }
 
     private static Candidate toCandidate(
-            final Map.Entry<Place, RecommendationReason> entry,
+            final Place place,
+            final Map<Place, RecommendationReason> reasonsByPlace,
             final Map<Place, CategorizedRecommendedPlaces> recommendedPlaces,
             final Map<Place, Routes> routesByPlace,
             final Map<Place, Courses> coursesByPlace,
             final Map<Place, List<CandidateSelectionTag>> tagsByPlace,
             final int votes
     ) {
-        final Place place = entry.getKey();
-        final RecommendationReason reason = entry.getValue();
         return Candidate.create(
                 place,
-                reason,
+                reasonsByPlace.get(place),
                 recommendedPlaces.get(place),
                 routesByPlace.get(place),
                 coursesByPlace.get(place),
