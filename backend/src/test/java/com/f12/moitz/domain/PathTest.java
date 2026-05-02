@@ -25,6 +25,29 @@ class PathTest {
     }
 
     @Test
+    @DisplayName("지하철 경로와 환승 경로를 생성 의도에 맞게 생성한다")
+    void createByPurpose() {
+        // Given
+        final Place start = new Place("루터회관", new Point(127.0, 37.0));
+        final Place end = new Place("선릉역", new Point(127.1, 37.1));
+        final SubwayLine subwayLine = SubwayLine.fromTitle("2호선");
+
+        // When
+        final Path subwayPath = Path.subway(start, end, 10, subwayLine);
+        final Path transferPath = Path.transfer(start, 5);
+
+        // Then
+        assertSoftly(softAssertions -> {
+            softAssertions.assertThat(subwayPath.getTravelMethod()).isEqualTo(TravelMethod.SUBWAY);
+            softAssertions.assertThat(subwayPath.getSubwayLine()).isEqualTo(subwayLine);
+            softAssertions.assertThat(transferPath.getTravelMethod()).isEqualTo(TravelMethod.TRANSFER);
+            softAssertions.assertThat(transferPath.getStart()).isEqualTo(start);
+            softAssertions.assertThat(transferPath.getEnd()).isEqualTo(start);
+            softAssertions.assertThat(transferPath.getSubwayLine()).isNull();
+        });
+    }
+
+    @Test
     @DisplayName("필수 인자가 null이라면 경로를 생성할 수 없다")
     void isThrownByNullArguments() {
         // Given

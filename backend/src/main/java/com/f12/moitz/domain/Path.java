@@ -15,7 +15,32 @@ public class Path {
     private TravelMethod travelMethod;
     private Duration travelTime;
     private SubwayLine subwayLine;
-    // line -> Bus number / Subway line
+
+    public static Path subway(
+            final Place start,
+            final Place end,
+            final Duration travelTime,
+            final SubwayLine subwayLine
+    ) {
+        return new Path(start, end, TravelMethod.SUBWAY, travelTime, subwayLine);
+    }
+
+    public static Path subway(
+            final Place start,
+            final Place end,
+            final int travelTime,
+            final SubwayLine subwayLine
+    ) {
+        return subway(start, end, Duration.ofSeconds(travelTime), subwayLine);
+    }
+
+    public static Path transfer(final Place station, final Duration travelTime) {
+        return new Path(station, station, TravelMethod.TRANSFER, travelTime, null);
+    }
+
+    public static Path transfer(final Place station, final int travelTime) {
+        return transfer(station, Duration.ofSeconds(travelTime));
+    }
 
     public Path(
             final Place start,
