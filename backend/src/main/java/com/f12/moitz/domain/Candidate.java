@@ -18,6 +18,30 @@ public class Candidate {
     private String reason;
     private int votes;
 
+    public static Candidate create(
+            final Place destination,
+            final RecommendationReason recommendationReason,
+            final CategorizedRecommendedPlaces recommendedPlaces,
+            final Routes routes,
+            final Courses courses,
+            final List<CandidateSelectionTag> tags,
+            final int votes
+    ) {
+        if (recommendationReason == null) {
+            throw new IllegalArgumentException("추천 이유는 필수입니다.");
+        }
+        return new Candidate(
+                destination,
+                routes,
+                courses,
+                recommendedPlaces,
+                tags,
+                recommendationReason.description(),
+                recommendationReason.reason(),
+                votes
+        );
+    }
+
     public Candidate(
             final Place destination,
             final Routes routes,

@@ -98,14 +98,13 @@ public class Recommendation {
     ) {
         final Place place = entry.getKey();
         final RecommendationReason reason = entry.getValue();
-        return new Candidate(
+        return Candidate.create(
                 place,
+                reason,
+                recommendedPlaces.get(place),
                 routesByPlace.get(place),
                 coursesByPlace.get(place),
-                recommendedPlaces.get(place),
                 tagsByPlace.getOrDefault(place, List.of(CandidateSelectionTag.GENERAL)),
-                reason.description(),
-                reason.reason(),
                 votes
         );
     }

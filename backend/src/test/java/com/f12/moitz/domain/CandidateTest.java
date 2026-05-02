@@ -153,6 +153,42 @@ class CandidateTest {
     }
 
     @Test
+    @DisplayName("추천 이유를 바탕으로 후보를 생성한다")
+    void createWithRecommendationReason() {
+        final Place startPlace = new Place("잠실역", new Point(127.0, 37.0));
+        final Place endPlace = new Place("강남역", new Point(127.2, 37.2));
+        final Route route = new Route(List.of(Path.subway(
+                startPlace,
+                endPlace,
+                600,
+                SubwayLine.fromTitle("2호선")
+        )));
+        final Routes routes = new Routes(List.of(route));
+        final Courses courses = new Courses(List.of(new Course(List.of(startPlace.getPoint(), endPlace.getPoint()))));
+        final RecommendedPlace recommendedPlace = new RecommendedPlace("스타벅스", DEFAULT_POINT, "카페", 5, "url", "imageUrl");
+        final CategorizedRecommendedPlaces recommendedPlaces = new CategorizedRecommendedPlaces(
+                Map.of(RecommendCondition.CAFE, List.of(recommendedPlace))
+        );
+        final RecommendationReason recommendationReason = new RecommendationReason("#공평", "이동 시간이 고르게 분산됩니다.");
+
+        final Candidate candidate = Candidate.create(
+                endPlace,
+                recommendationReason,
+                recommendedPlaces,
+                routes,
+                courses,
+                List.of(CandidateSelectionTag.FAIRNESS),
+                0
+        );
+
+        assertSoftly(softAssertions -> {
+            softAssertions.assertThat(candidate.getDescription()).isEqualTo("#공평");
+            softAssertions.assertThat(candidate.getReason()).isEqualTo("이동 시간이 고르게 분산됩니다.");
+            softAssertions.assertThat(candidate.getTag()).isEqualTo(CandidateSelectionTag.FAIRNESS);
+        });
+    }
+
+    @Test
     @DisplayName("저장 문서에 태그 정보가 없거나 비어있으면 종합 추천 태그로 보정한다")
     void getTags_UsesGeneralWhenTagsAndLegacyTagAreMissing() throws Exception {
         final var constructor = Candidate.class.getDeclaredConstructor();
