@@ -85,9 +85,7 @@ public class Recommendation {
         if (recommendedPlaces == null) {
             return false;
         }
-        final Map<RecommendCondition, List<RecommendedPlace>> categoryMap = recommendedPlaces.getCategorizedPlaces();
-        return recommendConditions.stream()
-                .allMatch(condition -> categoryMap.containsKey(condition) && !categoryMap.get(condition).isEmpty());
+        return recommendedPlaces.satisfiesAll(recommendConditions);
     }
 
     private static Candidate toCandidate(

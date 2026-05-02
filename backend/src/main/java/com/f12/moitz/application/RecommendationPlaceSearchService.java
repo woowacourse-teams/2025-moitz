@@ -7,7 +7,6 @@ import com.f12.moitz.domain.RecommendedCandidates;
 import com.f12.moitz.domain.CandidatePlaceSearchPolicy;
 import com.f12.moitz.domain.Place;
 import com.f12.moitz.domain.RecommendCondition;
-import com.f12.moitz.domain.RecommendedPlace;
 import com.f12.moitz.domain.Routes;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -123,18 +122,7 @@ public class RecommendationPlaceSearchService {
     ) {
         final CategorizedRecommendedPlaces categorizedRecommendedPlaces = recommendedPlaces.get(place);
         return categorizedRecommendedPlaces != null
-                && hasAllRequiredPlaces(categorizedRecommendedPlaces, recommendConditions);
-    }
-
-    private boolean hasAllRequiredPlaces(
-            final CategorizedRecommendedPlaces categorizedRecommendedPlaces,
-            final List<RecommendCondition> recommendConditions
-    ) {
-        final Map<RecommendCondition, List<RecommendedPlace>> categoryMap =
-                categorizedRecommendedPlaces.getCategorizedPlaces();
-
-        return recommendConditions.stream()
-                .allMatch(condition -> categoryMap.containsKey(condition) && !categoryMap.get(condition).isEmpty());
+                && categorizedRecommendedPlaces.satisfiesAll(recommendConditions);
     }
 
     private List<String> summarizePlacesWithScore(

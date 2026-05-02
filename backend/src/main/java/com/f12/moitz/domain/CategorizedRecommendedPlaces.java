@@ -21,4 +21,17 @@ public class CategorizedRecommendedPlaces {
     public boolean isEmpty() {
         return categorizedPlaces == null || categorizedPlaces.isEmpty();
     }
+
+    public boolean satisfiesAll(final List<RecommendCondition> recommendConditions) {
+        if (recommendConditions == null || recommendConditions.isEmpty()) {
+            return false;
+        }
+        return recommendConditions.stream()
+                .allMatch(this::hasRecommendedPlaces);
+    }
+
+    private boolean hasRecommendedPlaces(final RecommendCondition recommendCondition) {
+        return categorizedPlaces.containsKey(recommendCondition)
+                && !categorizedPlaces.get(recommendCondition).isEmpty();
+    }
 }
