@@ -79,6 +79,81 @@ class FinalCandidateSelectorTest {
     }
 
     @Test
+    @DisplayName("최소 환승 태그는 최종 후보 중 환승 점수가 가장 낮은 후보에만 부여한다")
+    void select_AssignsTransferTagOnlyToBestTransferScoresAmongFinalPlaces() {
+        final RouteCandidate wangsimni = routeCandidateWithTransfers("왕십리역", List.of(0, 0, 2, 2));
+        final RouteCandidate oksu = routeCandidateWithTransfers("옥수역", List.of(0, 1, 0, 1));
+        final RouteCandidate yaksu = routeCandidateWithTransfers("약수역", List.of(1, 1, 0, 1));
+        final RouteCandidate chungmuro = routeCandidateWithTransfers("충무로역", List.of(2, 1, 0, 1));
+        final Map<CandidateSelectionTag, List<RouteCandidate>> tagSelections = new LinkedHashMap<>();
+        tagSelections.put(CandidateSelectionTag.FAIRNESS, List.of(wangsimni));
+        tagSelections.put(CandidateSelectionTag.MAX_BURDEN_RELIEF, List.of(oksu));
+        tagSelections.put(CandidateSelectionTag.EFFICIENCY, List.of(wangsimni, yaksu));
+        tagSelections.put(CandidateSelectionTag.TRANSFER, List.of(wangsimni, yaksu, oksu, chungmuro));
+        tagSelections.put(CandidateSelectionTag.GENERAL, List.of(chungmuro));
+        final CandidateSelectionResult candidateSelectionResult = new CandidateSelectionResult(
+                List.of(wangsimni, oksu, yaksu, chungmuro),
+                DispersionPolicy.TIER_4,
+                DispersionPolicy.TIER_4,
+                4,
+                false,
+                tagSelections
+        );
+
+        final FinalCandidateSelectionResult selectionResult = finalCandidateSelector.select(
+                candidateSelectionResult,
+                candidateSelectionResult.getSelectedPlaces(),
+                ignored -> true,
+                4
+        );
+
+        assertThat(selectionResult.getTags(wangsimni.getPlace()))
+                .containsExactly(CandidateSelectionTag.FAIRNESS, CandidateSelectionTag.EFFICIENCY);
+        assertThat(selectionResult.getTags(oksu.getPlace()))
+                .containsExactly(CandidateSelectionTag.MAX_BURDEN_RELIEF, CandidateSelectionTag.TRANSFER);
+        assertThat(selectionResult.getTags(yaksu.getPlace()))
+                .containsExactly(CandidateSelectionTag.EFFICIENCY);
+        assertThat(selectionResult.getTags(chungmuro.getPlace()))
+                .containsExactly(CandidateSelectionTag.GENERAL);
+    }
+
+    @Test
+    @DisplayName("최종 후보 중 같은 최소 환승 점수인 후보에는 최소 환승 태그를 함께 부여한다")
+    void select_AddsTransferTagToAllBestTransferScorePlaces() {
+        final RouteCandidate fairness = routeCandidateWithTransfers("공평후보역", List.of(0, 1));
+        final RouteCandidate general = routeCandidateWithTransfers("일반후보역", List.of(0, 1));
+        final RouteCandidate highTransfer = routeCandidateWithTransfers("환승많은역", List.of(1, 1));
+        final Map<CandidateSelectionTag, List<RouteCandidate>> tagSelections = new LinkedHashMap<>();
+        tagSelections.put(CandidateSelectionTag.FAIRNESS, List.of(fairness));
+        tagSelections.put(CandidateSelectionTag.MAX_BURDEN_RELIEF, List.of(highTransfer));
+        tagSelections.put(CandidateSelectionTag.EFFICIENCY, List.of());
+        tagSelections.put(CandidateSelectionTag.TRANSFER, List.of(fairness, general, highTransfer));
+        tagSelections.put(CandidateSelectionTag.GENERAL, List.of(general));
+        final CandidateSelectionResult candidateSelectionResult = new CandidateSelectionResult(
+                List.of(fairness, highTransfer, general),
+                DispersionPolicy.TIER_4,
+                DispersionPolicy.TIER_4,
+                3,
+                false,
+                tagSelections
+        );
+
+        final FinalCandidateSelectionResult selectionResult = finalCandidateSelector.select(
+                candidateSelectionResult,
+                candidateSelectionResult.getSelectedPlaces(),
+                ignored -> true,
+                3
+        );
+
+        assertThat(selectionResult.getTags(fairness.getPlace()))
+                .containsExactly(CandidateSelectionTag.FAIRNESS, CandidateSelectionTag.TRANSFER);
+        assertThat(selectionResult.getTags(general.getPlace()))
+                .containsExactly(CandidateSelectionTag.TRANSFER);
+        assertThat(selectionResult.getTags(highTransfer.getPlace()))
+                .containsExactly(CandidateSelectionTag.MAX_BURDEN_RELIEF);
+    }
+
+    @Test
     @DisplayName("다음 장소 검색 대상은 비어있는 태그 후보를 우선하고 이 후보가 남아있다면 일반 후보로 채우지 않는다")
     void selectNextSearchPlaces_PrioritizesMissingTagsWithoutGeneralFillWhenTagCandidatesRemain() {
         final RouteCandidate fairness = routeCandidate("공평후보역");
@@ -177,6 +252,34 @@ class FinalCandidateSelectorTest {
                         SubwayLine.fromTitle("2호선")
                 )))))
         );
+    }
+
+    private RouteCandidate routeCandidateWithTransfers(final String name, final List<Integer> transferCounts) {
+        final Place end = place(name);
+        final List<Route> routes = java.util.stream.IntStream.range(0, transferCounts.size())
+                .mapToObj(index -> routeWithTransfers(
+                        new Place("출발" + index + "역", new Point(127.0 + index, 37.0 + index)),
+                        end,
+                        transferCounts.get(index)
+                ))
+                .toList();
+        return new RouteCandidate(end, new Routes(routes));
+    }
+
+    private Route routeWithTransfers(final Place start, final Place end, final int transferCount) {
+        final List<Path> paths = new java.util.ArrayList<>();
+        Place currentStart = start;
+        for (int index = 0; index < transferCount; index++) {
+            final Place transferStation = new Place(
+                    start.getName() + "환승" + index,
+                    new Point(127.4 + index, 37.4 + index)
+            );
+            paths.add(new Path(currentStart, transferStation, TravelMethod.SUBWAY, 0, SubwayLine.fromTitle("2호선")));
+            paths.add(new Path(transferStation, transferStation, TravelMethod.TRANSFER, 0, null));
+            currentStart = transferStation;
+        }
+        paths.add(new Path(currentStart, end, TravelMethod.SUBWAY, 20 * 60, SubwayLine.fromTitle("3호선")));
+        return new Route(paths);
     }
 
     private Place place(final String name) {
