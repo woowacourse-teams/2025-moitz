@@ -32,7 +32,7 @@ class CandidatePlaceSearchPolicyTest {
 
         final SelectedCandidates selectionResult = candidatePlaceSearchPolicy.select(
                 candidateSelection,
-                candidateSelection.getSelectedPlaces(),
+                candidateSelection.getSearchCandidatePlaces(),
                 ignored -> true,
                 5
         );
@@ -64,7 +64,7 @@ class CandidatePlaceSearchPolicyTest {
 
         final SelectedCandidates selectionResult = candidatePlaceSearchPolicy.select(
                 candidateSelection,
-                candidateSelection.getSelectedPlaces(),
+                candidateSelection.getSearchCandidatePlaces(),
                 place -> !place.getName().equals("실패후보역"),
                 1
         );

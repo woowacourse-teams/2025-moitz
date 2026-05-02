@@ -153,33 +153,33 @@ public class CandidateSelectionPolicy {
             final List<RouteCandidate> fallbackCandidates,
             final int limit
     ) {
-        final Map<String, RouteCandidate> selectedCandidates = new LinkedHashMap<>();
+        final Map<String, RouteCandidate> searchCandidates = new LinkedHashMap<>();
         final int maxTagSize = tagSelections.values().stream()
                 .mapToInt(List::size)
                 .max()
                 .orElse(0);
 
-        for (int index = 0; index < maxTagSize && selectedCandidates.size() < limit; index++) {
+        for (int index = 0; index < maxTagSize && searchCandidates.size() < limit; index++) {
             for (List<RouteCandidate> tagCandidates : tagSelections.values()) {
                 if (index >= tagCandidates.size()) {
                     continue;
                 }
                 final RouteCandidate candidate = tagCandidates.get(index);
-                selectedCandidates.putIfAbsent(candidate.getPlace().getName(), candidate);
-                if (selectedCandidates.size() >= limit) {
+                searchCandidates.putIfAbsent(candidate.getPlace().getName(), candidate);
+                if (searchCandidates.size() >= limit) {
                     break;
                 }
             }
         }
 
         for (RouteCandidate fallbackCandidate : fallbackCandidates) {
-            if (selectedCandidates.size() >= limit) {
+            if (searchCandidates.size() >= limit) {
                 break;
             }
-            selectedCandidates.putIfAbsent(fallbackCandidate.getPlace().getName(), fallbackCandidate);
+            searchCandidates.putIfAbsent(fallbackCandidate.getPlace().getName(), fallbackCandidate);
         }
 
-        return new ArrayList<>(selectedCandidates.values());
+        return new ArrayList<>(searchCandidates.values());
     }
 
 }

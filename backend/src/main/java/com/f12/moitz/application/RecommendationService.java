@@ -94,7 +94,7 @@ public class RecommendationService {
                 dispersionPolicy,
                 PLACE_SEARCH_POOL_LIMIT
         );
-        final List<Place> selectedPlaces = candidateSelection.getSelectedPlaces();
+        final List<Place> searchCandidatePlaces = candidateSelection.getSearchCandidatePlaces();
         logCandidateSelection(startingPlaces, candidatePlaces, candidateRoutes, candidateSelection);
         stopWatch.stop();
 
@@ -109,7 +109,7 @@ public class RecommendationService {
         final Map<Place, CategorizedRecommendedPlaces> recommendedPlaces = recommendationPlaceSearchResult.getRecommendedPlaces();
         log.debug(
                 "장소 추천 완료 - 탐색 대상 역 {}개 중 실제 조회 {}개, 결과 보유 역 {}개",
-                selectedPlaces.size(),
+                searchCandidatePlaces.size(),
                 recommendationPlaceSearchResult.getSearchedPlaces().size(),
                 recommendedPlaces.size()
         );
@@ -118,7 +118,7 @@ public class RecommendationService {
         stopWatch.start("추천 후보 확정");
         final SelectedCandidates selectedCandidates = recommendationPlaceSearchResult.getSelectedCandidates();
         final List<Place> recommendedCandidatePlaces = selectedCandidates.getSelectedPlaces();
-        logSelectedCandidates(selectedPlaces, recommendedCandidatePlaces, candidateRoutes, recommendConditions);
+        logSelectedCandidates(searchCandidatePlaces, recommendedCandidatePlaces, candidateRoutes, recommendConditions);
         validateRecommendationCandidates(recommendedCandidatePlaces);
         final SelectedCandidateRouteResult selectedCandidateRouteResult = selectedCandidateRouteService.prepare(
                 routeOrigins,
@@ -167,7 +167,7 @@ public class RecommendationService {
             final Map<Place, Routes> candidateRoutes,
             final CandidateSelection candidateSelection
     ) {
-        final List<Place> selectedPlaces = candidateSelection.getSelectedPlaces();
+        final List<Place> searchCandidatePlaces = candidateSelection.getSearchCandidatePlaces();
         final long routeCalculatedCount = candidatePlaces.stream()
                 .filter(candidateRoutes::containsKey)
                 .count();
@@ -180,11 +180,11 @@ public class RecommendationService {
                 candidatePlaces.size(),
                 routeCalculatedCount,
                 candidateSelection.getAcceptableCount(),
-                selectedPlaces.size(),
+                searchCandidatePlaces.size(),
                 candidateSelection.isFallbackToSortedCandidates()
         );
         log.debug("공평성 후보 tag - {}", summarizeTagSelections(candidateSelection.getTagSelections()));
-        log.debug("공평성 상위 후보 - {}", summarizePlacesWithScore(selectedPlaces, candidateRoutes));
+        log.debug("공평성 상위 후보 - {}", summarizePlacesWithScore(searchCandidatePlaces, candidateRoutes));
     }
 
     private Map<String, List<String>> summarizeTagSelections(
@@ -207,20 +207,20 @@ public class RecommendationService {
     }
 
     private void logSelectedCandidates(
-            final List<Place> selectedPlaces,
+            final List<Place> searchCandidatePlaces,
             final List<Place> recommendedCandidatePlaces,
             final Map<Place, Routes> candidateRoutes,
             final List<RecommendCondition> recommendConditions
     ) {
         log.debug(
                 "추천 후보 확정 - 장소 탐색 대상 {}개, 추천 후보 {}개, 요구 조건={}",
-                selectedPlaces.size(),
+                searchCandidatePlaces.size(),
                 recommendedCandidatePlaces.size(),
                 recommendConditions.stream().map(RecommendCondition::getTitle).toList()
         );
 
         if (recommendedCandidatePlaces.isEmpty()) {
-            log.debug("추천 후보 없음 - 장소 탐색 대상 상위 후보 {}", summarizePlacesWithScore(selectedPlaces, candidateRoutes));
+            log.debug("추천 후보 없음 - 장소 탐색 대상 상위 후보 {}", summarizePlacesWithScore(searchCandidatePlaces, candidateRoutes));
             return;
         }
 

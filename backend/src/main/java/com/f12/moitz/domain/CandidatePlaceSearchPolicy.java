@@ -84,7 +84,7 @@ public class CandidatePlaceSearchPolicy {
                     .toList();
         }
 
-        for (RouteCandidate candidate : candidateSelection.getSelectedCandidates()) {
+        for (RouteCandidate candidate : candidateSelection.getSearchCandidates()) {
             if (nextSearchPlaces.size() >= limit) {
                 break;
             }

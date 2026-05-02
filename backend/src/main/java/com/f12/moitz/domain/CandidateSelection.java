@@ -10,7 +10,7 @@ import lombok.Getter;
 @Getter
 public class CandidateSelection {
 
-    private final List<RouteCandidate> selectedCandidates;
+    private final List<RouteCandidate> searchCandidates;
     private final DispersionPolicy initialPolicy;
     private final DispersionPolicy effectivePolicy;
     private final long acceptableCount;
@@ -18,14 +18,14 @@ public class CandidateSelection {
     private final Map<CandidateSelectionTag, List<RouteCandidate>> tagSelections;
 
     public CandidateSelection(
-            final List<RouteCandidate> selectedCandidates,
+            final List<RouteCandidate> searchCandidates,
             final DispersionPolicy initialPolicy,
             final DispersionPolicy effectivePolicy,
             final long acceptableCount,
             final boolean fallbackToSortedCandidates,
             final Map<CandidateSelectionTag, List<RouteCandidate>> tagSelections
     ) {
-        this.selectedCandidates = List.copyOf(selectedCandidates);
+        this.searchCandidates = List.copyOf(searchCandidates);
         this.initialPolicy = initialPolicy;
         this.effectivePolicy = effectivePolicy;
         this.acceptableCount = acceptableCount;
@@ -45,8 +45,8 @@ public class CandidateSelection {
                 )));
     }
 
-    public List<Place> getSelectedPlaces() {
-        return selectedCandidates.stream()
+    public List<Place> getSearchCandidatePlaces() {
+        return searchCandidates.stream()
                 .map(RouteCandidate::getPlace)
                 .toList();
     }

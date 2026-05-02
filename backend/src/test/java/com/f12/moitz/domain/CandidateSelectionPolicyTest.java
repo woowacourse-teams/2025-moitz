@@ -39,7 +39,7 @@ class CandidateSelectionPolicyTest {
                         CandidateSelectionTag.TRANSFER,
                         CandidateSelectionTag.GENERAL
                 );
-        assertThat(result.getSelectedPlaces())
+        assertThat(result.getSearchCandidatePlaces())
                 .extracting(Place::getName)
                 .contains("공평후보역");
     }
