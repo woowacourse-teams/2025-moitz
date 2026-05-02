@@ -40,10 +40,12 @@ class PathTest {
         assertSoftly(softAssertions -> {
             softAssertions.assertThat(subwayPath.getTravelMethod()).isEqualTo(TravelMethod.SUBWAY);
             softAssertions.assertThat(subwayPath.getSubwayLine()).isEqualTo(subwayLine);
+            softAssertions.assertThat(subwayPath.getLineName()).isEqualTo("2호선");
             softAssertions.assertThat(transferPath.getTravelMethod()).isEqualTo(TravelMethod.TRANSFER);
             softAssertions.assertThat(transferPath.getStart()).isEqualTo(start);
             softAssertions.assertThat(transferPath.getEnd()).isEqualTo(start);
             softAssertions.assertThat(transferPath.getSubwayLine()).isNull();
+            softAssertions.assertThat(transferPath.getLineName()).isNull();
         });
     }
 

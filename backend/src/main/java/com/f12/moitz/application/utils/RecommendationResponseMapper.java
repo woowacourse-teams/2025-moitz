@@ -158,7 +158,7 @@ public class RecommendationResponseMapper {
                 path.getEnd().getName(),
                 path.getEnd().getPoint().getX(),
                 path.getEnd().getPoint().getY(),
-                path.getSubwayLine() != null ? path.getSubwayLine().getTitle() : null,
+                path.getLineName(),
                 (int) path.getTravelTime().toMinutes()
         );
     }

@@ -69,6 +69,13 @@ public class Path {
         this(start, end, travelMethod, Duration.ofSeconds(travelTime), subwayLine);
     }
 
+    public String getLineName() {
+        if (subwayLine == null) {
+            return null;
+        }
+        return subwayLine.getTitle();
+    }
+
     private void validate(final Place start, final Place end, final TravelMethod travelMethod, final Duration travelTime) {
         if (start == null || end == null) {
             throw new IllegalArgumentException("시작 장소와 끝 장소는 필수입니다.");
