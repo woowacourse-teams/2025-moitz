@@ -12,6 +12,7 @@ import com.f12.moitz.domain.CandidateSelectionTag;
 import com.f12.moitz.domain.Place;
 import com.f12.moitz.domain.Point;
 import com.f12.moitz.domain.RecommendedCandidates;
+import com.f12.moitz.domain.RecommendationReason;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.DisplayName;
@@ -53,11 +54,11 @@ class RecommendedCandidateReasonServiceTest {
                 "삼성역", samsungReason
         ));
 
-        final Map<Place, ReasonAndDescription> result = service.generate(recommendedCandidates);
+        final Map<Place, RecommendationReason> result = service.generate(recommendedCandidates);
 
         assertThat(result)
-                .containsEntry(seolleung, seolleungReason)
-                .containsEntry(samsung, samsungReason);
+                .containsEntry(seolleung, new RecommendationReason("#공평", "선릉역은 이동 시간이 고른 후보입니다."))
+                .containsEntry(samsung, new RecommendationReason("#평균최소", "삼성역은 평균 이동 시간이 짧은 후보입니다."));
         @SuppressWarnings("unchecked")
         final ArgumentCaptor<List<String>> namesCaptor = ArgumentCaptor.forClass(List.class);
         verify(locationReasonGenerator).generateReasons(namesCaptor.capture(), anyMap());

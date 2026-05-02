@@ -77,6 +77,58 @@ class RecommendationTest {
         assertThat(bestRecommendationTime).isEqualTo(30);
     }
 
+    @Test
+    @DisplayName("추천 생성에 필요한 정보를 조합해 후보를 생성한다")
+    void create() {
+        final Place startPlace = new Place("잠실역", new Point(127.0, 37.0));
+        final Place recommendedPlace = new Place("선릉역", new Point(127.1, 37.1));
+        final Routes routes = createRoutes(startPlace, recommendedPlace, 10 * 60);
+        final Courses courses = createCourses(startPlace, recommendedPlace);
+        final CategorizedRecommendedPlaces categorizedRecommendedPlaces = createRecommendedPlaces(RecommendCondition.CAFE);
+
+        final Recommendation recommendation = Recommendation.create(
+                Map.of(recommendedPlace, new RecommendationReason("#공평", "이동 시간이 고른 후보입니다.")),
+                Map.of(recommendedPlace, categorizedRecommendedPlaces),
+                Map.of(recommendedPlace, routes),
+                Map.of(recommendedPlace, courses),
+                Map.of(recommendedPlace, List.of(CandidateSelectionTag.FAIRNESS)),
+                0,
+                List.of(RecommendCondition.CAFE)
+        );
+
+        assertThat(recommendation.size()).isEqualTo(1);
+        assertThat(recommendation.get(0).getDestination()).isEqualTo(recommendedPlace);
+        assertThat(recommendation.get(0).getTags()).containsExactly(CandidateSelectionTag.FAIRNESS);
+        assertThat(recommendation.get(0).getDescription()).isEqualTo("#공평");
+        assertThat(recommendation.get(0).getReason()).isEqualTo("이동 시간이 고른 후보입니다.");
+    }
+
+    @Test
+    @DisplayName("요구 조건의 추천 장소가 부족한 후보는 추천 생성에서 제외한다")
+    void create_FiltersPlacesWithoutRequiredRecommendedPlaces() {
+        final Place startPlace = new Place("잠실역", new Point(127.0, 37.0));
+        final Place validPlace = new Place("선릉역", new Point(127.1, 37.1));
+        final Place invalidPlace = new Place("삼성역", new Point(127.2, 37.2));
+        final Routes validRoutes = createRoutes(startPlace, validPlace, 10 * 60);
+        final Courses validCourses = createCourses(startPlace, validPlace);
+
+        final Recommendation recommendation = Recommendation.create(
+                Map.of(
+                        validPlace, new RecommendationReason("#공평", "이동 시간이 고른 후보입니다."),
+                        invalidPlace, new RecommendationReason("#평균최소", "평균 이동 시간이 짧은 후보입니다.")
+                ),
+                Map.of(validPlace, createRecommendedPlaces(RecommendCondition.CAFE)),
+                Map.of(validPlace, validRoutes),
+                Map.of(validPlace, validCourses),
+                Map.of(validPlace, List.of(CandidateSelectionTag.FAIRNESS)),
+                0,
+                List.of(RecommendCondition.CAFE)
+        );
+
+        assertThat(recommendation.size()).isEqualTo(1);
+        assertThat(recommendation.get(0).getDestination()).isEqualTo(validPlace);
+    }
+
     private Candidate createCandidate(int path1TravelTime, int path2TravelTime) {
         return createCandidate(path1TravelTime, path2TravelTime, CandidateSelectionTag.GENERAL);
     }
@@ -106,6 +158,32 @@ class RecommendationTest {
         Map<RecommendCondition, List<RecommendedPlace>> categorizedRecommendedPlace = Map.of(RecommendCondition.CAFE, List.of(recommendedPlace));
         final CategorizedRecommendedPlaces recommendedPlaces = new CategorizedRecommendedPlaces(categorizedRecommendedPlace);
         return new Candidate(endPlace, routes, courses, recommendedPlaces, tag, "123", "123", 0);
+    }
+
+    private Routes createRoutes(final Place startPlace, final Place endPlace, final int travelTime) {
+        return new Routes(List.of(new Route(List.of(new Path(
+                startPlace,
+                endPlace,
+                TravelMethod.SUBWAY,
+                travelTime,
+                SubwayLine.fromTitle("2호선")
+        )))));
+    }
+
+    private Courses createCourses(final Place startPlace, final Place endPlace) {
+        return new Courses(List.of(new Course(List.of(startPlace.getPoint(), endPlace.getPoint()))));
+    }
+
+    private CategorizedRecommendedPlaces createRecommendedPlaces(final RecommendCondition recommendCondition) {
+        final RecommendedPlace recommendedPlace = new RecommendedPlace(
+                "스타벅스",
+                new Point(127.2, 37.21),
+                "카페",
+                5,
+                "url",
+                "imageUrl"
+        );
+        return new CategorizedRecommendedPlaces(Map.of(recommendCondition, List.of(recommendedPlace)));
     }
 
 }

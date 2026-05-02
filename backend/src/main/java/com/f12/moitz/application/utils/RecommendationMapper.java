@@ -7,7 +7,6 @@ import com.f12.moitz.application.dto.PointResponse;
 import com.f12.moitz.application.dto.RecommendationResultResponse;
 import com.f12.moitz.application.dto.RouteResponse;
 import com.f12.moitz.application.dto.StartingPlaceResponse;
-import com.f12.moitz.application.port.dto.ReasonAndDescription;
 import com.f12.moitz.domain.Candidate;
 import com.f12.moitz.domain.CandidateSelectionTag;
 import com.f12.moitz.domain.CategorizedRecommendedPlaces;
@@ -56,42 +55,6 @@ public class RecommendationMapper {
         return recommendConditions.stream()
                 .map(RecommendCondition::getTitle)
                 .toList();
-    }
-
-    public Recommendation toRecommendation(
-            final Map<Place, ReasonAndDescription> generatedPlaces,
-            final Map<Place, CategorizedRecommendedPlaces> placeListMap,
-            final Map<Place, Routes> placeRoutes,
-            final Map<Place, Courses> placeCourses,
-            final Map<Place, List<CandidateSelectionTag>> placeTags,
-            final int votes,
-            final List<RecommendCondition> recommendConditions
-    ) {
-        return new Recommendation(
-                generatedPlaces.entrySet().stream()
-                        .filter(entry -> placeListMap.get(entry.getKey()) != null)
-                        .filter(entry -> {
-                            Map<RecommendCondition, List<RecommendedPlace>> categoryMap =
-                                    placeListMap.get(entry.getKey()).getCategorizedPlaces();
-
-                            return recommendConditions.stream()
-                                    .allMatch(condition ->
-                                        categoryMap.containsKey(condition) &&
-                                        !categoryMap.get(condition).isEmpty()
-                                    );
-                        })
-                        .map(place -> new Candidate(
-                                place.getKey(),
-                                placeRoutes.get(place.getKey()),
-                                placeCourses.get(place.getKey()),
-                                placeListMap.get(place.getKey()),
-                                placeTags.getOrDefault(place.getKey(), List.of(CandidateSelectionTag.GENERAL)),
-                                place.getValue().description(),
-                                place.getValue().reason(),
-                                votes
-                        ))
-                        .toList()
-        );
     }
 
     public Result toResult(

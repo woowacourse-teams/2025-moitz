@@ -5,6 +5,7 @@ import com.f12.moitz.application.port.dto.ReasonAndDescription;
 import com.f12.moitz.domain.CandidateSelectionTag;
 import com.f12.moitz.domain.Place;
 import com.f12.moitz.domain.RecommendedCandidates;
+import com.f12.moitz.domain.RecommendationReason;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -22,7 +23,7 @@ public class RecommendedCandidateReasonService {
         this.locationReasonGenerator = locationReasonGenerator;
     }
 
-    public Map<Place, ReasonAndDescription> generate(final RecommendedCandidates recommendedCandidates) {
+    public Map<Place, RecommendationReason> generate(final RecommendedCandidates recommendedCandidates) {
         final List<Place> places = recommendedCandidates.getRecommendedCandidatePlaces();
         final Map<String, ReasonAndDescription> reasonsByPlaceName = locationReasonGenerator.generateReasons(
                 getPlaceNames(places),
@@ -31,7 +32,7 @@ public class RecommendedCandidateReasonService {
         return mapReasonsByPlace(places, reasonsByPlaceName);
     }
 
-    private Map<Place, ReasonAndDescription> mapReasonsByPlace(
+    private Map<Place, RecommendationReason> mapReasonsByPlace(
             final List<Place> places,
             final Map<String, ReasonAndDescription> reasonsByPlaceName
     ) {
@@ -41,7 +42,7 @@ public class RecommendedCandidateReasonService {
         return places.stream()
                 .collect(Collectors.toMap(
                         Function.identity(),
-                        place -> getReason(place, reasonsByPlaceName),
+                        place -> toRecommendationReason(getReason(place, reasonsByPlaceName)),
                         (left, right) -> left,
                         LinkedHashMap::new
                 ));
@@ -56,6 +57,10 @@ public class RecommendedCandidateReasonService {
             throw new IllegalStateException("추천 이유 생성 결과가 누락되었습니다. placeName=" + place.getName());
         }
         return reason;
+    }
+
+    private RecommendationReason toRecommendationReason(final ReasonAndDescription reason) {
+        return new RecommendationReason(reason.description(), reason.reason());
     }
 
     private List<String> getPlaceNames(final List<? extends Place> places) {

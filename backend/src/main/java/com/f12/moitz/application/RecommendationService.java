@@ -3,7 +3,6 @@ package com.f12.moitz.application;
 import com.f12.moitz.application.dto.RecommendationCreateResponse;
 import com.f12.moitz.application.dto.RecommendationRequest;
 import com.f12.moitz.application.dto.RecommendationResultResponse;
-import com.f12.moitz.application.port.dto.ReasonAndDescription;
 import com.f12.moitz.application.utils.RecommendationMapper;
 import com.f12.moitz.common.error.exception.BadRequestException;
 import com.f12.moitz.common.error.exception.GeneralErrorCode;
@@ -17,6 +16,7 @@ import com.f12.moitz.domain.Place;
 import com.f12.moitz.domain.CandidateSelectionPolicy;
 import com.f12.moitz.domain.RecommendCondition;
 import com.f12.moitz.domain.Recommendation;
+import com.f12.moitz.domain.RecommendationReason;
 import com.f12.moitz.domain.Result;
 import com.f12.moitz.domain.RouteCandidate;
 import com.f12.moitz.domain.RouteOrigins;
@@ -128,13 +128,13 @@ public class RecommendationService {
         stopWatch.stop();
 
         stopWatch.start("추천 이유 생성");
-        final Map<Place, ReasonAndDescription> generatedPlacesWithReason =
+        final Map<Place, RecommendationReason> reasonsByPlace =
                 recommendedCandidateReasonService.generate(recommendedCandidates);
         stopWatch.stop();
 
         stopWatch.start("Recommendation으로 변환");
-        final Recommendation recommendation = recommendationMapper.toRecommendation(
-                generatedPlacesWithReason,
+        final Recommendation recommendation = Recommendation.create(
+                reasonsByPlace,
                 recommendedPlaces,
                 recommendedCandidateRouteResult.getRoutesByPlace(),
                 recommendedCandidateRouteResult.getCoursesByPlace(),
