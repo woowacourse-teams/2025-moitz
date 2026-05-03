@@ -8,9 +8,9 @@ import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-class RouteCandidateComparatorsTest {
+class RouteCandidateRankingPolicyTest {
 
-    private final RouteCandidateComparators comparators = new RouteCandidateComparators();
+    private final RouteCandidateRankingPolicy rankingPolicy = new RouteCandidateRankingPolicy();
 
     @Test
     @DisplayName("공평 후보는 이동 시간 차이가 허용 범위 안이면 평균 이동 시간이 짧은 후보를 우선한다")
@@ -59,7 +59,7 @@ class RouteCandidateComparatorsTest {
     }
 
     private Comparator<RouteCandidate> comparator(final CandidateSelectionTag tag) {
-        return comparators.comparatorFor(tag, RouteCandidate::calculateFairnessScore);
+        return rankingPolicy.comparatorFor(tag, RouteCandidate::calculateFairnessScore);
     }
 
     private RouteCandidate routeCandidate(final String name, final int firstTravelTimeMinutes, final int secondTravelTimeMinutes) {

@@ -3,7 +3,7 @@ package com.f12.moitz.domain;
 import java.util.Comparator;
 import java.util.function.Function;
 
-public class RouteCandidateComparators {
+public class RouteCandidateRankingPolicy {
 
     private static final int SHORT_AVERAGE_TRAVEL_TIME_MINUTES = 10;
     private static final int MEDIUM_AVERAGE_TRAVEL_TIME_MINUTES = 30;

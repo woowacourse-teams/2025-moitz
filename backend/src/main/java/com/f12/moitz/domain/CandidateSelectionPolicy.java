@@ -9,7 +9,7 @@ import java.util.stream.Collectors;
 
 public class CandidateSelectionPolicy {
 
-    private final RouteCandidateComparators routeCandidateComparators = new RouteCandidateComparators();
+    private final RouteCandidateRankingPolicy routeCandidateRankingPolicy = new RouteCandidateRankingPolicy();
 
     public CandidateSelection select(
             final List<RouteCandidate> candidates,
@@ -100,7 +100,7 @@ public class CandidateSelectionPolicy {
         tagQuotas.forEach((tag, quota) -> tagSelections.put(
                 tag,
                 candidates.stream()
-                        .sorted(routeCandidateComparators.comparatorFor(tag, scoreResolver))
+                        .sorted(routeCandidateRankingPolicy.comparatorFor(tag, scoreResolver))
                         .limit(quota)
                         .toList()
         ));
