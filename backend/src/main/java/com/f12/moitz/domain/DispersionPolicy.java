@@ -8,11 +8,11 @@ import java.util.Map;
 
 public enum DispersionPolicy {
 
-    TIER_1(3, 45, 30.0, 0, 60, 20, 2, false),
-    TIER_2(4, 70, 45.0, 0, 65, 25, 2, false),
-    TIER_3(6, 110, 75.0, 3, 70, 35, 3, false),
-    TIER_4(6, 140, 90.0, 5, 75, 47, 3, false),
-    TIER_5(6, 0, 0.0, 0, 95, 68, 3, true);
+    TIER_1(3, 45, 30.0, 0, 60, 20, 2, 10, false),
+    TIER_2(4, 70, 45.0, 0, 65, 25, 2, 10, false),
+    TIER_3(6, 110, 75.0, 3, 70, 35, 3, 20, false),
+    TIER_4(6, 140, 90.0, 5, 75, 47, 3, 30, false),
+    TIER_5(6, 0, 0.0, 0, 95, 68, 3, 40, true);
 
     public static final int MIN_STARTING_PLACE_COUNT = 2;
     public static final int MAX_STARTING_PLACE_COUNT = 6;
@@ -25,6 +25,7 @@ public enum DispersionPolicy {
     private final int maxTravelTimeLimit;
     private final int timeDiffLimit;
     private final int maxTransferLimit;
+    private final int candidateSearchRadiusKilometers;
     private final boolean fallback;
 
     DispersionPolicy(
@@ -35,6 +36,7 @@ public enum DispersionPolicy {
             final int maxTravelTimeLimit,
             final int timeDiffLimit,
             final int maxTransferLimit,
+            final int candidateSearchRadiusKilometers,
             final boolean fallback
     ) {
         this.maxPartySize = maxPartySize;
@@ -44,6 +46,7 @@ public enum DispersionPolicy {
         this.maxTravelTimeLimit = maxTravelTimeLimit;
         this.timeDiffLimit = timeDiffLimit;
         this.maxTransferLimit = maxTransferLimit;
+        this.candidateSearchRadiusKilometers = candidateSearchRadiusKilometers;
         this.fallback = fallback;
     }
 
@@ -100,6 +103,10 @@ public enum DispersionPolicy {
             case TIER_3 -> createTagQuotas(9, 7, 9, 5, 5);
             case TIER_4, TIER_5 -> createTagQuotas(12, 7, 6, 5, 5);
         };
+    }
+
+    public int candidateSearchRadiusKilometers() {
+        return candidateSearchRadiusKilometers;
     }
 
     private Map<CandidateSelectionTag, Integer> createTagQuotas(

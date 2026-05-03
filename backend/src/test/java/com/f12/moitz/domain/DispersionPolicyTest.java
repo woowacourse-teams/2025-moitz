@@ -41,6 +41,16 @@ class DispersionPolicyTest {
     }
 
     @Test
+    @DisplayName("정책 tier별 후보 지역 탐색 반경을 제공한다")
+    void candidateSearchRadiusKilometers() {
+        assertThat(DispersionPolicy.TIER_1.candidateSearchRadiusKilometers()).isEqualTo(10);
+        assertThat(DispersionPolicy.TIER_2.candidateSearchRadiusKilometers()).isEqualTo(10);
+        assertThat(DispersionPolicy.TIER_3.candidateSearchRadiusKilometers()).isEqualTo(20);
+        assertThat(DispersionPolicy.TIER_4.candidateSearchRadiusKilometers()).isEqualTo(30);
+        assertThat(DispersionPolicy.TIER_5.candidateSearchRadiusKilometers()).isEqualTo(40);
+    }
+
+    @Test
     @DisplayName("최소 출발지 수보다 적으면 분산도 정책을 판정할 수 없다")
     void resolve_ThrowsException_WhenPartySizeIsLessThanLimit() {
         assertThatThrownBy(() -> DispersionPolicy.resolve(1, 0, 0.0, 0))

@@ -50,7 +50,7 @@ public class RouteCandidatePreparationService {
             final RouteOrigins routeOrigins,
             final DispersionPolicy dispersionPolicy
     ) {
-        final int radiusKilometers = resolveCandidatePrefilterRadius(dispersionPolicy);
+        final int radiusKilometers = dispersionPolicy.candidateSearchRadiusKilometers();
         final List<String> originNames = routeOrigins.getNames();
         final List<Place> candidatePlaces = subwayStationService.generateCandidatePlace(
                         originStations,
@@ -67,15 +67,6 @@ public class RouteCandidatePreparationService {
                 candidatePlaces.size()
         );
         return candidatePlaces;
-    }
-
-    private int resolveCandidatePrefilterRadius(final DispersionPolicy dispersionPolicy) {
-        return switch (dispersionPolicy) {
-            case TIER_1, TIER_2 -> 10;
-            case TIER_3 -> 20;
-            case TIER_4 -> 30;
-            case TIER_5 -> 40;
-        };
     }
 
     private Map<Place, Routes> findRoutesByDestination(final List<OriginDestination> originDestinations) {
