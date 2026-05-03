@@ -27,8 +27,4 @@ public class RouteCandidate {
         return routes.calculateTransferBurden();
     }
 
-    public boolean isAcceptable(final DispersionPolicy dispersionPolicy) {
-        return routes.isAcceptable(dispersionPolicy);
-    }
-
 }
