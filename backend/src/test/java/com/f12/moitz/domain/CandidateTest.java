@@ -309,8 +309,8 @@ class CandidateTest {
     }
 
     @Test
-    @DisplayName("후보는 경로와 이동 코스를 같은 순서로 제공한다")
-    void getRouteAndCourseByIndex() {
+    @DisplayName("후보는 경로와 이동 코스를 하나의 경로 단위로 제공한다")
+    void getCandidateRoutes() {
         final Place startA = new Place("출발A", new Point(127.0, 37.0));
         final Place startB = new Place("출발B", new Point(127.1, 37.1));
         final Place endPlace = new Place("강남역", new Point(127.2, 37.2));
@@ -333,11 +333,13 @@ class CandidateTest {
                 0
         );
 
-        assertThat(candidate.getRouteCount()).isEqualTo(2);
-        assertThat(candidate.getRoute(0)).isEqualTo(routeA);
-        assertThat(candidate.getCourse(0)).isEqualTo(courseA);
-        assertThat(candidate.getRoute(1)).isEqualTo(routeB);
-        assertThat(candidate.getCourse(1)).isEqualTo(courseB);
+        final List<CandidateRoute> candidateRoutes = candidate.getCandidateRoutes();
+
+        assertThat(candidateRoutes).hasSize(2);
+        assertThat(candidateRoutes.get(0).getRoute()).isEqualTo(routeA);
+        assertThat(candidateRoutes.get(0).getCourse()).isEqualTo(courseA);
+        assertThat(candidateRoutes.get(1).getRoute()).isEqualTo(routeB);
+        assertThat(candidateRoutes.get(1).getCourse()).isEqualTo(courseB);
     }
 
 }

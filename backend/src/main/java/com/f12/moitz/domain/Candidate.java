@@ -1,11 +1,10 @@
 package com.f12.moitz.domain;
 
 import java.util.List;
+import java.util.stream.IntStream;
 import lombok.AccessLevel;
-import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-@Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Candidate {
 
@@ -200,20 +199,34 @@ public class Candidate {
         return getTags().getFirst();
     }
 
+    public Place getDestination() {
+        return destination;
+    }
+
+    public RecommendedPlaces getRecommendedPlaces() {
+        return recommendedPlaces;
+    }
+
     public List<CandidateSelectionTag> getTags() {
         return resolveTags(tags);
     }
 
-    public int getRouteCount() {
-        return routes.size();
+    public String getDescription() {
+        return description;
     }
 
-    public Route getRoute(final int index) {
-        return routes.get(index);
+    public String getReason() {
+        return reason;
     }
 
-    public Course getCourse(final int index) {
-        return courses.get(index);
+    public int getVotes() {
+        return votes;
+    }
+
+    public List<CandidateRoute> getCandidateRoutes() {
+        return IntStream.range(0, routes.size())
+                .mapToObj(index -> new CandidateRoute(routes.get(index), courses.get(index)))
+                .toList();
     }
 
 }
