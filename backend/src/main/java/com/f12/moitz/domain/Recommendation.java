@@ -21,16 +21,14 @@ public class Recommendation {
     public static Recommendation create(
             final Map<Place, RecommendationReason> reasonsByPlace,
             final Map<Place, CategorizedRecommendedPlaces> recommendedPlacesByPlace,
-            final Map<Place, Routes> routesByPlace,
-            final Map<Place, Courses> coursesByPlace,
+            final RecommendedCandidateTravels recommendedCandidateTravels,
             final Map<Place, List<CandidateSelectionTag>> tagsByPlace,
             final List<RecommendCondition> recommendConditions
     ) {
         return new Recommendation(
                 reasonsByPlace,
                 recommendedPlacesByPlace,
-                routesByPlace,
-                coursesByPlace,
+                recommendedCandidateTravels,
                 tagsByPlace,
                 recommendConditions
         );
@@ -39,16 +37,14 @@ public class Recommendation {
     private Recommendation(
             final Map<Place, RecommendationReason> reasonsByPlace,
             final Map<Place, CategorizedRecommendedPlaces> recommendedPlacesByPlace,
-            final Map<Place, Routes> routesByPlace,
-            final Map<Place, Courses> coursesByPlace,
+            final RecommendedCandidateTravels recommendedCandidateTravels,
             final Map<Place, List<CandidateSelectionTag>> tagsByPlace,
             final List<RecommendCondition> recommendConditions
     ) {
         validateCreationInputs(
                 reasonsByPlace,
                 recommendedPlacesByPlace,
-                routesByPlace,
-                coursesByPlace,
+                recommendedCandidateTravels,
                 tagsByPlace,
                 recommendConditions
         );
@@ -59,8 +55,7 @@ public class Recommendation {
         );
         validateCandidateMaterials(
                 placesReadyForCandidateCreation,
-                routesByPlace,
-                coursesByPlace,
+                recommendedCandidateTravels,
                 tagsByPlace
         );
         final List<Candidate> candidates = placesReadyForCandidateCreation.stream()
@@ -68,8 +63,7 @@ public class Recommendation {
                         place,
                         reasonsByPlace,
                         recommendedPlacesByPlace,
-                        routesByPlace,
-                        coursesByPlace,
+                        recommendedCandidateTravels,
                         tagsByPlace
                 ))
                 .toList();
@@ -80,8 +74,7 @@ public class Recommendation {
     private void validateCreationInputs(
             final Map<Place, RecommendationReason> reasonsByPlace,
             final Map<Place, CategorizedRecommendedPlaces> recommendedPlacesByPlace,
-            final Map<Place, Routes> routesByPlace,
-            final Map<Place, Courses> coursesByPlace,
+            final RecommendedCandidateTravels recommendedCandidateTravels,
             final Map<Place, List<CandidateSelectionTag>> tagsByPlace,
             final List<RecommendCondition> recommendConditions
     ) {
@@ -91,11 +84,8 @@ public class Recommendation {
         if (recommendedPlacesByPlace == null) {
             throw new IllegalArgumentException("추천 장소 목록은 null일 수 없습니다.");
         }
-        if (routesByPlace == null) {
-            throw new IllegalArgumentException("추천 후보 경로는 null일 수 없습니다.");
-        }
-        if (coursesByPlace == null) {
-            throw new IllegalArgumentException("추천 후보 이동 코스는 null일 수 없습니다.");
+        if (recommendedCandidateTravels == null) {
+            throw new IllegalArgumentException("추천 후보 이동 정보는 null일 수 없습니다.");
         }
         if (tagsByPlace == null) {
             throw new IllegalArgumentException("추천 후보 태그는 null일 수 없습니다.");
@@ -120,30 +110,23 @@ public class Recommendation {
 
     private void validateCandidateMaterials(
             final List<Place> placesReadyForCandidateCreation,
-            final Map<Place, Routes> routesByPlace,
-            final Map<Place, Courses> coursesByPlace,
+            final RecommendedCandidateTravels recommendedCandidateTravels,
             final Map<Place, List<CandidateSelectionTag>> tagsByPlace
     ) {
         placesReadyForCandidateCreation.forEach(place -> validateCandidateMaterials(
                 place,
-                routesByPlace,
-                coursesByPlace,
+                recommendedCandidateTravels,
                 tagsByPlace
         ));
     }
 
     private void validateCandidateMaterials(
             final Place place,
-            final Map<Place, Routes> routesByPlace,
-            final Map<Place, Courses> coursesByPlace,
+            final RecommendedCandidateTravels recommendedCandidateTravels,
             final Map<Place, List<CandidateSelectionTag>> tagsByPlace
     ) {
-        if (!routesByPlace.containsKey(place) || routesByPlace.get(place) == null) {
-            throw new IllegalArgumentException("추천 후보 경로가 누락되었습니다. 추천 지역: " + place.getName());
-        }
-        if (!coursesByPlace.containsKey(place) || coursesByPlace.get(place) == null) {
-            throw new IllegalArgumentException("추천 후보 이동 코스가 누락되었습니다. 추천 지역: " + place.getName());
-        }
+        recommendedCandidateTravels.getRoutes(place);
+        recommendedCandidateTravels.getCourses(place);
         if (!tagsByPlace.containsKey(place) || tagsByPlace.get(place) == null) {
             throw new IllegalArgumentException("추천 후보 태그가 누락되었습니다. 추천 지역: " + place.getName());
         }
@@ -163,16 +146,15 @@ public class Recommendation {
             final Place place,
             final Map<Place, RecommendationReason> reasonsByPlace,
             final Map<Place, CategorizedRecommendedPlaces> recommendedPlaces,
-            final Map<Place, Routes> routesByPlace,
-            final Map<Place, Courses> coursesByPlace,
+            final RecommendedCandidateTravels recommendedCandidateTravels,
             final Map<Place, List<CandidateSelectionTag>> tagsByPlace
     ) {
         return Candidate.create(
                 place,
                 reasonsByPlace.get(place),
                 recommendedPlaces.get(place),
-                routesByPlace.get(place),
-                coursesByPlace.get(place),
+                recommendedCandidateTravels.getRoutes(place),
+                recommendedCandidateTravels.getCourses(place),
                 tagsByPlace.getOrDefault(place, List.of(CandidateSelectionTag.GENERAL))
         );
     }

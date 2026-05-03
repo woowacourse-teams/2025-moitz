@@ -17,6 +17,7 @@ import com.f12.moitz.domain.CandidateSelectionPolicy;
 import com.f12.moitz.domain.RecommendCondition;
 import com.f12.moitz.domain.Recommendation;
 import com.f12.moitz.domain.RecommendationReason;
+import com.f12.moitz.domain.RecommendedCandidateTravels;
 import com.f12.moitz.domain.Result;
 import com.f12.moitz.domain.RouteCandidate;
 import com.f12.moitz.domain.RouteOrigins;
@@ -135,8 +136,7 @@ public class RecommendationService {
         final Recommendation recommendation = Recommendation.create(
                 reasonsByPlace,
                 recommendedPlaces,
-                recommendedCandidateTravels.getRoutesByPlace(),
-                recommendedCandidateTravels.getCoursesByPlace(),
+                recommendedCandidateTravels,
                 recommendedCandidates.getTagsByPlace(),
                 recommendConditions
         );

@@ -1,8 +1,5 @@
-package com.f12.moitz.application;
+package com.f12.moitz.domain;
 
-import com.f12.moitz.domain.Courses;
-import com.f12.moitz.domain.Place;
-import com.f12.moitz.domain.Routes;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -53,12 +50,20 @@ public class RecommendedCandidateTravels {
         }
     }
 
-    public Map<Place, Routes> getRoutesByPlace() {
-        return routesByPlace;
+    public Routes getRoutes(final Place place) {
+        final Routes routes = routesByPlace.get(place);
+        if (routes == null) {
+            throw new IllegalArgumentException("추천 후보 경로가 누락되었습니다. 추천 지역: " + place.getName());
+        }
+        return routes;
     }
 
-    public Map<Place, Courses> getCoursesByPlace() {
-        return coursesByPlace;
+    public Courses getCourses(final Place place) {
+        final Courses courses = coursesByPlace.get(place);
+        if (courses == null) {
+            throw new IllegalArgumentException("추천 후보 이동 코스가 누락되었습니다. 추천 지역: " + place.getName());
+        }
+        return courses;
     }
 
 }

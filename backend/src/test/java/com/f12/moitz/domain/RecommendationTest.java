@@ -65,12 +65,9 @@ class RecommendationTest {
                 recommendedPlace,
                 createRecommendedPlaces(RecommendCondition.CAFE)
         );
-        final Map<Place, Routes> routesByPlace = Map.of(
+        final RecommendedCandidateTravels recommendedCandidateTravels = createRecommendedCandidateTravels(
                 recommendedPlace,
-                createRoutes(startPlace, recommendedPlace, 10 * 60)
-        );
-        final Map<Place, Courses> coursesByPlace = Map.of(
-                recommendedPlace,
+                createRoutes(startPlace, recommendedPlace, 10 * 60),
                 createCourses(startPlace, recommendedPlace)
         );
         final Map<Place, List<CandidateSelectionTag>> tagsByPlace = Map.of(
@@ -83,8 +80,7 @@ class RecommendationTest {
             softAssertions.assertThatThrownBy(() -> Recommendation.create(
                             null,
                             recommendedPlacesByPlace,
-                            routesByPlace,
-                            coursesByPlace,
+                            recommendedCandidateTravels,
                             tagsByPlace,
                             recommendConditions
                     ))
@@ -93,8 +89,7 @@ class RecommendationTest {
             softAssertions.assertThatThrownBy(() -> Recommendation.create(
                             reasonsByPlace,
                             null,
-                            routesByPlace,
-                            coursesByPlace,
+                            recommendedCandidateTravels,
                             tagsByPlace,
                             recommendConditions
                     ))
@@ -104,27 +99,15 @@ class RecommendationTest {
                             reasonsByPlace,
                             recommendedPlacesByPlace,
                             null,
-                            coursesByPlace,
                             tagsByPlace,
                             recommendConditions
                     ))
                     .isInstanceOf(IllegalArgumentException.class)
-                    .hasMessage("추천 후보 경로는 null일 수 없습니다.");
+                    .hasMessage("추천 후보 이동 정보는 null일 수 없습니다.");
             softAssertions.assertThatThrownBy(() -> Recommendation.create(
                             reasonsByPlace,
                             recommendedPlacesByPlace,
-                            routesByPlace,
-                            null,
-                            tagsByPlace,
-                            recommendConditions
-                    ))
-                    .isInstanceOf(IllegalArgumentException.class)
-                    .hasMessage("추천 후보 이동 코스는 null일 수 없습니다.");
-            softAssertions.assertThatThrownBy(() -> Recommendation.create(
-                            reasonsByPlace,
-                            recommendedPlacesByPlace,
-                            routesByPlace,
-                            coursesByPlace,
+                            recommendedCandidateTravels,
                             null,
                             recommendConditions
                     ))
@@ -133,8 +116,7 @@ class RecommendationTest {
             softAssertions.assertThatThrownBy(() -> Recommendation.create(
                             reasonsByPlace,
                             recommendedPlacesByPlace,
-                            routesByPlace,
-                            coursesByPlace,
+                            recommendedCandidateTravels,
                             tagsByPlace,
                             List.of()
                     ))
@@ -189,8 +171,7 @@ class RecommendationTest {
         final Recommendation recommendation = Recommendation.create(
                 Map.of(recommendedPlace, new RecommendationReason("#공평", "이동 시간이 고른 후보입니다.")),
                 Map.of(recommendedPlace, categorizedRecommendedPlaces),
-                Map.of(recommendedPlace, routes),
-                Map.of(recommendedPlace, courses),
+                createRecommendedCandidateTravels(recommendedPlace, routes, courses),
                 Map.of(recommendedPlace, List.of(CandidateSelectionTag.FAIRNESS)),
                 List.of(RecommendCondition.CAFE)
         );
@@ -216,14 +197,12 @@ class RecommendationTest {
                 recommendedPlace,
                 createRecommendedPlaces(RecommendCondition.CAFE)
         );
-        final Map<Place, Routes> routesByPlace = Map.of(
+        final RecommendedCandidateTravels recommendedCandidateTravels = createRecommendedCandidateTravels(
                 recommendedPlace,
-                createRoutes(startPlace, recommendedPlace, 10 * 60)
-        );
-        final Map<Place, Courses> coursesByPlace = Map.of(
-                recommendedPlace,
+                createRoutes(startPlace, recommendedPlace, 10 * 60),
                 createCourses(startPlace, recommendedPlace)
         );
+        final RecommendedCandidateTravels emptyTravels = new RecommendedCandidateTravels(Map.of(), Map.of());
         final Map<Place, List<CandidateSelectionTag>> tagsByPlace = Map.of(
                 recommendedPlace,
                 List.of(CandidateSelectionTag.FAIRNESS)
@@ -234,8 +213,7 @@ class RecommendationTest {
             softAssertions.assertThatThrownBy(() -> Recommendation.create(
                             reasonsByPlace,
                             recommendedPlacesByPlace,
-                            Map.of(),
-                            coursesByPlace,
+                            emptyTravels,
                             tagsByPlace,
                             recommendConditions
                     ))
@@ -244,18 +222,7 @@ class RecommendationTest {
             softAssertions.assertThatThrownBy(() -> Recommendation.create(
                             reasonsByPlace,
                             recommendedPlacesByPlace,
-                            routesByPlace,
-                            Map.of(),
-                            tagsByPlace,
-                            recommendConditions
-                    ))
-                    .isInstanceOf(IllegalArgumentException.class)
-                    .hasMessage("추천 후보 이동 코스가 누락되었습니다. 추천 지역: 선릉역");
-            softAssertions.assertThatThrownBy(() -> Recommendation.create(
-                            reasonsByPlace,
-                            recommendedPlacesByPlace,
-                            routesByPlace,
-                            coursesByPlace,
+                            recommendedCandidateTravels,
                             Map.of(),
                             recommendConditions
                     ))
@@ -279,8 +246,7 @@ class RecommendationTest {
                         invalidPlace, new RecommendationReason("#평균최소", "평균 이동 시간이 짧은 후보입니다.")
                 ),
                 Map.of(validPlace, createRecommendedPlaces(RecommendCondition.CAFE)),
-                Map.of(validPlace, validRoutes),
-                Map.of(validPlace, validCourses),
+                createRecommendedCandidateTravels(validPlace, validRoutes, validCourses),
                 Map.of(validPlace, List.of(CandidateSelectionTag.FAIRNESS)),
                 List.of(RecommendCondition.CAFE)
         );
@@ -300,8 +266,7 @@ class RecommendationTest {
         assertSoftly(softAssertions -> softAssertions.assertThatThrownBy(() -> Recommendation.create(
                         Map.of(recommendedPlace, new RecommendationReason("#공평", "이동 시간이 고른 후보입니다.")),
                         Map.of(recommendedPlace, createRecommendedPlaces(RecommendCondition.CAFE)),
-                        Map.of(recommendedPlace, routes),
-                        Map.of(recommendedPlace, courses),
+                        createRecommendedCandidateTravels(recommendedPlace, routes, courses),
                         Map.of(recommendedPlace, List.of(CandidateSelectionTag.FAIRNESS)),
                         List.of(RecommendCondition.RESTAURANT)
                 ))
@@ -352,6 +317,17 @@ class RecommendationTest {
 
     private Courses createCourses(final Place startPlace, final Place endPlace) {
         return new Courses(List.of(new Course(List.of(startPlace.getPoint(), endPlace.getPoint()))));
+    }
+
+    private RecommendedCandidateTravels createRecommendedCandidateTravels(
+            final Place recommendedPlace,
+            final Routes routes,
+            final Courses courses
+    ) {
+        return new RecommendedCandidateTravels(
+                Map.of(recommendedPlace, routes),
+                Map.of(recommendedPlace, courses)
+        );
     }
 
     private CategorizedRecommendedPlaces createRecommendedPlaces(final RecommendCondition recommendCondition) {

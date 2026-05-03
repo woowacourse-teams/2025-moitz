@@ -1,16 +1,8 @@
-package com.f12.moitz.application;
+package com.f12.moitz.domain;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.SoftAssertions.assertSoftly;
 
-import com.f12.moitz.domain.Course;
-import com.f12.moitz.domain.Courses;
-import com.f12.moitz.domain.Path;
-import com.f12.moitz.domain.Place;
-import com.f12.moitz.domain.Point;
-import com.f12.moitz.domain.Route;
-import com.f12.moitz.domain.Routes;
-import com.f12.moitz.domain.TravelMethod;
 import com.f12.moitz.domain.subway.SubwayLine;
 import java.util.LinkedHashMap;
 import java.util.List;

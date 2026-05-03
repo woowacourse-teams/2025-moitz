@@ -11,6 +11,7 @@ import com.f12.moitz.domain.OriginDestination;
 import com.f12.moitz.domain.Path;
 import com.f12.moitz.domain.Place;
 import com.f12.moitz.domain.Point;
+import com.f12.moitz.domain.RecommendedCandidateTravels;
 import com.f12.moitz.domain.Route;
 import com.f12.moitz.domain.RouteOrigins;
 import com.f12.moitz.domain.Routes;
@@ -59,11 +60,10 @@ class RecommendedCandidateRouteServiceTest {
                 candidateRoutes
         );
 
-        assertThat(result.getRoutesByPlace()).containsEntry(seolleung, seolleungRoutes)
-                .containsEntry(samsung, samsungRoutes);
-        assertThat(result.getCoursesByPlace()).containsOnlyKeys(seolleung, samsung);
-        assertThat(result.getCoursesByPlace().get(seolleung).getCourses()).hasSize(2);
-        assertThat(result.getCoursesByPlace().get(samsung).getCourses()).hasSize(2);
+        assertThat(result.getRoutes(seolleung)).isEqualTo(seolleungRoutes);
+        assertThat(result.getRoutes(samsung)).isEqualTo(samsungRoutes);
+        assertThat(result.getCourses(seolleung).getCourses()).hasSize(2);
+        assertThat(result.getCourses(samsung).getCourses()).hasSize(2);
 
         final ArgumentCaptor<List<OriginDestination>> captor = ArgumentCaptor.forClass(List.class);
         verify(routeFinder).findCourses(captor.capture());

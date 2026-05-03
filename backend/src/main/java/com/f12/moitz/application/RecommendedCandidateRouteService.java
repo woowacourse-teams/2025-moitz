@@ -5,6 +5,7 @@ import com.f12.moitz.domain.Course;
 import com.f12.moitz.domain.Courses;
 import com.f12.moitz.domain.OriginDestination;
 import com.f12.moitz.domain.Place;
+import com.f12.moitz.domain.RecommendedCandidateTravels;
 import com.f12.moitz.domain.RouteOrigins;
 import com.f12.moitz.domain.Routes;
 import java.util.LinkedHashMap;
