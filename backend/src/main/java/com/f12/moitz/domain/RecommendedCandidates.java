@@ -40,7 +40,8 @@ public class RecommendedCandidates {
     }
 
     public List<CandidateSelectionTag> getTags(final Place place) {
-        return CandidateSelectionTag.normalize(tagsByPlace.get(place));
+        validateRecommendedCandidatePlace(place);
+        return tagsByPlace.get(place);
     }
 
     public List<Place> getPlaces() {
@@ -53,6 +54,15 @@ public class RecommendedCandidates {
 
     public boolean isEmpty() {
         return recommendedCandidatePlaces.isEmpty();
+    }
+
+    private void validateRecommendedCandidatePlace(final Place place) {
+        if (place == null) {
+            throw new IllegalArgumentException("추천 후보 장소는 null일 수 없습니다.");
+        }
+        if (!tagsByPlace.containsKey(place)) {
+            throw new IllegalArgumentException("추천 후보 태그가 누락되었습니다. 추천 지역: " + place.getName());
+        }
     }
 
     private Map<Place, List<CandidateSelectionTag>> normalizeTagsByPlace(

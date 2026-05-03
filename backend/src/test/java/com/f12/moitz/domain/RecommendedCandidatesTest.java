@@ -90,6 +90,26 @@ class RecommendedCandidatesTest {
                 .isInstanceOf(UnsupportedOperationException.class);
     }
 
+    @Test
+    @DisplayName("추천 후보가 아닌 장소의 태그는 조회할 수 없다")
+    void getTags_ThrowsExceptionWhenPlaceIsNotRecommendedCandidate() {
+        final Place seolleung = place("선릉역");
+        final Place samsung = place("삼성역");
+        final RecommendedCandidates recommendedCandidates = new RecommendedCandidates(
+                List.of(seolleung),
+                Map.of(seolleung, List.of(CandidateSelectionTag.FAIRNESS))
+        );
+
+        assertSoftly(softAssertions -> {
+            softAssertions.assertThatThrownBy(() -> recommendedCandidates.getTags(null))
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessage("추천 후보 장소는 null일 수 없습니다.");
+            softAssertions.assertThatThrownBy(() -> recommendedCandidates.getTags(samsung))
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessage("추천 후보 태그가 누락되었습니다. 추천 지역: 삼성역");
+        });
+    }
+
     private Place place(final String name) {
         return new Place(name, new Point(127.0, 37.0));
     }

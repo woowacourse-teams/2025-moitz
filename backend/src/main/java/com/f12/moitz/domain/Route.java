@@ -10,12 +10,15 @@ public class Route {
 
     public Route(final List<Path> paths) {
         validate(paths);
-        this.paths = paths;
+        this.paths = List.copyOf(paths);
     }
 
     private void validate(final List<Path> paths) {
         if (paths == null || paths.isEmpty()) {
             throw new IllegalArgumentException("이동 경로는 반드시 존재해야 합니다.");
+        }
+        if (paths.stream().anyMatch(path -> path == null)) {
+            throw new IllegalArgumentException("이동 경로에 null이 포함될 수 없습니다.");
         }
     }
 
@@ -26,7 +29,9 @@ public class Route {
     }
 
     public int calculateTransferCount() {
-        return paths.size() > 2 ? paths.size() / 2 : 0;
+        return (int) paths.stream()
+                .filter(path -> path.getTravelMethod().isTransfer())
+                .count();
     }
 
     public Place getStartPlace() {

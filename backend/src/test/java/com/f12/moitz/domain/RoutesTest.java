@@ -1,8 +1,13 @@
 package com.f12.moitz.domain;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.SoftAssertions.assertSoftly;
 
 import com.f12.moitz.domain.subway.SubwayLine;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -101,6 +106,53 @@ class RoutesTest {
 
         assertThat(routes.calculateTransferBurden())
                 .isEqualTo(new TransferBurden(1.0, 2, 2));
+    }
+
+    @Test
+    @DisplayName("경로 묶음은 null이거나 비어있거나 null 경로를 포함할 수 없다")
+    void constructor_ThrowsExceptionWhenRoutesAreInvalid() {
+        final Route route = route(
+                new Place("출발", new Point(127.0, 37.0)),
+                new Place("도착", new Point(127.1, 37.1)),
+                20,
+                0
+        );
+
+        assertSoftly(softAssertions -> {
+            softAssertions.assertThatThrownBy(() -> new Routes(null))
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessage("이동 경로는 비어있거나 null일 수 없습니다.");
+            softAssertions.assertThatThrownBy(() -> new Routes(List.of()))
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessage("이동 경로는 비어있거나 null일 수 없습니다.");
+            softAssertions.assertThatThrownBy(() -> new Routes(Arrays.asList(route, null)))
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessage("이동 경로 목록에 null이 포함될 수 없습니다.");
+        });
+    }
+
+    @Test
+    @DisplayName("경로 묶음은 외부에서 변경할 수 없다")
+    void getRoutes_ReturnsUnmodifiableList() {
+        final List<Route> routeList = new ArrayList<>();
+        routeList.add(route(
+                new Place("출발", new Point(127.0, 37.0)),
+                new Place("도착", new Point(127.1, 37.1)),
+                20,
+                0
+        ));
+
+        final Routes routes = new Routes(routeList);
+
+        routeList.clear();
+
+        assertThat(routes.getRoutes()).hasSize(1);
+        assertThatThrownBy(() -> routes.getRoutes().add(route(
+                new Place("다른 출발", new Point(127.2, 37.2)),
+                new Place("다른 도착", new Point(127.3, 37.3)),
+                20,
+                0
+        ))).isInstanceOf(UnsupportedOperationException.class);
     }
 
     private Route route(final Place start, final Place end, final int minutes, final int transferCount) {

@@ -10,12 +10,15 @@ public class Routes {
 
     public Routes(final List<Route> routes) {
         validate(routes);
-        this.routes = routes;
+        this.routes = List.copyOf(routes);
     }
 
     private void validate(final List<Route> routes) {
         if (routes == null || routes.isEmpty()) {
             throw new IllegalArgumentException("이동 경로는 비어있거나 null일 수 없습니다.");
+        }
+        if (routes.stream().anyMatch(route -> route == null)) {
+            throw new IllegalArgumentException("이동 경로 목록에 null이 포함될 수 없습니다.");
         }
     }
 
