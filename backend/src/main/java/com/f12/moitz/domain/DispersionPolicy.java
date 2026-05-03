@@ -1,7 +1,10 @@
 package com.f12.moitz.domain;
 
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 public enum DispersionPolicy {
 
@@ -93,6 +96,30 @@ public enum DispersionPolicy {
         return Arrays.stream(values())
                 .filter(policy -> policy.ordinal() >= ordinal())
                 .toList();
+    }
+
+    public Map<CandidateSelectionTag, Integer> tagQuotas() {
+        return switch (this) {
+            case TIER_1, TIER_2 -> createTagQuotas(7, 6, 12, 5, 5);
+            case TIER_3 -> createTagQuotas(9, 7, 9, 5, 5);
+            case TIER_4, TIER_5 -> createTagQuotas(12, 7, 6, 5, 5);
+        };
+    }
+
+    private Map<CandidateSelectionTag, Integer> createTagQuotas(
+            final int fairnessQuota,
+            final int maxBurdenReliefQuota,
+            final int efficiencyQuota,
+            final int transferQuota,
+            final int generalQuota
+    ) {
+        final Map<CandidateSelectionTag, Integer> tagQuotas = new LinkedHashMap<>();
+        tagQuotas.put(CandidateSelectionTag.FAIRNESS, fairnessQuota);
+        tagQuotas.put(CandidateSelectionTag.MAX_BURDEN_RELIEF, maxBurdenReliefQuota);
+        tagQuotas.put(CandidateSelectionTag.EFFICIENCY, efficiencyQuota);
+        tagQuotas.put(CandidateSelectionTag.TRANSFER, transferQuota);
+        tagQuotas.put(CandidateSelectionTag.GENERAL, generalQuota);
+        return Collections.unmodifiableMap(tagQuotas);
     }
 
 }

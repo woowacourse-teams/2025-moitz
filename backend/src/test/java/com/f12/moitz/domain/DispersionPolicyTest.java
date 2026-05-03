@@ -33,6 +33,14 @@ class DispersionPolicyTest {
     }
 
     @Test
+    @DisplayName("정책 tier별 태그 후보 할당량을 제공한다")
+    void tagQuotas() {
+        assertTagQuotas(DispersionPolicy.TIER_1, 7, 6, 12, 5, 5);
+        assertTagQuotas(DispersionPolicy.TIER_3, 9, 7, 9, 5, 5);
+        assertTagQuotas(DispersionPolicy.TIER_5, 12, 7, 6, 5, 5);
+    }
+
+    @Test
     @DisplayName("최소 출발지 수보다 적으면 분산도 정책을 판정할 수 없다")
     void resolve_ThrowsException_WhenPartySizeIsLessThanLimit() {
         assertThatThrownBy(() -> DispersionPolicy.resolve(1, 0, 0.0, 0))
@@ -46,6 +54,30 @@ class DispersionPolicyTest {
         assertThatThrownBy(() -> DispersionPolicy.resolve(7, 100, 70.0, 3))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("6개 이하");
+    }
+
+    private void assertTagQuotas(
+            final DispersionPolicy policy,
+            final int fairnessQuota,
+            final int maxBurdenReliefQuota,
+            final int efficiencyQuota,
+            final int transferQuota,
+            final int generalQuota
+    ) {
+        assertThat(policy.tagQuotas().keySet())
+                .containsExactly(
+                        CandidateSelectionTag.FAIRNESS,
+                        CandidateSelectionTag.MAX_BURDEN_RELIEF,
+                        CandidateSelectionTag.EFFICIENCY,
+                        CandidateSelectionTag.TRANSFER,
+                        CandidateSelectionTag.GENERAL
+                );
+        assertThat(policy.tagQuotas())
+                .containsEntry(CandidateSelectionTag.FAIRNESS, fairnessQuota)
+                .containsEntry(CandidateSelectionTag.MAX_BURDEN_RELIEF, maxBurdenReliefQuota)
+                .containsEntry(CandidateSelectionTag.EFFICIENCY, efficiencyQuota)
+                .containsEntry(CandidateSelectionTag.TRANSFER, transferQuota)
+                .containsEntry(CandidateSelectionTag.GENERAL, generalQuota);
     }
 
 }

@@ -93,7 +93,7 @@ public class CandidateSelectionPolicy {
             final DispersionPolicy dispersionPolicy,
             final Function<RouteCandidate, FairnessScore> scoreResolver
     ) {
-        final Map<CandidateSelectionTag, Integer> tagQuotas = resolveTagQuotas(dispersionPolicy);
+        final Map<CandidateSelectionTag, Integer> tagQuotas = dispersionPolicy.tagQuotas();
         final Map<CandidateSelectionTag, List<RouteCandidate>> tagSelections = new LinkedHashMap<>();
 
         tagQuotas.forEach((tag, quota) -> tagSelections.put(
@@ -104,48 +104,6 @@ public class CandidateSelectionPolicy {
                         .toList()
         ));
         return tagSelections;
-    }
-
-    private Map<CandidateSelectionTag, Integer> resolveTagQuotas(final DispersionPolicy dispersionPolicy) {
-        return switch (dispersionPolicy) {
-            case TIER_1, TIER_2 -> createTagQuotas(List.of(
-                    CandidateSelectionTag.FAIRNESS,
-                    CandidateSelectionTag.MAX_BURDEN_RELIEF,
-                    CandidateSelectionTag.EFFICIENCY,
-                    CandidateSelectionTag.TRANSFER,
-                    CandidateSelectionTag.GENERAL
-            ), 7, 6, 12, 5, 5);
-            case TIER_3 -> createTagQuotas(List.of(
-                    CandidateSelectionTag.FAIRNESS,
-                    CandidateSelectionTag.MAX_BURDEN_RELIEF,
-                    CandidateSelectionTag.EFFICIENCY,
-                    CandidateSelectionTag.TRANSFER,
-                    CandidateSelectionTag.GENERAL
-            ), 9, 7, 9, 5, 5);
-            case TIER_4, TIER_5 -> createTagQuotas(List.of(
-                    CandidateSelectionTag.FAIRNESS,
-                    CandidateSelectionTag.MAX_BURDEN_RELIEF,
-                    CandidateSelectionTag.EFFICIENCY,
-                    CandidateSelectionTag.TRANSFER,
-                    CandidateSelectionTag.GENERAL
-            ), 12, 7, 6, 5, 5);
-        };
-    }
-
-    private Map<CandidateSelectionTag, Integer> createTagQuotas(
-            final List<CandidateSelectionTag> tagOrder,
-            final int firstQuota,
-            final int secondQuota,
-            final int thirdQuota,
-            final int fourthQuota,
-            final int fifthQuota
-    ) {
-        final List<Integer> quotas = List.of(firstQuota, secondQuota, thirdQuota, fourthQuota, fifthQuota);
-        final Map<CandidateSelectionTag, Integer> tagQuotas = new LinkedHashMap<>();
-        for (int index = 0; index < tagOrder.size(); index++) {
-            tagQuotas.put(tagOrder.get(index), quotas.get(index));
-        }
-        return tagQuotas;
     }
 
     private List<RouteCandidate> mergeTagCandidates(
