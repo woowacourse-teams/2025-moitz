@@ -73,8 +73,7 @@ public class CandidatePlaceSearchPolicy {
             if (selectedByTag.containsKey(tag)) {
                 continue;
             }
-            candidateSelection.getTagSelections()
-                    .getOrDefault(tag, List.of())
+            candidateSelection.getCandidatesByTag(tag)
                     .stream()
                     .map(RouteCandidate::getPlace)
                     .filter(place -> !searchedPlaceSet.contains(place))
@@ -116,8 +115,7 @@ public class CandidatePlaceSearchPolicy {
         final Map<Place, Set<CandidateSelectionTag>> tagsByPlace = new LinkedHashMap<>();
 
         for (CandidateSelectionTag tag : CandidateSelectionTag.orderedValues()) {
-            final List<RouteCandidate> tagCandidates = candidateSelection.getTagSelections()
-                    .getOrDefault(tag, List.of());
+            final List<RouteCandidate> tagCandidates = candidateSelection.getCandidatesByTag(tag);
             for (RouteCandidate candidate : tagCandidates) {
                 final Place place = candidate.getPlace();
                 if (!searchedPlaceSet.contains(place) || !placeCondition.test(place)) {
@@ -199,8 +197,7 @@ public class CandidatePlaceSearchPolicy {
 
     private Set<Place> transferCandidatePlaces(final CandidateSelection candidateSelection) {
         final Set<Place> transferCandidatePlaces = new HashSet<>();
-        candidateSelection.getTagSelections()
-                .getOrDefault(CandidateSelectionTag.TRANSFER, List.of())
+        candidateSelection.getCandidatesByTag(CandidateSelectionTag.TRANSFER)
                 .forEach(candidate -> transferCandidatePlaces.add(candidate.getPlace()));
         return transferCandidatePlaces;
     }
@@ -209,10 +206,9 @@ public class CandidatePlaceSearchPolicy {
         final Map<Place, RouteCandidate> candidatesByPlace = new LinkedHashMap<>();
         candidateSelection.getSearchCandidates()
                 .forEach(candidate -> candidatesByPlace.putIfAbsent(candidate.getPlace(), candidate));
-        candidateSelection.getTagSelections()
-                .values()
-                .forEach(candidates -> candidates.forEach(candidate ->
-                        candidatesByPlace.putIfAbsent(candidate.getPlace(), candidate)));
+        CandidateSelectionTag.orderedValues()
+                .forEach(tag -> candidateSelection.getCandidatesByTag(tag)
+                        .forEach(candidate -> candidatesByPlace.putIfAbsent(candidate.getPlace(), candidate)));
         return candidatesByPlace;
     }
 

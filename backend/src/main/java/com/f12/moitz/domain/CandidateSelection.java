@@ -6,9 +6,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-import lombok.Getter;
 
-@Getter
 public class CandidateSelection {
 
     private final List<RouteCandidate> searchCandidates;
@@ -176,10 +174,34 @@ public class CandidateSelection {
                 )));
     }
 
+    public List<RouteCandidate> getSearchCandidates() {
+        return searchCandidates;
+    }
+
     public List<Place> getSearchCandidatePlaces() {
         return searchCandidates.stream()
                 .map(RouteCandidate::getPlace)
                 .toList();
+    }
+
+    public List<RouteCandidate> getCandidatesByTag(final CandidateSelectionTag tag) {
+        return tagSelections.getOrDefault(tag, List.of());
+    }
+
+    public DispersionPolicy getInitialPolicy() {
+        return initialPolicy;
+    }
+
+    public DispersionPolicy getEffectivePolicy() {
+        return effectivePolicy;
+    }
+
+    public long getAcceptableCount() {
+        return acceptableCount;
+    }
+
+    public boolean isFallbackToSortedCandidates() {
+        return fallbackToSortedCandidates;
     }
 
 }

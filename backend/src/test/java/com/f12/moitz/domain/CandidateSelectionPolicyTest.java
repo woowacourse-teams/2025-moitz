@@ -31,14 +31,8 @@ class CandidateSelectionPolicyTest {
                 5
         );
 
-        assertThat(result.getTagSelections().keySet())
-                .containsExactly(
-                        CandidateSelectionTag.FAIRNESS,
-                        CandidateSelectionTag.MAX_BURDEN_RELIEF,
-                        CandidateSelectionTag.EFFICIENCY,
-                        CandidateSelectionTag.TRANSFER,
-                        CandidateSelectionTag.GENERAL
-                );
+        assertThat(CandidateSelectionTag.orderedValues())
+                .allSatisfy(tag -> assertThat(result.getCandidatesByTag(tag)).isNotEmpty());
         assertThat(result.getSearchCandidatePlaces())
                 .extracting(Place::getName)
                 .contains("공평후보역");

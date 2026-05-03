@@ -181,17 +181,15 @@ public class RecommendationService {
                 searchCandidatePlaces.size(),
                 candidateSelection.isFallbackToSortedCandidates()
         );
-        log.debug("공평성 후보 tag - {}", summarizeTagSelections(candidateSelection.getTagSelections()));
+        log.debug("공평성 후보 tag - {}", summarizeTagSelections(candidateSelection));
         log.debug("공평성 상위 후보 - {}", summarizePlacesWithScore(searchCandidatePlaces, candidateRoutes));
     }
 
-    private Map<String, List<String>> summarizeTagSelections(
-            final Map<CandidateSelectionTag, List<RouteCandidate>> tagSelections
-    ) {
-        return tagSelections.entrySet().stream()
+    private Map<String, List<String>> summarizeTagSelections(final CandidateSelection candidateSelection) {
+        return CandidateSelectionTag.orderedValues().stream()
                 .collect(Collectors.toMap(
-                        entry -> entry.getKey().getDescription(),
-                        entry -> summarizeCandidatesWithScore(entry.getValue()),
+                        CandidateSelectionTag::getDescription,
+                        tag -> summarizeCandidatesWithScore(candidateSelection.getCandidatesByTag(tag)),
                         (left, right) -> left,
                         java.util.LinkedHashMap::new
                 ));
