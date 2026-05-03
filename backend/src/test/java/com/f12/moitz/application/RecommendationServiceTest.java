@@ -34,7 +34,7 @@ import com.f12.moitz.domain.subway.SubwayStation;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -165,15 +165,15 @@ class RecommendationServiceTest {
 
         Result savedResult = resultCaptor.getValue();
         assertThat(savedResult.getRecommendedLocationsCount()).isEqualTo(2);
-        assertThat(savedResult.getRecommendedLocations().getCandidates().stream()
-                .map(recommendedLocation -> recommendedLocation.getDestination().getName())
-                .collect(Collectors.toList()))
+        assertThat(IntStream.range(0, savedResult.getRecommendedLocationsCount())
+                .mapToObj(index -> savedResult.getRecommendedLocations().get(index).getDestination().getName())
+                .toList())
                 .containsExactly("삼성역", "선릉역");
-        assertThat(savedResult.getRecommendedLocations().getCandidates().stream()
-                .map(recommendedLocation -> recommendedLocation.getTags().stream()
+        assertThat(IntStream.range(0, savedResult.getRecommendedLocationsCount())
+                .mapToObj(index -> savedResult.getRecommendedLocations().get(index).getTags().stream()
                         .map(Enum::name)
                         .toList())
-                .collect(Collectors.toList()))
+                .toList())
                 .containsExactly(
                         List.of("FAIRNESS", "EFFICIENCY", "TRANSFER"),
                         List.of("MAX_BURDEN_RELIEF", "EFFICIENCY", "TRANSFER")

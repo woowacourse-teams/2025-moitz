@@ -72,9 +72,7 @@ class RecommendationTest {
 
         assertSoftly(softAssertions -> {
             softAssertions.assertThat(recommendation.size()).isEqualTo(1);
-            softAssertions.assertThat(recommendation.getCandidates()).containsExactly(candidate);
-            softAssertions.assertThatThrownBy(() -> recommendation.getCandidates().add(createCandidate(30, 10)))
-                    .isInstanceOf(UnsupportedOperationException.class);
+            softAssertions.assertThat(recommendation.get(0)).isEqualTo(candidate);
         });
     }
 
