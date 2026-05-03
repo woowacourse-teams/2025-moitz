@@ -74,6 +74,7 @@ class RecommendationServiceTest {
                 new RecommendedCandidateReasonService(locationReasonGenerator),
                 new RouteOriginDispersionService(routeFinder),
                 new RouteCandidatePreparationService(subwayStationService, routeFinder),
+                new RouteCandidateSelectionService(),
                 new RecommendationPlaceSearchService(placeRecommender),
                 new RecommendedCandidateConfirmationService(new RecommendedCandidateRouteService(routeFinder)),
                 new RecommendationCreationService(),
