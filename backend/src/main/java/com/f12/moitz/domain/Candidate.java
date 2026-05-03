@@ -14,7 +14,7 @@ public class Candidate {
     private Place destination;
     private Routes routes;
     private Courses courses;
-    private CategorizedRecommendedPlaces recommendedPlaces;
+    private RecommendedPlaces recommendedPlaces;
     private List<CandidateSelectionTag> tags;
     private String description;
     private String reason;
@@ -23,7 +23,7 @@ public class Candidate {
     public static Candidate create(
             final Place destination,
             final RecommendationReason recommendationReason,
-            final CategorizedRecommendedPlaces recommendedPlaces,
+            final RecommendedPlaces recommendedPlaces,
             final Routes routes,
             final Courses courses,
             final List<CandidateSelectionTag> tags
@@ -42,7 +42,7 @@ public class Candidate {
     private Candidate(
             final Place destination,
             final RecommendationReason recommendationReason,
-            final CategorizedRecommendedPlaces recommendedPlaces,
+            final RecommendedPlaces recommendedPlaces,
             final Routes routes,
             final Courses courses,
             final List<CandidateSelectionTag> tags,
@@ -74,7 +74,7 @@ public class Candidate {
             final Place destination,
             final Routes routes,
             final Courses courses,
-            final CategorizedRecommendedPlaces recommendedPlaces,
+            final RecommendedPlaces recommendedPlaces,
             final CandidateSelectionTag tag,
             final String description,
             final String reason,
@@ -97,7 +97,7 @@ public class Candidate {
             final Place destination,
             final Routes routes,
             final Courses courses,
-            final CategorizedRecommendedPlaces recommendedPlaces,
+            final RecommendedPlaces recommendedPlaces,
             final List<CandidateSelectionTag> tags,
             final String description,
             final String reason,
@@ -120,7 +120,7 @@ public class Candidate {
             final Place destination,
             final Routes routes,
             final Courses courses,
-            final CategorizedRecommendedPlaces recommendedPlaces,
+            final RecommendedPlaces recommendedPlaces,
             final List<CandidateSelectionTag> tags,
             final String description,
             final String reason,
@@ -140,7 +140,7 @@ public class Candidate {
             final Place suggestedLocation,
             final Routes routes,
             final Courses courses,
-            final CategorizedRecommendedPlaces recommendedPlaces,
+            final RecommendedPlaces recommendedPlaces,
             final String description,
             final String reason,
             final int votes

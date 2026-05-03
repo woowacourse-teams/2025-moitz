@@ -61,7 +61,7 @@ class RecommendationTest {
                 recommendedPlace,
                 new RecommendationReason("#공평", "이동 시간이 고른 후보입니다.")
         );
-        final Map<Place, CategorizedRecommendedPlaces> recommendedPlacesByPlace = Map.of(
+        final Map<Place, RecommendedPlaces> recommendedPlacesByPlace = Map.of(
                 recommendedPlace,
                 createRecommendedPlaces(RecommendCondition.CAFE)
         );
@@ -166,11 +166,11 @@ class RecommendationTest {
         final Place recommendedPlace = new Place("선릉역", new Point(127.1, 37.1));
         final Routes routes = createRoutes(startPlace, recommendedPlace, 10 * 60);
         final Courses courses = createCourses(startPlace, recommendedPlace);
-        final CategorizedRecommendedPlaces categorizedRecommendedPlaces = createRecommendedPlaces(RecommendCondition.CAFE);
+        final RecommendedPlaces recommendedPlaces = createRecommendedPlaces(RecommendCondition.CAFE);
 
         final Recommendation recommendation = Recommendation.create(
                 Map.of(recommendedPlace, new RecommendationReason("#공평", "이동 시간이 고른 후보입니다.")),
-                Map.of(recommendedPlace, categorizedRecommendedPlaces),
+                Map.of(recommendedPlace, recommendedPlaces),
                 createRecommendedCandidateTravels(recommendedPlace, routes, courses),
                 createRecommendedCandidates(recommendedPlace, CandidateSelectionTag.FAIRNESS),
                 List.of(RecommendCondition.CAFE)
@@ -192,7 +192,7 @@ class RecommendationTest {
                 recommendedPlace,
                 new RecommendationReason("#공평", "이동 시간이 고른 후보입니다.")
         );
-        final Map<Place, CategorizedRecommendedPlaces> recommendedPlacesByPlace = Map.of(
+        final Map<Place, RecommendedPlaces> recommendedPlacesByPlace = Map.of(
                 recommendedPlace,
                 createRecommendedPlaces(RecommendCondition.CAFE)
         );
@@ -283,8 +283,8 @@ class RecommendationTest {
         final Courses courses = new Courses(List.of(course));
 
         final RecommendedPlace recommendedPlace = new RecommendedPlace("스타벅스", new Point(127.2, 37.21), "카페", 5, "url","imageUrl");
-        Map<RecommendCondition, List<RecommendedPlace>> categorizedRecommendedPlace = Map.of(RecommendCondition.CAFE, List.of(recommendedPlace));
-        final CategorizedRecommendedPlaces recommendedPlaces = new CategorizedRecommendedPlaces(categorizedRecommendedPlace);
+        Map<RecommendCondition, List<RecommendedPlace>> recommendedPlacesByCondition = Map.of(RecommendCondition.CAFE, List.of(recommendedPlace));
+        final RecommendedPlaces recommendedPlaces = new RecommendedPlaces(recommendedPlacesByCondition);
         return new Candidate(endPlace, routes, courses, recommendedPlaces, tag, "123", "123", 0);
     }
 
@@ -323,7 +323,7 @@ class RecommendationTest {
         );
     }
 
-    private CategorizedRecommendedPlaces createRecommendedPlaces(final RecommendCondition recommendCondition) {
+    private RecommendedPlaces createRecommendedPlaces(final RecommendCondition recommendCondition) {
         final RecommendedPlace recommendedPlace = new RecommendedPlace(
                 "스타벅스",
                 new Point(127.2, 37.21),
@@ -332,7 +332,7 @@ class RecommendationTest {
                 "url",
                 "imageUrl"
         );
-        return new CategorizedRecommendedPlaces(Map.of(recommendCondition, List.of(recommendedPlace)));
+        return new RecommendedPlaces(Map.of(recommendCondition, List.of(recommendedPlace)));
     }
 
 }

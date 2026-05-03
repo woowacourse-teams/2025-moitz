@@ -38,8 +38,8 @@ class CandidateTest {
         final Courses courses = new Courses(List.of(course));
 
         final RecommendedPlace recommendedPlace = new RecommendedPlace("스타벅스", DEFAULT_POINT, "카페", 5, "url","imageUrl");
-        Map<RecommendCondition, List<RecommendedPlace>> categorizedRecommendedPlace = Map.of(RecommendCondition.CAFE, List.of(recommendedPlace));
-        final CategorizedRecommendedPlaces recommendedPlaces = new CategorizedRecommendedPlaces(categorizedRecommendedPlace);
+        Map<RecommendCondition, List<RecommendedPlace>> recommendedPlacesByCondition = Map.of(RecommendCondition.CAFE, List.of(recommendedPlace));
+        final RecommendedPlaces recommendedPlaces = new RecommendedPlaces(recommendedPlacesByCondition);
 
         // When & Then
         assertThatNoException().isThrownBy(() -> new Candidate(endPlace, routes, courses, recommendedPlaces, CandidateSelectionTag.GENERAL, "123", "123", 0));
@@ -66,8 +66,8 @@ class CandidateTest {
         final Courses courses = new Courses(List.of(course));
 
         final RecommendedPlace recommendedPlace = new RecommendedPlace("스타벅스", DEFAULT_POINT, "카페", 5, "url","imageUrl");
-        Map<RecommendCondition, List<RecommendedPlace>> categorizedRecommendedPlace = Map.of(RecommendCondition.CAFE, List.of(recommendedPlace));
-        final CategorizedRecommendedPlaces recommendedPlaces = new CategorizedRecommendedPlaces(categorizedRecommendedPlace);
+        Map<RecommendCondition, List<RecommendedPlace>> recommendedPlacesByCondition = Map.of(RecommendCondition.CAFE, List.of(recommendedPlace));
+        final RecommendedPlaces recommendedPlaces = new RecommendedPlaces(recommendedPlacesByCondition);
 
 
         // When & Then
@@ -101,7 +101,7 @@ class CandidateTest {
                     .isInstanceOf(IllegalArgumentException.class)
                     .hasMessage("추천 장소 목록은 비어 있을 수 없습니다.");
 
-            softAssertions.assertThatThrownBy(() -> new Candidate(endPlace, routes, courses, new CategorizedRecommendedPlaces(Collections.emptyMap()), CandidateSelectionTag.GENERAL, "123", "123", 0))
+            softAssertions.assertThatThrownBy(() -> new Candidate(endPlace, routes, courses, new RecommendedPlaces(Collections.emptyMap()), CandidateSelectionTag.GENERAL, "123", "123", 0))
                     .isInstanceOf(IllegalArgumentException.class)
                     .hasMessage("추천 장소 목록은 비어 있을 수 없습니다.");
 
@@ -145,7 +145,7 @@ class CandidateTest {
         final Routes routes = new Routes(List.of(route));
         final Courses courses = new Courses(List.of(new Course(List.of(startPlace.getPoint(), endPlace.getPoint()))));
         final RecommendedPlace recommendedPlace = new RecommendedPlace("스타벅스", DEFAULT_POINT, "카페", 5, "url", "imageUrl");
-        final CategorizedRecommendedPlaces recommendedPlaces = new CategorizedRecommendedPlaces(
+        final RecommendedPlaces recommendedPlaces = new RecommendedPlaces(
                 Map.of(RecommendCondition.CAFE, List.of(recommendedPlace))
         );
 
@@ -179,7 +179,7 @@ class CandidateTest {
         final Routes routes = new Routes(List.of(route));
         final Courses courses = new Courses(List.of(new Course(List.of(startPlace.getPoint(), endPlace.getPoint()))));
         final RecommendedPlace recommendedPlace = new RecommendedPlace("스타벅스", DEFAULT_POINT, "카페", 5, "url", "imageUrl");
-        final CategorizedRecommendedPlaces recommendedPlaces = new CategorizedRecommendedPlaces(
+        final RecommendedPlaces recommendedPlaces = new RecommendedPlaces(
                 Map.of(RecommendCondition.CAFE, List.of(recommendedPlace))
         );
         final RecommendationReason recommendationReason = new RecommendationReason("#공평", "이동 시간이 고르게 분산됩니다.");
@@ -265,8 +265,8 @@ class CandidateTest {
         final Courses courses = new Courses(List.of(course));
 
         final RecommendedPlace recommendedPlace = new RecommendedPlace("스타벅스", DEFAULT_POINT, "카페", 5, "url","imageUrl");
-        Map<RecommendCondition, List<RecommendedPlace>> categorizedRecommendedPlace = Map.of(RecommendCondition.CAFE, List.of(recommendedPlace));
-        final CategorizedRecommendedPlaces recommendedPlaces = new CategorizedRecommendedPlaces(categorizedRecommendedPlace);
+        Map<RecommendCondition, List<RecommendedPlace>> recommendedPlacesByCondition = Map.of(RecommendCondition.CAFE, List.of(recommendedPlace));
+        final RecommendedPlaces recommendedPlaces = new RecommendedPlaces(recommendedPlacesByCondition);
         final Candidate candidate = new Candidate(endPlace, routes, courses, recommendedPlaces, CandidateSelectionTag.GENERAL, "123", "123", 0);
 
         // When
@@ -291,7 +291,7 @@ class CandidateTest {
                 new Course(List.of(startB.getPoint(), endPlace.getPoint()))
         ));
         final RecommendedPlace recommendedPlace = new RecommendedPlace("스타벅스", DEFAULT_POINT, "카페", 5, "url", "imageUrl");
-        final CategorizedRecommendedPlaces recommendedPlaces = new CategorizedRecommendedPlaces(
+        final RecommendedPlaces recommendedPlaces = new RecommendedPlaces(
                 Map.of(RecommendCondition.CAFE, List.of(recommendedPlace))
         );
         final Candidate candidate = new Candidate(
@@ -319,7 +319,7 @@ class CandidateTest {
         final Course courseA = new Course(List.of(startA.getPoint(), endPlace.getPoint()));
         final Course courseB = new Course(List.of(startB.getPoint(), endPlace.getPoint()));
         final RecommendedPlace recommendedPlace = new RecommendedPlace("스타벅스", DEFAULT_POINT, "카페", 5, "url", "imageUrl");
-        final CategorizedRecommendedPlaces recommendedPlaces = new CategorizedRecommendedPlaces(
+        final RecommendedPlaces recommendedPlaces = new RecommendedPlaces(
                 Map.of(RecommendCondition.CAFE, List.of(recommendedPlace))
         );
         final Candidate candidate = new Candidate(

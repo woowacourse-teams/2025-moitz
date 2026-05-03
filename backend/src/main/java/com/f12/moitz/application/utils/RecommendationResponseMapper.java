@@ -9,7 +9,7 @@ import com.f12.moitz.application.dto.RouteResponse;
 import com.f12.moitz.application.dto.StartingPlaceResponse;
 import com.f12.moitz.domain.Candidate;
 import com.f12.moitz.domain.CandidateSelectionTag;
-import com.f12.moitz.domain.CategorizedRecommendedPlaces;
+import com.f12.moitz.domain.RecommendedPlaces;
 import com.f12.moitz.domain.Course;
 import com.f12.moitz.domain.Path;
 import com.f12.moitz.domain.Place;
@@ -96,9 +96,9 @@ public class RecommendationResponseMapper {
     }
 
     private Map<RecommendCondition, List<PlaceRecommendResponse>> toPlaceRecommendResponses(
-            final CategorizedRecommendedPlaces categorizedRecommendedPlaces
+            final RecommendedPlaces recommendedPlaces
     ) {
-        return categorizedRecommendedPlaces.getCategorizedPlaces().entrySet().stream()
+        return recommendedPlaces.getPlacesByCondition().entrySet().stream()
                 .collect(Collectors.toMap(
                         Entry::getKey,
                         entry -> IntStream.range(0, entry.getValue().size())

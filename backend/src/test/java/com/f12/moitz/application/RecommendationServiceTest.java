@@ -18,7 +18,7 @@ import com.f12.moitz.application.port.RouteFinder;
 import com.f12.moitz.application.utils.RecommendationResponseMapper;
 import com.f12.moitz.common.error.exception.BadRequestException;
 import com.f12.moitz.common.error.exception.GeneralErrorCode;
-import com.f12.moitz.domain.CategorizedRecommendedPlaces;
+import com.f12.moitz.domain.RecommendedPlaces;
 import com.f12.moitz.domain.Course;
 import com.f12.moitz.domain.Path;
 import com.f12.moitz.domain.Place;
@@ -96,8 +96,8 @@ class RecommendationServiceTest {
         given(subwayStationService.generateCandidatePlace(anyList(), anyInt()))
                 .willReturn(List.of(gangnam, yeoksam, seolleung, samsung));
 
-        Map<Place, CategorizedRecommendedPlaces> mockRecommendedPlaces = Map.of(
-                seolleung, new CategorizedRecommendedPlaces(
+        Map<Place, RecommendedPlaces> mockRecommendedPlaces = Map.of(
+                seolleung, new RecommendedPlaces(
                         Map.of(
                                 RecommendCondition.CAFE, List.of(
                                         new RecommendedPlace(
@@ -111,7 +111,7 @@ class RecommendationServiceTest {
                                 )
                         )
                 ),
-                samsung, new CategorizedRecommendedPlaces(
+                samsung, new RecommendedPlaces(
                         Map.of(
                                 RecommendCondition.CAFE, List.of(
                                         new RecommendedPlace(
@@ -200,7 +200,7 @@ class RecommendationServiceTest {
                 new Route(List.of(new Path(yeoksam, seolleung, TravelMethod.SUBWAY, 5 * 60, SubwayLine.fromTitle("2호선"))))
         ));
         given(placeRecommender.recommendPlaces(anyList(), anyList())).willReturn(Map.of(
-                seolleung, new CategorizedRecommendedPlaces(Map.of())
+                seolleung, new RecommendedPlaces(Map.of())
         ));
 
         assertThatThrownBy(() -> recommendationService.recommendLocation(request))

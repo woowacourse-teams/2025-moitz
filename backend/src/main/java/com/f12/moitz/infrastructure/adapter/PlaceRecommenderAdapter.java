@@ -1,7 +1,7 @@
 package com.f12.moitz.infrastructure.adapter;
 
 import com.f12.moitz.application.port.PlaceRecommender;
-import com.f12.moitz.domain.CategorizedRecommendedPlaces;
+import com.f12.moitz.domain.RecommendedPlaces;
 import com.f12.moitz.domain.Place;
 import com.f12.moitz.domain.RecommendCondition;
 import com.f12.moitz.domain.RecommendedPlace;
@@ -30,21 +30,21 @@ public class PlaceRecommenderAdapter implements PlaceRecommender {
     private final KakaoPlaceMapper kakaoPlaceMapper;
 
     @Override
-    public Map<Place, CategorizedRecommendedPlaces> recommendPlaces(
+    public Map<Place, RecommendedPlaces> recommendPlaces(
             final List<Place> targetPlaces,
             final List<RecommendCondition> requirements
     ) {
         final Map<Place, KakaoApiResponses> searchResults = searchPlacesWithRequirement(targetPlaces, requirements);
-        return buildCategorizedRecommendedPlaces(searchResults);
+        return buildRecommendedPlaces(searchResults);
     }
 
-    private Map<Place, CategorizedRecommendedPlaces> buildCategorizedRecommendedPlaces(
+    private Map<Place, RecommendedPlaces> buildRecommendedPlaces(
             final Map<Place, KakaoApiResponses> searchResults
     ) {
         return searchResults.entrySet().stream()
                 .collect(Collectors.toMap(
                         Entry::getKey,
-                        entry -> new CategorizedRecommendedPlaces(
+                        entry -> new RecommendedPlaces(
                                 buildCategoryMap(entry.getValue().kakaoApiResponses())
                         )
                 ));

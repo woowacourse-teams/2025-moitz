@@ -2,7 +2,7 @@ package com.f12.moitz.application;
 
 import com.f12.moitz.application.port.PlaceRecommender;
 import com.f12.moitz.domain.CandidateSelection;
-import com.f12.moitz.domain.CategorizedRecommendedPlaces;
+import com.f12.moitz.domain.RecommendedPlaces;
 import com.f12.moitz.domain.RecommendedCandidates;
 import com.f12.moitz.domain.CandidatePlaceSearchPolicy;
 import com.f12.moitz.domain.Place;
@@ -38,7 +38,7 @@ public class RecommendationPlaceSearchService {
             final int searchLimit,
             final int targetCount
     ) {
-        final Map<Place, CategorizedRecommendedPlaces> accumulatedRecommendedPlaces = new LinkedHashMap<>();
+        final Map<Place, RecommendedPlaces> accumulatedRecommendedPlaces = new LinkedHashMap<>();
         final List<Place> searchedPlaces = new ArrayList<>();
         RecommendedCandidates recommendedCandidates = selectRecommendedCandidates(
                 candidateSelection,
@@ -103,7 +103,7 @@ public class RecommendationPlaceSearchService {
     private RecommendedCandidates selectRecommendedCandidates(
             final CandidateSelection candidateSelection,
             final List<Place> searchedPlaces,
-            final Map<Place, CategorizedRecommendedPlaces> recommendedPlaces,
+            final Map<Place, RecommendedPlaces> recommendedPlaces,
             final List<RecommendCondition> recommendConditions,
             final int targetCount
     ) {
@@ -117,12 +117,12 @@ public class RecommendationPlaceSearchService {
 
     private boolean satisfiesPlaceRequirements(
             final Place place,
-            final Map<Place, CategorizedRecommendedPlaces> recommendedPlaces,
+            final Map<Place, RecommendedPlaces> recommendedPlacesByPlace,
             final List<RecommendCondition> recommendConditions
     ) {
-        final CategorizedRecommendedPlaces categorizedRecommendedPlaces = recommendedPlaces.get(place);
-        return categorizedRecommendedPlaces != null
-                && categorizedRecommendedPlaces.satisfiesAll(recommendConditions);
+        final RecommendedPlaces recommendedPlaces = recommendedPlacesByPlace.get(place);
+        return recommendedPlaces != null
+                && recommendedPlaces.satisfiesAllConditions(recommendConditions);
     }
 
     private List<String> summarizePlacesWithScore(

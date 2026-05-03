@@ -20,7 +20,7 @@ public class Recommendation {
 
     public static Recommendation create(
             final Map<Place, RecommendationReason> reasonsByPlace,
-            final Map<Place, CategorizedRecommendedPlaces> recommendedPlacesByPlace,
+            final Map<Place, RecommendedPlaces> recommendedPlacesByPlace,
             final RecommendedCandidateTravels recommendedCandidateTravels,
             final RecommendedCandidates recommendedCandidates,
             final List<RecommendCondition> recommendConditions
@@ -36,7 +36,7 @@ public class Recommendation {
 
     private Recommendation(
             final Map<Place, RecommendationReason> reasonsByPlace,
-            final Map<Place, CategorizedRecommendedPlaces> recommendedPlacesByPlace,
+            final Map<Place, RecommendedPlaces> recommendedPlacesByPlace,
             final RecommendedCandidateTravels recommendedCandidateTravels,
             final RecommendedCandidates recommendedCandidates,
             final List<RecommendCondition> recommendConditions
@@ -74,7 +74,7 @@ public class Recommendation {
 
     private void validateCreationInputs(
             final Map<Place, RecommendationReason> reasonsByPlace,
-            final Map<Place, CategorizedRecommendedPlaces> recommendedPlacesByPlace,
+            final Map<Place, RecommendedPlaces> recommendedPlacesByPlace,
             final RecommendedCandidateTravels recommendedCandidateTravels,
             final RecommendedCandidates recommendedCandidates,
             final List<RecommendCondition> recommendConditions
@@ -98,7 +98,7 @@ public class Recommendation {
 
     private List<Place> findPlacesReadyForCandidateCreation(
             final Map<Place, RecommendationReason> reasonsByPlace,
-            final Map<Place, CategorizedRecommendedPlaces> recommendedPlacesByPlace,
+            final Map<Place, RecommendedPlaces> recommendedPlacesByPlace,
             final RecommendedCandidates recommendedCandidates,
             final List<RecommendCondition> recommendConditions
     ) {
@@ -134,19 +134,19 @@ public class Recommendation {
     }
 
     private boolean hasRequiredRecommendedPlaces(
-            final CategorizedRecommendedPlaces recommendedPlaces,
+            final RecommendedPlaces recommendedPlaces,
             final List<RecommendCondition> recommendConditions
     ) {
         if (recommendedPlaces == null) {
             return false;
         }
-        return recommendedPlaces.satisfiesAll(recommendConditions);
+        return recommendedPlaces.satisfiesAllConditions(recommendConditions);
     }
 
     private Candidate toCandidate(
             final Place place,
             final Map<Place, RecommendationReason> reasonsByPlace,
-            final Map<Place, CategorizedRecommendedPlaces> recommendedPlaces,
+            final Map<Place, RecommendedPlaces> recommendedPlaces,
             final RecommendedCandidateTravels recommendedCandidateTravels,
             final RecommendedCandidates recommendedCandidates
     ) {

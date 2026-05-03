@@ -8,7 +8,7 @@ import static org.mockito.Mockito.verify;
 import com.f12.moitz.application.port.PlaceRecommender;
 import com.f12.moitz.domain.CandidateSelection;
 import com.f12.moitz.domain.CandidateSelectionTag;
-import com.f12.moitz.domain.CategorizedRecommendedPlaces;
+import com.f12.moitz.domain.RecommendedPlaces;
 import com.f12.moitz.domain.DispersionPolicy;
 import com.f12.moitz.domain.Path;
 import com.f12.moitz.domain.Place;
@@ -59,7 +59,7 @@ class RecommendationPlaceSearchServiceTest {
                 seolleung, seolleungCandidate.getRoutes(),
                 samsung, samsungCandidate.getRoutes()
         );
-        final Map<Place, CategorizedRecommendedPlaces> recommendedPlaces = Map.of(
+        final Map<Place, RecommendedPlaces> recommendedPlaces = Map.of(
                 seolleung, createRecommendedPlaces("선릉 카페"),
                 samsung, createRecommendedPlaces("삼성 카페")
         );
@@ -94,8 +94,8 @@ class RecommendationPlaceSearchServiceTest {
         )))));
     }
 
-    private CategorizedRecommendedPlaces createRecommendedPlaces(final String name) {
-        return new CategorizedRecommendedPlaces(Map.of(
+    private RecommendedPlaces createRecommendedPlaces(final String name) {
+        return new RecommendedPlaces(Map.of(
                 RecommendCondition.CAFE,
                 List.of(new RecommendedPlace(
                         name,

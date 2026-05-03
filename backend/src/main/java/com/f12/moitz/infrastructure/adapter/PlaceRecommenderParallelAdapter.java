@@ -3,7 +3,7 @@ package com.f12.moitz.infrastructure.adapter;
 import com.f12.moitz.application.port.PlaceRecommender;
 import com.f12.moitz.common.error.exception.ExternalApiErrorCode;
 import com.f12.moitz.common.error.exception.ExternalApiException;
-import com.f12.moitz.domain.CategorizedRecommendedPlaces;
+import com.f12.moitz.domain.RecommendedPlaces;
 import com.f12.moitz.domain.Place;
 import com.f12.moitz.domain.RecommendCondition;
 import com.f12.moitz.domain.RecommendedPlace;
@@ -33,7 +33,7 @@ public class PlaceRecommenderParallelAdapter implements PlaceRecommender {
     private final KakaoPlaceMapper kakaoPlaceMapper;
 
     @Override
-    public Map<Place, CategorizedRecommendedPlaces> recommendPlaces(
+    public Map<Place, RecommendedPlaces> recommendPlaces(
             final List<Place> targetPlaces,
             final List<RecommendCondition> requirements
     ) {
@@ -41,21 +41,21 @@ public class PlaceRecommenderParallelAdapter implements PlaceRecommender {
                 .block();
     }
 
-    private Mono<Map<Place, CategorizedRecommendedPlaces>> recommendPlacesAsync(
+    private Mono<Map<Place, RecommendedPlaces>> recommendPlacesAsync(
             final List<Place> targetPlaces,
             final List<RecommendCondition> requirements
     ) {
         return searchPlacesWithRequirementAsync(targetPlaces, requirements)
-                .map(this::buildCategorizedRecommendedPlaces);
+                .map(this::buildRecommendedPlaces);
     }
 
-    private Map<Place, CategorizedRecommendedPlaces> buildCategorizedRecommendedPlaces(
+    private Map<Place, RecommendedPlaces> buildRecommendedPlaces(
             final Map<Place, Map<RecommendCondition, List<KakaoApiResponse>>> searchResults
     ) {
         return searchResults.entrySet().stream()
                 .collect(Collectors.toMap(
                         Entry::getKey,
-                        entry -> new CategorizedRecommendedPlaces(
+                        entry -> new RecommendedPlaces(
                                 buildCategoryMap(entry.getValue())
                         )
                 ));

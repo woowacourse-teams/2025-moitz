@@ -8,7 +8,7 @@ import com.f12.moitz.common.error.exception.BadRequestException;
 import com.f12.moitz.common.error.exception.GeneralErrorCode;
 import com.f12.moitz.common.error.exception.NotFoundException;
 import com.f12.moitz.domain.CandidateSelection;
-import com.f12.moitz.domain.CategorizedRecommendedPlaces;
+import com.f12.moitz.domain.RecommendedPlaces;
 import com.f12.moitz.domain.DispersionPolicy;
 import com.f12.moitz.domain.RecommendedCandidates;
 import com.f12.moitz.domain.Place;
@@ -95,7 +95,7 @@ public class RecommendationService {
                 recommendConditions,
                 candidateRoutes
         );
-        final Map<Place, CategorizedRecommendedPlaces> recommendedPlaces = recommendationPlaceSearchResult.getRecommendedPlaces();
+        final Map<Place, RecommendedPlaces> recommendedPlaces = recommendationPlaceSearchResult.getRecommendedPlaces();
         recommendationFlowLogger.logPlaceSearchResult(searchCandidatePlaces, recommendationPlaceSearchResult);
         stopWatch.stop();
 
@@ -191,7 +191,7 @@ public class RecommendationService {
 
     private Recommendation createRecommendation(
             final Map<Place, RecommendationReason> reasonsByPlace,
-            final Map<Place, CategorizedRecommendedPlaces> recommendedPlaces,
+            final Map<Place, RecommendedPlaces> recommendedPlaces,
             final RecommendedCandidateTravels recommendedCandidateTravels,
             final RecommendedCandidates recommendedCandidates,
             final List<RecommendCondition> recommendConditions
