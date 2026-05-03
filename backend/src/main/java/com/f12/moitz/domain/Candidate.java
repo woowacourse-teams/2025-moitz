@@ -154,6 +154,9 @@ public class Candidate {
         if (courses == null) {
             throw new IllegalArgumentException("이동 코스 목록은 필수입니다.");
         }
+        if (routes.size() != courses.size()) {
+            throw new IllegalArgumentException("경로 목록과 이동 코스 목록의 개수는 같아야 합니다.");
+        }
         if (recommendedPlaces == null || recommendedPlaces.isEmpty()) {
             throw new IllegalArgumentException("추천 장소 목록은 비어 있을 수 없습니다.");
         }

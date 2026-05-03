@@ -112,4 +112,8 @@ public class Routes {
         return calculateMaxTransferCount() - calculateMinTransferCount();
     }
 
+    public int size() {
+        return routes.size();
+    }
+
 }

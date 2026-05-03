@@ -19,4 +19,8 @@ public class Courses {
         }
     }
 
+    public int size() {
+        return courses.size();
+    }
+
 }

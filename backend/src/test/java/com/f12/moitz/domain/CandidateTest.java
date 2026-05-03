@@ -84,6 +84,19 @@ class CandidateTest {
                     .isInstanceOf(IllegalArgumentException.class)
                     .hasMessage("이동 코스 목록은 필수입니다.");
 
+            softAssertions.assertThatThrownBy(() -> new Candidate(
+                            endPlace,
+                            routes,
+                            new Courses(List.of(course, course)),
+                            recommendedPlaces,
+                            CandidateSelectionTag.GENERAL,
+                            "123",
+                            "123",
+                            0
+                    ))
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessage("경로 목록과 이동 코스 목록의 개수는 같아야 합니다.");
+
             softAssertions.assertThatThrownBy(() -> new Candidate(endPlace, routes, courses, null, CandidateSelectionTag.GENERAL, "123", "123", 0))
                     .isInstanceOf(IllegalArgumentException.class)
                     .hasMessage("추천 장소 목록은 비어 있을 수 없습니다.");
@@ -273,7 +286,10 @@ class CandidateTest {
                 new Route(List.of(Path.subway(startA, endPlace, 10 * 60, SubwayLine.fromTitle("2호선")))),
                 new Route(List.of(Path.subway(startB, endPlace, 20 * 60, SubwayLine.fromTitle("2호선"))))
         ));
-        final Courses courses = new Courses(List.of(new Course(List.of(startA.getPoint(), endPlace.getPoint()))));
+        final Courses courses = new Courses(List.of(
+                new Course(List.of(startA.getPoint(), endPlace.getPoint())),
+                new Course(List.of(startB.getPoint(), endPlace.getPoint()))
+        ));
         final RecommendedPlace recommendedPlace = new RecommendedPlace("스타벅스", DEFAULT_POINT, "카페", 5, "url", "imageUrl");
         final CategorizedRecommendedPlaces recommendedPlaces = new CategorizedRecommendedPlaces(
                 Map.of(RecommendCondition.CAFE, List.of(recommendedPlace))
