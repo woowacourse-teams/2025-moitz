@@ -3,12 +3,15 @@ package com.f12.moitz.domain;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Recommendation {
 
-    private final List<Candidate> candidates;
+    private List<Candidate> candidates;
 
     public Recommendation(final List<Candidate> candidates) {
         validate(candidates);

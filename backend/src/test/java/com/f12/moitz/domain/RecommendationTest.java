@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThatNoException;
 import static org.assertj.core.api.SoftAssertions.assertSoftly;
 
 import com.f12.moitz.domain.subway.SubwayLine;
+import java.lang.reflect.Modifier;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -12,6 +13,14 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 class RecommendationTest {
+
+    @Test
+    @DisplayName("MongoDB 역직렬화를 위한 기본 생성자를 제공한다")
+    void hasDefaultConstructorForMongoDeserialization() throws NoSuchMethodException {
+        final java.lang.reflect.Constructor<Recommendation> constructor = Recommendation.class.getDeclaredConstructor();
+
+        assertThat(Modifier.isProtected(constructor.getModifiers())).isTrue();
+    }
 
     @Test
     @DisplayName("예외가 발생하지 않고 추천이 생성된다")
