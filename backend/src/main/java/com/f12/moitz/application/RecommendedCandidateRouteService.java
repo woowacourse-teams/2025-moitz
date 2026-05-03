@@ -53,6 +53,7 @@ public class RecommendedCandidateRouteService {
 
     private Map<Place, Courses> findCoursesByDestination(final List<OriginDestination> originDestinations) {
         final List<Course> courses = routeFinder.findCourses(originDestinations);
+        validateCourseCount(originDestinations, courses);
         return IntStream.range(0, originDestinations.size())
                 .boxed()
                 .collect(Collectors.groupingBy(
@@ -67,6 +68,22 @@ public class RecommendedCandidateRouteService {
                         Entry::getKey,
                         entry -> new Courses(entry.getValue())
                 ));
+    }
+
+    private void validateCourseCount(
+            final List<OriginDestination> originDestinations,
+            final List<Course> courses
+    ) {
+        if (courses == null) {
+            throw new IllegalStateException("추천 후보 이동 코스 조회 결과가 null입니다.");
+        }
+        if (originDestinations.size() != courses.size()) {
+            throw new IllegalStateException(String.format(
+                    "추천 후보 이동 코스 조회 결과 개수가 일치하지 않습니다. 요청=%d, 응답=%d",
+                    originDestinations.size(),
+                    courses.size()
+            ));
+        }
     }
 
 }
