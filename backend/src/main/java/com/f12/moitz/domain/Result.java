@@ -3,14 +3,12 @@ package com.f12.moitz.domain;
 import java.time.Instant;
 import java.util.List;
 import java.util.Objects;
-import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-@Getter
 @Document(collection = "result")
 @NoArgsConstructor(access = lombok.AccessLevel.PROTECTED)
 public class Result {
@@ -75,6 +73,26 @@ public class Result {
 
     public int getBestRecommendationTime() {
         return recommendedLocations.getBestRecommendationTime();
+    }
+
+    public ObjectId getId() {
+        return id;
+    }
+
+    public List<RecommendCondition> getRecommendConditions() {
+        return recommendConditions;
+    }
+
+    public Instant getCreatedAt() {
+        return createdAt;
+    }
+
+    public List<? extends Place> getStartingPlaces() {
+        return startingPlaces;
+    }
+
+    public Recommendation getRecommendedLocations() {
+        return recommendedLocations;
     }
 
     public int getStartingPlacesCount() {
