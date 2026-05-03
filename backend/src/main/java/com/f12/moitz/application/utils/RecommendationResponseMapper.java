@@ -21,7 +21,6 @@ import com.f12.moitz.domain.Result;
 import com.f12.moitz.domain.Route;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import org.springframework.stereotype.Component;
@@ -99,24 +98,27 @@ public class RecommendationResponseMapper {
     private Map<RecommendCondition, List<PlaceRecommendResponse>> toPlaceRecommendResponses(
             final RecommendedPlaces recommendedPlaces
     ) {
-        return recommendedPlaces.getPlacesByCondition().entrySet().stream()
+        return recommendedPlaces.getConditions().stream()
                 .collect(Collectors.toMap(
-                        Entry::getKey,
-                        entry -> IntStream.range(0, entry.getValue().size())
-                                .mapToObj(i -> {
-                                    RecommendedPlace p = entry.getValue().get(i);
-                                    return new PlaceRecommendResponse(
-                                            i + 1,       // 순번
-                                            p.getX(),
-                                            p.getY(),
-                                            p.getName(),
-                                            p.getCategory(),
-                                            p.getWalkingTime(),
-                                            p.getPlaceUrl(),
-                                            p.getImageUrl()
-                                    );
-                                })
-                                .toList()
+                        recommendCondition -> recommendCondition,
+                        recommendCondition -> {
+                            final List<RecommendedPlace> places = recommendedPlaces.getPlaces(recommendCondition);
+                            return IntStream.range(0, places.size())
+                                    .mapToObj(i -> {
+                                        RecommendedPlace p = places.get(i);
+                                        return new PlaceRecommendResponse(
+                                                i + 1,       // 순번
+                                                p.getX(),
+                                                p.getY(),
+                                                p.getName(),
+                                                p.getCategory(),
+                                                p.getWalkingTime(),
+                                                p.getPlaceUrl(),
+                                                p.getImageUrl()
+                                        );
+                                    })
+                                    .toList();
+                        }
                 ));
     }
 

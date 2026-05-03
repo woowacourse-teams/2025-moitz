@@ -79,7 +79,7 @@ class RecommendedPlacesTest {
 
     @Test
     @DisplayName("추천 조건별 추천 장소는 외부에서 변경할 수 없다")
-    void getPlacesByCondition_ReturnsUnmodifiableMapAndLists() {
+    void constructor_CopiesPlacesByCondition() {
         final List<RecommendedPlace> cafes = new ArrayList<>();
         cafes.add(createRecommendedPlace("카페"));
         final Map<RecommendCondition, List<RecommendedPlace>> placesByCondition = new LinkedHashMap<>();
@@ -91,13 +91,26 @@ class RecommendedPlacesTest {
 
         assertSoftly(softAssertions -> {
             softAssertions.assertThat(recommendedPlaces.satisfiesAllConditions(List.of(RecommendCondition.CAFE))).isTrue();
-            softAssertions.assertThatThrownBy(() -> recommendedPlaces.getPlacesByCondition()
-                            .put(RecommendCondition.RESTAURANT, List.of(createRecommendedPlace("식당"))))
-                    .isInstanceOf(UnsupportedOperationException.class);
-            softAssertions.assertThatThrownBy(() -> recommendedPlaces.getPlacesByCondition()
-                            .get(RecommendCondition.CAFE)
+            softAssertions.assertThat(recommendedPlaces.getConditions()).containsExactly(RecommendCondition.CAFE);
+            softAssertions.assertThat(recommendedPlaces.getPlaces(RecommendCondition.CAFE)).hasSize(1);
+            softAssertions.assertThatThrownBy(() -> recommendedPlaces.getPlaces(RecommendCondition.CAFE)
                             .add(createRecommendedPlace("다른 카페")))
                     .isInstanceOf(UnsupportedOperationException.class);
+        });
+    }
+
+    @Test
+    @DisplayName("추천 조건이 없으면 빈 추천 장소 목록을 반환한다")
+    void getPlaces_ReturnsEmptyListWhenConditionIsMissing() {
+        final RecommendedPlaces recommendedPlaces = new RecommendedPlaces(Map.of(
+                RecommendCondition.CAFE, List.of(createRecommendedPlace("카페"))
+        ));
+
+        assertSoftly(softAssertions -> {
+            softAssertions.assertThat(recommendedPlaces.getPlaces(RecommendCondition.RESTAURANT)).isEmpty();
+            softAssertions.assertThatThrownBy(() -> recommendedPlaces.getPlaces(null))
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessage("추천 조건은 null일 수 없습니다.");
         });
     }
 

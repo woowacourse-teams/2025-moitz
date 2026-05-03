@@ -5,9 +5,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import lombok.Getter;
 
-@Getter
 public class RecommendedPlaces {
 
     private final Map<RecommendCondition, List<RecommendedPlace>> placesByCondition;
@@ -23,6 +21,17 @@ public class RecommendedPlaces {
 
     public boolean isEmpty() {
         return placesByCondition.isEmpty();
+    }
+
+    public List<RecommendCondition> getConditions() {
+        return List.copyOf(placesByCondition.keySet());
+    }
+
+    public List<RecommendedPlace> getPlaces(final RecommendCondition recommendCondition) {
+        if (recommendCondition == null) {
+            throw new IllegalArgumentException("추천 조건은 null일 수 없습니다.");
+        }
+        return placesByCondition.getOrDefault(recommendCondition, List.of());
     }
 
     public boolean satisfiesAllConditions(final List<RecommendCondition> recommendConditions) {
