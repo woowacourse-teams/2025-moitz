@@ -76,35 +76,27 @@ public class RecommendationService {
 
         stopWatch.start("공평한 후보역 선정");
         final List<RecommendCondition> recommendConditions = RecommendCondition.fromTitle(request.requirements());
-        final RouteOriginPreparationResult routeOriginPreparationResult = routeOriginPreparationService.prepare(
-                request.startingPlaceNames()
-        );
+        final RouteOriginPreparationResult routeOriginPreparationResult = prepareRouteOrigins(request);
         final List<SubwayStation> startingPlaces = routeOriginPreparationResult.getStartingPlaces();
         final RouteOrigins routeOrigins = routeOriginPreparationResult.getRouteOrigins();
-        final DispersionPolicy dispersionPolicy = routeOriginDispersionService.resolve(routeOrigins);
-        final RouteCandidatePreparationResult routeCandidatePreparationResult = routeCandidatePreparationService.prepare(
+        final DispersionPolicy dispersionPolicy = resolveDispersionPolicy(routeOrigins);
+        final RouteCandidatePreparationResult routeCandidatePreparationResult = prepareRouteCandidates(
                 startingPlaces,
                 routeOrigins,
                 dispersionPolicy
         );
         final List<Place> candidatePlaces = routeCandidatePreparationResult.getCandidatePlaces();
         final Map<Place, Routes> candidateRoutes = routeCandidatePreparationResult.getCandidateRoutes();
-        final CandidateSelection candidateSelection = candidateSelectionPolicy.select(
-                routeCandidatePreparationResult.getRouteCandidates(),
-                dispersionPolicy,
-                PLACE_SEARCH_POOL_LIMIT
-        );
+        final CandidateSelection candidateSelection = selectCandidates(routeCandidatePreparationResult, dispersionPolicy);
         final List<Place> searchCandidatePlaces = candidateSelection.getSearchCandidatePlaces();
         logCandidateSelection(startingPlaces, candidatePlaces, candidateRoutes, candidateSelection);
         stopWatch.stop();
 
         stopWatch.start("장소 추천");
-        final RecommendationPlaceSearchResult recommendationPlaceSearchResult = recommendationPlaceSearchService.search(
+        final RecommendationPlaceSearchResult recommendationPlaceSearchResult = searchRecommendedPlaces(
                 candidateSelection,
                 recommendConditions,
-                candidateRoutes,
-                PLACE_SEARCH_POOL_LIMIT,
-                RECOMMENDED_CANDIDATE_TARGET_COUNT
+                candidateRoutes
         );
         final Map<Place, CategorizedRecommendedPlaces> recommendedPlaces = recommendationPlaceSearchResult.getRecommendedPlaces();
         log.debug(
@@ -120,7 +112,7 @@ public class RecommendationService {
         final List<Place> recommendedCandidatePlaces = recommendedCandidates.getPlaces();
         logRecommendedCandidates(searchCandidatePlaces, recommendedCandidatePlaces, candidateRoutes, recommendConditions);
         validateRecommendationCandidates(recommendedCandidates);
-        final RecommendedCandidateTravels recommendedCandidateTravels = recommendedCandidateRouteService.prepare(
+        final RecommendedCandidateTravels recommendedCandidateTravels = prepareRecommendedCandidateTravels(
                 routeOrigins,
                 recommendedCandidates,
                 candidateRoutes
@@ -128,12 +120,11 @@ public class RecommendationService {
         stopWatch.stop();
 
         stopWatch.start("추천 이유 생성");
-        final Map<Place, RecommendationReason> reasonsByPlace =
-                recommendedCandidateReasonService.generate(recommendedCandidates);
+        final Map<Place, RecommendationReason> reasonsByPlace = generateRecommendationReasons(recommendedCandidates);
         stopWatch.stop();
 
         stopWatch.start("Recommendation으로 변환");
-        final Recommendation recommendation = Recommendation.create(
+        final Recommendation recommendation = createRecommendation(
                 reasonsByPlace,
                 recommendedPlaces,
                 recommendedCandidateTravels,
@@ -143,14 +134,93 @@ public class RecommendationService {
         stopWatch.stop();
         log.debug("추천 서비스 완료. {}", stopWatch.shortSummary());
 
-        final String id = recommendResultRepository.saveAndReturnId(
+        final String id = saveRecommendationResult(recommendConditions, startingPlaces, recommendation);
+        return new RecommendationCreateResponse(id);
+    }
+
+    private RouteOriginPreparationResult prepareRouteOrigins(final RecommendationRequest request) {
+        return routeOriginPreparationService.prepare(request.startingPlaceNames());
+    }
+
+    private DispersionPolicy resolveDispersionPolicy(final RouteOrigins routeOrigins) {
+        return routeOriginDispersionService.resolve(routeOrigins);
+    }
+
+    private RouteCandidatePreparationResult prepareRouteCandidates(
+            final List<SubwayStation> startingPlaces,
+            final RouteOrigins routeOrigins,
+            final DispersionPolicy dispersionPolicy
+    ) {
+        return routeCandidatePreparationService.prepare(startingPlaces, routeOrigins, dispersionPolicy);
+    }
+
+    private CandidateSelection selectCandidates(
+            final RouteCandidatePreparationResult routeCandidatePreparationResult,
+            final DispersionPolicy dispersionPolicy
+    ) {
+        return candidateSelectionPolicy.select(
+                routeCandidatePreparationResult.getRouteCandidates(),
+                dispersionPolicy,
+                PLACE_SEARCH_POOL_LIMIT
+        );
+    }
+
+    private RecommendationPlaceSearchResult searchRecommendedPlaces(
+            final CandidateSelection candidateSelection,
+            final List<RecommendCondition> recommendConditions,
+            final Map<Place, Routes> candidateRoutes
+    ) {
+        return recommendationPlaceSearchService.search(
+                candidateSelection,
+                recommendConditions,
+                candidateRoutes,
+                PLACE_SEARCH_POOL_LIMIT,
+                RECOMMENDED_CANDIDATE_TARGET_COUNT
+        );
+    }
+
+    private RecommendedCandidateTravels prepareRecommendedCandidateTravels(
+            final RouteOrigins routeOrigins,
+            final RecommendedCandidates recommendedCandidates,
+            final Map<Place, Routes> candidateRoutes
+    ) {
+        return recommendedCandidateRouteService.prepare(routeOrigins, recommendedCandidates, candidateRoutes);
+    }
+
+    private Map<Place, RecommendationReason> generateRecommendationReasons(
+            final RecommendedCandidates recommendedCandidates
+    ) {
+        return recommendedCandidateReasonService.generate(recommendedCandidates);
+    }
+
+    private Recommendation createRecommendation(
+            final Map<Place, RecommendationReason> reasonsByPlace,
+            final Map<Place, CategorizedRecommendedPlaces> recommendedPlaces,
+            final RecommendedCandidateTravels recommendedCandidateTravels,
+            final RecommendedCandidates recommendedCandidates,
+            final List<RecommendCondition> recommendConditions
+    ) {
+        return Recommendation.create(
+                reasonsByPlace,
+                recommendedPlaces,
+                recommendedCandidateTravels,
+                recommendedCandidates,
+                recommendConditions
+        );
+    }
+
+    private String saveRecommendationResult(
+            final List<RecommendCondition> recommendConditions,
+            final List<SubwayStation> startingPlaces,
+            final Recommendation recommendation
+    ) {
+        return recommendResultRepository.saveAndReturnId(
                 new Result(
                         recommendConditions,
                         startingPlaces,
                         recommendation
                 )
         ).toHexString().toUpperCase();
-        return new RecommendationCreateResponse(id);
     }
 
     private List<String> getPlaceNames(final List<? extends Place> places) {
