@@ -117,7 +117,7 @@ public class RecommendationService {
 
         stopWatch.start("추천 후보 확정");
         final RecommendedCandidates recommendedCandidates = recommendationPlaceSearchResult.getRecommendedCandidates();
-        final List<Place> recommendedCandidatePlaces = recommendedCandidates.getRecommendedCandidatePlaces();
+        final List<Place> recommendedCandidatePlaces = recommendedCandidates.getPlaces();
         logRecommendedCandidates(searchCandidatePlaces, recommendedCandidatePlaces, candidateRoutes, recommendConditions);
         validateRecommendationCandidates(recommendedCandidatePlaces);
         final RecommendedCandidateTravels recommendedCandidateTravels = recommendedCandidateRouteService.prepare(
@@ -137,7 +137,7 @@ public class RecommendationService {
                 reasonsByPlace,
                 recommendedPlaces,
                 recommendedCandidateTravels,
-                recommendedCandidates.getTagsByPlace(),
+                recommendedCandidates,
                 recommendConditions
         );
         stopWatch.stop();

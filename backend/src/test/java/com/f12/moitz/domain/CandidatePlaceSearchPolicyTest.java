@@ -37,15 +37,19 @@ class CandidatePlaceSearchPolicyTest {
                 5
         );
 
-        assertThat(recommendedCandidates.getRecommendedCandidatePlaces())
+        assertThat(recommendedCandidates.getPlaces())
                 .extracting(Place::getName)
                 .containsExactly("공통후보역", "최장후보역", "평균후보역", "환승후보역", "일반후보역");
-        assertThat(recommendedCandidates.getTagsByPlace())
-                .containsEntry(shared.getPlace(), List.of(CandidateSelectionTag.FAIRNESS, CandidateSelectionTag.EFFICIENCY))
-                .containsEntry(maxBurden.getPlace(), List.of(CandidateSelectionTag.MAX_BURDEN_RELIEF))
-                .containsEntry(efficiency.getPlace(), List.of(CandidateSelectionTag.EFFICIENCY))
-                .containsEntry(transfer.getPlace(), List.of(CandidateSelectionTag.TRANSFER))
-                .containsEntry(general.getPlace(), List.of(CandidateSelectionTag.GENERAL));
+        assertThat(recommendedCandidates.getTags(shared.getPlace()))
+                .containsExactly(CandidateSelectionTag.FAIRNESS, CandidateSelectionTag.EFFICIENCY);
+        assertThat(recommendedCandidates.getTags(maxBurden.getPlace()))
+                .containsExactly(CandidateSelectionTag.MAX_BURDEN_RELIEF);
+        assertThat(recommendedCandidates.getTags(efficiency.getPlace()))
+                .containsExactly(CandidateSelectionTag.EFFICIENCY);
+        assertThat(recommendedCandidates.getTags(transfer.getPlace()))
+                .containsExactly(CandidateSelectionTag.TRANSFER);
+        assertThat(recommendedCandidates.getTags(general.getPlace()))
+                .containsExactly(CandidateSelectionTag.GENERAL);
     }
 
     @Test
@@ -72,7 +76,7 @@ class CandidatePlaceSearchPolicyTest {
                 2
         );
 
-        assertThat(recommendedCandidates.getRecommendedCandidatePlaces())
+        assertThat(recommendedCandidates.getPlaces())
                 .containsExactly(first.getPlace(), second.getPlace());
     }
 
@@ -97,7 +101,7 @@ class CandidatePlaceSearchPolicyTest {
                 1
         );
 
-        assertThat(recommendedCandidates.getRecommendedCandidatePlaces())
+        assertThat(recommendedCandidates.getPlaces())
                 .extracting(Place::getName)
                 .containsExactly("대체후보역");
         assertThat(recommendedCandidates.getTag(nextFairness.getPlace()))

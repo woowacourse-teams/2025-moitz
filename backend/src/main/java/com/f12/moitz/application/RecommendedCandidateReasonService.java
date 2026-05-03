@@ -9,7 +9,6 @@ import com.f12.moitz.domain.RecommendationReason;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import org.springframework.stereotype.Component;
@@ -24,7 +23,7 @@ public class RecommendedCandidateReasonService {
     }
 
     public Map<Place, RecommendationReason> generate(final RecommendedCandidates recommendedCandidates) {
-        final List<Place> places = recommendedCandidates.getRecommendedCandidatePlaces();
+        final List<Place> places = recommendedCandidates.getPlaces();
         final Map<String, ReasonAndDescription> reasonsByPlaceName = locationReasonGenerator.generateReasons(
                 getPlaceNames(places),
                 toTagsByPlaceName(recommendedCandidates)
@@ -72,10 +71,10 @@ public class RecommendedCandidateReasonService {
     private Map<String, List<CandidateSelectionTag>> toTagsByPlaceName(
             final RecommendedCandidates recommendedCandidates
     ) {
-        return recommendedCandidates.getTagsByPlace().entrySet().stream()
+        return recommendedCandidates.getPlaces().stream()
                 .collect(Collectors.toMap(
-                        entry -> entry.getKey().getName(),
-                        Entry::getValue,
+                        Place::getName,
+                        recommendedCandidates::getTags,
                         (left, right) -> left,
                         LinkedHashMap::new
                 ));

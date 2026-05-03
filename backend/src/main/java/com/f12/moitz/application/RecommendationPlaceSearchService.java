@@ -49,7 +49,7 @@ public class RecommendationPlaceSearchService {
         );
 
         while (searchedPlaces.size() < searchLimit) {
-            if (recommendedCandidates.getRecommendedCandidatePlaces().size() >= targetCount) {
+            if (recommendedCandidates.size() >= targetCount) {
                 log.debug("장소 추천 조기 종료 - 추천 후보 {}개 확보", targetCount);
                 break;
             }
@@ -89,7 +89,7 @@ public class RecommendationPlaceSearchService {
             log.debug(
                     "장소 추천 배치 완료 - 누적 조회 {}개, 현재 추천 후보 {}개",
                     searchedPlaces.size(),
-                    recommendedCandidates.getRecommendedCandidatePlaces().size()
+                    recommendedCandidates.size()
             );
         }
 

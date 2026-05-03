@@ -5,9 +5,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import lombok.Getter;
 
-@Getter
 public class RecommendedCandidates {
 
     private final List<Place> recommendedCandidatePlaces;
@@ -43,6 +41,18 @@ public class RecommendedCandidates {
 
     public List<CandidateSelectionTag> getTags(final Place place) {
         return CandidateSelectionTag.normalize(tagsByPlace.get(place));
+    }
+
+    public List<Place> getPlaces() {
+        return recommendedCandidatePlaces;
+    }
+
+    public int size() {
+        return recommendedCandidatePlaces.size();
+    }
+
+    public boolean isEmpty() {
+        return recommendedCandidatePlaces.isEmpty();
     }
 
     private Map<Place, List<CandidateSelectionTag>> normalizeTagsByPlace(

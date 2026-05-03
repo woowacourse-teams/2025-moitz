@@ -28,14 +28,14 @@ class RecommendedCandidatesTest {
         );
 
         assertSoftly(softAssertions -> {
-            softAssertions.assertThat(recommendedCandidates.getRecommendedCandidatePlaces())
+            softAssertions.assertThat(recommendedCandidates.getPlaces())
                     .containsExactly(seolleung, samsung);
             softAssertions.assertThat(recommendedCandidates.getTags(seolleung))
                     .containsExactly(CandidateSelectionTag.FAIRNESS);
             softAssertions.assertThat(recommendedCandidates.getTags(samsung))
                     .containsExactly(CandidateSelectionTag.GENERAL);
-            softAssertions.assertThat(recommendedCandidates.getTagsByPlace())
-                    .containsOnlyKeys(seolleung, samsung);
+            softAssertions.assertThat(recommendedCandidates.size()).isEqualTo(2);
+            softAssertions.assertThat(recommendedCandidates.isEmpty()).isFalse();
         });
     }
 
@@ -78,18 +78,16 @@ class RecommendedCandidatesTest {
     }
 
     @Test
-    @DisplayName("추천 후보 태그 맵은 외부에서 변경할 수 없다")
-    void getTagsByPlace_ReturnsUnmodifiableMap() {
+    @DisplayName("추천 후보 목록은 외부에서 변경할 수 없다")
+    void getPlaces_ReturnsUnmodifiableList() {
         final Place seolleung = place("선릉역");
         final RecommendedCandidates recommendedCandidates = new RecommendedCandidates(
                 List.of(seolleung),
                 Map.of(seolleung, List.of(CandidateSelectionTag.FAIRNESS))
         );
 
-        assertThatThrownBy(() -> recommendedCandidates.getTagsByPlace().put(
-                place("삼성역"),
-                List.of(CandidateSelectionTag.TRANSFER)
-        )).isInstanceOf(UnsupportedOperationException.class);
+        assertThatThrownBy(() -> recommendedCandidates.getPlaces().add(place("삼성역")))
+                .isInstanceOf(UnsupportedOperationException.class);
     }
 
     private Place place(final String name) {

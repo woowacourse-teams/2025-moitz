@@ -70,9 +70,9 @@ class RecommendationTest {
                 createRoutes(startPlace, recommendedPlace, 10 * 60),
                 createCourses(startPlace, recommendedPlace)
         );
-        final Map<Place, List<CandidateSelectionTag>> tagsByPlace = Map.of(
+        final RecommendedCandidates recommendedCandidates = createRecommendedCandidates(
                 recommendedPlace,
-                List.of(CandidateSelectionTag.FAIRNESS)
+                CandidateSelectionTag.FAIRNESS
         );
         final List<RecommendCondition> recommendConditions = List.of(RecommendCondition.CAFE);
 
@@ -81,7 +81,7 @@ class RecommendationTest {
                             null,
                             recommendedPlacesByPlace,
                             recommendedCandidateTravels,
-                            tagsByPlace,
+                            recommendedCandidates,
                             recommendConditions
                     ))
                     .isInstanceOf(IllegalArgumentException.class)
@@ -90,7 +90,7 @@ class RecommendationTest {
                             reasonsByPlace,
                             null,
                             recommendedCandidateTravels,
-                            tagsByPlace,
+                            recommendedCandidates,
                             recommendConditions
                     ))
                     .isInstanceOf(IllegalArgumentException.class)
@@ -99,7 +99,7 @@ class RecommendationTest {
                             reasonsByPlace,
                             recommendedPlacesByPlace,
                             null,
-                            tagsByPlace,
+                            recommendedCandidates,
                             recommendConditions
                     ))
                     .isInstanceOf(IllegalArgumentException.class)
@@ -112,12 +112,12 @@ class RecommendationTest {
                             recommendConditions
                     ))
                     .isInstanceOf(IllegalArgumentException.class)
-                    .hasMessage("추천 후보 태그는 null일 수 없습니다.");
+                    .hasMessage("추천 후보는 null일 수 없습니다.");
             softAssertions.assertThatThrownBy(() -> Recommendation.create(
                             reasonsByPlace,
                             recommendedPlacesByPlace,
                             recommendedCandidateTravels,
-                            tagsByPlace,
+                            recommendedCandidates,
                             List.of()
                     ))
                     .isInstanceOf(IllegalArgumentException.class)
@@ -172,7 +172,7 @@ class RecommendationTest {
                 Map.of(recommendedPlace, new RecommendationReason("#공평", "이동 시간이 고른 후보입니다.")),
                 Map.of(recommendedPlace, categorizedRecommendedPlaces),
                 createRecommendedCandidateTravels(recommendedPlace, routes, courses),
-                Map.of(recommendedPlace, List.of(CandidateSelectionTag.FAIRNESS)),
+                createRecommendedCandidates(recommendedPlace, CandidateSelectionTag.FAIRNESS),
                 List.of(RecommendCondition.CAFE)
         );
 
@@ -187,7 +187,6 @@ class RecommendationTest {
     @Test
     @DisplayName("추천 후보 생성에 필요한 재료가 누락되면 추천을 생성할 수 없다")
     void create_IsThrownByMissingCandidateMaterials() {
-        final Place startPlace = new Place("잠실역", new Point(127.0, 37.0));
         final Place recommendedPlace = new Place("선릉역", new Point(127.1, 37.1));
         final Map<Place, RecommendationReason> reasonsByPlace = Map.of(
                 recommendedPlace,
@@ -197,38 +196,22 @@ class RecommendationTest {
                 recommendedPlace,
                 createRecommendedPlaces(RecommendCondition.CAFE)
         );
-        final RecommendedCandidateTravels recommendedCandidateTravels = createRecommendedCandidateTravels(
-                recommendedPlace,
-                createRoutes(startPlace, recommendedPlace, 10 * 60),
-                createCourses(startPlace, recommendedPlace)
-        );
         final RecommendedCandidateTravels emptyTravels = new RecommendedCandidateTravels(Map.of(), Map.of());
-        final Map<Place, List<CandidateSelectionTag>> tagsByPlace = Map.of(
+        final RecommendedCandidates recommendedCandidates = createRecommendedCandidates(
                 recommendedPlace,
-                List.of(CandidateSelectionTag.FAIRNESS)
+                CandidateSelectionTag.FAIRNESS
         );
         final List<RecommendCondition> recommendConditions = List.of(RecommendCondition.CAFE);
 
-        assertSoftly(softAssertions -> {
-            softAssertions.assertThatThrownBy(() -> Recommendation.create(
-                            reasonsByPlace,
-                            recommendedPlacesByPlace,
-                            emptyTravels,
-                            tagsByPlace,
-                            recommendConditions
-                    ))
-                    .isInstanceOf(IllegalArgumentException.class)
-                    .hasMessage("추천 후보 경로가 누락되었습니다. 추천 지역: 선릉역");
-            softAssertions.assertThatThrownBy(() -> Recommendation.create(
-                            reasonsByPlace,
-                            recommendedPlacesByPlace,
-                            recommendedCandidateTravels,
-                            Map.of(),
-                            recommendConditions
-                    ))
-                    .isInstanceOf(IllegalArgumentException.class)
-                    .hasMessage("추천 후보 태그가 누락되었습니다. 추천 지역: 선릉역");
-        });
+        assertSoftly(softAssertions -> softAssertions.assertThatThrownBy(() -> Recommendation.create(
+                        reasonsByPlace,
+                        recommendedPlacesByPlace,
+                        emptyTravels,
+                        recommendedCandidates,
+                        recommendConditions
+                ))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("추천 후보 경로가 누락되었습니다. 추천 지역: 선릉역"));
     }
 
     @Test
@@ -247,7 +230,7 @@ class RecommendationTest {
                 ),
                 Map.of(validPlace, createRecommendedPlaces(RecommendCondition.CAFE)),
                 createRecommendedCandidateTravels(validPlace, validRoutes, validCourses),
-                Map.of(validPlace, List.of(CandidateSelectionTag.FAIRNESS)),
+                createRecommendedCandidates(validPlace, CandidateSelectionTag.FAIRNESS),
                 List.of(RecommendCondition.CAFE)
         );
 
@@ -267,7 +250,7 @@ class RecommendationTest {
                         Map.of(recommendedPlace, new RecommendationReason("#공평", "이동 시간이 고른 후보입니다.")),
                         Map.of(recommendedPlace, createRecommendedPlaces(RecommendCondition.CAFE)),
                         createRecommendedCandidateTravels(recommendedPlace, routes, courses),
-                        Map.of(recommendedPlace, List.of(CandidateSelectionTag.FAIRNESS)),
+                        createRecommendedCandidates(recommendedPlace, CandidateSelectionTag.FAIRNESS),
                         List.of(RecommendCondition.RESTAURANT)
                 ))
                 .isInstanceOf(IllegalArgumentException.class)
@@ -327,6 +310,16 @@ class RecommendationTest {
         return new RecommendedCandidateTravels(
                 Map.of(recommendedPlace, routes),
                 Map.of(recommendedPlace, courses)
+        );
+    }
+
+    private RecommendedCandidates createRecommendedCandidates(
+            final Place recommendedPlace,
+            final CandidateSelectionTag tag
+    ) {
+        return new RecommendedCandidates(
+                List.of(recommendedPlace),
+                Map.of(recommendedPlace, List.of(tag))
         );
     }
 
