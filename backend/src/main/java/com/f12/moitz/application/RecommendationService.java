@@ -4,7 +4,6 @@ import com.f12.moitz.application.dto.RecommendationCreateResponse;
 import com.f12.moitz.application.dto.RecommendationRequest;
 import com.f12.moitz.application.dto.RecommendationResultResponse;
 import com.f12.moitz.application.utils.RecommendationResponseMapper;
-import com.f12.moitz.common.error.exception.BadRequestException;
 import com.f12.moitz.common.error.exception.GeneralErrorCode;
 import com.f12.moitz.common.error.exception.NotFoundException;
 import com.f12.moitz.domain.CandidateSelection;
@@ -42,7 +41,7 @@ public class RecommendationService {
     private final RouteOriginDispersionService routeOriginDispersionService;
     private final RouteCandidatePreparationService routeCandidatePreparationService;
     private final RecommendationPlaceSearchService recommendationPlaceSearchService;
-    private final RecommendedCandidateRouteService recommendedCandidateRouteService;
+    private final RecommendedCandidateConfirmationService recommendedCandidateConfirmationService;
     private final RecommendationCreationService recommendationCreationService;
     private final RecommendationResponseMapper recommendationResponseMapper;
     private final RecommendResultRepository recommendResultRepository;
@@ -55,7 +54,7 @@ public class RecommendationService {
             @Autowired final RouteOriginDispersionService routeOriginDispersionService,
             @Autowired final RouteCandidatePreparationService routeCandidatePreparationService,
             @Autowired final RecommendationPlaceSearchService recommendationPlaceSearchService,
-            @Autowired final RecommendedCandidateRouteService recommendedCandidateRouteService,
+            @Autowired final RecommendedCandidateConfirmationService recommendedCandidateConfirmationService,
             @Autowired final RecommendationCreationService recommendationCreationService,
             @Autowired final RecommendationResponseMapper recommendationResponseMapper,
             @Autowired final RecommendResultRepository recommendResultRepository
@@ -65,7 +64,7 @@ public class RecommendationService {
         this.routeOriginDispersionService = routeOriginDispersionService;
         this.routeCandidatePreparationService = routeCandidatePreparationService;
         this.recommendationPlaceSearchService = recommendationPlaceSearchService;
-        this.recommendedCandidateRouteService = recommendedCandidateRouteService;
+        this.recommendedCandidateConfirmationService = recommendedCandidateConfirmationService;
         this.recommendationCreationService = recommendationCreationService;
         this.recommendationResponseMapper = recommendationResponseMapper;
         this.recommendResultRepository = recommendResultRepository;
@@ -103,19 +102,16 @@ public class RecommendationService {
         stopWatch.stop();
 
         stopWatch.start("추천 후보 확정");
-        final RecommendedCandidates recommendedCandidates = recommendationPlaceSearchResult.getRecommendedCandidates();
-        recommendationFlowLogger.logRecommendedCandidates(
+        final RecommendedCandidateConfirmationResult recommendedCandidateConfirmationResult = confirmRecommendedCandidates(
                 searchCandidatePlaces,
-                recommendedCandidates,
+                recommendationPlaceSearchResult,
+                routeOrigins,
                 candidateRoutes,
                 recommendConditions
         );
-        validateRecommendationCandidates(recommendedCandidates);
-        final RecommendedCandidateTravels recommendedCandidateTravels = prepareRecommendedCandidateTravels(
-                routeOrigins,
-                recommendedCandidates,
-                candidateRoutes
-        );
+        final RecommendedCandidates recommendedCandidates = recommendedCandidateConfirmationResult.getRecommendedCandidates();
+        final RecommendedCandidateTravels recommendedCandidateTravels =
+                recommendedCandidateConfirmationResult.getRecommendedCandidateTravels();
         stopWatch.stop();
 
         stopWatch.start("추천 이유 생성");
@@ -178,12 +174,20 @@ public class RecommendationService {
         );
     }
 
-    private RecommendedCandidateTravels prepareRecommendedCandidateTravels(
+    private RecommendedCandidateConfirmationResult confirmRecommendedCandidates(
+            final List<Place> searchCandidatePlaces,
+            final RecommendationPlaceSearchResult recommendationPlaceSearchResult,
             final RouteOrigins routeOrigins,
-            final RecommendedCandidates recommendedCandidates,
-            final Map<Place, Routes> candidateRoutes
+            final Map<Place, Routes> candidateRoutes,
+            final List<RecommendCondition> recommendConditions
     ) {
-        return recommendedCandidateRouteService.prepare(routeOrigins, recommendedCandidates, candidateRoutes);
+        return recommendedCandidateConfirmationService.confirm(
+                searchCandidatePlaces,
+                recommendationPlaceSearchResult,
+                routeOrigins,
+                candidateRoutes,
+                recommendConditions
+        );
     }
 
     private Map<Place, RecommendationReason> generateRecommendationReasons(
@@ -220,12 +224,6 @@ public class RecommendationService {
                         recommendation
                 )
         ).toHexString().toUpperCase();
-    }
-
-    private void validateRecommendationCandidates(final RecommendedCandidates recommendedCandidates) {
-        if (recommendedCandidates.isEmpty()) {
-            throw new BadRequestException(GeneralErrorCode.RECOMMENDATION_NOT_FOUND);
-        }
     }
 
     public RecommendationResultResponse getById(final String id) {
