@@ -5,11 +5,7 @@ import java.util.function.Function;
 
 public class RouteCandidateRankingPolicy {
 
-    private static final int SHORT_AVERAGE_TRAVEL_TIME_MINUTES = 10;
-    private static final int MEDIUM_AVERAGE_TRAVEL_TIME_MINUTES = 30;
-    private static final double SHORT_TRAVEL_TIME_TOLERANCE_RATIO = 0.5;
-    private static final double MEDIUM_TRAVEL_TIME_TOLERANCE_RATIO = 0.3;
-    private static final double LONG_TRAVEL_TIME_TOLERANCE_RATIO = 0.2;
+    private final FairnessTolerancePolicy fairnessTolerancePolicy = new FairnessTolerancePolicy();
 
     public Comparator<RouteCandidate> comparatorFor(
             final CandidateSelectionTag tag,
@@ -34,8 +30,8 @@ public class RouteCandidateRankingPolicy {
         return (left, right) -> {
             final FairnessScore leftScore = scoreResolver.apply(left);
             final FairnessScore rightScore = scoreResolver.apply(right);
-            final boolean leftTolerable = isTolerablyFair(leftScore);
-            final boolean rightTolerable = isTolerablyFair(rightScore);
+            final boolean leftTolerable = fairnessTolerancePolicy.isTolerable(leftScore);
+            final boolean rightTolerable = fairnessTolerancePolicy.isTolerable(rightScore);
 
             if (leftTolerable != rightTolerable) {
                 return Boolean.compare(rightTolerable, leftTolerable);
@@ -45,24 +41,6 @@ public class RouteCandidateRankingPolicy {
             }
             return compareStrictFairnessScores(leftScore, rightScore);
         };
-    }
-
-    private boolean isTolerablyFair(final FairnessScore score) {
-        return score.getTimeDiff() <= resolveFairnessToleranceMinutes(score);
-    }
-
-    private int resolveFairnessToleranceMinutes(final FairnessScore score) {
-        return (int) Math.ceil(score.getAverageTravelTime() * resolveFairnessToleranceRatio(score));
-    }
-
-    private double resolveFairnessToleranceRatio(final FairnessScore score) {
-        if (score.getAverageTravelTime() <= SHORT_AVERAGE_TRAVEL_TIME_MINUTES) {
-            return SHORT_TRAVEL_TIME_TOLERANCE_RATIO;
-        }
-        if (score.getAverageTravelTime() <= MEDIUM_AVERAGE_TRAVEL_TIME_MINUTES) {
-            return MEDIUM_TRAVEL_TIME_TOLERANCE_RATIO;
-        }
-        return LONG_TRAVEL_TIME_TOLERANCE_RATIO;
     }
 
     private int compareTolerablyFairScores(final FairnessScore left, final FairnessScore right) {
