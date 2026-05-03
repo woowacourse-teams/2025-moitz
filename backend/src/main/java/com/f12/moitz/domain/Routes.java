@@ -19,10 +19,6 @@ public class Routes {
         }
     }
 
-    public boolean isAcceptable() {
-        return calculateFairnessScore().isAcceptable();
-    }
-
     public boolean isAcceptable(final DispersionPolicy dispersionPolicy) {
         return calculateFairnessScore().isAcceptable(dispersionPolicy);
     }

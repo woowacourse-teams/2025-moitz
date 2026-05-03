@@ -68,7 +68,7 @@ class RoutesTest {
                 route(startC, destination, 57, 1)
         ));
 
-        assertThat(unacceptableRoutes.isAcceptable()).isFalse();
+        assertThat(unacceptableRoutes.isAcceptable(DispersionPolicy.TIER_1)).isFalse();
     }
 
     @Test

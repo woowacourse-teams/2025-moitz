@@ -20,6 +20,15 @@ class RouteCandidateScoresTest {
     }
 
     @Test
+    @DisplayName("계산된 공평 점수로 후보의 허용 여부를 판단한다")
+    void isAcceptable() {
+        final RouteCandidate candidate = routeCandidate("후보역", 10, 20);
+        final RouteCandidateScores scores = new RouteCandidateScores(List.of(candidate));
+
+        assertThat(scores.isAcceptable(candidate, DispersionPolicy.TIER_1)).isTrue();
+    }
+
+    @Test
     @DisplayName("점수를 계산하지 않은 후보는 조회할 수 없다")
     void scoreOf_ThrowsException_WhenCandidateIsMissing() {
         final RouteCandidate scoredCandidate = routeCandidate("점수후보역", 10, 20);

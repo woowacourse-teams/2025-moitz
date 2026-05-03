@@ -66,10 +66,6 @@ public class FairnessScore implements Comparable<FairnessScore> {
         this.weightedScore = calculateWeightedScore();
     }
 
-    public boolean isAcceptable() {
-        return isAcceptable(DispersionPolicy.TIER_1);
-    }
-
     public boolean isAcceptable(final DispersionPolicy dispersionPolicy) {
         return dispersionPolicy.isAcceptable(this);
     }

@@ -38,4 +38,11 @@ public class RouteCandidateScores {
         return score;
     }
 
+    public boolean isAcceptable(
+            final RouteCandidate candidate,
+            final DispersionPolicy dispersionPolicy
+    ) {
+        return scoreOf(candidate).isAcceptable(dispersionPolicy);
+    }
+
 }

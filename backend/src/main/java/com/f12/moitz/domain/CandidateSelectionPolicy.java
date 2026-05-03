@@ -23,7 +23,7 @@ public class CandidateSelectionPolicy {
 
         for (DispersionPolicy candidatePolicy : dispersionPolicy.relaxations()) {
             final List<RouteCandidate> acceptableCandidates = sortedCandidates.stream()
-                    .filter(candidate -> routeCandidateScores.scoreOf(candidate).isAcceptable(candidatePolicy))
+                    .filter(candidate -> routeCandidateScores.isAcceptable(candidate, candidatePolicy))
                     .toList();
 
             if (!acceptableCandidates.isEmpty()) {
