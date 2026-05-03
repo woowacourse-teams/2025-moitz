@@ -39,7 +39,7 @@ public class SubwayRouteCalculatorIntTest {
         final SubwayStation end = subwayStationService.getByName("판교역");
 
         // When
-        final List<Path> paths = subwayRouteCalculator.findShortestTimePath(start, end).groupByLine();
+        final List<Path> paths = subwayRouteCalculator.findShortestTimePath(start, end).toRoute().getPaths();
         for (Path path : paths) {
             log.debug("출발: {}, 도착: {}, 호선: {}", path.getStart().getName(), path.getEnd().getName(),
                     path.getSubwayLine() == null ? "null" : path.getSubwayLine().getTitle());
@@ -61,7 +61,7 @@ public class SubwayRouteCalculatorIntTest {
         final SubwayStation end = subwayStationService.getByName("정자역");
 
         // When
-        final List<Path> paths = subwayRouteCalculator.findShortestTimePath(start, end).groupByLine();
+        final List<Path> paths = subwayRouteCalculator.findShortestTimePath(start, end).toRoute().getPaths();
         for (Path path : paths) {
             log.debug("출발: {}, 도착: {}, 호선: {}", path.getStart().getName(), path.getEnd().getName(),
                     path.getSubwayLine() == null ? "null" : path.getSubwayLine().getTitle());
@@ -84,7 +84,7 @@ public class SubwayRouteCalculatorIntTest {
         final SubwayStation end = subwayStationService.getByName("사리역");
 
         // When
-        final List<Path> paths = subwayRouteCalculator.findShortestTimePath(start, end).groupByLine();
+        final List<Path> paths = subwayRouteCalculator.findShortestTimePath(start, end).toRoute().getPaths();
         for (Path path : paths) {
             log.debug("출발: {}, 도착: {}, 호선: {}", path.getStart().getName(), path.getEnd().getName(),
                     path.getSubwayLine() == null ? "null" : path.getSubwayLine().getTitle());
@@ -105,7 +105,7 @@ public class SubwayRouteCalculatorIntTest {
         final SubwayStation end = subwayStationService.getByName("상록수역");
 
         // When
-        final List<Path> paths = subwayRouteCalculator.findShortestTimePath(start, end).groupByLine();
+        final List<Path> paths = subwayRouteCalculator.findShortestTimePath(start, end).toRoute().getPaths();
         for (Path path : paths) {
             log.debug("출발: {}, 도착: {}, 호선: {}", path.getStart().getName(), path.getEnd().getName(),
                     path.getSubwayLine() == null ? "null" : path.getSubwayLine().getTitle());
@@ -126,7 +126,7 @@ public class SubwayRouteCalculatorIntTest {
         final SubwayStation end = subwayStationService.getByName("광화문역");
 
         // When
-        final List<Path> paths = subwayRouteCalculator.findShortestTimePath(start, end).groupByLine();
+        final List<Path> paths = subwayRouteCalculator.findShortestTimePath(start, end).toRoute().getPaths();
         for (Path path : paths) {
             log.debug("출발: {}, 도착: {}, 호선: {}", path.getStart().getName(), path.getEnd().getName(),
                     path.getSubwayLine() == null ? "null" : path.getSubwayLine().getTitle());
@@ -147,7 +147,7 @@ public class SubwayRouteCalculatorIntTest {
         final SubwayStation end = subwayStationService.getByName("올림픽공원역");
 
         // When
-        final List<Path> paths = subwayRouteCalculator.findShortestTimePath(start, end).groupByLine();
+        final List<Path> paths = subwayRouteCalculator.findShortestTimePath(start, end).toRoute().getPaths();
         for (Path path : paths) {
             log.debug("출발: {}, 도착: {}, 호선: {}", path.getStart().getName(), path.getEnd().getName(),
                     path.getSubwayLine() == null ? "null" : path.getSubwayLine().getTitle());
@@ -170,7 +170,7 @@ public class SubwayRouteCalculatorIntTest {
         // When
         final StationSequence stationSequence = subwayRouteCalculator.findShortestTimePath(start, end);
         log.debug("");
-        final List<Path> paths = stationSequence.groupByLine();
+        final List<Path> paths = stationSequence.toRoute().getPaths();
         for (Path path : paths) {
             log.debug("출발: {}, 도착: {}, 호선: {}", path.getStart().getName(), path.getEnd().getName(),
                     path.getSubwayLine() == null ? "null" : path.getSubwayLine().getTitle());
@@ -196,7 +196,7 @@ public class SubwayRouteCalculatorIntTest {
                 subwayStationService.getByName(end)
         );
 
-        final List<Point> points = stationSequence.getPoints();
+        final List<Point> points = stationSequence.toCourse().getPoints();
 
         for (Point point : points) {
             log.info("{ \"x\": {}, \"y\": {} },", point.getX(), point.getY());

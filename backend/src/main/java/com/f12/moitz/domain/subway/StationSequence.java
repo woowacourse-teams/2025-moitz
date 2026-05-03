@@ -1,7 +1,10 @@
 package com.f12.moitz.domain.subway;
 
+import com.f12.moitz.domain.CandidateRoute;
+import com.f12.moitz.domain.Course;
 import com.f12.moitz.domain.Path;
 import com.f12.moitz.domain.Point;
+import com.f12.moitz.domain.Route;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,7 +23,7 @@ public class StationSequence {
         }
     }
 
-    public List<Path> groupByLine() {
+    private List<Path> groupByLine() {
         final List<Path> paths = new ArrayList<>();
 
         SubwayLine currentLine = segments.getFirst().getLine();
@@ -71,12 +74,24 @@ public class StationSequence {
         return paths;
     }
 
-    public List<Point> getPoints() {
+    public Route toRoute() {
+        return new Route(groupByLine());
+    }
+
+    private List<Point> getPoints() {
         return segments.stream()
                 .map(StationSegment::getStation)
                 .map(SubwayStation::getPoint)
                 .distinct()
                 .toList();
+    }
+
+    public Course toCourse() {
+        return new Course(getPoints());
+    }
+
+    public CandidateRoute toCandidateRoute() {
+        return new CandidateRoute(toRoute(), toCourse());
     }
 
 }

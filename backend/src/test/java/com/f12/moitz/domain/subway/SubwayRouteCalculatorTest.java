@@ -60,7 +60,9 @@ class SubwayRouteCalculatorTest {
     @Test
     void findShortest() {
         // When
-        final List<Path> paths = subwayRouteCalculator.findShortestTimePath(station1, station2).groupByLine();
+        final List<Path> paths = subwayRouteCalculator.findShortestTimePath(station1, station2)
+                .toRoute()
+                .getPaths();
 
         // Then
         SoftAssertions.assertSoftly(softly -> {
