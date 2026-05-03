@@ -40,8 +40,8 @@ class RecommendedCandidateRouteServiceTest {
         final Place seolleung = new Place("선릉역", new Point(127.048, 37.504));
         final Place samsung = new Place("삼성역", new Point(127.063, 37.508));
         final RouteOrigins routeOrigins = new RouteOrigins(List.of(gangnam, yeoksam));
-        final Routes seolleungRoutes = createRoutes(gangnam, seolleung);
-        final Routes samsungRoutes = createRoutes(gangnam, samsung);
+        final Routes seolleungRoutes = createRoutes(List.of(gangnam, yeoksam), seolleung);
+        final Routes samsungRoutes = createRoutes(List.of(gangnam, yeoksam), samsung);
         final Map<Place, Routes> candidateRoutes = Map.of(
                 seolleung, seolleungRoutes,
                 samsung, samsungRoutes
@@ -53,7 +53,7 @@ class RecommendedCandidateRouteServiceTest {
                 new Course(List.of(yeoksam.getPoint(), samsung.getPoint()))
         ));
 
-        final RecommendedCandidateRouteResult result = service.prepare(
+        final RecommendedCandidateTravels result = service.prepare(
                 routeOrigins,
                 List.of(seolleung, samsung),
                 candidateRoutes
@@ -73,14 +73,16 @@ class RecommendedCandidateRouteServiceTest {
                 .containsExactly(seolleung, seolleung, samsung, samsung);
     }
 
-    private Routes createRoutes(final Place origin, final Place destination) {
-        return new Routes(List.of(new Route(List.of(new Path(
-                origin,
-                destination,
-                TravelMethod.SUBWAY,
-                10 * 60,
-                SubwayLine.fromTitle("2호선")
-        )))));
+    private Routes createRoutes(final List<Place> origins, final Place destination) {
+        return new Routes(origins.stream()
+                .map(origin -> new Route(List.of(new Path(
+                        origin,
+                        destination,
+                        TravelMethod.SUBWAY,
+                        10 * 60,
+                        SubwayLine.fromTitle("2호선")
+                ))))
+                .toList());
     }
 
 }

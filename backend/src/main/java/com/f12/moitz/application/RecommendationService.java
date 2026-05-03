@@ -119,7 +119,7 @@ public class RecommendationService {
         final List<Place> recommendedCandidatePlaces = recommendedCandidates.getRecommendedCandidatePlaces();
         logRecommendedCandidates(searchCandidatePlaces, recommendedCandidatePlaces, candidateRoutes, recommendConditions);
         validateRecommendationCandidates(recommendedCandidatePlaces);
-        final RecommendedCandidateRouteResult recommendedCandidateRouteResult = recommendedCandidateRouteService.prepare(
+        final RecommendedCandidateTravels recommendedCandidateTravels = recommendedCandidateRouteService.prepare(
                 routeOrigins,
                 recommendedCandidatePlaces,
                 candidateRoutes
@@ -135,8 +135,8 @@ public class RecommendationService {
         final Recommendation recommendation = Recommendation.create(
                 reasonsByPlace,
                 recommendedPlaces,
-                recommendedCandidateRouteResult.getRoutesByPlace(),
-                recommendedCandidateRouteResult.getCoursesByPlace(),
+                recommendedCandidateTravels.getRoutesByPlace(),
+                recommendedCandidateTravels.getCoursesByPlace(),
                 recommendedCandidates.getTagsByPlace(),
                 recommendConditions
         );

@@ -7,10 +7,10 @@ import com.f12.moitz.domain.OriginDestination;
 import com.f12.moitz.domain.Place;
 import com.f12.moitz.domain.RouteOrigins;
 import com.f12.moitz.domain.Routes;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -27,13 +27,13 @@ public class RecommendedCandidateRouteService {
         this.routeFinder = routeFinder;
     }
 
-    public RecommendedCandidateRouteResult prepare(
+    public RecommendedCandidateTravels prepare(
             final RouteOrigins routeOrigins,
             final List<Place> recommendedCandidatePlaces,
             final Map<Place, Routes> candidateRoutes
     ) {
         final List<OriginDestination> originDestinations = routeOrigins.createOriginDestinationsTo(recommendedCandidatePlaces);
-        return new RecommendedCandidateRouteResult(
+        return new RecommendedCandidateTravels(
                 collectRoutes(recommendedCandidatePlaces, candidateRoutes),
                 findCoursesByDestination(originDestinations)
         );
@@ -43,11 +43,9 @@ public class RecommendedCandidateRouteService {
             final List<Place> recommendedCandidatePlaces,
             final Map<Place, Routes> candidateRoutes
     ) {
-        return recommendedCandidatePlaces.stream()
-                .collect(Collectors.toMap(
-                        Function.identity(),
-                        candidateRoutes::get
-                ));
+        final Map<Place, Routes> routesByPlace = new LinkedHashMap<>();
+        recommendedCandidatePlaces.forEach(place -> routesByPlace.put(place, candidateRoutes.get(place)));
+        return routesByPlace;
     }
 
     private Map<Place, Courses> findCoursesByDestination(final List<OriginDestination> originDestinations) {
