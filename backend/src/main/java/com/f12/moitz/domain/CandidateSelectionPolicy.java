@@ -35,7 +35,7 @@ public class CandidateSelectionPolicy {
                         candidatePolicy,
                         scoreResolver
                 );
-                return CandidateSelection.create(
+                return CandidateSelection.fromTagSelections(
                         tagSelections,
                         acceptableCandidates,
                         dispersionPolicy,
@@ -52,7 +52,7 @@ public class CandidateSelectionPolicy {
                 DispersionPolicy.TIER_5,
                 scoreResolver
         );
-        return CandidateSelection.create(
+        return CandidateSelection.fromTagSelections(
                 tagSelections,
                 sortedCandidates,
                 dispersionPolicy,

@@ -18,7 +18,7 @@ public class CandidateSelection {
     private final boolean fallbackToSortedCandidates;
     private final Map<CandidateSelectionTag, List<RouteCandidate>> tagSelections;
 
-    public static CandidateSelection create(
+    public static CandidateSelection fromTagSelections(
             final Map<CandidateSelectionTag, List<RouteCandidate>> tagSelections,
             final List<RouteCandidate> fallbackCandidates,
             final DispersionPolicy initialPolicy,

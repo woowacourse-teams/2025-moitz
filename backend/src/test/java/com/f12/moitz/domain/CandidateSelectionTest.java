@@ -23,7 +23,7 @@ class CandidateSelectionTest {
         tagSelections.put(CandidateSelectionTag.EFFICIENCY, List.of(efficiency1));
         tagSelections.put(CandidateSelectionTag.TRANSFER, List.of(transfer1));
 
-        final CandidateSelection candidateSelection = CandidateSelection.create(
+        final CandidateSelection candidateSelection = CandidateSelection.fromTagSelections(
                 tagSelections,
                 List.of(),
                 DispersionPolicy.TIER_4,
@@ -49,7 +49,7 @@ class CandidateSelectionTest {
         tagSelections.put(CandidateSelectionTag.FAIRNESS, List.of(selected));
         tagSelections.put(CandidateSelectionTag.EFFICIENCY, List.of(duplicated));
 
-        final CandidateSelection candidateSelection = CandidateSelection.create(
+        final CandidateSelection candidateSelection = CandidateSelection.fromTagSelections(
                 tagSelections,
                 List.of(duplicated, fallback1, fallback2),
                 DispersionPolicy.TIER_4,
