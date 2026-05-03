@@ -6,9 +6,9 @@ import com.f12.moitz.domain.Place;
 import com.f12.moitz.domain.RouteOrigins;
 import com.f12.moitz.domain.subway.SubwayStation;
 import java.util.List;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
-@Component
+@Service
 public class RouteOriginPreparationService {
 
     private final SubwayStationService subwayStationService;

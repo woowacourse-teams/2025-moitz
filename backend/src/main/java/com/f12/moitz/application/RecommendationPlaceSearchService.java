@@ -14,10 +14,10 @@ import java.util.List;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 @Slf4j
-@Component
+@Service
 public class RecommendationPlaceSearchService {
 
     private static final int PLACE_SEARCH_BATCH_SIZE = 5;
