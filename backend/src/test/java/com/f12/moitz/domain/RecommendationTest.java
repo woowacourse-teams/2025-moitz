@@ -5,6 +5,8 @@ import static org.assertj.core.api.Assertions.assertThatNoException;
 import static org.assertj.core.api.SoftAssertions.assertSoftly;
 
 import com.f12.moitz.domain.subway.SubwayLine;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.lang.reflect.Modifier;
 import java.util.Collections;
 import java.util.List;
@@ -39,6 +41,7 @@ class RecommendationTest {
         // Given
         final List<Candidate> candidatesNull = null;
         final List<Candidate> candidatesEmpty = Collections.emptyList();
+        final List<Candidate> candidatesWithNull = Arrays.asList(createCandidate(20, 10), null);
 
         // When & Then
         assertSoftly(softAssertions -> {
@@ -49,6 +52,29 @@ class RecommendationTest {
             softAssertions.assertThatThrownBy(() -> new Recommendation(candidatesEmpty))
                     .isInstanceOf(IllegalArgumentException.class)
                     .hasMessage("추천 후보지는 비어있거나 null일 수 없습니다.");
+
+            softAssertions.assertThatThrownBy(() -> new Recommendation(candidatesWithNull))
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessage("추천 후보지 목록에 null이 포함될 수 없습니다.");
+        });
+    }
+
+    @Test
+    @DisplayName("추천 후보 목록은 외부에서 변경할 수 없다")
+    void constructor_CopiesCandidates() {
+        final Candidate candidate = createCandidate(20, 10);
+        final List<Candidate> candidates = new ArrayList<>();
+        candidates.add(candidate);
+
+        final Recommendation recommendation = new Recommendation(candidates);
+
+        candidates.clear();
+
+        assertSoftly(softAssertions -> {
+            softAssertions.assertThat(recommendation.size()).isEqualTo(1);
+            softAssertions.assertThat(recommendation.getCandidates()).containsExactly(candidate);
+            softAssertions.assertThatThrownBy(() -> recommendation.getCandidates().add(createCandidate(30, 10)))
+                    .isInstanceOf(UnsupportedOperationException.class);
         });
     }
 

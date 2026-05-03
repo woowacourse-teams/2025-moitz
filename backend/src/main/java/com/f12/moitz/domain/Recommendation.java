@@ -3,6 +3,7 @@ package com.f12.moitz.domain;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -161,6 +162,9 @@ public class Recommendation {
     private void validate(final List<Candidate> candidates) {
         if (candidates == null || candidates.isEmpty()) {
             throw new IllegalArgumentException("추천 후보지는 비어있거나 null일 수 없습니다.");
+        }
+        if (candidates.stream().anyMatch(Objects::isNull)) {
+            throw new IllegalArgumentException("추천 후보지 목록에 null이 포함될 수 없습니다.");
         }
     }
 
