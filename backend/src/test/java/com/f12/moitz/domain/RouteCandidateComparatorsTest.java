@@ -59,7 +59,7 @@ class RouteCandidateComparatorsTest {
     }
 
     private Comparator<RouteCandidate> comparator(final CandidateSelectionTag tag) {
-        return comparators.getByTag(tag, RouteCandidate::calculateFairnessScore);
+        return comparators.comparatorFor(tag, RouteCandidate::calculateFairnessScore);
     }
 
     private RouteCandidate routeCandidate(final String name, final int firstTravelTimeMinutes, final int secondTravelTimeMinutes) {

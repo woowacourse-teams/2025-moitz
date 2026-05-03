@@ -100,7 +100,7 @@ public class CandidateSelectionPolicy {
         tagQuotas.forEach((tag, quota) -> tagSelections.put(
                 tag,
                 candidates.stream()
-                        .sorted(routeCandidateComparators.getByTag(tag, scoreResolver))
+                        .sorted(routeCandidateComparators.comparatorFor(tag, scoreResolver))
                         .limit(quota)
                         .toList()
         ));
