@@ -20,7 +20,7 @@ public class CandidateSelection {
 
     public static CandidateSelection fromTagSelections(
             final Map<CandidateSelectionTag, List<RouteCandidate>> tagSelections,
-            final List<RouteCandidate> fallbackCandidates,
+            final List<RouteCandidate> supplementaryCandidates,
             final DispersionPolicy initialPolicy,
             final DispersionPolicy effectivePolicy,
             final long acceptableCount,
@@ -29,7 +29,7 @@ public class CandidateSelection {
     ) {
         return new CandidateSelection(
                 tagSelections,
-                fallbackCandidates,
+                supplementaryCandidates,
                 initialPolicy,
                 effectivePolicy,
                 acceptableCount,
@@ -57,15 +57,22 @@ public class CandidateSelection {
 
     private CandidateSelection(
             final Map<CandidateSelectionTag, List<RouteCandidate>> tagSelections,
-            final List<RouteCandidate> fallbackCandidates,
+            final List<RouteCandidate> supplementaryCandidates,
             final DispersionPolicy initialPolicy,
             final DispersionPolicy effectivePolicy,
             final long acceptableCount,
             final boolean fallbackToSortedCandidates,
             final int limit
     ) {
-        validateCreationInputs(tagSelections, fallbackCandidates, initialPolicy, effectivePolicy, acceptableCount, limit);
-        this.searchCandidates = selectSearchCandidates(tagSelections, fallbackCandidates, limit);
+        validateTagSelectionInputs(
+                tagSelections,
+                supplementaryCandidates,
+                initialPolicy,
+                effectivePolicy,
+                acceptableCount,
+                limit
+        );
+        this.searchCandidates = composeSearchCandidates(tagSelections, supplementaryCandidates, limit);
         this.initialPolicy = initialPolicy;
         this.effectivePolicy = effectivePolicy;
         this.acceptableCount = acceptableCount;
@@ -86,17 +93,17 @@ public class CandidateSelection {
         validateCommonInputs(initialPolicy, effectivePolicy, acceptableCount, tagSelections);
     }
 
-    private void validateCreationInputs(
+    private void validateTagSelectionInputs(
             final Map<CandidateSelectionTag, List<RouteCandidate>> tagSelections,
-            final List<RouteCandidate> fallbackCandidates,
+            final List<RouteCandidate> supplementaryCandidates,
             final DispersionPolicy initialPolicy,
             final DispersionPolicy effectivePolicy,
             final long acceptableCount,
             final int limit
     ) {
         validateCommonInputs(initialPolicy, effectivePolicy, acceptableCount, tagSelections);
-        if (fallbackCandidates == null) {
-            throw new IllegalArgumentException("기본 후보 목록은 null일 수 없습니다.");
+        if (supplementaryCandidates == null) {
+            throw new IllegalArgumentException("보충 후보 목록은 null일 수 없습니다.");
         }
         if (limit < 1) {
             throw new IllegalArgumentException("후보 선발 개수는 1 이상이어야 합니다.");
@@ -123,9 +130,9 @@ public class CandidateSelection {
         }
     }
 
-    private List<RouteCandidate> selectSearchCandidates(
+    private List<RouteCandidate> composeSearchCandidates(
             final Map<CandidateSelectionTag, List<RouteCandidate>> tagSelections,
-            final List<RouteCandidate> fallbackCandidates,
+            final List<RouteCandidate> supplementaryCandidates,
             final int limit
     ) {
         final Map<String, RouteCandidate> searchCandidates = new LinkedHashMap<>();
@@ -147,11 +154,11 @@ public class CandidateSelection {
             }
         }
 
-        for (RouteCandidate fallbackCandidate : fallbackCandidates) {
+        for (RouteCandidate supplementaryCandidate : supplementaryCandidates) {
             if (searchCandidates.size() >= limit) {
                 break;
             }
-            searchCandidates.putIfAbsent(fallbackCandidate.getPlace().getName(), fallbackCandidate);
+            searchCandidates.putIfAbsent(supplementaryCandidate.getPlace().getName(), supplementaryCandidate);
         }
 
         return new ArrayList<>(searchCandidates.values());

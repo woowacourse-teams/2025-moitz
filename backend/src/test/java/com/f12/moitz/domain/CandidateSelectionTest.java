@@ -39,19 +39,19 @@ class CandidateSelectionTest {
     }
 
     @Test
-    @DisplayName("태그 후보가 부족하면 기본 후보로 채우고 장소명 기준으로 중복을 제거한다")
-    void create_FillsWithFallbackCandidatesWithoutDuplicatingPlaceNames() {
+    @DisplayName("태그 후보가 부족하면 보충 후보로 채우고 장소명 기준으로 중복을 제거한다")
+    void create_FillsWithSupplementaryCandidatesWithoutDuplicatingPlaceNames() {
         final RouteCandidate selected = routeCandidate("선택역");
         final RouteCandidate duplicated = routeCandidate("선택역");
-        final RouteCandidate fallback1 = routeCandidate("보충1역");
-        final RouteCandidate fallback2 = routeCandidate("보충2역");
+        final RouteCandidate supplement1 = routeCandidate("보충1역");
+        final RouteCandidate supplement2 = routeCandidate("보충2역");
         final Map<CandidateSelectionTag, List<RouteCandidate>> tagSelections = new LinkedHashMap<>();
         tagSelections.put(CandidateSelectionTag.FAIRNESS, List.of(selected));
         tagSelections.put(CandidateSelectionTag.EFFICIENCY, List.of(duplicated));
 
         final CandidateSelection candidateSelection = CandidateSelection.fromTagSelections(
                 tagSelections,
-                List.of(duplicated, fallback1, fallback2),
+                List.of(duplicated, supplement1, supplement2),
                 DispersionPolicy.TIER_4,
                 DispersionPolicy.TIER_4,
                 3,
