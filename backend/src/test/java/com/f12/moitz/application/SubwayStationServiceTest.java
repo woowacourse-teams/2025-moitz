@@ -47,6 +47,21 @@ class SubwayStationServiceTest {
         assertThat(station2.get().getName()).isEqualTo(expectedName);
     }
 
+    @DisplayName("대표 역명이 없으면 입력 역명으로 다시 지하철 역을 검색한다")
+    @Test
+    void findByName_FallbackAliasName() {
+        // Given
+        final SubwayStationEntity expectedStation = new SubwayStationEntity("이수역", new GeoJsonPoint(125, 34));
+        Mockito.when(subwayStationRepository.findByName("총신대입구(이수)역")).thenReturn(Optional.empty());
+        Mockito.when(subwayStationRepository.findByName("이수역")).thenReturn(Optional.of(expectedStation));
+
+        // When
+        final Optional<SubwayStation> station = subwayStationService.findByName("이수역");
+
+        // Then
+        assertThat(station).contains(expectedStation.toSubwayStation());
+    }
+
     @DisplayName("후보역 생성 시 출발역 목록은 비어있거나 null일 수 없다")
     @Test
     void generateCandidatePlace_ValidateStartingStations() {

@@ -3,6 +3,7 @@ package com.f12.moitz.application;
 import com.f12.moitz.domain.Place;
 import com.f12.moitz.domain.repository.SubwayStationRepository;
 import com.f12.moitz.domain.subway.SubwayStation;
+import com.f12.moitz.domain.subway.SubwayStationName;
 import com.f12.moitz.infrastructure.persistence.SubwayStationEntity;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -45,11 +46,11 @@ public class SubwayStationService {
     }
 
     public Optional<SubwayStation> findByName(final String name) {
-        if ("총신대입구역".equals(name) || "이수역".equals(name)) {
-            return getSubwayStation("총신대입구(이수)역")
-                    .or(() -> getSubwayStation(name));
-        }
-        return getSubwayStation(name);
+        final SubwayStationName subwayStationName = new SubwayStationName(name);
+        return subwayStationName.getSearchNames().stream()
+                .map(this::getSubwayStation)
+                .flatMap(Optional::stream)
+                .findFirst();
     }
 
     private Optional<SubwayStation> getSubwayStation(final String stationName) {
