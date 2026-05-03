@@ -1,0 +1,99 @@
+package com.f12.moitz.domain;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.SoftAssertions.assertSoftly;
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+
+class RecommendedCandidatesTest {
+
+    @Test
+    @DisplayName("추천 후보 장소 기준으로 태그를 정규화한다")
+    void constructor_NormalizesTagsByRecommendedCandidatePlaces() {
+        final Place seolleung = place("선릉역");
+        final Place samsung = place("삼성역");
+        final Place gangnam = place("강남역");
+
+        final RecommendedCandidates recommendedCandidates = new RecommendedCandidates(
+                List.of(seolleung, samsung),
+                Map.of(
+                        seolleung, List.of(CandidateSelectionTag.FAIRNESS, CandidateSelectionTag.GENERAL),
+                        gangnam, List.of(CandidateSelectionTag.TRANSFER)
+                )
+        );
+
+        assertSoftly(softAssertions -> {
+            softAssertions.assertThat(recommendedCandidates.getRecommendedCandidatePlaces())
+                    .containsExactly(seolleung, samsung);
+            softAssertions.assertThat(recommendedCandidates.getTags(seolleung))
+                    .containsExactly(CandidateSelectionTag.FAIRNESS);
+            softAssertions.assertThat(recommendedCandidates.getTags(samsung))
+                    .containsExactly(CandidateSelectionTag.GENERAL);
+            softAssertions.assertThat(recommendedCandidates.getTagsByPlace())
+                    .containsOnlyKeys(seolleung, samsung);
+        });
+    }
+
+    @Test
+    @DisplayName("추천 후보 태그가 비어있거나 null만 있으면 종합 추천 태그로 보정한다")
+    void constructor_UsesGeneralWhenTagsAreEmptyOrOnlyNull() {
+        final Place seolleung = place("선릉역");
+        final Place samsung = place("삼성역");
+
+        final RecommendedCandidates recommendedCandidates = new RecommendedCandidates(
+                List.of(seolleung, samsung),
+                Map.of(
+                        seolleung, List.of(),
+                        samsung, Arrays.asList(null, null)
+                )
+        );
+
+        assertThat(recommendedCandidates.getTags(seolleung))
+                .containsExactly(CandidateSelectionTag.GENERAL);
+        assertThat(recommendedCandidates.getTags(samsung))
+                .containsExactly(CandidateSelectionTag.GENERAL);
+    }
+
+    @Test
+    @DisplayName("추천 후보 목록과 태그 맵은 null일 수 없다")
+    void constructor_ThrowsExceptionWhenArgumentsAreInvalid() {
+        final Place seolleung = place("선릉역");
+
+        assertSoftly(softAssertions -> {
+            softAssertions.assertThatThrownBy(() -> new RecommendedCandidates(null, Map.of()))
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessage("추천 후보 목록은 null일 수 없습니다.");
+            softAssertions.assertThatThrownBy(() -> new RecommendedCandidates(Arrays.asList(seolleung, null), Map.of()))
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessage("추천 후보 목록에 null이 포함될 수 없습니다.");
+            softAssertions.assertThatThrownBy(() -> new RecommendedCandidates(List.of(seolleung), null))
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessage("추천 후보 태그는 null일 수 없습니다.");
+        });
+    }
+
+    @Test
+    @DisplayName("추천 후보 태그 맵은 외부에서 변경할 수 없다")
+    void getTagsByPlace_ReturnsUnmodifiableMap() {
+        final Place seolleung = place("선릉역");
+        final RecommendedCandidates recommendedCandidates = new RecommendedCandidates(
+                List.of(seolleung),
+                Map.of(seolleung, List.of(CandidateSelectionTag.FAIRNESS))
+        );
+
+        assertThatThrownBy(() -> recommendedCandidates.getTagsByPlace().put(
+                place("삼성역"),
+                List.of(CandidateSelectionTag.TRANSFER)
+        )).isInstanceOf(UnsupportedOperationException.class);
+    }
+
+    private Place place(final String name) {
+        return new Place(name, new Point(127.0, 37.0));
+    }
+
+}

@@ -4,7 +4,7 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
+import java.util.Objects;
 import lombok.Getter;
 
 @Getter
@@ -17,8 +17,24 @@ public class RecommendedCandidates {
             final List<Place> recommendedCandidatePlaces,
             final Map<Place, List<CandidateSelectionTag>> tagsByPlace
     ) {
+        validate(recommendedCandidatePlaces, tagsByPlace);
         this.recommendedCandidatePlaces = List.copyOf(recommendedCandidatePlaces);
-        this.tagsByPlace = copyTagsByPlace(tagsByPlace);
+        this.tagsByPlace = normalizeTagsByPlace(recommendedCandidatePlaces, tagsByPlace);
+    }
+
+    private void validate(
+            final List<Place> recommendedCandidatePlaces,
+            final Map<Place, List<CandidateSelectionTag>> tagsByPlace
+    ) {
+        if (recommendedCandidatePlaces == null) {
+            throw new IllegalArgumentException("추천 후보 목록은 null일 수 없습니다.");
+        }
+        if (recommendedCandidatePlaces.stream().anyMatch(Objects::isNull)) {
+            throw new IllegalArgumentException("추천 후보 목록에 null이 포함될 수 없습니다.");
+        }
+        if (tagsByPlace == null) {
+            throw new IllegalArgumentException("추천 후보 태그는 null일 수 없습니다.");
+        }
     }
 
     public CandidateSelectionTag getTag(final Place place) {
@@ -29,16 +45,16 @@ public class RecommendedCandidates {
         return CandidateSelectionTag.normalize(tagsByPlace.get(place));
     }
 
-    private Map<Place, List<CandidateSelectionTag>> copyTagsByPlace(
+    private Map<Place, List<CandidateSelectionTag>> normalizeTagsByPlace(
+            final List<Place> recommendedCandidatePlaces,
             final Map<Place, List<CandidateSelectionTag>> tagsByPlace
     ) {
-        return Collections.unmodifiableMap(tagsByPlace.entrySet().stream()
-                .collect(Collectors.toMap(
-                        Map.Entry::getKey,
-                        entry -> CandidateSelectionTag.normalize(entry.getValue()),
-                        (left, right) -> left,
-                        LinkedHashMap::new
-                )));
+        final Map<Place, List<CandidateSelectionTag>> normalizedTagsByPlace = new LinkedHashMap<>();
+        recommendedCandidatePlaces.forEach(place -> normalizedTagsByPlace.put(
+                place,
+                CandidateSelectionTag.normalize(tagsByPlace.get(place))
+        ));
+        return Collections.unmodifiableMap(normalizedTagsByPlace);
     }
 
 }
