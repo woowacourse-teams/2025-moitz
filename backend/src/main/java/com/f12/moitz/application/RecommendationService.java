@@ -7,6 +7,7 @@ import com.f12.moitz.application.utils.RecommendationResponseMapper;
 import com.f12.moitz.common.error.exception.GeneralErrorCode;
 import com.f12.moitz.common.error.exception.NotFoundException;
 import com.f12.moitz.domain.CandidateSelection;
+import com.f12.moitz.domain.CandidateSelectionPolicy;
 import com.f12.moitz.domain.DispersionPolicy;
 import com.f12.moitz.domain.RecommendedCandidates;
 import com.f12.moitz.domain.Place;
@@ -39,12 +40,12 @@ public class RecommendationService {
     private final RecommendedCandidateReasonService recommendedCandidateReasonService;
     private final RouteOriginDispersionService routeOriginDispersionService;
     private final RouteCandidatePreparationService routeCandidatePreparationService;
-    private final RouteCandidateSelectionService routeCandidateSelectionService;
     private final RecommendationPlaceSearchService recommendationPlaceSearchService;
     private final RecommendedCandidateConfirmationService recommendedCandidateConfirmationService;
     private final RecommendationCreationService recommendationCreationService;
     private final RecommendationResponseMapper recommendationResponseMapper;
     private final RecommendResultRepository recommendResultRepository;
+    private final CandidateSelectionPolicy candidateSelectionPolicy = new CandidateSelectionPolicy();
     private final RecommendationFlowLogger recommendationFlowLogger = new RecommendationFlowLogger();
 
     public RecommendationService(
@@ -52,7 +53,6 @@ public class RecommendationService {
             @Autowired final RecommendedCandidateReasonService recommendedCandidateReasonService,
             @Autowired final RouteOriginDispersionService routeOriginDispersionService,
             @Autowired final RouteCandidatePreparationService routeCandidatePreparationService,
-            @Autowired final RouteCandidateSelectionService routeCandidateSelectionService,
             @Autowired final RecommendationPlaceSearchService recommendationPlaceSearchService,
             @Autowired final RecommendedCandidateConfirmationService recommendedCandidateConfirmationService,
             @Autowired final RecommendationCreationService recommendationCreationService,
@@ -63,7 +63,6 @@ public class RecommendationService {
         this.recommendedCandidateReasonService = recommendedCandidateReasonService;
         this.routeOriginDispersionService = routeOriginDispersionService;
         this.routeCandidatePreparationService = routeCandidatePreparationService;
-        this.routeCandidateSelectionService = routeCandidateSelectionService;
         this.recommendationPlaceSearchService = recommendationPlaceSearchService;
         this.recommendedCandidateConfirmationService = recommendedCandidateConfirmationService;
         this.recommendationCreationService = recommendationCreationService;
@@ -154,8 +153,8 @@ public class RecommendationService {
             final RouteCandidatePreparationResult routeCandidatePreparationResult,
             final DispersionPolicy dispersionPolicy
     ) {
-        return routeCandidateSelectionService.select(
-                routeCandidatePreparationResult,
+        return candidateSelectionPolicy.select(
+                routeCandidatePreparationResult.getRouteCandidates(),
                 dispersionPolicy,
                 PLACE_SEARCH_POOL_LIMIT
         );
