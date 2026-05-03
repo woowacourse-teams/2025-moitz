@@ -119,10 +119,10 @@ public class RecommendationService {
         final RecommendedCandidates recommendedCandidates = recommendationPlaceSearchResult.getRecommendedCandidates();
         final List<Place> recommendedCandidatePlaces = recommendedCandidates.getPlaces();
         logRecommendedCandidates(searchCandidatePlaces, recommendedCandidatePlaces, candidateRoutes, recommendConditions);
-        validateRecommendationCandidates(recommendedCandidatePlaces);
+        validateRecommendationCandidates(recommendedCandidates);
         final RecommendedCandidateTravels recommendedCandidateTravels = recommendedCandidateRouteService.prepare(
                 routeOrigins,
-                recommendedCandidatePlaces,
+                recommendedCandidates,
                 candidateRoutes
         );
         stopWatch.stop();
@@ -235,8 +235,8 @@ public class RecommendationService {
                 .toList();
     }
 
-    private void validateRecommendationCandidates(final List<Place> recommendedCandidatePlaces) {
-        if (recommendedCandidatePlaces.isEmpty()) {
+    private void validateRecommendationCandidates(final RecommendedCandidates recommendedCandidates) {
+        if (recommendedCandidates.isEmpty()) {
             throw new BadRequestException(GeneralErrorCode.RECOMMENDATION_NOT_FOUND);
         }
     }

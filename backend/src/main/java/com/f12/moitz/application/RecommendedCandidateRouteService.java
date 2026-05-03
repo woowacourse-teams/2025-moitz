@@ -6,6 +6,7 @@ import com.f12.moitz.domain.Courses;
 import com.f12.moitz.domain.OriginDestination;
 import com.f12.moitz.domain.Place;
 import com.f12.moitz.domain.RecommendedCandidateTravels;
+import com.f12.moitz.domain.RecommendedCandidates;
 import com.f12.moitz.domain.RouteOrigins;
 import com.f12.moitz.domain.Routes;
 import java.util.LinkedHashMap;
@@ -30,9 +31,10 @@ public class RecommendedCandidateRouteService {
 
     public RecommendedCandidateTravels prepare(
             final RouteOrigins routeOrigins,
-            final List<Place> recommendedCandidatePlaces,
+            final RecommendedCandidates recommendedCandidates,
             final Map<Place, Routes> candidateRoutes
     ) {
+        final List<Place> recommendedCandidatePlaces = recommendedCandidates.getPlaces();
         final List<OriginDestination> originDestinations = routeOrigins.createOriginDestinationsTo(recommendedCandidatePlaces);
         return new RecommendedCandidateTravels(
                 collectRoutes(recommendedCandidatePlaces, candidateRoutes),

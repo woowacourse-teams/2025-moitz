@@ -6,12 +6,14 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 
 import com.f12.moitz.application.port.RouteFinder;
+import com.f12.moitz.domain.CandidateSelectionTag;
 import com.f12.moitz.domain.Course;
 import com.f12.moitz.domain.OriginDestination;
 import com.f12.moitz.domain.Path;
 import com.f12.moitz.domain.Place;
 import com.f12.moitz.domain.Point;
 import com.f12.moitz.domain.RecommendedCandidateTravels;
+import com.f12.moitz.domain.RecommendedCandidates;
 import com.f12.moitz.domain.Route;
 import com.f12.moitz.domain.RouteOrigins;
 import com.f12.moitz.domain.Routes;
@@ -56,7 +58,13 @@ class RecommendedCandidateRouteServiceTest {
 
         final RecommendedCandidateTravels result = service.prepare(
                 routeOrigins,
-                List.of(seolleung, samsung),
+                new RecommendedCandidates(
+                        List.of(seolleung, samsung),
+                        Map.of(
+                                seolleung, List.of(CandidateSelectionTag.FAIRNESS),
+                                samsung, List.of(CandidateSelectionTag.EFFICIENCY)
+                        )
+                ),
                 candidateRoutes
         );
 
