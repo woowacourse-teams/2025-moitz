@@ -63,6 +63,8 @@ class RouteCandidatePreparationServiceTest {
         );
 
         assertThat(result.getCandidatePlaces()).containsExactly(seolleung, samsung);
+        assertThat(result.getCandidatePlaceCount()).isEqualTo(2);
+        assertThat(result.getRoutedPlaceCount()).isEqualTo(2);
         assertThat(result.getCandidateRoutes()).containsOnlyKeys(seolleung, samsung);
         assertThat(result.getRouteCandidates())
                 .extracting(RouteCandidate::getPlace)

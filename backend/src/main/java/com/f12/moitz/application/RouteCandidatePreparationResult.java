@@ -26,6 +26,16 @@ public class RouteCandidatePreparationResult {
         return candidatePlaces;
     }
 
+    public int getCandidatePlaceCount() {
+        return candidatePlaces.size();
+    }
+
+    public long getRoutedPlaceCount() {
+        return candidatePlaces.stream()
+                .filter(candidateRoutes::containsKey)
+                .count();
+    }
+
     public Map<Place, Routes> getCandidateRoutes() {
         return candidateRoutes;
     }

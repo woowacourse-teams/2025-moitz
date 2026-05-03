@@ -85,11 +85,10 @@ public class RecommendationService {
                 routeOrigins,
                 dispersionPolicy
         );
-        final List<Place> candidatePlaces = routeCandidatePreparationResult.getCandidatePlaces();
         final Map<Place, Routes> candidateRoutes = routeCandidatePreparationResult.getCandidateRoutes();
         final CandidateSelection candidateSelection = selectCandidates(routeCandidatePreparationResult, dispersionPolicy);
         final List<Place> searchCandidatePlaces = candidateSelection.getSearchCandidatePlaces();
-        logCandidateSelection(startingPlaces, candidatePlaces, candidateRoutes, candidateSelection);
+        logCandidateSelection(startingPlaces, routeCandidatePreparationResult, candidateSelection);
         stopWatch.stop();
 
         stopWatch.start("장소 추천");
@@ -231,28 +230,27 @@ public class RecommendationService {
 
     private void logCandidateSelection(
             final List<SubwayStation> startingPlaces,
-            final List<Place> candidatePlaces,
-            final Map<Place, Routes> candidateRoutes,
+            final RouteCandidatePreparationResult routeCandidatePreparationResult,
             final CandidateSelection candidateSelection
     ) {
         final List<Place> searchCandidatePlaces = candidateSelection.getSearchCandidatePlaces();
-        final long routeCalculatedCount = candidatePlaces.stream()
-                .filter(candidateRoutes::containsKey)
-                .count();
 
         log.debug(
                 "공평성 후보 선정 - 출발역={}, initialPolicy={}, effectivePolicy={}, 전체 후보 {}개, 경로 계산 성공 {}개, 하드 필터 통과 {}개, 장소 탐색 대상 {}개, fallback={}",
                 getPlaceNames(startingPlaces),
                 candidateSelection.getInitialPolicy(),
                 candidateSelection.getEffectivePolicy(),
-                candidatePlaces.size(),
-                routeCalculatedCount,
+                routeCandidatePreparationResult.getCandidatePlaceCount(),
+                routeCandidatePreparationResult.getRoutedPlaceCount(),
                 candidateSelection.getAcceptableCount(),
                 searchCandidatePlaces.size(),
                 candidateSelection.isFallbackToSortedCandidates()
         );
         log.debug("공평성 후보 tag - {}", summarizeTagSelections(candidateSelection));
-        log.debug("공평성 상위 후보 - {}", summarizePlacesWithScore(searchCandidatePlaces, candidateRoutes));
+        log.debug("공평성 상위 후보 - {}", summarizePlacesWithScore(
+                searchCandidatePlaces,
+                routeCandidatePreparationResult.getCandidateRoutes()
+        ));
     }
 
     private Map<String, List<String>> summarizeTagSelections(final CandidateSelection candidateSelection) {
