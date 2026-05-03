@@ -48,13 +48,13 @@ public class Recommendation {
                 recommendConditions
         );
         final List<Place> placesReadyForCandidateCreation = findPlacesReadyForCandidateCreation(
-                reasonsByPlace,
                 recommendedPlacesByPlace,
                 recommendedCandidates,
                 recommendConditions
         );
         validateCandidateMaterials(
                 placesReadyForCandidateCreation,
+                reasonsByPlace,
                 recommendedCandidateTravels,
                 recommendedCandidates
         );
@@ -96,13 +96,11 @@ public class Recommendation {
     }
 
     private List<Place> findPlacesReadyForCandidateCreation(
-            final Map<Place, RecommendationReason> reasonsByPlace,
             final Map<Place, RecommendedPlaces> recommendedPlacesByPlace,
             final RecommendedCandidates recommendedCandidates,
             final List<RecommendCondition> recommendConditions
     ) {
         return recommendedCandidates.getPlaces().stream()
-                .filter(reasonsByPlace::containsKey)
                 .filter(place -> hasRequiredRecommendedPlaces(
                         recommendedPlacesByPlace.get(place),
                         recommendConditions
@@ -112,11 +110,13 @@ public class Recommendation {
 
     private void validateCandidateMaterials(
             final List<Place> placesReadyForCandidateCreation,
+            final Map<Place, RecommendationReason> reasonsByPlace,
             final RecommendedCandidateTravels recommendedCandidateTravels,
             final RecommendedCandidates recommendedCandidates
     ) {
         placesReadyForCandidateCreation.forEach(place -> validateCandidateMaterials(
                 place,
+                reasonsByPlace,
                 recommendedCandidateTravels,
                 recommendedCandidates
         ));
@@ -124,9 +124,11 @@ public class Recommendation {
 
     private void validateCandidateMaterials(
             final Place place,
+            final Map<Place, RecommendationReason> reasonsByPlace,
             final RecommendedCandidateTravels recommendedCandidateTravels,
             final RecommendedCandidates recommendedCandidates
     ) {
+        getRecommendationReason(place, reasonsByPlace);
         recommendedCandidateTravels.getCandidateRoutes(place);
         recommendedCandidates.getTags(place);
     }
@@ -150,11 +152,22 @@ public class Recommendation {
     ) {
         return Candidate.create(
                 place,
-                reasonsByPlace.get(place),
+                getRecommendationReason(place, reasonsByPlace),
                 recommendedPlaces.get(place),
                 recommendedCandidateTravels.getCandidateRoutes(place),
                 recommendedCandidates.getTags(place)
         );
+    }
+
+    private RecommendationReason getRecommendationReason(
+            final Place place,
+            final Map<Place, RecommendationReason> reasonsByPlace
+    ) {
+        final RecommendationReason recommendationReason = reasonsByPlace.get(place);
+        if (recommendationReason == null) {
+            throw new IllegalArgumentException("추천 이유가 누락되었습니다. 추천 지역: " + place.getName());
+        }
+        return recommendationReason;
     }
 
     private void validate(final List<Candidate> candidates) {
