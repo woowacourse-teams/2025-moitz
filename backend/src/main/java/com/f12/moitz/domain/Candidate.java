@@ -189,6 +189,10 @@ public class Candidate {
         return routes.calculateAverageTravelTime();
     }
 
+    public FairnessScore calculateFairnessScore() {
+        return routes.calculateFairnessScore();
+    }
+
     public CandidateSelectionTag getTag() {
         return getTags().getFirst();
     }

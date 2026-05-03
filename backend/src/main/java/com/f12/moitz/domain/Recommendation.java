@@ -183,7 +183,7 @@ public class Recommendation {
     private List<Candidate> sort(final List<Candidate> candidates) {
         return candidates.stream()
                 .sorted(Comparator.comparingInt((Candidate candidate) -> candidate.getTag().getPriority())
-                        .thenComparing(candidate -> candidate.getRoutes().calculateFairnessScore()))
+                        .thenComparing(Candidate::calculateFairnessScore))
                 .toList();
     }
 

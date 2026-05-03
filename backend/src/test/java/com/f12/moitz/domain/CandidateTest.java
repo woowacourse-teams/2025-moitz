@@ -263,4 +263,33 @@ class CandidateTest {
         assertThat(averageTravelTime).isEqualTo(30);
     }
 
+    @Test
+    @DisplayName("후보의 공평 점수를 계산한다")
+    void calculateFairnessScore() {
+        final Place startA = new Place("출발A", new Point(127.0, 37.0));
+        final Place startB = new Place("출발B", new Point(127.1, 37.1));
+        final Place endPlace = new Place("강남역", new Point(127.2, 37.2));
+        final Routes routes = new Routes(List.of(
+                new Route(List.of(Path.subway(startA, endPlace, 10 * 60, SubwayLine.fromTitle("2호선")))),
+                new Route(List.of(Path.subway(startB, endPlace, 20 * 60, SubwayLine.fromTitle("2호선"))))
+        ));
+        final Courses courses = new Courses(List.of(new Course(List.of(startA.getPoint(), endPlace.getPoint()))));
+        final RecommendedPlace recommendedPlace = new RecommendedPlace("스타벅스", DEFAULT_POINT, "카페", 5, "url", "imageUrl");
+        final CategorizedRecommendedPlaces recommendedPlaces = new CategorizedRecommendedPlaces(
+                Map.of(RecommendCondition.CAFE, List.of(recommendedPlace))
+        );
+        final Candidate candidate = new Candidate(
+                endPlace,
+                routes,
+                courses,
+                recommendedPlaces,
+                CandidateSelectionTag.GENERAL,
+                "123",
+                "123",
+                0
+        );
+
+        assertThat(candidate.calculateFairnessScore().getAverageTravelTime()).isEqualTo(15);
+    }
+
 }
