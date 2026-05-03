@@ -39,8 +39,8 @@ class CandidateSelectionTest {
     }
 
     @Test
-    @DisplayName("태그 후보가 부족하면 보충 후보로 채우고 장소명 기준으로 중복을 제거한다")
-    void create_FillsWithSupplementaryCandidatesWithoutDuplicatingPlaceNames() {
+    @DisplayName("태그 후보가 부족하면 보충 후보로 채우고 같은 장소 기준으로 중복을 제거한다")
+    void create_FillsWithSupplementaryCandidatesWithoutDuplicatingPlaces() {
         final RouteCandidate selected = routeCandidate("선택역");
         final RouteCandidate duplicated = routeCandidate("선택역");
         final RouteCandidate supplement1 = routeCandidate("보충1역");
@@ -64,9 +64,36 @@ class CandidateSelectionTest {
                 .containsExactly("선택역", "보충1역", "보충2역");
     }
 
+    @Test
+    @DisplayName("장소명이 같아도 좌표가 다르면 서로 다른 검색 대상 후보로 유지한다")
+    void create_DoesNotDeduplicateCandidatesOnlyByPlaceName() {
+        final RouteCandidate first = routeCandidate("같은이름", new Point(127.1, 37.1));
+        final RouteCandidate second = routeCandidate("같은이름", new Point(127.2, 37.2));
+        final Map<CandidateSelectionTag, List<RouteCandidate>> tagSelections = new LinkedHashMap<>();
+        tagSelections.put(CandidateSelectionTag.FAIRNESS, List.of(first));
+        tagSelections.put(CandidateSelectionTag.EFFICIENCY, List.of(second));
+
+        final CandidateSelection candidateSelection = CandidateSelection.fromTagSelections(
+                tagSelections,
+                List.of(),
+                DispersionPolicy.TIER_4,
+                DispersionPolicy.TIER_4,
+                2,
+                false,
+                2
+        );
+
+        assertThat(candidateSelection.getSearchCandidatePlaces())
+                .containsExactly(first.getPlace(), second.getPlace());
+    }
+
     private RouteCandidate routeCandidate(final String name) {
+        return routeCandidate(name, new Point(127.1, 37.1));
+    }
+
+    private RouteCandidate routeCandidate(final String name, final Point point) {
         final Place start = new Place("출발역", new Point(127.0, 37.0));
-        final Place end = new Place(name, new Point(127.1, 37.1));
+        final Place end = new Place(name, point);
         return new RouteCandidate(
                 end,
                 new Routes(List.of(new Route(List.of(Path.subway(

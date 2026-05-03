@@ -135,7 +135,7 @@ public class CandidateSelection {
             final List<RouteCandidate> supplementaryCandidates,
             final int limit
     ) {
-        final Map<String, RouteCandidate> searchCandidates = new LinkedHashMap<>();
+        final Map<Place, RouteCandidate> searchCandidates = new LinkedHashMap<>();
         final int maxTagSize = tagSelections.values().stream()
                 .mapToInt(List::size)
                 .max()
@@ -147,7 +147,7 @@ public class CandidateSelection {
                     continue;
                 }
                 final RouteCandidate candidate = tagCandidates.get(index);
-                searchCandidates.putIfAbsent(candidate.getPlace().getName(), candidate);
+                searchCandidates.putIfAbsent(candidate.getPlace(), candidate);
                 if (searchCandidates.size() >= limit) {
                     break;
                 }
@@ -158,7 +158,7 @@ public class CandidateSelection {
             if (searchCandidates.size() >= limit) {
                 break;
             }
-            searchCandidates.putIfAbsent(supplementaryCandidate.getPlace().getName(), supplementaryCandidate);
+            searchCandidates.putIfAbsent(supplementaryCandidate.getPlace(), supplementaryCandidate);
         }
 
         return new ArrayList<>(searchCandidates.values());
