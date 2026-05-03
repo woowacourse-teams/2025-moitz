@@ -204,4 +204,16 @@ public class Candidate {
         return resolveTags(tags);
     }
 
+    public int getRouteCount() {
+        return routes.size();
+    }
+
+    public Route getRoute(final int index) {
+        return routes.get(index);
+    }
+
+    public Course getCourse(final int index) {
+        return courses.get(index);
+    }
+
 }

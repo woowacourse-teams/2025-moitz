@@ -11,7 +11,6 @@ import com.f12.moitz.domain.Candidate;
 import com.f12.moitz.domain.CandidateSelectionTag;
 import com.f12.moitz.domain.CategorizedRecommendedPlaces;
 import com.f12.moitz.domain.Course;
-import com.f12.moitz.domain.Courses;
 import com.f12.moitz.domain.Path;
 import com.f12.moitz.domain.Place;
 import com.f12.moitz.domain.Point;
@@ -19,7 +18,6 @@ import com.f12.moitz.domain.RecommendCondition;
 import com.f12.moitz.domain.RecommendedPlace;
 import com.f12.moitz.domain.Result;
 import com.f12.moitz.domain.Route;
-import com.f12.moitz.domain.Routes;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -76,7 +74,7 @@ public class RecommendationResponseMapper {
         final Map<RecommendCondition, List<PlaceRecommendResponse>> recommendedPlaces = toPlaceRecommendResponses(
                 candidate.getRecommendedPlaces()
         );
-        final List<RouteResponse> routes = toRouteResponses(candidate.getRoutes(), candidate.getCourses());
+        final List<RouteResponse> routes = toRouteResponses(candidate);
 
         return new LocationResponse(
                 (long) index + 1,
@@ -121,11 +119,11 @@ public class RecommendationResponseMapper {
                 ));
     }
 
-    private List<RouteResponse> toRouteResponses(final Routes routes, final Courses courses) {
-        return IntStream.range(0, routes.getRoutes().size())
+    private List<RouteResponse> toRouteResponses(final Candidate candidate) {
+        return IntStream.range(0, candidate.getRouteCount())
                 .mapToObj(index -> toRouteResponse(
-                        routes.getRoutes().get(index),
-                        courses.getCourses().get(index),
+                        candidate.getRoute(index),
+                        candidate.getCourse(index),
                         index + 1
                 )).toList();
     }

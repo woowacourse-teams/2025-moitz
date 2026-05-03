@@ -116,4 +116,8 @@ public class Routes {
         return routes.size();
     }
 
+    public Route get(final int index) {
+        return routes.get(index);
+    }
+
 }

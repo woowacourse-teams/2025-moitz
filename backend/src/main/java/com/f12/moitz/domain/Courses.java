@@ -23,4 +23,8 @@ public class Courses {
         return courses.size();
     }
 
+    public Course get(final int index) {
+        return courses.get(index);
+    }
+
 }

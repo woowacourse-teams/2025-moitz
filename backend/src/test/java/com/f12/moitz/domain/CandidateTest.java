@@ -308,4 +308,36 @@ class CandidateTest {
         assertThat(candidate.calculateFairnessScore().getAverageTravelTime()).isEqualTo(15);
     }
 
+    @Test
+    @DisplayName("후보는 경로와 이동 코스를 같은 순서로 제공한다")
+    void getRouteAndCourseByIndex() {
+        final Place startA = new Place("출발A", new Point(127.0, 37.0));
+        final Place startB = new Place("출발B", new Point(127.1, 37.1));
+        final Place endPlace = new Place("강남역", new Point(127.2, 37.2));
+        final Route routeA = new Route(List.of(Path.subway(startA, endPlace, 10 * 60, SubwayLine.fromTitle("2호선"))));
+        final Route routeB = new Route(List.of(Path.subway(startB, endPlace, 20 * 60, SubwayLine.fromTitle("2호선"))));
+        final Course courseA = new Course(List.of(startA.getPoint(), endPlace.getPoint()));
+        final Course courseB = new Course(List.of(startB.getPoint(), endPlace.getPoint()));
+        final RecommendedPlace recommendedPlace = new RecommendedPlace("스타벅스", DEFAULT_POINT, "카페", 5, "url", "imageUrl");
+        final CategorizedRecommendedPlaces recommendedPlaces = new CategorizedRecommendedPlaces(
+                Map.of(RecommendCondition.CAFE, List.of(recommendedPlace))
+        );
+        final Candidate candidate = new Candidate(
+                endPlace,
+                new Routes(List.of(routeA, routeB)),
+                new Courses(List.of(courseA, courseB)),
+                recommendedPlaces,
+                CandidateSelectionTag.GENERAL,
+                "123",
+                "123",
+                0
+        );
+
+        assertThat(candidate.getRouteCount()).isEqualTo(2);
+        assertThat(candidate.getRoute(0)).isEqualTo(routeA);
+        assertThat(candidate.getCourse(0)).isEqualTo(courseA);
+        assertThat(candidate.getRoute(1)).isEqualTo(routeB);
+        assertThat(candidate.getCourse(1)).isEqualTo(courseB);
+    }
+
 }
