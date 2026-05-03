@@ -113,8 +113,7 @@ public class RecommendationService {
         validateRecommendationCandidates(recommendedCandidates);
         final RecommendedCandidateTravels recommendedCandidateTravels = prepareRecommendedCandidateTravels(
                 routeOrigins,
-                recommendedCandidates,
-                candidateRoutes
+                recommendedCandidates
         );
         stopWatch.stop();
 
@@ -179,10 +178,9 @@ public class RecommendationService {
 
     private RecommendedCandidateTravels prepareRecommendedCandidateTravels(
             final RouteOrigins routeOrigins,
-            final RecommendedCandidates recommendedCandidates,
-            final Map<Place, Routes> candidateRoutes
+            final RecommendedCandidates recommendedCandidates
     ) {
-        return recommendedCandidateRouteService.prepare(routeOrigins, recommendedCandidates, candidateRoutes);
+        return recommendedCandidateRouteService.prepare(routeOrigins, recommendedCandidates);
     }
 
     private Map<Place, RecommendationReason> generateRecommendationReasons(

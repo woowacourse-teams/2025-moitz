@@ -18,6 +18,7 @@ import com.f12.moitz.application.port.RouteFinder;
 import com.f12.moitz.application.utils.RecommendationResponseMapper;
 import com.f12.moitz.common.error.exception.BadRequestException;
 import com.f12.moitz.common.error.exception.GeneralErrorCode;
+import com.f12.moitz.domain.CandidateRoute;
 import com.f12.moitz.domain.RecommendedPlaces;
 import com.f12.moitz.domain.Course;
 import com.f12.moitz.domain.Path;
@@ -141,13 +142,13 @@ class RecommendationServiceTest {
         );
         given(routeFinder.findRoutes(anyList())).willReturn(pairwiseRoutes, mockRoutes);
 
-        List<Course> mockCourses = List.of(
-                new Course(List.of(gangnam.getPoint(), seolleung.getPoint())),
-                new Course(List.of(yeoksam.getPoint(), seolleung.getPoint())),
-                new Course(List.of(gangnam.getPoint(), samsung.getPoint())),
-                new Course(List.of(yeoksam.getPoint(), samsung.getPoint()))
+        List<CandidateRoute> mockCandidateRoutes = List.of(
+                new CandidateRoute(mockRoutes.get(0), new Course(List.of(gangnam.getPoint(), seolleung.getPoint()))),
+                new CandidateRoute(mockRoutes.get(1), new Course(List.of(yeoksam.getPoint(), seolleung.getPoint()))),
+                new CandidateRoute(mockRoutes.get(2), new Course(List.of(gangnam.getPoint(), samsung.getPoint()))),
+                new CandidateRoute(mockRoutes.get(3), new Course(List.of(yeoksam.getPoint(), samsung.getPoint())))
         );
-        given(routeFinder.findCourses(anyList())).willReturn(mockCourses);
+        given(routeFinder.findCandidateRoutes(anyList())).willReturn(mockCandidateRoutes);
         given(locationReasonGenerator.generateReasons(anyList(), anyMap())).willReturn(Map.of(
                 "선릉역", new ReasonAndDescription("설명1", "이유1"),
                 "삼성역", new ReasonAndDescription("설명2", "이유2")

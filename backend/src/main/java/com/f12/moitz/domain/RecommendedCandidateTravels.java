@@ -21,6 +21,53 @@ public class RecommendedCandidateTravels {
         this.coursesByPlace = Collections.unmodifiableMap(new LinkedHashMap<>(coursesByPlace));
     }
 
+    public RecommendedCandidateTravels(final Map<Place, List<CandidateRoute>> candidateRoutesByPlace) {
+        validate(candidateRoutesByPlace);
+        this.routesByPlace = Collections.unmodifiableMap(toRoutesByPlace(candidateRoutesByPlace));
+        this.coursesByPlace = Collections.unmodifiableMap(toCoursesByPlace(candidateRoutesByPlace));
+    }
+
+    private void validate(final Map<Place, List<CandidateRoute>> candidateRoutesByPlace) {
+        if (candidateRoutesByPlace == null) {
+            throw new IllegalArgumentException("추천 후보 경로는 null일 수 없습니다.");
+        }
+        if (candidateRoutesByPlace.keySet().stream().anyMatch(Objects::isNull)) {
+            throw new IllegalArgumentException("추천 후보 장소는 null일 수 없습니다.");
+        }
+        candidateRoutesByPlace.forEach(this::validateCandidateRoutes);
+    }
+
+    private void validateCandidateRoutes(final Place place, final List<CandidateRoute> candidateRoutes) {
+        if (candidateRoutes == null || candidateRoutes.isEmpty()) {
+            throw new IllegalArgumentException("후보 경로 목록은 비어있거나 null일 수 없습니다. 추천 지역: " + place.getName());
+        }
+        if (candidateRoutes.stream().anyMatch(Objects::isNull)) {
+            throw new IllegalArgumentException("후보 경로 목록에 null이 포함될 수 없습니다. 추천 지역: " + place.getName());
+        }
+    }
+
+    private Map<Place, Routes> toRoutesByPlace(final Map<Place, List<CandidateRoute>> candidateRoutesByPlace) {
+        final Map<Place, Routes> routesByPlace = new LinkedHashMap<>();
+        candidateRoutesByPlace.forEach((place, candidateRoutes) -> routesByPlace.put(
+                place,
+                new Routes(candidateRoutes.stream()
+                        .map(CandidateRoute::getRoute)
+                        .toList())
+        ));
+        return routesByPlace;
+    }
+
+    private Map<Place, Courses> toCoursesByPlace(final Map<Place, List<CandidateRoute>> candidateRoutesByPlace) {
+        final Map<Place, Courses> coursesByPlace = new LinkedHashMap<>();
+        candidateRoutesByPlace.forEach((place, candidateRoutes) -> coursesByPlace.put(
+                place,
+                new Courses(candidateRoutes.stream()
+                        .map(CandidateRoute::getCourse)
+                        .toList())
+        ));
+        return coursesByPlace;
+    }
+
     private void validate(
             final Map<Place, Routes> routesByPlace,
             final Map<Place, Courses> coursesByPlace

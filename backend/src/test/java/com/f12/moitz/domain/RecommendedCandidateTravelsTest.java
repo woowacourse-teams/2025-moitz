@@ -88,6 +88,29 @@ class RecommendedCandidateTravelsTest {
     }
 
     @Test
+    @DisplayName("후보 경로 목록으로 추천 후보 이동 정보를 생성한다")
+    void constructor_FromCandidateRoutes() {
+        final Place seolleung = place("선릉역");
+        final Routes routes = routes(seolleung, 2);
+        final Courses courses = courses(seolleung, 2);
+
+        final RecommendedCandidateTravels travels = new RecommendedCandidateTravels(Map.of(
+                seolleung,
+                List.of(
+                        new CandidateRoute(routes.get(0), courses.get(0)),
+                        new CandidateRoute(routes.get(1), courses.get(1))
+                )
+        ));
+
+        final List<CandidateRoute> candidateRoutes = travels.getCandidateRoutes(seolleung);
+        assertThat(candidateRoutes).hasSize(2);
+        assertThat(candidateRoutes.get(0).getRoute()).isEqualTo(routes.get(0));
+        assertThat(candidateRoutes.get(0).getCourse()).isEqualTo(courses.get(0));
+        assertThat(candidateRoutes.get(1).getRoute()).isEqualTo(routes.get(1));
+        assertThat(candidateRoutes.get(1).getCourse()).isEqualTo(courses.get(1));
+    }
+
+    @Test
     @DisplayName("추천 후보가 아닌 장소의 후보 경로는 조회할 수 없다")
     void getCandidateRoutes_ThrowsExceptionWhenPlaceIsNotRecommendedCandidate() {
         final Place seolleung = place("선릉역");

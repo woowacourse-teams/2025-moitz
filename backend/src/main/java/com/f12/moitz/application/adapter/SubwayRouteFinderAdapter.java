@@ -2,6 +2,7 @@ package com.f12.moitz.application.adapter;
 
 import com.f12.moitz.application.SubwayStationService;
 import com.f12.moitz.application.port.RouteFinder;
+import com.f12.moitz.domain.CandidateRoute;
 import com.f12.moitz.domain.Course;
 import com.f12.moitz.domain.Route;
 import com.f12.moitz.domain.OriginDestination;
@@ -35,9 +36,12 @@ public class SubwayRouteFinderAdapter implements RouteFinder {
     }
 
     @Override
-    public List<Course> findCourses(final List<OriginDestination> originDestinations) {
+    public List<CandidateRoute> findCandidateRoutes(final List<OriginDestination> originDestinations) {
         return findStationSequences(originDestinations).stream()
-                .map(sequence -> new Course(sequence.getPoints()))
+                .map(sequence -> new CandidateRoute(
+                        new Route(sequence.groupByLine()),
+                        new Course(sequence.getPoints())
+                ))
                 .toList();
     }
 

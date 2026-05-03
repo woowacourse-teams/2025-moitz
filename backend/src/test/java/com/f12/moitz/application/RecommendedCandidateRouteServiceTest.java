@@ -7,6 +7,7 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 
 import com.f12.moitz.application.port.RouteFinder;
+import com.f12.moitz.domain.CandidateRoute;
 import com.f12.moitz.domain.CandidateSelectionTag;
 import com.f12.moitz.domain.Course;
 import com.f12.moitz.domain.OriginDestination;
@@ -46,15 +47,11 @@ class RecommendedCandidateRouteServiceTest {
         final RouteOrigins routeOrigins = new RouteOrigins(List.of(gangnam, yeoksam));
         final Routes seolleungRoutes = createRoutes(List.of(gangnam, yeoksam), seolleung);
         final Routes samsungRoutes = createRoutes(List.of(gangnam, yeoksam), samsung);
-        final Map<Place, Routes> candidateRoutes = Map.of(
-                seolleung, seolleungRoutes,
-                samsung, samsungRoutes
-        );
-        given(routeFinder.findCourses(anyList())).willReturn(List.of(
-                new Course(List.of(gangnam.getPoint(), seolleung.getPoint())),
-                new Course(List.of(yeoksam.getPoint(), seolleung.getPoint())),
-                new Course(List.of(gangnam.getPoint(), samsung.getPoint())),
-                new Course(List.of(yeoksam.getPoint(), samsung.getPoint()))
+        given(routeFinder.findCandidateRoutes(anyList())).willReturn(List.of(
+                new CandidateRoute(seolleungRoutes.get(0), new Course(List.of(gangnam.getPoint(), seolleung.getPoint()))),
+                new CandidateRoute(seolleungRoutes.get(1), new Course(List.of(yeoksam.getPoint(), seolleung.getPoint()))),
+                new CandidateRoute(samsungRoutes.get(0), new Course(List.of(gangnam.getPoint(), samsung.getPoint()))),
+                new CandidateRoute(samsungRoutes.get(1), new Course(List.of(yeoksam.getPoint(), samsung.getPoint())))
         ));
 
         final RecommendedCandidateTravels result = service.prepare(
@@ -65,8 +62,7 @@ class RecommendedCandidateRouteServiceTest {
                                 seolleung, List.of(CandidateSelectionTag.FAIRNESS),
                                 samsung, List.of(CandidateSelectionTag.EFFICIENCY)
                         )
-                ),
-                candidateRoutes
+                )
         );
 
         assertThat(result.getCandidateRoutes(seolleung))
@@ -83,7 +79,7 @@ class RecommendedCandidateRouteServiceTest {
                 .hasSize(2);
 
         final ArgumentCaptor<List<OriginDestination>> captor = ArgumentCaptor.forClass(List.class);
-        verify(routeFinder).findCourses(captor.capture());
+        verify(routeFinder).findCandidateRoutes(captor.capture());
         assertThat(captor.getValue()).hasSize(4);
         assertThat(captor.getValue())
                 .extracting(OriginDestination::getDestination)
@@ -91,16 +87,16 @@ class RecommendedCandidateRouteServiceTest {
     }
 
     @Test
-    @DisplayName("코스 조회 결과 개수가 요청 개수와 다르면 추천 후보 이동 정보를 조립할 수 없다")
-    void prepare_ThrowsExceptionWhenCourseCountDoesNotMatchOriginDestinations() {
+    @DisplayName("후보 경로 조회 결과 개수가 요청 개수와 다르면 추천 후보 이동 정보를 조립할 수 없다")
+    void prepare_ThrowsExceptionWhenCandidateRouteCountDoesNotMatchOriginDestinations() {
         final RecommendedCandidateRouteService service = new RecommendedCandidateRouteService(routeFinder);
         final Place gangnam = new Place("강남역", new Point(127.027, 37.497));
         final Place yeoksam = new Place("역삼역", new Point(127.036, 37.501));
         final Place seolleung = new Place("선릉역", new Point(127.048, 37.504));
         final RouteOrigins routeOrigins = new RouteOrigins(List.of(gangnam, yeoksam));
         final Routes seolleungRoutes = createRoutes(List.of(gangnam, yeoksam), seolleung);
-        given(routeFinder.findCourses(anyList())).willReturn(List.of(
-                new Course(List.of(gangnam.getPoint(), seolleung.getPoint()))
+        given(routeFinder.findCandidateRoutes(anyList())).willReturn(List.of(
+                new CandidateRoute(seolleungRoutes.get(0), new Course(List.of(gangnam.getPoint(), seolleung.getPoint())))
         ));
 
         assertThatThrownBy(() -> service.prepare(
@@ -108,33 +104,30 @@ class RecommendedCandidateRouteServiceTest {
                 new RecommendedCandidates(
                         List.of(seolleung),
                         Map.of(seolleung, List.of(CandidateSelectionTag.FAIRNESS))
-                ),
-                Map.of(seolleung, seolleungRoutes)
+                )
         ))
                 .isInstanceOf(IllegalStateException.class)
-                .hasMessage("추천 후보 이동 코스 조회 결과 개수가 일치하지 않습니다. 요청=2, 응답=1");
+                .hasMessage("추천 후보 경로 조회 결과 개수가 일치하지 않습니다. 요청=2, 응답=1");
     }
 
     @Test
-    @DisplayName("코스 조회 결과가 null이면 추천 후보 이동 정보를 조립할 수 없다")
-    void prepare_ThrowsExceptionWhenCoursesAreNull() {
+    @DisplayName("후보 경로 조회 결과가 null이면 추천 후보 이동 정보를 조립할 수 없다")
+    void prepare_ThrowsExceptionWhenCandidateRoutesAreNull() {
         final RecommendedCandidateRouteService service = new RecommendedCandidateRouteService(routeFinder);
         final Place gangnam = new Place("강남역", new Point(127.027, 37.497));
         final Place seolleung = new Place("선릉역", new Point(127.048, 37.504));
         final RouteOrigins routeOrigins = new RouteOrigins(List.of(gangnam));
-        final Routes seolleungRoutes = createRoutes(List.of(gangnam), seolleung);
-        given(routeFinder.findCourses(anyList())).willReturn(null);
+        given(routeFinder.findCandidateRoutes(anyList())).willReturn(null);
 
         assertThatThrownBy(() -> service.prepare(
                 routeOrigins,
                 new RecommendedCandidates(
                         List.of(seolleung),
                         Map.of(seolleung, List.of(CandidateSelectionTag.FAIRNESS))
-                ),
-                Map.of(seolleung, seolleungRoutes)
+                )
         ))
                 .isInstanceOf(IllegalStateException.class)
-                .hasMessage("추천 후보 이동 코스 조회 결과가 null입니다.");
+                .hasMessage("추천 후보 경로 조회 결과가 null입니다.");
     }
 
     private Routes createRoutes(final List<Place> origins, final Place destination) {
