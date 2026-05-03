@@ -49,7 +49,7 @@ public class CandidatePlaceSearchPolicy {
                 normalizeTransferTags(
                         candidateSelection,
                         limitedRecommendedCandidatePlaces,
-                        filterTagsByRecommendedCandidatePlaces(tagsByPlace, limitedRecommendedCandidatePlaces)
+                        tagsByPlace
                 )
         );
     }
@@ -163,18 +163,6 @@ public class CandidatePlaceSearchPolicy {
         final Map<Place, List<CandidateSelectionTag>> copiedTagsByPlace = new LinkedHashMap<>();
         tagsByPlace.forEach((place, tags) -> copiedTagsByPlace.put(place, List.copyOf(tags)));
         return copiedTagsByPlace;
-    }
-
-    private Map<Place, List<CandidateSelectionTag>> filterTagsByRecommendedCandidatePlaces(
-            final Map<Place, List<CandidateSelectionTag>> tagsByPlace,
-            final List<Place> recommendedCandidatePlaces
-    ) {
-        final Map<Place, List<CandidateSelectionTag>> filteredTagsByPlace = new LinkedHashMap<>();
-        recommendedCandidatePlaces.forEach(place -> filteredTagsByPlace.put(
-                place,
-                tagsByPlace.getOrDefault(place, List.of(CandidateSelectionTag.GENERAL))
-        ));
-        return filteredTagsByPlace;
     }
 
     private Set<String> toPlaceNames(final List<Place> places) {
