@@ -24,7 +24,7 @@ public class CandidatePlaceSearchPolicy {
                 placeCondition
         );
         final List<Place> recommendedCandidatePlaces = new ArrayList<>(taggedPlaceSelection.recommendedCandidatePlaces());
-        final Set<String> recommendedCandidatePlaceNames = toPlaceNames(recommendedCandidatePlaces);
+        final Set<Place> recommendedCandidatePlaceSet = toPlaceSet(recommendedCandidatePlaces);
         final Map<Place, List<CandidateSelectionTag>> tagsByPlace = new LinkedHashMap<>(
                 taggedPlaceSelection.tagsByPlace()
         );
@@ -33,11 +33,11 @@ public class CandidatePlaceSearchPolicy {
             if (recommendedCandidatePlaces.size() >= limit) {
                 break;
             }
-            if (recommendedCandidatePlaceNames.contains(place.getName()) || !placeCondition.test(place)) {
+            if (recommendedCandidatePlaceSet.contains(place) || !placeCondition.test(place)) {
                 continue;
             }
             recommendedCandidatePlaces.add(place);
-            recommendedCandidatePlaceNames.add(place.getName());
+            recommendedCandidatePlaceSet.add(place);
             tagsByPlace.put(place, List.of(CandidateSelectionTag.GENERAL));
         }
 
@@ -65,9 +65,9 @@ public class CandidatePlaceSearchPolicy {
                 searchedPlaces,
                 placeCondition
         ).selectedByTag();
-        final Set<String> searchedPlaceNames = toPlaceNames(searchedPlaces);
-        final Set<String> selectedPlaceNames = toPlaceNames(new ArrayList<>(selectedByTag.values()));
-        final Map<String, Place> nextSearchPlaces = new LinkedHashMap<>();
+        final Set<Place> searchedPlaceSet = toPlaceSet(searchedPlaces);
+        final Set<Place> selectedPlaceSet = toPlaceSet(new ArrayList<>(selectedByTag.values()));
+        final Map<Place, Place> nextSearchPlaces = new LinkedHashMap<>();
 
         for (CandidateSelectionTag tag : CandidateSelectionTag.orderedValues()) {
             if (selectedByTag.containsKey(tag)) {
@@ -77,10 +77,10 @@ public class CandidatePlaceSearchPolicy {
                     .getOrDefault(tag, List.of())
                     .stream()
                     .map(RouteCandidate::getPlace)
-                    .filter(place -> !searchedPlaceNames.contains(place.getName()))
-                    .filter(place -> !selectedPlaceNames.contains(place.getName()))
+                    .filter(place -> !searchedPlaceSet.contains(place))
+                    .filter(place -> !selectedPlaceSet.contains(place))
                     .findFirst()
-                    .ifPresent(place -> nextSearchPlaces.putIfAbsent(place.getName(), place));
+                    .ifPresent(place -> nextSearchPlaces.putIfAbsent(place, place));
         }
 
         if (!nextSearchPlaces.isEmpty()) {
@@ -94,10 +94,10 @@ public class CandidatePlaceSearchPolicy {
                 break;
             }
             final Place place = candidate.getPlace();
-            if (searchedPlaceNames.contains(place.getName()) || selectedPlaceNames.contains(place.getName())) {
+            if (searchedPlaceSet.contains(place) || selectedPlaceSet.contains(place)) {
                 continue;
             }
-            nextSearchPlaces.putIfAbsent(place.getName(), place);
+            nextSearchPlaces.putIfAbsent(place, place);
         }
 
         return nextSearchPlaces.values().stream()
@@ -110,8 +110,8 @@ public class CandidatePlaceSearchPolicy {
             final List<Place> searchedPlaces,
             final Predicate<Place> placeCondition
     ) {
-        final Set<String> searchedPlaceNames = toPlaceNames(searchedPlaces);
-        final Set<String> selectedPlaceNames = new HashSet<>();
+        final Set<Place> searchedPlaceSet = toPlaceSet(searchedPlaces);
+        final Set<Place> selectedPlaceSet = new HashSet<>();
         final Map<CandidateSelectionTag, Place> selectedByTag = new LinkedHashMap<>();
         final Map<Place, Set<CandidateSelectionTag>> tagsByPlace = new LinkedHashMap<>();
 
@@ -120,15 +120,15 @@ public class CandidatePlaceSearchPolicy {
                     .getOrDefault(tag, List.of());
             for (RouteCandidate candidate : tagCandidates) {
                 final Place place = candidate.getPlace();
-                if (!searchedPlaceNames.contains(place.getName()) || !placeCondition.test(place)) {
+                if (!searchedPlaceSet.contains(place) || !placeCondition.test(place)) {
                     continue;
                 }
-                if (selectedPlaceNames.contains(place.getName())) {
+                if (selectedPlaceSet.contains(place)) {
                     addTag(tagsByPlace, place, tag);
                     continue;
                 }
                 selectedByTag.put(tag, place);
-                selectedPlaceNames.add(place.getName());
+                selectedPlaceSet.add(place);
                 addTag(tagsByPlace, place, tag);
                 break;
             }
@@ -165,10 +165,8 @@ public class CandidatePlaceSearchPolicy {
         return copiedTagsByPlace;
     }
 
-    private Set<String> toPlaceNames(final List<Place> places) {
-        final Set<String> placeNames = new HashSet<>();
-        places.forEach(place -> placeNames.add(place.getName()));
-        return placeNames;
+    private Set<Place> toPlaceSet(final List<Place> places) {
+        return new HashSet<>(places);
     }
 
     private Map<Place, List<CandidateSelectionTag>> normalizeTransferTags(

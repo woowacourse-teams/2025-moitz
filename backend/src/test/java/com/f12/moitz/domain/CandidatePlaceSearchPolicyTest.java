@@ -14,7 +14,7 @@ class CandidatePlaceSearchPolicyTest {
     private final CandidatePlaceSearchPolicy candidatePlaceSearchPolicy = new CandidatePlaceSearchPolicy();
 
     @Test
-    @DisplayName("추천 후보는 역 기준으로 중복 제거하고 선택된 후보가 속한 태그를 모두 부여한다")
+    @DisplayName("추천 후보는 장소 기준으로 중복 제거하고 선택된 후보가 속한 태그를 모두 부여한다")
     void select_AssignsAllMatchedTagsWithoutDuplicatingPlaces() {
         final RouteCandidate shared = routeCandidate("공통후보역");
         final RouteCandidate maxBurden = routeCandidate("최장후보역");
@@ -46,6 +46,34 @@ class CandidatePlaceSearchPolicyTest {
                 .containsEntry(efficiency.getPlace(), List.of(CandidateSelectionTag.EFFICIENCY))
                 .containsEntry(transfer.getPlace(), List.of(CandidateSelectionTag.TRANSFER))
                 .containsEntry(general.getPlace(), List.of(CandidateSelectionTag.GENERAL));
+    }
+
+    @Test
+    @DisplayName("장소명이 같아도 좌표가 다르면 서로 다른 추천 후보로 선택한다")
+    void select_DoesNotDeduplicateOnlyByPlaceName() {
+        final RouteCandidate first = routeCandidate("동명장소", new Point(127.1, 37.1));
+        final RouteCandidate second = routeCandidate("동명장소", new Point(127.2, 37.2));
+        final Map<CandidateSelectionTag, List<RouteCandidate>> tagSelections = new LinkedHashMap<>();
+        tagSelections.put(CandidateSelectionTag.FAIRNESS, List.of(first));
+        tagSelections.put(CandidateSelectionTag.EFFICIENCY, List.of(second));
+        final CandidateSelection candidateSelection = new CandidateSelection(
+                List.of(first, second),
+                DispersionPolicy.TIER_4,
+                DispersionPolicy.TIER_4,
+                2,
+                false,
+                tagSelections
+        );
+
+        final RecommendedCandidates recommendedCandidates = candidatePlaceSearchPolicy.select(
+                candidateSelection,
+                candidateSelection.getSearchCandidatePlaces(),
+                ignored -> true,
+                2
+        );
+
+        assertThat(recommendedCandidates.getRecommendedCandidatePlaces())
+                .containsExactly(first.getPlace(), second.getPlace());
     }
 
     @Test
@@ -255,6 +283,34 @@ class CandidatePlaceSearchPolicyTest {
     }
 
     @Test
+    @DisplayName("장소명이 같아도 좌표가 다르면 미검색 장소를 다음 검색 대상으로 선택한다")
+    void selectNextSearchPlaces_DoesNotSkipUnsearchedPlaceOnlyByPlaceName() {
+        final RouteCandidate searched = routeCandidate("동명장소", new Point(127.1, 37.1));
+        final RouteCandidate unsearched = routeCandidate("동명장소", new Point(127.2, 37.2));
+        final Map<CandidateSelectionTag, List<RouteCandidate>> tagSelections = new LinkedHashMap<>();
+        tagSelections.put(CandidateSelectionTag.FAIRNESS, List.of(searched));
+        tagSelections.put(CandidateSelectionTag.EFFICIENCY, List.of(unsearched));
+        final CandidateSelection candidateSelection = new CandidateSelection(
+                List.of(searched, unsearched),
+                DispersionPolicy.TIER_4,
+                DispersionPolicy.TIER_4,
+                2,
+                false,
+                tagSelections
+        );
+
+        final List<Place> nextSearchPlaces = candidatePlaceSearchPolicy.selectNextSearchPlaces(
+                candidateSelection,
+                List.of(searched.getPlace()),
+                ignored -> true,
+                2
+        );
+
+        assertThat(nextSearchPlaces)
+                .containsExactly(unsearched.getPlace());
+    }
+
+    @Test
     @DisplayName("비어있는 태그의 미검색 후보가 더 이상 없으면 일반 후보로 추천 개수를 보충한다")
     void selectNextSearchPlaces_FillsWithGeneralCandidatesWhenMissingTagCandidatesAreExhausted() {
         final RouteCandidate fairness = routeCandidate("공평후보역");
@@ -306,8 +362,12 @@ class CandidatePlaceSearchPolicyTest {
     }
 
     private RouteCandidate routeCandidate(final String name) {
+        return routeCandidate(name, new Point(127.0, 37.0));
+    }
+
+    private RouteCandidate routeCandidate(final String name, final Point point) {
         final Place start = place("출발역");
-        final Place end = place(name);
+        final Place end = new Place(name, point);
         return new RouteCandidate(
                 end,
                 new Routes(List.of(new Route(List.of(new Path(
