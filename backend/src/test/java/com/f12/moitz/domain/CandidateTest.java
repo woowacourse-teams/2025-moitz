@@ -177,14 +177,14 @@ class CandidateTest {
                 recommendedPlaces,
                 routes,
                 courses,
-                List.of(CandidateSelectionTag.FAIRNESS),
-                0
+                List.of(CandidateSelectionTag.FAIRNESS)
         );
 
         assertSoftly(softAssertions -> {
             softAssertions.assertThat(candidate.getDescription()).isEqualTo("#공평");
             softAssertions.assertThat(candidate.getReason()).isEqualTo("이동 시간이 고르게 분산됩니다.");
             softAssertions.assertThat(candidate.getTag()).isEqualTo(CandidateSelectionTag.FAIRNESS);
+            softAssertions.assertThat(candidate.getVotes()).isZero();
         });
     }
 

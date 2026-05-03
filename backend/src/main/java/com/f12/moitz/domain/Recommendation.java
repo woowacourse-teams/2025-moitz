@@ -21,7 +21,6 @@ public class Recommendation {
             final Map<Place, Routes> routesByPlace,
             final Map<Place, Courses> coursesByPlace,
             final Map<Place, List<CandidateSelectionTag>> tagsByPlace,
-            final int votes,
             final List<RecommendCondition> recommendConditions
     ) {
         return new Recommendation(
@@ -30,7 +29,6 @@ public class Recommendation {
                 routesByPlace,
                 coursesByPlace,
                 tagsByPlace,
-                votes,
                 recommendConditions
         );
     }
@@ -41,7 +39,6 @@ public class Recommendation {
             final Map<Place, Routes> routesByPlace,
             final Map<Place, Courses> coursesByPlace,
             final Map<Place, List<CandidateSelectionTag>> tagsByPlace,
-            final int votes,
             final List<RecommendCondition> recommendConditions
     ) {
         validateCreationInputs(
@@ -70,8 +67,7 @@ public class Recommendation {
                         recommendedPlacesByPlace,
                         routesByPlace,
                         coursesByPlace,
-                        tagsByPlace,
-                        votes
+                        tagsByPlace
                 ))
                 .toList();
         validate(candidates);
@@ -166,8 +162,7 @@ public class Recommendation {
             final Map<Place, CategorizedRecommendedPlaces> recommendedPlaces,
             final Map<Place, Routes> routesByPlace,
             final Map<Place, Courses> coursesByPlace,
-            final Map<Place, List<CandidateSelectionTag>> tagsByPlace,
-            final int votes
+            final Map<Place, List<CandidateSelectionTag>> tagsByPlace
     ) {
         return Candidate.create(
                 place,
@@ -175,8 +170,7 @@ public class Recommendation {
                 recommendedPlaces.get(place),
                 routesByPlace.get(place),
                 coursesByPlace.get(place),
-                tagsByPlace.getOrDefault(place, List.of(CandidateSelectionTag.GENERAL)),
-                votes
+                tagsByPlace.getOrDefault(place, List.of(CandidateSelectionTag.GENERAL))
         );
     }
 

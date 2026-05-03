@@ -77,7 +77,6 @@ class RecommendationTest {
                             routesByPlace,
                             coursesByPlace,
                             tagsByPlace,
-                            0,
                             recommendConditions
                     ))
                     .isInstanceOf(IllegalArgumentException.class)
@@ -88,7 +87,6 @@ class RecommendationTest {
                             routesByPlace,
                             coursesByPlace,
                             tagsByPlace,
-                            0,
                             recommendConditions
                     ))
                     .isInstanceOf(IllegalArgumentException.class)
@@ -99,7 +97,6 @@ class RecommendationTest {
                             null,
                             coursesByPlace,
                             tagsByPlace,
-                            0,
                             recommendConditions
                     ))
                     .isInstanceOf(IllegalArgumentException.class)
@@ -110,7 +107,6 @@ class RecommendationTest {
                             routesByPlace,
                             null,
                             tagsByPlace,
-                            0,
                             recommendConditions
                     ))
                     .isInstanceOf(IllegalArgumentException.class)
@@ -121,7 +117,6 @@ class RecommendationTest {
                             routesByPlace,
                             coursesByPlace,
                             null,
-                            0,
                             recommendConditions
                     ))
                     .isInstanceOf(IllegalArgumentException.class)
@@ -132,7 +127,6 @@ class RecommendationTest {
                             routesByPlace,
                             coursesByPlace,
                             tagsByPlace,
-                            0,
                             List.of()
                     ))
                     .isInstanceOf(IllegalArgumentException.class)
@@ -189,7 +183,6 @@ class RecommendationTest {
                 Map.of(recommendedPlace, routes),
                 Map.of(recommendedPlace, courses),
                 Map.of(recommendedPlace, List.of(CandidateSelectionTag.FAIRNESS)),
-                0,
                 List.of(RecommendCondition.CAFE)
         );
 
@@ -198,6 +191,7 @@ class RecommendationTest {
         assertThat(recommendation.get(0).getTags()).containsExactly(CandidateSelectionTag.FAIRNESS);
         assertThat(recommendation.get(0).getDescription()).isEqualTo("#공평");
         assertThat(recommendation.get(0).getReason()).isEqualTo("이동 시간이 고른 후보입니다.");
+        assertThat(recommendation.get(0).getVotes()).isZero();
     }
 
     @Test
@@ -234,7 +228,6 @@ class RecommendationTest {
                             Map.of(),
                             coursesByPlace,
                             tagsByPlace,
-                            0,
                             recommendConditions
                     ))
                     .isInstanceOf(IllegalArgumentException.class)
@@ -245,7 +238,6 @@ class RecommendationTest {
                             routesByPlace,
                             Map.of(),
                             tagsByPlace,
-                            0,
                             recommendConditions
                     ))
                     .isInstanceOf(IllegalArgumentException.class)
@@ -256,7 +248,6 @@ class RecommendationTest {
                             routesByPlace,
                             coursesByPlace,
                             Map.of(),
-                            0,
                             recommendConditions
                     ))
                     .isInstanceOf(IllegalArgumentException.class)
@@ -282,7 +273,6 @@ class RecommendationTest {
                 Map.of(validPlace, validRoutes),
                 Map.of(validPlace, validCourses),
                 Map.of(validPlace, List.of(CandidateSelectionTag.FAIRNESS)),
-                0,
                 List.of(RecommendCondition.CAFE)
         );
 
@@ -304,7 +294,6 @@ class RecommendationTest {
                         Map.of(recommendedPlace, routes),
                         Map.of(recommendedPlace, courses),
                         Map.of(recommendedPlace, List.of(CandidateSelectionTag.FAIRNESS)),
-                        0,
                         List.of(RecommendCondition.RESTAURANT)
                 ))
                 .isInstanceOf(IllegalArgumentException.class)

@@ -36,7 +36,6 @@ import org.springframework.util.StopWatch;
 @Service
 public class RecommendationService {
 
-    private static final int STARTING_VOTES = 0;
     private static final int PLACE_SEARCH_POOL_LIMIT = 50;
     private static final int RECOMMENDED_CANDIDATE_TARGET_COUNT = 5;
 
@@ -139,7 +138,6 @@ public class RecommendationService {
                 recommendedCandidateRouteResult.getRoutesByPlace(),
                 recommendedCandidateRouteResult.getCoursesByPlace(),
                 recommendedCandidates.getTagsByPlace(),
-                STARTING_VOTES,
                 recommendConditions
         );
         stopWatch.stop();

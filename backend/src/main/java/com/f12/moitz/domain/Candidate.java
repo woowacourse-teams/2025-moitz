@@ -9,6 +9,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Candidate {
 
+    private static final int INITIAL_VOTES = 0;
+
     private Place destination;
     private Routes routes;
     private Courses courses;
@@ -24,8 +26,7 @@ public class Candidate {
             final CategorizedRecommendedPlaces recommendedPlaces,
             final Routes routes,
             final Courses courses,
-            final List<CandidateSelectionTag> tags,
-            final int votes
+            final List<CandidateSelectionTag> tags
     ) {
         return new Candidate(
                 destination,
@@ -34,7 +35,7 @@ public class Candidate {
                 routes,
                 courses,
                 tags,
-                votes
+                INITIAL_VOTES
         );
     }
 
