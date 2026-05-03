@@ -80,7 +80,7 @@ class CandidatePlaceSearchPolicyTest {
 
     @Test
     @DisplayName("최소 환승 태그는 최종 후보 중 환승 점수가 가장 낮은 후보에만 부여한다")
-    void select_AssignsTransferTagOnlyToBestTransferScoresAmongFinalPlaces() {
+    void select_AssignsTransferTagOnlyToBestTransferBurdensAmongFinalPlaces() {
         final RouteCandidate wangsimni = routeCandidateWithTransfers("왕십리역", List.of(0, 0, 2, 2));
         final RouteCandidate oksu = routeCandidateWithTransfers("옥수역", List.of(0, 1, 0, 1));
         final RouteCandidate yaksu = routeCandidateWithTransfers("약수역", List.of(1, 1, 0, 1));
@@ -119,7 +119,7 @@ class CandidatePlaceSearchPolicyTest {
 
     @Test
     @DisplayName("최종 후보 중 같은 최소 환승 점수인 후보에는 최소 환승 태그를 함께 부여한다")
-    void select_AddsTransferTagToAllBestTransferScorePlaces() {
+    void select_AddsTransferTagToAllBestTransferBurdenPlaces() {
         final RouteCandidate fairness = routeCandidateWithTransfers("공평후보역", List.of(0, 1));
         final RouteCandidate general = routeCandidateWithTransfers("일반후보역", List.of(0, 1));
         final RouteCandidate highTransfer = routeCandidateWithTransfers("환승많은역", List.of(1, 1));

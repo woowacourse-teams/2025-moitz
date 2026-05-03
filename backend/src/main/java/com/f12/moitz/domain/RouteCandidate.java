@@ -23,6 +23,10 @@ public class RouteCandidate {
         return routes.calculateFairnessScore();
     }
 
+    public TransferBurden calculateTransferBurden() {
+        return routes.calculateTransferBurden();
+    }
+
     public boolean isAcceptable(final DispersionPolicy dispersionPolicy) {
         return routes.isAcceptable(dispersionPolicy);
     }

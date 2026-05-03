@@ -20,7 +20,7 @@ public class Routes {
     }
 
     public boolean isAcceptable(final DispersionPolicy dispersionPolicy) {
-        return calculateFairnessScore().isAcceptable(dispersionPolicy);
+        return dispersionPolicy.isAcceptable(calculateFairnessScore());
     }
 
     public FairnessScore calculateFairnessScore() {
@@ -36,6 +36,14 @@ public class Routes {
                 calculateAverageTravelTime(),
                 medianTravelTime - minTravelTime,
                 maxTravelTime - medianTravelTime
+        );
+    }
+
+    public TransferBurden calculateTransferBurden() {
+        return new TransferBurden(
+                calculateAverageTransferCount(),
+                calculateMaxTransferCount(),
+                calculateTransferDiff()
         );
     }
 

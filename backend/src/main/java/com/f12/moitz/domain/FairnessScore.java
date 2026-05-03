@@ -70,6 +70,14 @@ public class FairnessScore implements Comparable<FairnessScore> {
         return dispersionPolicy.isAcceptable(this);
     }
 
+    public TransferBurden getTransferBurden() {
+        return new TransferBurden(
+                averageTransferCount,
+                maxTransferCount,
+                transferDiff
+        );
+    }
+
     @Override
     public int compareTo(final FairnessScore other) {
         final int weightedScoreComparison = Double.compare(weightedScore, other.weightedScore);

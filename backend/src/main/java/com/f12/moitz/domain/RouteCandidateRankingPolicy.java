@@ -94,10 +94,7 @@ public class RouteCandidateRankingPolicy {
     }
 
     private Comparator<RouteCandidate> prioritizeTransfer(final Function<RouteCandidate, FairnessScore> scoreResolver) {
-        return Comparator.comparingDouble((RouteCandidate candidate) -> scoreResolver.apply(candidate)
-                        .getAverageTransferCount())
-                .thenComparingInt(candidate -> scoreResolver.apply(candidate).getMaxTransferCount())
-                .thenComparingInt(candidate -> scoreResolver.apply(candidate).getTransferDiff())
+        return Comparator.comparing((RouteCandidate candidate) -> scoreResolver.apply(candidate).getTransferBurden())
                 .thenComparingInt(candidate -> scoreResolver.apply(candidate).getAverageTravelTime())
                 .thenComparingInt(candidate -> scoreResolver.apply(candidate).getMaxTravelTime())
                 .thenComparing(scoreResolver);

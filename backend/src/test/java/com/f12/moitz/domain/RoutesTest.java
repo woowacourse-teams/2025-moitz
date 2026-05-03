@@ -87,6 +87,22 @@ class RoutesTest {
         assertThat(routes.calculateFairnessScore().getAverageTransferCount()).isEqualTo(0.5);
     }
 
+    @Test
+    @DisplayName("환승 부담을 계산한다")
+    void calculateTransferBurden() {
+        final Place startA = new Place("출발A", new Point(127.0, 37.0));
+        final Place startB = new Place("출발B", new Point(127.1, 37.1));
+        final Place destination = new Place("도착", new Point(127.3, 37.3));
+
+        final Routes routes = new Routes(java.util.List.of(
+                route(startA, destination, 20, 0),
+                route(startB, destination, 20, 2)
+        ));
+
+        assertThat(routes.calculateTransferBurden())
+                .isEqualTo(new TransferBurden(1.0, 2, 2));
+    }
+
     private Route route(final Place start, final Place end, final int minutes, final int transferCount) {
         final java.util.List<Path> paths = new java.util.ArrayList<>();
         Place currentStart = start;

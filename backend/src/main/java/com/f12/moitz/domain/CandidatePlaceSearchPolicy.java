@@ -177,24 +177,24 @@ public class CandidatePlaceSearchPolicy {
             final Map<Place, List<CandidateSelectionTag>> tagsByPlace
     ) {
         final Map<String, RouteCandidate> candidatesByPlaceName = candidatesByPlaceName(candidateSelection);
-        final List<TransferScore> transferScores = recommendedCandidatePlaces.stream()
+        final List<TransferBurden> transferBurdens = recommendedCandidatePlaces.stream()
                 .map(place -> candidatesByPlaceName.get(place.getName()))
                 .filter(Objects::nonNull)
-                .map(candidate -> toTransferScore(candidate.calculateFairnessScore()))
+                .map(RouteCandidate::calculateTransferBurden)
                 .toList();
 
-        if (transferScores.isEmpty()) {
+        if (transferBurdens.isEmpty()) {
             return tagsByPlace;
         }
 
-        final TransferScore bestTransferScore = transferScores.stream()
-                .min(TransferScore::compareTo)
+        final TransferBurden bestTransferBurden = transferBurdens.stream()
+                .min(TransferBurden::compareTo)
                 .orElseThrow();
         final Set<String> transferCandidateNames = transferCandidateNames(candidateSelection);
         final Map<Place, List<CandidateSelectionTag>> normalizedTagsByPlace = new LinkedHashMap<>();
         recommendedCandidatePlaces.forEach(place -> normalizedTagsByPlace.put(
                 place,
-                normalizeTransferTag(place, tagsByPlace, candidatesByPlaceName, transferCandidateNames, bestTransferScore)
+                normalizeTransferTag(place, tagsByPlace, candidatesByPlaceName, transferCandidateNames, bestTransferBurden)
         ));
         return normalizedTagsByPlace;
     }
@@ -223,12 +223,12 @@ public class CandidatePlaceSearchPolicy {
             final Map<Place, List<CandidateSelectionTag>> tagsByPlace,
             final Map<String, RouteCandidate> candidatesByPlaceName,
             final Set<String> transferCandidateNames,
-            final TransferScore bestTransferScore
+            final TransferBurden bestTransferBurden
     ) {
         final List<CandidateSelectionTag> tags = tagsByPlace.getOrDefault(place, List.of(CandidateSelectionTag.GENERAL));
         final RouteCandidate candidate = candidatesByPlaceName.get(place.getName());
         final boolean isBestTransfer = candidate != null
-                && toTransferScore(candidate.calculateFairnessScore()).compareTo(bestTransferScore) == 0;
+                && candidate.calculateTransferBurden().compareTo(bestTransferBurden) == 0;
 
         if (isBestTransfer && transferCandidateNames.contains(place.getName())) {
             if (tags.contains(CandidateSelectionTag.TRANSFER)) {
@@ -241,34 +241,6 @@ public class CandidatePlaceSearchPolicy {
         return tags.stream()
                 .filter(tag -> tag != CandidateSelectionTag.TRANSFER)
                 .toList();
-    }
-
-    private TransferScore toTransferScore(final FairnessScore fairnessScore) {
-        return new TransferScore(
-                fairnessScore.getAverageTransferCount(),
-                fairnessScore.getMaxTransferCount(),
-                fairnessScore.getTransferDiff()
-        );
-    }
-
-    private record TransferScore(
-            double averageTransferCount,
-            int maxTransferCount,
-            int transferDiff
-    ) implements Comparable<TransferScore> {
-
-        @Override
-        public int compareTo(final TransferScore other) {
-            final int averageComparison = Double.compare(averageTransferCount, other.averageTransferCount);
-            if (averageComparison != 0) {
-                return averageComparison;
-            }
-            if (maxTransferCount != other.maxTransferCount) {
-                return Integer.compare(maxTransferCount, other.maxTransferCount);
-            }
-            return Integer.compare(transferDiff, other.transferDiff);
-        }
-
     }
 
     private record TaggedPlaceSelection(
