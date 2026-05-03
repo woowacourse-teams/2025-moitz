@@ -142,8 +142,9 @@ class CandidateTest {
                 600,
                 SubwayLine.fromTitle("2호선")
         )));
+        final Course course = new Course(List.of(startPlace.getPoint(), endPlace.getPoint()));
         final Routes routes = new Routes(List.of(route));
-        final Courses courses = new Courses(List.of(new Course(List.of(startPlace.getPoint(), endPlace.getPoint()))));
+        final Courses courses = new Courses(List.of(course));
         final RecommendedPlace recommendedPlace = new RecommendedPlace("스타벅스", DEFAULT_POINT, "카페", 5, "url", "imageUrl");
         final RecommendedPlaces recommendedPlaces = new RecommendedPlaces(
                 Map.of(RecommendCondition.CAFE, List.of(recommendedPlace))
@@ -176,8 +177,7 @@ class CandidateTest {
                 600,
                 SubwayLine.fromTitle("2호선")
         )));
-        final Routes routes = new Routes(List.of(route));
-        final Courses courses = new Courses(List.of(new Course(List.of(startPlace.getPoint(), endPlace.getPoint()))));
+        final Course course = new Course(List.of(startPlace.getPoint(), endPlace.getPoint()));
         final RecommendedPlace recommendedPlace = new RecommendedPlace("스타벅스", DEFAULT_POINT, "카페", 5, "url", "imageUrl");
         final RecommendedPlaces recommendedPlaces = new RecommendedPlaces(
                 Map.of(RecommendCondition.CAFE, List.of(recommendedPlace))
@@ -188,8 +188,7 @@ class CandidateTest {
                 endPlace,
                 recommendationReason,
                 recommendedPlaces,
-                routes,
-                courses,
+                List.of(new CandidateRoute(route, course)),
                 List.of(CandidateSelectionTag.FAIRNESS)
         );
 

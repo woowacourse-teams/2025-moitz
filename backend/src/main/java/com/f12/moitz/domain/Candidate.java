@@ -23,16 +23,14 @@ public class Candidate {
             final Place destination,
             final RecommendationReason recommendationReason,
             final RecommendedPlaces recommendedPlaces,
-            final Routes routes,
-            final Courses courses,
+            final List<CandidateRoute> candidateRoutes,
             final List<CandidateSelectionTag> tags
     ) {
         return new Candidate(
                 destination,
                 recommendationReason,
                 recommendedPlaces,
-                routes,
-                courses,
+                candidateRoutes,
                 tags,
                 INITIAL_VOTES
         );
@@ -42,12 +40,14 @@ public class Candidate {
             final Place destination,
             final RecommendationReason recommendationReason,
             final RecommendedPlaces recommendedPlaces,
-            final Routes routes,
-            final Courses courses,
+            final List<CandidateRoute> candidateRoutes,
             final List<CandidateSelectionTag> tags,
             final int votes
     ) {
         validateRecommendationReason(recommendationReason);
+        validateCandidateRoutes(candidateRoutes);
+        final Routes routes = toRoutes(candidateRoutes);
+        final Courses courses = toCourses(candidateRoutes);
         validate(
                 destination,
                 routes,
@@ -174,6 +174,27 @@ public class Candidate {
         if (recommendationReason == null) {
             throw new IllegalArgumentException("추천 이유는 필수입니다.");
         }
+    }
+
+    private void validateCandidateRoutes(final List<CandidateRoute> candidateRoutes) {
+        if (candidateRoutes == null || candidateRoutes.isEmpty()) {
+            throw new IllegalArgumentException("후보 경로 목록은 비어있거나 null일 수 없습니다.");
+        }
+        if (candidateRoutes.stream().anyMatch(candidateRoute -> candidateRoute == null)) {
+            throw new IllegalArgumentException("후보 경로 목록에 null이 포함될 수 없습니다.");
+        }
+    }
+
+    private Routes toRoutes(final List<CandidateRoute> candidateRoutes) {
+        return new Routes(candidateRoutes.stream()
+                .map(CandidateRoute::getRoute)
+                .toList());
+    }
+
+    private Courses toCourses(final List<CandidateRoute> candidateRoutes) {
+        return new Courses(candidateRoutes.stream()
+                .map(CandidateRoute::getCourse)
+                .toList());
     }
 
     private List<CandidateSelectionTag> resolveTag(final CandidateSelectionTag tag) {

@@ -2,8 +2,10 @@ package com.f12.moitz.domain;
 
 import java.util.Collections;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.stream.IntStream;
 
 public class RecommendedCandidateTravels {
 
@@ -50,7 +52,16 @@ public class RecommendedCandidateTravels {
         }
     }
 
-    public Routes getRoutes(final Place place) {
+    public List<CandidateRoute> getCandidateRoutes(final Place place) {
+        final Routes routes = getRoutes(place);
+        final Courses courses = getCourses(place);
+        return IntStream.range(0, routes.size())
+                .mapToObj(index -> new CandidateRoute(routes.get(index), courses.get(index)))
+                .toList();
+    }
+
+    private Routes getRoutes(final Place place) {
+        validatePlace(place);
         final Routes routes = routesByPlace.get(place);
         if (routes == null) {
             throw new IllegalArgumentException("추천 후보 경로가 누락되었습니다. 추천 지역: " + place.getName());
@@ -58,12 +69,19 @@ public class RecommendedCandidateTravels {
         return routes;
     }
 
-    public Courses getCourses(final Place place) {
+    private Courses getCourses(final Place place) {
+        validatePlace(place);
         final Courses courses = coursesByPlace.get(place);
         if (courses == null) {
             throw new IllegalArgumentException("추천 후보 이동 코스가 누락되었습니다. 추천 지역: " + place.getName());
         }
         return courses;
+    }
+
+    private void validatePlace(final Place place) {
+        if (place == null) {
+            throw new IllegalArgumentException("추천 후보 장소는 null일 수 없습니다.");
+        }
     }
 
 }

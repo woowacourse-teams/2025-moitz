@@ -1,5 +1,6 @@
 package com.f12.moitz.domain;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.SoftAssertions.assertSoftly;
 
@@ -63,6 +64,46 @@ class RecommendedCandidateTravelsTest {
                     ))
                     .isInstanceOf(IllegalArgumentException.class)
                     .hasMessage("추천 후보 이동 코스는 null일 수 없습니다. 추천 지역: 선릉역");
+        });
+    }
+
+    @Test
+    @DisplayName("추천 후보 경로와 이동 코스를 하나의 후보 경로 단위로 제공한다")
+    void getCandidateRoutes() {
+        final Place seolleung = place("선릉역");
+        final Routes routes = routes(seolleung, 2);
+        final Courses courses = courses(seolleung, 2);
+        final RecommendedCandidateTravels travels = new RecommendedCandidateTravels(
+                Map.of(seolleung, routes),
+                Map.of(seolleung, courses)
+        );
+
+        final List<CandidateRoute> candidateRoutes = travels.getCandidateRoutes(seolleung);
+
+        assertThat(candidateRoutes).hasSize(2);
+        assertThat(candidateRoutes.get(0).getRoute()).isEqualTo(routes.get(0));
+        assertThat(candidateRoutes.get(0).getCourse()).isEqualTo(courses.get(0));
+        assertThat(candidateRoutes.get(1).getRoute()).isEqualTo(routes.get(1));
+        assertThat(candidateRoutes.get(1).getCourse()).isEqualTo(courses.get(1));
+    }
+
+    @Test
+    @DisplayName("추천 후보가 아닌 장소의 후보 경로는 조회할 수 없다")
+    void getCandidateRoutes_ThrowsExceptionWhenPlaceIsNotRecommendedCandidate() {
+        final Place seolleung = place("선릉역");
+        final Place samsung = place("삼성역");
+        final RecommendedCandidateTravels travels = new RecommendedCandidateTravels(
+                Map.of(seolleung, routes(seolleung)),
+                Map.of(seolleung, courses(seolleung))
+        );
+
+        assertSoftly(softAssertions -> {
+            softAssertions.assertThatThrownBy(() -> travels.getCandidateRoutes(null))
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessage("추천 후보 장소는 null일 수 없습니다.");
+            softAssertions.assertThatThrownBy(() -> travels.getCandidateRoutes(samsung))
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessage("추천 후보 경로가 누락되었습니다. 추천 지역: 삼성역");
         });
     }
 

@@ -68,10 +68,18 @@ class RecommendedCandidateRouteServiceTest {
                 candidateRoutes
         );
 
-        assertThat(result.getRoutes(seolleung)).isEqualTo(seolleungRoutes);
-        assertThat(result.getRoutes(samsung)).isEqualTo(samsungRoutes);
-        assertThat(result.getCourses(seolleung).getCourses()).hasSize(2);
-        assertThat(result.getCourses(samsung).getCourses()).hasSize(2);
+        assertThat(result.getCandidateRoutes(seolleung))
+                .extracting(candidateRoute -> candidateRoute.getRoute())
+                .containsExactly(seolleungRoutes.get(0), seolleungRoutes.get(1));
+        assertThat(result.getCandidateRoutes(samsung))
+                .extracting(candidateRoute -> candidateRoute.getRoute())
+                .containsExactly(samsungRoutes.get(0), samsungRoutes.get(1));
+        assertThat(result.getCandidateRoutes(seolleung))
+                .extracting(candidateRoute -> candidateRoute.getCourse())
+                .hasSize(2);
+        assertThat(result.getCandidateRoutes(samsung))
+                .extracting(candidateRoute -> candidateRoute.getCourse())
+                .hasSize(2);
 
         final ArgumentCaptor<List<OriginDestination>> captor = ArgumentCaptor.forClass(List.class);
         verify(routeFinder).findCourses(captor.capture());

@@ -128,8 +128,7 @@ public class Recommendation {
             final RecommendedCandidateTravels recommendedCandidateTravels,
             final RecommendedCandidates recommendedCandidates
     ) {
-        recommendedCandidateTravels.getRoutes(place);
-        recommendedCandidateTravels.getCourses(place);
+        recommendedCandidateTravels.getCandidateRoutes(place);
         recommendedCandidates.getTags(place);
     }
 
@@ -154,8 +153,7 @@ public class Recommendation {
                 place,
                 reasonsByPlace.get(place),
                 recommendedPlaces.get(place),
-                recommendedCandidateTravels.getRoutes(place),
-                recommendedCandidateTravels.getCourses(place),
+                recommendedCandidateTravels.getCandidateRoutes(place),
                 recommendedCandidates.getTags(place)
         );
     }
