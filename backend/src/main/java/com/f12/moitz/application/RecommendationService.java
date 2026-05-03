@@ -127,8 +127,7 @@ public class RecommendationService {
                 reasonsByPlace,
                 recommendedPlaces,
                 recommendedCandidateTravels,
-                recommendedCandidates,
-                recommendConditions
+                recommendedCandidates
         );
         stopWatch.stop();
         log.debug("추천 서비스 완료. {}", stopWatch.shortSummary());
@@ -196,15 +195,13 @@ public class RecommendationService {
             final Map<Place, RecommendationReason> reasonsByPlace,
             final Map<Place, RecommendedPlaces> recommendedPlaces,
             final RecommendedCandidateTravels recommendedCandidateTravels,
-            final RecommendedCandidates recommendedCandidates,
-            final List<RecommendCondition> recommendConditions
+            final RecommendedCandidates recommendedCandidates
     ) {
         return recommendationCreationService.create(
                 reasonsByPlace,
                 recommendedPlaces,
                 recommendedCandidateTravels,
-                recommendedCandidates,
-                recommendConditions
+                recommendedCandidates
         );
     }
 

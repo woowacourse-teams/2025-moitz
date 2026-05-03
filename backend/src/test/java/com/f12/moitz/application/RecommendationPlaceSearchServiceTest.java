@@ -84,6 +84,46 @@ class RecommendationPlaceSearchServiceTest {
         assertThat(captor.getValue()).containsExactly(seolleung, samsung);
     }
 
+    @Test
+    @DisplayName("장소 검색 결과가 조건을 만족하지 못하면 추천 후보에서 제외한다")
+    void search_FiltersPlacesWithoutRequiredRecommendedPlaces() {
+        final RecommendationPlaceSearchService service = new RecommendationPlaceSearchService(placeRecommender);
+        final Place gangnam = new Place("강남역", new Point(127.027, 37.497));
+        final Place seolleung = new Place("선릉역", new Point(127.048, 37.504));
+        final Place samsung = new Place("삼성역", new Point(127.063, 37.508));
+        final RouteCandidate seolleungCandidate = new RouteCandidate(seolleung, createRoutes(gangnam, seolleung));
+        final RouteCandidate samsungCandidate = new RouteCandidate(samsung, createRoutes(gangnam, samsung));
+        final CandidateSelection candidateSelection = new CandidateSelection(
+                List.of(seolleungCandidate, samsungCandidate),
+                DispersionPolicy.TIER_1,
+                DispersionPolicy.TIER_1,
+                2,
+                false,
+                Map.of(
+                        CandidateSelectionTag.FAIRNESS, List.of(seolleungCandidate),
+                        CandidateSelectionTag.EFFICIENCY, List.of(samsungCandidate)
+                )
+        );
+        final Map<Place, Routes> candidateRoutes = Map.of(
+                seolleung, seolleungCandidate.getRoutes(),
+                samsung, samsungCandidate.getRoutes()
+        );
+        given(placeRecommender.recommendPlaces(anyList(), anyList())).willReturn(Map.of(
+                seolleung, createRecommendedPlaces("선릉 카페"),
+                samsung, new RecommendedPlaces(Map.of())
+        ));
+
+        final RecommendationPlaceSearchResult result = service.search(
+                candidateSelection,
+                List.of(RecommendCondition.CAFE),
+                candidateRoutes,
+                2,
+                2
+        );
+
+        assertThat(result.getRecommendedCandidates().getPlaces()).containsExactly(seolleung);
+    }
+
     private Routes createRoutes(final Place origin, final Place destination) {
         return new Routes(List.of(new Route(List.of(new Path(
                 origin,

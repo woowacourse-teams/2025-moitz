@@ -43,8 +43,7 @@ class RecommendationCreationServiceTest {
                 createRecommendedCandidates(
                         List.of(recommendedPlace),
                         Map.of(recommendedPlace, List.of(CandidateSelectionTag.FAIRNESS))
-                ),
-                List.of(RecommendCondition.CAFE)
+                )
         );
 
         assertThat(recommendation.size()).isEqualTo(1);
@@ -53,34 +52,6 @@ class RecommendationCreationServiceTest {
         assertThat(recommendation.get(0).getDescription()).isEqualTo("#공평");
         assertThat(recommendation.get(0).getReason()).isEqualTo("이동 시간이 고른 후보입니다.");
         assertThat(recommendation.get(0).getVotes()).isZero();
-    }
-
-    @Test
-    @DisplayName("추천 장소 조건을 만족하지 못하는 후보는 추천 결과에서 제외한다")
-    void create_FiltersPlacesWithoutRequiredRecommendedPlaces() {
-        final Place startPlace = new Place("잠실역", new Point(127.0, 37.0));
-        final Place validPlace = new Place("선릉역", new Point(127.1, 37.1));
-        final Place invalidPlace = new Place("삼성역", new Point(127.2, 37.2));
-
-        final Recommendation recommendation = service.create(
-                Map.of(
-                        validPlace, new RecommendationReason("#공평", "이동 시간이 고른 후보입니다."),
-                        invalidPlace, new RecommendationReason("#평균최소", "평균 이동 시간이 짧은 후보입니다.")
-                ),
-                Map.of(validPlace, createRecommendedPlaces(RecommendCondition.CAFE)),
-                createRecommendedCandidateTravels(startPlace, validPlace),
-                createRecommendedCandidates(
-                        List.of(validPlace, invalidPlace),
-                        Map.of(
-                                validPlace, List.of(CandidateSelectionTag.FAIRNESS),
-                                invalidPlace, List.of(CandidateSelectionTag.EFFICIENCY)
-                        )
-                ),
-                List.of(RecommendCondition.CAFE)
-        );
-
-        assertThat(recommendation.size()).isEqualTo(1);
-        assertThat(recommendation.get(0).getDestination()).isEqualTo(validPlace);
     }
 
     @Test
@@ -97,8 +68,7 @@ class RecommendationCreationServiceTest {
                 createRecommendedCandidates(
                         List.of(recommendedPlace),
                         Map.of(recommendedPlace, List.of(CandidateSelectionTag.FAIRNESS))
-                ),
-                List.of(RecommendCondition.CAFE)
+                )
         ))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("추천 이유가 누락되었습니다. 추천 지역: 선릉역");

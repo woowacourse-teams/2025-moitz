@@ -2,7 +2,6 @@ package com.f12.moitz.application;
 
 import com.f12.moitz.domain.Candidate;
 import com.f12.moitz.domain.Place;
-import com.f12.moitz.domain.RecommendCondition;
 import com.f12.moitz.domain.Recommendation;
 import com.f12.moitz.domain.RecommendationReason;
 import com.f12.moitz.domain.RecommendedCandidateTravels;
@@ -19,11 +18,9 @@ public class RecommendationCreationService {
             final Map<Place, RecommendationReason> reasonsByPlace,
             final Map<Place, RecommendedPlaces> recommendedPlaces,
             final RecommendedCandidateTravels recommendedCandidateTravels,
-            final RecommendedCandidates recommendedCandidates,
-            final List<RecommendCondition> recommendConditions
+            final RecommendedCandidates recommendedCandidates
     ) {
         final List<Candidate> candidates = recommendedCandidates.getPlaces().stream()
-                .filter(place -> hasRequiredRecommendedPlaces(recommendedPlaces.get(place), recommendConditions))
                 .map(place -> createCandidate(
                         place,
                         reasonsByPlace,
@@ -33,16 +30,6 @@ public class RecommendationCreationService {
                 ))
                 .toList();
         return new Recommendation(candidates);
-    }
-
-    private boolean hasRequiredRecommendedPlaces(
-            final RecommendedPlaces recommendedPlaces,
-            final List<RecommendCondition> recommendConditions
-    ) {
-        if (recommendedPlaces == null) {
-            return false;
-        }
-        return recommendedPlaces.satisfiesAllConditions(recommendConditions);
     }
 
     private Candidate createCandidate(
