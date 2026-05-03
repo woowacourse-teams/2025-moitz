@@ -4,8 +4,6 @@ import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 public class CandidateSelectionPolicy {
 
@@ -18,22 +16,21 @@ public class CandidateSelectionPolicy {
     ) {
         validate(candidates, dispersionPolicy, limit);
 
-        final Map<RouteCandidate, FairnessScore> scoresByCandidate = calculateFairnessScores(candidates);
-        final Function<RouteCandidate, FairnessScore> scoreResolver = scoresByCandidate::get;
+        final RouteCandidateScores routeCandidateScores = new RouteCandidateScores(candidates);
         final List<RouteCandidate> sortedCandidates = candidates.stream()
-                .sorted(Comparator.comparing(scoreResolver))
+                .sorted(Comparator.comparing(routeCandidateScores::scoreOf))
                 .toList();
 
         for (DispersionPolicy candidatePolicy : dispersionPolicy.relaxations()) {
             final List<RouteCandidate> acceptableCandidates = sortedCandidates.stream()
-                    .filter(candidate -> scoreResolver.apply(candidate).isAcceptable(candidatePolicy))
+                    .filter(candidate -> routeCandidateScores.scoreOf(candidate).isAcceptable(candidatePolicy))
                     .toList();
 
             if (!acceptableCandidates.isEmpty()) {
                 final Map<CandidateSelectionTag, List<RouteCandidate>> tagSelections = selectTagCandidates(
                         acceptableCandidates,
                         candidatePolicy,
-                        scoreResolver
+                        routeCandidateScores
                 );
                 return CandidateSelection.fromTagSelections(
                         tagSelections,
@@ -50,7 +47,7 @@ public class CandidateSelectionPolicy {
         final Map<CandidateSelectionTag, List<RouteCandidate>> tagSelections = selectTagCandidates(
                 sortedCandidates,
                 DispersionPolicy.TIER_5,
-                scoreResolver
+                routeCandidateScores
         );
         return CandidateSelection.fromTagSelections(
                 tagSelections,
@@ -61,16 +58,6 @@ public class CandidateSelectionPolicy {
                 true,
                 limit
         );
-    }
-
-    private Map<RouteCandidate, FairnessScore> calculateFairnessScores(final List<RouteCandidate> candidates) {
-        return candidates.stream()
-                .collect(Collectors.toMap(
-                        Function.identity(),
-                        RouteCandidate::calculateFairnessScore,
-                        (left, right) -> left,
-                        LinkedHashMap::new
-                ));
     }
 
     private void validate(
@@ -92,7 +79,7 @@ public class CandidateSelectionPolicy {
     private Map<CandidateSelectionTag, List<RouteCandidate>> selectTagCandidates(
             final List<RouteCandidate> candidates,
             final DispersionPolicy dispersionPolicy,
-            final Function<RouteCandidate, FairnessScore> scoreResolver
+            final RouteCandidateScores routeCandidateScores
     ) {
         final Map<CandidateSelectionTag, Integer> tagQuotas = dispersionPolicy.tagQuotas();
         final Map<CandidateSelectionTag, List<RouteCandidate>> tagSelections = new LinkedHashMap<>();
@@ -100,7 +87,7 @@ public class CandidateSelectionPolicy {
         tagQuotas.forEach((tag, quota) -> tagSelections.put(
                 tag,
                 candidates.stream()
-                        .sorted(routeCandidateRankingPolicy.comparatorFor(tag, scoreResolver))
+                        .sorted(routeCandidateRankingPolicy.comparatorFor(tag, routeCandidateScores::scoreOf))
                         .limit(quota)
                         .toList()
         ));
