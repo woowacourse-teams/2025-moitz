@@ -6,7 +6,6 @@ import com.f12.moitz.domain.OriginDestination;
 import com.f12.moitz.domain.Route;
 import com.f12.moitz.domain.RouteOrigins;
 import java.util.List;
-import java.util.Locale;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
@@ -28,31 +27,12 @@ public class RouteOriginDispersionService {
 
         final List<OriginDestination> originDestinations = routeOrigins.createOriginDestinationsBetweenOrigins();
         final List<Route> pairRoutes = routeFinder.findRoutes(originDestinations);
-        final int pairMaxTravelTime = pairRoutes.stream()
-                .mapToInt(Route::calculateTotalTravelTime)
-                .max()
-                .orElse(0);
-        final double pairAverageTravelTime = pairRoutes.stream()
-                .mapToInt(Route::calculateTotalTravelTime)
-                .average()
-                .orElse(0.0);
-        final long longPairCount = pairRoutes.stream()
-                .mapToInt(Route::calculateTotalTravelTime)
-                .filter(minutes -> minutes >= DispersionPolicy.LONG_PAIR_TRAVEL_TIME_MINUTES)
-                .count();
-        final DispersionPolicy dispersionPolicy = DispersionPolicy.resolve(
-                routeOrigins.size(),
-                pairMaxTravelTime,
-                pairAverageTravelTime,
-                longPairCount
-        );
+        final DispersionPolicy dispersionPolicy = routeOrigins.resolveDispersionPolicy(pairRoutes);
 
         log.debug(
-                "출발지 분산도 판정 - 출발역={}, pairMax={}분, pairAvg={}분, longPairCount={}, policy={}",
+                "출발지 분산도 판정 - 출발역={}, pairRoutes={}개, policy={}",
                 routeOrigins.getNames(),
-                pairMaxTravelTime,
-                String.format(Locale.US, "%.1f", pairAverageTravelTime),
-                longPairCount,
+                pairRoutes.size(),
                 dispersionPolicy
         );
         return dispersionPolicy;

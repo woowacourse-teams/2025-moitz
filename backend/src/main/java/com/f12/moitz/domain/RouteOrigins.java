@@ -52,6 +52,37 @@ public class RouteOrigins {
                 .toList();
     }
 
+    public DispersionPolicy resolveDispersionPolicy(final List<Route> pairRoutes) {
+        validatePairRoutes(pairRoutes);
+        final int pairMaxTravelTime = pairRoutes.stream()
+                .mapToInt(Route::calculateTotalTravelTime)
+                .max()
+                .orElse(0);
+        final double pairAverageTravelTime = pairRoutes.stream()
+                .mapToInt(Route::calculateTotalTravelTime)
+                .average()
+                .orElse(0.0);
+        final long longPairCount = pairRoutes.stream()
+                .mapToInt(Route::calculateTotalTravelTime)
+                .filter(minutes -> minutes >= DispersionPolicy.LONG_PAIR_TRAVEL_TIME_MINUTES)
+                .count();
+        return DispersionPolicy.resolve(
+                size(),
+                pairMaxTravelTime,
+                pairAverageTravelTime,
+                longPairCount
+        );
+    }
+
+    private void validatePairRoutes(final List<Route> pairRoutes) {
+        if (pairRoutes == null) {
+            throw new IllegalArgumentException("출발지 간 경로는 null일 수 없습니다.");
+        }
+        if (pairRoutes.stream().anyMatch(route -> route == null)) {
+            throw new IllegalArgumentException("출발지 간 경로는 null일 수 없습니다.");
+        }
+    }
+
     public int size() {
         return origins.size();
     }
