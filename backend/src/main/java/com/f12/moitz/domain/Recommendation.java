@@ -24,6 +24,26 @@ public class Recommendation {
             final int votes,
             final List<RecommendCondition> recommendConditions
     ) {
+        return new Recommendation(
+                reasonsByPlace,
+                recommendedPlacesByPlace,
+                routesByPlace,
+                coursesByPlace,
+                tagsByPlace,
+                votes,
+                recommendConditions
+        );
+    }
+
+    private Recommendation(
+            final Map<Place, RecommendationReason> reasonsByPlace,
+            final Map<Place, CategorizedRecommendedPlaces> recommendedPlacesByPlace,
+            final Map<Place, Routes> routesByPlace,
+            final Map<Place, Courses> coursesByPlace,
+            final Map<Place, List<CandidateSelectionTag>> tagsByPlace,
+            final int votes,
+            final List<RecommendCondition> recommendConditions
+    ) {
         validateCreationInputs(
                 reasonsByPlace,
                 recommendedPlacesByPlace,
@@ -43,22 +63,22 @@ public class Recommendation {
                 coursesByPlace,
                 tagsByPlace
         );
-        return new Recommendation(
-                placesReadyForCandidateCreation.stream()
-                        .map(place -> toCandidate(
-                                place,
-                                reasonsByPlace,
-                                recommendedPlacesByPlace,
-                                routesByPlace,
-                                coursesByPlace,
-                                tagsByPlace,
-                                votes
-                        ))
-                        .toList()
-        );
+        final List<Candidate> candidates = placesReadyForCandidateCreation.stream()
+                .map(place -> toCandidate(
+                        place,
+                        reasonsByPlace,
+                        recommendedPlacesByPlace,
+                        routesByPlace,
+                        coursesByPlace,
+                        tagsByPlace,
+                        votes
+                ))
+                .toList();
+        validate(candidates);
+        this.candidates = sort(candidates);
     }
 
-    private static void validateCreationInputs(
+    private void validateCreationInputs(
             final Map<Place, RecommendationReason> reasonsByPlace,
             final Map<Place, CategorizedRecommendedPlaces> recommendedPlacesByPlace,
             final Map<Place, Routes> routesByPlace,
@@ -86,7 +106,7 @@ public class Recommendation {
         }
     }
 
-    private static List<Place> findPlacesReadyForCandidateCreation(
+    private List<Place> findPlacesReadyForCandidateCreation(
             final Map<Place, RecommendationReason> reasonsByPlace,
             final Map<Place, CategorizedRecommendedPlaces> recommendedPlacesByPlace,
             final List<RecommendCondition> recommendConditions
@@ -99,7 +119,7 @@ public class Recommendation {
                 .toList();
     }
 
-    private static void validateCandidateMaterials(
+    private void validateCandidateMaterials(
             final List<Place> placesReadyForCandidateCreation,
             final Map<Place, Routes> routesByPlace,
             final Map<Place, Courses> coursesByPlace,
@@ -113,7 +133,7 @@ public class Recommendation {
         ));
     }
 
-    private static void validateCandidateMaterials(
+    private void validateCandidateMaterials(
             final Place place,
             final Map<Place, Routes> routesByPlace,
             final Map<Place, Courses> coursesByPlace,
@@ -130,7 +150,7 @@ public class Recommendation {
         }
     }
 
-    private static boolean hasRequiredRecommendedPlaces(
+    private boolean hasRequiredRecommendedPlaces(
             final CategorizedRecommendedPlaces recommendedPlaces,
             final List<RecommendCondition> recommendConditions
     ) {
@@ -140,7 +160,7 @@ public class Recommendation {
         return recommendedPlaces.satisfiesAll(recommendConditions);
     }
 
-    private static Candidate toCandidate(
+    private Candidate toCandidate(
             final Place place,
             final Map<Place, RecommendationReason> reasonsByPlace,
             final Map<Place, CategorizedRecommendedPlaces> recommendedPlaces,

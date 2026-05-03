@@ -27,15 +27,42 @@ public class Candidate {
             final List<CandidateSelectionTag> tags,
             final int votes
     ) {
-        if (recommendationReason == null) {
-            throw new IllegalArgumentException("추천 이유는 필수입니다.");
-        }
         return new Candidate(
+                destination,
+                recommendationReason,
+                recommendedPlaces,
+                routes,
+                courses,
+                tags,
+                votes
+        );
+    }
+
+    private Candidate(
+            final Place destination,
+            final RecommendationReason recommendationReason,
+            final CategorizedRecommendedPlaces recommendedPlaces,
+            final Routes routes,
+            final Courses courses,
+            final List<CandidateSelectionTag> tags,
+            final int votes
+    ) {
+        validateRecommendationReason(recommendationReason);
+        validate(
                 destination,
                 routes,
                 courses,
                 recommendedPlaces,
-                tags,
+                recommendationReason.description(),
+                recommendationReason.reason(),
+                votes
+        );
+        assignFields(
+                destination,
+                routes,
+                courses,
+                recommendedPlaces,
+                resolveTags(tags),
                 recommendationReason.description(),
                 recommendationReason.reason(),
                 votes
@@ -52,7 +79,17 @@ public class Candidate {
             final String reason,
             final int votes
     ) {
-        this(destination, routes, courses, recommendedPlaces, List.of(resolveNullableTag(tag)), description, reason, votes);
+        validate(destination, routes, courses, recommendedPlaces, description, reason, votes);
+        assignFields(
+                destination,
+                routes,
+                courses,
+                recommendedPlaces,
+                resolveTag(tag),
+                description,
+                reason,
+                votes
+        );
     }
 
     public Candidate(
@@ -66,11 +103,33 @@ public class Candidate {
             final int votes
     ) {
         validate(destination, routes, courses, recommendedPlaces, description, reason, votes);
+        assignFields(
+                destination,
+                routes,
+                courses,
+                recommendedPlaces,
+                resolveTags(tags),
+                description,
+                reason,
+                votes
+        );
+    }
+
+    private void assignFields(
+            final Place destination,
+            final Routes routes,
+            final Courses courses,
+            final CategorizedRecommendedPlaces recommendedPlaces,
+            final List<CandidateSelectionTag> tags,
+            final String description,
+            final String reason,
+            final int votes
+    ) {
         this.destination = destination;
         this.routes = routes;
         this.courses = courses;
         this.recommendedPlaces = recommendedPlaces;
-        this.tags = resolveTags(tags);
+        this.tags = tags;
         this.description = description;
         this.reason = reason;
         this.votes = votes;
@@ -108,11 +167,17 @@ public class Candidate {
         }
     }
 
-    private static CandidateSelectionTag resolveNullableTag(final CandidateSelectionTag tag) {
-        if (tag == null) {
-            return CandidateSelectionTag.GENERAL;
+    private void validateRecommendationReason(final RecommendationReason recommendationReason) {
+        if (recommendationReason == null) {
+            throw new IllegalArgumentException("추천 이유는 필수입니다.");
         }
-        return tag;
+    }
+
+    private List<CandidateSelectionTag> resolveTag(final CandidateSelectionTag tag) {
+        if (tag == null) {
+            return CandidateSelectionTag.normalize(null);
+        }
+        return CandidateSelectionTag.normalize(List.of(tag));
     }
 
     private List<CandidateSelectionTag> resolveTags(final List<CandidateSelectionTag> tags) {

@@ -290,6 +290,27 @@ class RecommendationTest {
         assertThat(recommendation.get(0).getDestination()).isEqualTo(validPlace);
     }
 
+    @Test
+    @DisplayName("요구 조건을 만족하는 후보가 없으면 추천을 생성할 수 없다")
+    void create_ThrowsException_WhenNoPlaceIsReadyForCandidateCreation() {
+        final Place startPlace = new Place("잠실역", new Point(127.0, 37.0));
+        final Place recommendedPlace = new Place("선릉역", new Point(127.1, 37.1));
+        final Routes routes = createRoutes(startPlace, recommendedPlace, 10 * 60);
+        final Courses courses = createCourses(startPlace, recommendedPlace);
+
+        assertSoftly(softAssertions -> softAssertions.assertThatThrownBy(() -> Recommendation.create(
+                        Map.of(recommendedPlace, new RecommendationReason("#공평", "이동 시간이 고른 후보입니다.")),
+                        Map.of(recommendedPlace, createRecommendedPlaces(RecommendCondition.CAFE)),
+                        Map.of(recommendedPlace, routes),
+                        Map.of(recommendedPlace, courses),
+                        Map.of(recommendedPlace, List.of(CandidateSelectionTag.FAIRNESS)),
+                        0,
+                        List.of(RecommendCondition.RESTAURANT)
+                ))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("추천 후보지는 비어있거나 null일 수 없습니다."));
+    }
+
     private Candidate createCandidate(int path1TravelTime, int path2TravelTime) {
         return createCandidate(path1TravelTime, path2TravelTime, CandidateSelectionTag.GENERAL);
     }

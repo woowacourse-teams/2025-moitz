@@ -1,6 +1,5 @@
 package com.f12.moitz.domain;
 
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -36,13 +35,14 @@ public class CandidateSelectionPolicy {
                         candidatePolicy,
                         scoreResolver
                 );
-                return new CandidateSelection(
-                        mergeTagCandidates(tagSelections, acceptableCandidates, limit),
+                return CandidateSelection.create(
+                        tagSelections,
+                        acceptableCandidates,
                         dispersionPolicy,
                         candidatePolicy,
                         acceptableCandidates.size(),
                         false,
-                        tagSelections
+                        limit
                 );
             }
         }
@@ -52,13 +52,14 @@ public class CandidateSelectionPolicy {
                 DispersionPolicy.TIER_5,
                 scoreResolver
         );
-        return new CandidateSelection(
-                mergeTagCandidates(tagSelections, sortedCandidates, limit),
+        return CandidateSelection.create(
+                tagSelections,
+                sortedCandidates,
                 dispersionPolicy,
                 DispersionPolicy.TIER_5,
                 0,
                 true,
-                tagSelections
+                limit
         );
     }
 
@@ -104,40 +105,6 @@ public class CandidateSelectionPolicy {
                         .toList()
         ));
         return tagSelections;
-    }
-
-    private List<RouteCandidate> mergeTagCandidates(
-            final Map<CandidateSelectionTag, List<RouteCandidate>> tagSelections,
-            final List<RouteCandidate> fallbackCandidates,
-            final int limit
-    ) {
-        final Map<String, RouteCandidate> searchCandidates = new LinkedHashMap<>();
-        final int maxTagSize = tagSelections.values().stream()
-                .mapToInt(List::size)
-                .max()
-                .orElse(0);
-
-        for (int index = 0; index < maxTagSize && searchCandidates.size() < limit; index++) {
-            for (List<RouteCandidate> tagCandidates : tagSelections.values()) {
-                if (index >= tagCandidates.size()) {
-                    continue;
-                }
-                final RouteCandidate candidate = tagCandidates.get(index);
-                searchCandidates.putIfAbsent(candidate.getPlace().getName(), candidate);
-                if (searchCandidates.size() >= limit) {
-                    break;
-                }
-            }
-        }
-
-        for (RouteCandidate fallbackCandidate : fallbackCandidates) {
-            if (searchCandidates.size() >= limit) {
-                break;
-            }
-            searchCandidates.putIfAbsent(fallbackCandidate.getPlace().getName(), fallbackCandidate);
-        }
-
-        return new ArrayList<>(searchCandidates.values());
     }
 
 }

@@ -53,7 +53,11 @@ public enum DispersionPolicy {
             final double pairAverageTravelTime,
             final long longPairCount
     ) {
-        validatePartySize(partySize);
+        if (partySize < MIN_STARTING_PLACE_COUNT || partySize > MAX_STARTING_PLACE_COUNT) {
+            throw new IllegalArgumentException(
+                    "출발지는 " + MIN_STARTING_PLACE_COUNT + "개 이상 " + MAX_STARTING_PLACE_COUNT + "개 이하로 입력해야 합니다."
+            );
+        }
         return Arrays.stream(values())
                 .filter(policy -> !policy.fallback)
                 .filter(policy -> policy.supports(
@@ -64,14 +68,6 @@ public enum DispersionPolicy {
                 ))
                 .findFirst()
                 .orElse(TIER_5);
-    }
-
-    private static void validatePartySize(final int partySize) {
-        if (partySize < MIN_STARTING_PLACE_COUNT || partySize > MAX_STARTING_PLACE_COUNT) {
-            throw new IllegalArgumentException(
-                    "출발지는 " + MIN_STARTING_PLACE_COUNT + "개 이상 " + MAX_STARTING_PLACE_COUNT + "개 이하로 입력해야 합니다."
-            );
-        }
     }
 
     private boolean supports(
