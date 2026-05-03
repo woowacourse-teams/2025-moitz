@@ -187,6 +187,39 @@ class CandidatePlaceSearchPolicyTest {
     }
 
     @Test
+    @DisplayName("장소명이 같아도 다른 장소에는 최소 환승 태그를 전파하지 않는다")
+    void select_DoesNotPropagateTransferTagOnlyByPlaceName() {
+        final RouteCandidate transfer = routeCandidateWithTransfers("동명장소", new Point(127.1, 37.1), List.of(0, 0));
+        final RouteCandidate general = routeCandidateWithTransfers("동명장소", new Point(127.2, 37.2), List.of(0, 0));
+        final Map<CandidateSelectionTag, List<RouteCandidate>> tagSelections = new LinkedHashMap<>();
+        tagSelections.put(CandidateSelectionTag.FAIRNESS, List.of());
+        tagSelections.put(CandidateSelectionTag.MAX_BURDEN_RELIEF, List.of());
+        tagSelections.put(CandidateSelectionTag.EFFICIENCY, List.of());
+        tagSelections.put(CandidateSelectionTag.TRANSFER, List.of(transfer));
+        tagSelections.put(CandidateSelectionTag.GENERAL, List.of(general));
+        final CandidateSelection candidateSelection = new CandidateSelection(
+                List.of(general, transfer),
+                DispersionPolicy.TIER_4,
+                DispersionPolicy.TIER_4,
+                2,
+                false,
+                tagSelections
+        );
+
+        final RecommendedCandidates recommendedCandidates = candidatePlaceSearchPolicy.select(
+                candidateSelection,
+                candidateSelection.getSearchCandidatePlaces(),
+                ignored -> true,
+                2
+        );
+
+        assertThat(recommendedCandidates.getTags(general.getPlace()))
+                .containsExactly(CandidateSelectionTag.GENERAL);
+        assertThat(recommendedCandidates.getTags(transfer.getPlace()))
+                .containsExactly(CandidateSelectionTag.TRANSFER);
+    }
+
+    @Test
     @DisplayName("다음 장소 검색 대상은 비어있는 태그 후보를 우선하고 이 후보가 남아있다면 일반 후보로 채우지 않는다")
     void selectNextSearchPlaces_PrioritizesMissingTagsWithoutGeneralFillWhenTagCandidatesRemain() {
         final RouteCandidate fairness = routeCandidate("공평후보역");
@@ -288,7 +321,15 @@ class CandidatePlaceSearchPolicyTest {
     }
 
     private RouteCandidate routeCandidateWithTransfers(final String name, final List<Integer> transferCounts) {
-        final Place end = place(name);
+        return routeCandidateWithTransfers(name, new Point(127.0, 37.0), transferCounts);
+    }
+
+    private RouteCandidate routeCandidateWithTransfers(
+            final String name,
+            final Point point,
+            final List<Integer> transferCounts
+    ) {
+        final Place end = new Place(name, point);
         final List<Route> routes = java.util.stream.IntStream.range(0, transferCounts.size())
                 .mapToObj(index -> routeWithTransfers(
                         new Place("출발" + index + "역", new Point(127.0 + index, 37.0 + index)),

@@ -176,9 +176,9 @@ public class CandidatePlaceSearchPolicy {
             final List<Place> recommendedCandidatePlaces,
             final Map<Place, List<CandidateSelectionTag>> tagsByPlace
     ) {
-        final Map<String, RouteCandidate> candidatesByPlaceName = candidatesByPlaceName(candidateSelection);
+        final Map<Place, RouteCandidate> candidatesByPlace = candidatesByPlace(candidateSelection);
         final List<TransferBurden> transferBurdens = recommendedCandidatePlaces.stream()
-                .map(place -> candidatesByPlaceName.get(place.getName()))
+                .map(candidatesByPlace::get)
                 .filter(Objects::nonNull)
                 .map(RouteCandidate::calculateTransferBurden)
                 .toList();
@@ -190,47 +190,47 @@ public class CandidatePlaceSearchPolicy {
         final TransferBurden bestTransferBurden = transferBurdens.stream()
                 .min(TransferBurden::compareTo)
                 .orElseThrow();
-        final Set<String> transferCandidateNames = transferCandidateNames(candidateSelection);
+        final Set<Place> transferCandidatePlaces = transferCandidatePlaces(candidateSelection);
         final Map<Place, List<CandidateSelectionTag>> normalizedTagsByPlace = new LinkedHashMap<>();
         recommendedCandidatePlaces.forEach(place -> normalizedTagsByPlace.put(
                 place,
-                normalizeTransferTag(place, tagsByPlace, candidatesByPlaceName, transferCandidateNames, bestTransferBurden)
+                normalizeTransferTag(place, tagsByPlace, candidatesByPlace, transferCandidatePlaces, bestTransferBurden)
         ));
         return normalizedTagsByPlace;
     }
 
-    private Set<String> transferCandidateNames(final CandidateSelection candidateSelection) {
-        final Set<String> transferCandidateNames = new HashSet<>();
+    private Set<Place> transferCandidatePlaces(final CandidateSelection candidateSelection) {
+        final Set<Place> transferCandidatePlaces = new HashSet<>();
         candidateSelection.getTagSelections()
                 .getOrDefault(CandidateSelectionTag.TRANSFER, List.of())
-                .forEach(candidate -> transferCandidateNames.add(candidate.getPlace().getName()));
-        return transferCandidateNames;
+                .forEach(candidate -> transferCandidatePlaces.add(candidate.getPlace()));
+        return transferCandidatePlaces;
     }
 
-    private Map<String, RouteCandidate> candidatesByPlaceName(final CandidateSelection candidateSelection) {
-        final Map<String, RouteCandidate> candidatesByPlaceName = new LinkedHashMap<>();
+    private Map<Place, RouteCandidate> candidatesByPlace(final CandidateSelection candidateSelection) {
+        final Map<Place, RouteCandidate> candidatesByPlace = new LinkedHashMap<>();
         candidateSelection.getSearchCandidates()
-                .forEach(candidate -> candidatesByPlaceName.putIfAbsent(candidate.getPlace().getName(), candidate));
+                .forEach(candidate -> candidatesByPlace.putIfAbsent(candidate.getPlace(), candidate));
         candidateSelection.getTagSelections()
                 .values()
                 .forEach(candidates -> candidates.forEach(candidate ->
-                        candidatesByPlaceName.putIfAbsent(candidate.getPlace().getName(), candidate)));
-        return candidatesByPlaceName;
+                        candidatesByPlace.putIfAbsent(candidate.getPlace(), candidate)));
+        return candidatesByPlace;
     }
 
     private List<CandidateSelectionTag> normalizeTransferTag(
             final Place place,
             final Map<Place, List<CandidateSelectionTag>> tagsByPlace,
-            final Map<String, RouteCandidate> candidatesByPlaceName,
-            final Set<String> transferCandidateNames,
+            final Map<Place, RouteCandidate> candidatesByPlace,
+            final Set<Place> transferCandidatePlaces,
             final TransferBurden bestTransferBurden
     ) {
         final List<CandidateSelectionTag> tags = tagsByPlace.getOrDefault(place, List.of(CandidateSelectionTag.GENERAL));
-        final RouteCandidate candidate = candidatesByPlaceName.get(place.getName());
+        final RouteCandidate candidate = candidatesByPlace.get(place);
         final boolean isBestTransfer = candidate != null
                 && candidate.calculateTransferBurden().compareTo(bestTransferBurden) == 0;
 
-        if (isBestTransfer && transferCandidateNames.contains(place.getName())) {
+        if (isBestTransfer && transferCandidatePlaces.contains(place)) {
             if (tags.contains(CandidateSelectionTag.TRANSFER)) {
                 return tags;
             }
