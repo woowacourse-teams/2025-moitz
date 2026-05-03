@@ -1,13 +1,14 @@
 package com.f12.moitz.domain;
 
 import java.time.Instant;
+import java.util.List;
+import java.util.Objects;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
-import java.util.List;
 
 @Getter
 @Document(collection = "result")
@@ -32,8 +33,8 @@ public class Result {
             final Recommendation recommendedLocations
     ) {
         validate(recommendConditions, startingPlaces, recommendedLocations);
-        this.recommendConditions = recommendConditions;
-        this.startingPlaces = startingPlaces;
+        this.recommendConditions = List.copyOf(recommendConditions);
+        this.startingPlaces = List.copyOf(startingPlaces);
         this.recommendedLocations = recommendedLocations;
     }
 
@@ -45,17 +46,27 @@ public class Result {
     ) {
         validate(recommendConditions, startingPlaces, recommendedLocations);
         this.id = id;
-        this.recommendConditions = recommendConditions;
-        this.startingPlaces = startingPlaces;
+        this.recommendConditions = List.copyOf(recommendConditions);
+        this.startingPlaces = List.copyOf(startingPlaces);
         this.recommendedLocations = recommendedLocations;
     }
 
-    private void validate(final List<RecommendCondition> recommendConditions, final List<? extends Place> startingPlaces, final Recommendation recommendedLocations) {
+    private void validate(
+            final List<RecommendCondition> recommendConditions,
+            final List<? extends Place> startingPlaces,
+            final Recommendation recommendedLocations
+    ) {
         if (recommendConditions == null || recommendConditions.isEmpty()) {
             throw new IllegalArgumentException("추천 조건은 비어있거나 null일 수 없습니다.");
         }
+        if (recommendConditions.stream().anyMatch(Objects::isNull)) {
+            throw new IllegalArgumentException("추천 조건에 null이 포함될 수 없습니다.");
+        }
         if (startingPlaces == null || startingPlaces.isEmpty()) {
             throw new IllegalArgumentException("출발지들은 비어있거나 null일 수 없습니다.");
+        }
+        if (startingPlaces.stream().anyMatch(Objects::isNull)) {
+            throw new IllegalArgumentException("출발지 목록에 null이 포함될 수 없습니다.");
         }
         if (recommendedLocations == null) {
             throw new IllegalArgumentException("추천 정보는 null일 수 없습니다.");
