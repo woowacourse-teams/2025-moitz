@@ -101,8 +101,8 @@ public class RecommendationService {
         log.debug(
                 "장소 추천 완료 - 탐색 대상 역 {}개 중 실제 조회 {}개, 결과 보유 역 {}개",
                 searchCandidatePlaces.size(),
-                recommendationPlaceSearchResult.getSearchedPlaces().size(),
-                recommendedPlaces.size()
+                recommendationPlaceSearchResult.getSearchedPlaceCount(),
+                recommendationPlaceSearchResult.getRecommendedPlaceCount()
         );
         stopWatch.stop();
 

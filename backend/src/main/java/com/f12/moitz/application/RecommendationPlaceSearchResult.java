@@ -28,8 +28,16 @@ public class RecommendationPlaceSearchResult {
         return searchedPlaces;
     }
 
+    public int getSearchedPlaceCount() {
+        return searchedPlaces.size();
+    }
+
     public Map<Place, CategorizedRecommendedPlaces> getRecommendedPlaces() {
         return recommendedPlaces;
+    }
+
+    public int getRecommendedPlaceCount() {
+        return recommendedPlaces.size();
     }
 
     public RecommendedCandidates getRecommendedCandidates() {
