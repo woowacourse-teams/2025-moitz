@@ -6,19 +6,19 @@ import java.util.List;
 
 public class RouteOriginPreparationResult {
 
-    private final List<SubwayStation> startingPlaces;
+    private final List<SubwayStation> originStations;
     private final RouteOrigins routeOrigins;
 
     public RouteOriginPreparationResult(
-            final List<SubwayStation> startingPlaces,
+            final List<SubwayStation> originStations,
             final RouteOrigins routeOrigins
     ) {
-        this.startingPlaces = List.copyOf(startingPlaces);
+        this.originStations = List.copyOf(originStations);
         this.routeOrigins = routeOrigins;
     }
 
-    public List<SubwayStation> getStartingPlaces() {
-        return startingPlaces;
+    public List<SubwayStation> getOriginStations() {
+        return originStations;
     }
 
     public RouteOrigins getRouteOrigins() {

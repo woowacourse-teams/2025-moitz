@@ -36,7 +36,7 @@ class RouteOriginPreparationServiceTest {
 
         final RouteOriginPreparationResult result = service.prepare(List.of("강남역", "역삼역"));
 
-        assertThat(result.getStartingPlaces()).containsExactly(gangnam, yeoksam);
+        assertThat(result.getOriginStations()).containsExactly(gangnam, yeoksam);
         assertThat(result.getRouteOrigins().getOrigins()).containsExactly(gangnam, yeoksam);
     }
 

@@ -17,7 +17,7 @@ import lombok.extern.slf4j.Slf4j;
 public class RecommendationFlowLogger {
 
     public void logCandidateSelection(
-            final List<SubwayStation> startingPlaces,
+            final List<SubwayStation> originStations,
             final RouteCandidatePreparationResult routeCandidatePreparationResult,
             final CandidateSelection candidateSelection
     ) {
@@ -25,7 +25,7 @@ public class RecommendationFlowLogger {
 
         log.debug(
                 "공평성 후보 선정 - 출발역={}, initialPolicy={}, effectivePolicy={}, 전체 후보 {}개, 경로 계산 성공 {}개, 하드 필터 통과 {}개, 장소 탐색 대상 {}개, fallback={}",
-                getPlaceNames(startingPlaces),
+                getPlaceNames(originStations),
                 candidateSelection.getInitialPolicy(),
                 candidateSelection.getEffectivePolicy(),
                 routeCandidatePreparationResult.getCandidatePlaceCount(),

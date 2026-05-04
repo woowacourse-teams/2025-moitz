@@ -75,18 +75,18 @@ public class RecommendationService {
         stopWatch.start("공평한 후보역 선정");
         final List<RecommendCondition> recommendConditions = RecommendCondition.fromTitle(request.requirements());
         final RouteOriginPreparationResult routeOriginPreparationResult = prepareRouteOrigins(request);
-        final List<SubwayStation> startingPlaces = routeOriginPreparationResult.getStartingPlaces();
+        final List<SubwayStation> originStations = routeOriginPreparationResult.getOriginStations();
         final RouteOrigins routeOrigins = routeOriginPreparationResult.getRouteOrigins();
         final DispersionPolicy dispersionPolicy = resolveDispersionPolicy(routeOrigins);
         final RouteCandidatePreparationResult routeCandidatePreparationResult = prepareRouteCandidates(
-                startingPlaces,
+                originStations,
                 routeOrigins,
                 dispersionPolicy
         );
         final Map<Place, Routes> candidateRoutes = routeCandidatePreparationResult.getCandidateRoutes();
         final CandidateSelection candidateSelection = selectCandidates(routeCandidatePreparationResult, dispersionPolicy);
         final List<Place> searchCandidatePlaces = candidateSelection.getSearchCandidatePlaces();
-        recommendationFlowLogger.logCandidateSelection(startingPlaces, routeCandidatePreparationResult, candidateSelection);
+        recommendationFlowLogger.logCandidateSelection(originStations, routeCandidatePreparationResult, candidateSelection);
         stopWatch.stop();
 
         stopWatch.start("장소 추천");
@@ -128,7 +128,7 @@ public class RecommendationService {
         stopWatch.stop();
         log.debug("추천 서비스 완료. {}", stopWatch.shortSummary());
 
-        final String id = saveRecommendationResult(recommendConditions, startingPlaces, recommendation);
+        final String id = saveRecommendationResult(recommendConditions, originStations, recommendation);
         return new RecommendationCreateResponse(id);
     }
 
@@ -141,11 +141,11 @@ public class RecommendationService {
     }
 
     private RouteCandidatePreparationResult prepareRouteCandidates(
-            final List<SubwayStation> startingPlaces,
+            final List<SubwayStation> originStations,
             final RouteOrigins routeOrigins,
             final DispersionPolicy dispersionPolicy
     ) {
-        return routeCandidatePreparationService.prepare(startingPlaces, routeOrigins, dispersionPolicy);
+        return routeCandidatePreparationService.prepare(originStations, routeOrigins, dispersionPolicy);
     }
 
     private CandidateSelection selectCandidates(
@@ -202,13 +202,13 @@ public class RecommendationService {
 
     private String saveRecommendationResult(
             final List<RecommendCondition> recommendConditions,
-            final List<SubwayStation> startingPlaces,
+            final List<SubwayStation> originStations,
             final Recommendation recommendation
     ) {
         return recommendResultRepository.saveAndReturnId(
                 new Result(
                         recommendConditions,
-                        startingPlaces,
+                        originStations,
                         recommendation
                 )
         ).toHexString().toUpperCase();

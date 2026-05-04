@@ -19,10 +19,10 @@ public class RouteOriginPreparationService {
     }
 
     public RouteOriginPreparationResult prepare(final List<String> startingPlaceNames) {
-        final List<SubwayStation> startingPlaces = getByNames(startingPlaceNames);
+        final List<SubwayStation> originStations = getByNames(startingPlaceNames);
         return new RouteOriginPreparationResult(
-                startingPlaces,
-                createRouteOrigins(startingPlaces)
+                originStations,
+                createRouteOrigins(originStations)
         );
     }
 
@@ -33,11 +33,11 @@ public class RouteOriginPreparationService {
                 .toList();
     }
 
-    private RouteOrigins createRouteOrigins(final List<SubwayStation> startingPlaces) {
+    private RouteOrigins createRouteOrigins(final List<SubwayStation> originStations) {
         try {
-            return new RouteOrigins(startingPlaces);
+            return new RouteOrigins(originStations);
         } catch (IllegalArgumentException e) {
-            throw new BadRequestException(GeneralErrorCode.INPUT_INVALID_START_LOCATION, getPlaceNames(startingPlaces));
+            throw new BadRequestException(GeneralErrorCode.INPUT_INVALID_START_LOCATION, getPlaceNames(originStations));
         }
     }
 
