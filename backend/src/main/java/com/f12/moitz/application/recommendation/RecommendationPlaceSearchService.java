@@ -13,7 +13,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 @Slf4j
@@ -25,9 +24,7 @@ public class RecommendationPlaceSearchService {
     private final PlaceRecommender placeRecommender;
     private final CandidatePlaceSearchPolicy candidatePlaceSearchPolicy = new CandidatePlaceSearchPolicy();
 
-    public RecommendationPlaceSearchService(
-            @Qualifier("placeRecommenderParallelAdapter") final PlaceRecommender placeRecommender
-    ) {
+    public RecommendationPlaceSearchService(final PlaceRecommender placeRecommender) {
         this.placeRecommender = placeRecommender;
     }
 
