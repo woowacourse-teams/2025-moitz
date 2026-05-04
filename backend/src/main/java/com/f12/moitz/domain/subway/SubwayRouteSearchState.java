@@ -10,7 +10,7 @@ import java.util.Map;
 import java.util.PriorityQueue;
 import java.util.Set;
 
-class SubwayRouteSearchState {
+public class SubwayRouteSearchState {
 
     private static final int UNREACHABLE_TIME = Integer.MAX_VALUE;
 
@@ -19,41 +19,41 @@ class SubwayRouteSearchState {
     private final PriorityQueue<Node> queue = new PriorityQueue<>(Comparator.comparingInt(Node::time));
     private final Set<SubwayStation> visited = new HashSet<>();
 
-    SubwayRouteSearchState(final SubwayStation start) {
+    public SubwayRouteSearchState(final SubwayStation start) {
         times.put(start, 0);
         queue.add(new Node(start, 0));
     }
 
-    boolean hasNext() {
+    public boolean hasNext() {
         return !queue.isEmpty();
     }
 
-    SubwayStation pollStation() {
+    public SubwayStation pollStation() {
         return queue.poll().station();
     }
 
-    boolean visit(final SubwayStation station) {
+    public boolean visit(final SubwayStation station) {
         return visited.add(station);
     }
 
-    boolean isVisited(final SubwayStation station) {
+    public boolean isVisited(final SubwayStation station) {
         return visited.contains(station);
     }
 
-    int calculateTimeTo(final SubwayStation currentStation, final Edge edge) {
+    public int calculateTimeTo(final SubwayStation currentStation, final Edge edge) {
         return times.getOrDefault(currentStation, UNREACHABLE_TIME) + edge.getTimeInSeconds();
     }
 
-    boolean canContinueOn(final SubwayStation station, final SubwayLine line) {
+    public boolean canContinueOn(final SubwayStation station, final SubwayLine line) {
         return previousStations.get(station).stream()
                 .anyMatch(previousStation -> previousStation.isSameLine(line));
     }
 
-    SubwayLine getFirstPreviousLine(final SubwayStation station) {
+    public SubwayLine getFirstPreviousLine(final SubwayStation station) {
         return previousStations.get(station).getFirst().line();
     }
 
-    void recordIfShorter(
+    public void recordIfShorter(
             final SubwayStation previousStation,
             final SubwayStation nextStation,
             final SubwayLine line,
@@ -74,7 +74,7 @@ class SubwayRouteSearchState {
         }
     }
 
-    SubwayRouteSearchResult toResult() {
+    public SubwayRouteSearchResult toResult() {
         return new SubwayRouteSearchResult(previousStations);
     }
 

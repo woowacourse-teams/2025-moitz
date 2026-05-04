@@ -8,15 +8,15 @@ import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-class StationSequenceReconstructor {
+public class StationSequenceReconstructor {
 
     private final SubwayEdges edges;
 
-    StationSequenceReconstructor(final SubwayEdges edges) {
+    public StationSequenceReconstructor(final SubwayEdges edges) {
         this.edges = edges;
     }
 
-    StationSequence reconstruct(
+    public StationSequence reconstruct(
             final SubwayRouteSearchResult searchResult,
             final SubwayStation start,
             final SubwayStation end
