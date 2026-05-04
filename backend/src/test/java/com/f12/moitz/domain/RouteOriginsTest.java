@@ -50,6 +50,33 @@ class RouteOriginsTest {
     }
 
     @Test
+    @DisplayName("목적지 후보 목록에서 출발지를 제외한다")
+    void excludeOriginsFrom() {
+        final Place gangnam = new Place("강남역", new Point(127.027, 37.497));
+        final Place yeoksam = new Place("역삼역", new Point(127.036, 37.501));
+        final Place seolleung = new Place("선릉역", new Point(127.048, 37.504));
+        final RouteOrigins routeOrigins = new RouteOrigins(List.of(gangnam, yeoksam));
+
+        final List<Place> destinations = routeOrigins.excludeOriginsFrom(List.of(gangnam, yeoksam, seolleung));
+
+        assertThat(destinations).containsExactly(seolleung);
+    }
+
+    @Test
+    @DisplayName("목적지 후보 목록은 null이거나 null을 포함할 수 없다")
+    void excludeOriginsFrom_ThrowsExceptionWhenDestinationsAreInvalid() {
+        final Place gangnam = new Place("강남역", new Point(127.027, 37.497));
+        final RouteOrigins routeOrigins = new RouteOrigins(List.of(gangnam));
+
+        assertThatThrownBy(() -> routeOrigins.excludeOriginsFrom(null))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("경로 도착지는 null일 수 없습니다.");
+        assertThatThrownBy(() -> routeOrigins.excludeOriginsFrom(Arrays.asList(gangnam, null)))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("경로 도착지는 null일 수 없습니다.");
+    }
+
+    @Test
     @DisplayName("출발지는 중복될 수 없다")
     void throwsExceptionWhenOriginsAreDuplicated() {
         final Place gangnam = new Place("강남역", new Point(127.027, 37.497));

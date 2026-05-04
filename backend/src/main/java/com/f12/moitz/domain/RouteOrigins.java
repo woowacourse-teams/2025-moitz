@@ -35,6 +35,14 @@ public class RouteOrigins {
                 .toList();
     }
 
+    public List<Place> excludeOriginsFrom(final List<? extends Place> destinations) {
+        validateDestinations(destinations);
+        return destinations.stream()
+                .filter(destination -> !origins.contains(destination))
+                .map(Place.class::cast)
+                .toList();
+    }
+
     private void validateDestinations(final List<? extends Place> destinations) {
         if (destinations == null) {
             throw new IllegalArgumentException("경로 도착지는 null일 수 없습니다.");

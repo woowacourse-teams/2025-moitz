@@ -51,14 +51,11 @@ public class RouteCandidatePreparationService {
             final DispersionPolicy dispersionPolicy
     ) {
         final int radiusKilometers = dispersionPolicy.candidateSearchRadiusKilometers();
-        final List<String> originNames = routeOrigins.getNames();
-        final List<Place> candidatePlaces = subwayStationService.generateCandidatePlace(
-                        originStations,
-                        radiusKilometers
-                ).stream()
-                .filter(place -> !originNames.contains(place.getName()))
-                .map(Place.class::cast)
-                .toList();
+        final List<SubwayStation> nearbyStations = subwayStationService.generateCandidatePlace(
+                originStations,
+                radiusKilometers
+        );
+        final List<Place> candidatePlaces = routeOrigins.excludeOriginsFrom(nearbyStations);
 
         log.debug(
                 "후보역 1차 필터 완료 - policy={}, radius={}km, 후보 {}개",
