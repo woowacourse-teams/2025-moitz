@@ -1,4 +1,4 @@
-package com.f12.moitz.application.subway;
+package com.f12.moitz.application.subway.setup;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

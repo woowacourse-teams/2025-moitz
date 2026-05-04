@@ -1,8 +1,10 @@
-package com.f12.moitz.application.subway;
+package com.f12.moitz.application.subway.setup;
 
 import com.f12.moitz.application.port.PlaceFinder;
 import com.f12.moitz.application.port.subway.SubwayMapLoader;
 import com.f12.moitz.application.port.subway.dto.RawRouteInfo;
+import com.f12.moitz.application.subway.SubwayEdgeService;
+import com.f12.moitz.application.subway.SubwayStationService;
 import com.f12.moitz.domain.subway.SubwayEdges;
 import com.f12.moitz.domain.subway.SubwayStation;
 import java.util.List;

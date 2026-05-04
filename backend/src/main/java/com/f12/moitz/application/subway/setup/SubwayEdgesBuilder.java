@@ -1,4 +1,4 @@
-package com.f12.moitz.application.subway;
+package com.f12.moitz.application.subway.setup;
 
 import com.f12.moitz.application.port.subway.dto.RawPathInfo;
 import com.f12.moitz.application.port.subway.dto.RawRouteInfo;
