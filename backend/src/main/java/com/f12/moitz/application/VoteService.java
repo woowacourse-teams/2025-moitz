@@ -5,7 +5,7 @@ import com.f12.moitz.common.error.exception.BadRequestException;
 import com.f12.moitz.common.error.exception.GeneralErrorCode;
 import com.f12.moitz.common.error.exception.NotFoundException;
 import com.f12.moitz.domain.recommendation.repository.RecommendResultRepository;
-import com.f12.moitz.domain.recommendation.repository.dto.CandidateVote;
+import com.f12.moitz.domain.recommendation.vote.CandidateVote;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;

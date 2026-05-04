@@ -2,7 +2,7 @@ package com.f12.moitz.infrastructure.persistence;
 
 import com.f12.moitz.domain.recommendation.Result;
 import com.f12.moitz.domain.recommendation.repository.RecommendResultRepository;
-import com.f12.moitz.domain.recommendation.repository.dto.CandidateVote;
+import com.f12.moitz.domain.recommendation.vote.CandidateVote;
 import com.f12.moitz.infrastructure.persistence.dto.CandidateVoteProjection;
 import com.f12.moitz.infrastructure.persistence.repository.RecommendResultMongoRepository;
 import java.util.List;
