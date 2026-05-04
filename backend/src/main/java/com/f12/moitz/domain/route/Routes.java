@@ -1,8 +1,8 @@
 package com.f12.moitz.domain.route;
 
-import com.f12.moitz.domain.DispersionPolicy;
-import com.f12.moitz.domain.FairnessScore;
-import com.f12.moitz.domain.TransferBurden;
+import com.f12.moitz.domain.recommendation.candidate.DispersionPolicy;
+import com.f12.moitz.domain.recommendation.candidate.FairnessScore;
+import com.f12.moitz.domain.recommendation.candidate.TransferBurden;
 import java.util.List;
 import lombok.Getter;
 

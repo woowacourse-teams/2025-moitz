@@ -8,7 +8,7 @@ import static org.mockito.Mockito.verify;
 
 import com.f12.moitz.application.port.LocationReasonGenerator;
 import com.f12.moitz.application.port.dto.ReasonAndDescription;
-import com.f12.moitz.domain.CandidateSelectionTag;
+import com.f12.moitz.domain.recommendation.candidate.CandidateSelectionTag;
 import com.f12.moitz.domain.Place;
 import com.f12.moitz.domain.Point;
 import com.f12.moitz.domain.recommendation.RecommendedCandidates;

@@ -1,5 +1,7 @@
-package com.f12.moitz.domain;
+package com.f12.moitz.domain.recommendation.candidate;
 
+import com.f12.moitz.domain.Place;
+import com.f12.moitz.domain.Point;
 import java.util.List;
 import java.util.Objects;
 

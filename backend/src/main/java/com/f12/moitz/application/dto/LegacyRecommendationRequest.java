@@ -2,7 +2,7 @@ package com.f12.moitz.application.dto;
 
 import com.f12.moitz.common.error.exception.BadRequestException;
 import com.f12.moitz.common.error.exception.GeneralErrorCode;
-import com.f12.moitz.domain.DispersionPolicy;
+import com.f12.moitz.domain.recommendation.candidate.DispersionPolicy;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
 

@@ -1,6 +1,6 @@
 package com.f12.moitz.application;
 
-import com.f12.moitz.domain.CandidatePlaceSearchArea;
+import com.f12.moitz.domain.recommendation.candidate.CandidatePlaceSearchArea;
 import com.f12.moitz.domain.Place;
 import com.f12.moitz.domain.Point;
 import com.f12.moitz.domain.repository.SubwayStationRepository;

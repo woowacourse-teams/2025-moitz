@@ -6,7 +6,7 @@ import com.f12.moitz.domain.route.Path;
 import com.f12.moitz.domain.Place;
 import com.f12.moitz.domain.Point;
 import com.f12.moitz.domain.route.Route;
-import com.f12.moitz.domain.RouteCandidate;
+import com.f12.moitz.domain.recommendation.candidate.RouteCandidate;
 import com.f12.moitz.domain.route.Routes;
 import com.f12.moitz.domain.route.TravelMethod;
 import com.f12.moitz.domain.subway.SubwayLine;

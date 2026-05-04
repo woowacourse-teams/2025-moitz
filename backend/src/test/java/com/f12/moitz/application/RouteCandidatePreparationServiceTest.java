@@ -6,13 +6,13 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 
 import com.f12.moitz.application.port.RouteFinder;
-import com.f12.moitz.domain.DispersionPolicy;
+import com.f12.moitz.domain.recommendation.candidate.DispersionPolicy;
 import com.f12.moitz.domain.route.OriginDestination;
 import com.f12.moitz.domain.route.Path;
 import com.f12.moitz.domain.Place;
 import com.f12.moitz.domain.Point;
 import com.f12.moitz.domain.route.Route;
-import com.f12.moitz.domain.RouteCandidate;
+import com.f12.moitz.domain.recommendation.candidate.RouteCandidate;
 import com.f12.moitz.domain.route.RouteOrigins;
 import com.f12.moitz.domain.route.TravelMethod;
 import com.f12.moitz.domain.subway.SubwayLine;

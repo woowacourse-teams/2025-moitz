@@ -9,7 +9,7 @@ import com.f12.moitz.application.dto.RouteResponse;
 import com.f12.moitz.application.dto.StartingPlaceResponse;
 import com.f12.moitz.domain.recommendation.Candidate;
 import com.f12.moitz.domain.route.CandidateRoute;
-import com.f12.moitz.domain.CandidateSelectionTag;
+import com.f12.moitz.domain.recommendation.candidate.CandidateSelectionTag;
 import com.f12.moitz.domain.recommendation.RecommendedPlaces;
 import com.f12.moitz.domain.route.Course;
 import com.f12.moitz.domain.route.Path;

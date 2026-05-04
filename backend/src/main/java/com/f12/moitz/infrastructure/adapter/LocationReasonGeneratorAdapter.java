@@ -2,7 +2,7 @@ package com.f12.moitz.infrastructure.adapter;
 
 import com.f12.moitz.application.port.LocationReasonGenerator;
 import com.f12.moitz.application.port.dto.ReasonAndDescription;
-import com.f12.moitz.domain.CandidateSelectionTag;
+import com.f12.moitz.domain.recommendation.candidate.CandidateSelectionTag;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
