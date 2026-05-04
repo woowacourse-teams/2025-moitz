@@ -27,12 +27,12 @@ public class RouteOrigins {
         }
     }
 
-    public List<OriginDestination> createOriginDestinationsTo(final List<? extends Place> destinations) {
+    public OriginDestinations createOriginDestinationsTo(final List<? extends Place> destinations) {
         validateDestinations(destinations);
-        return destinations.stream()
+        return new OriginDestinations(destinations.stream()
                 .flatMap(destination -> origins.stream()
                         .map(origin -> new OriginDestination(origin, destination)))
-                .toList();
+                .toList());
     }
 
     public List<Place> excludeOriginsFrom(final List<? extends Place> destinations) {
@@ -52,12 +52,12 @@ public class RouteOrigins {
         }
     }
 
-    public List<OriginDestination> createOriginDestinationsBetweenOrigins() {
-        return IntStream.range(0, origins.size())
+    public OriginDestinations createOriginDestinationsBetweenOrigins() {
+        return new OriginDestinations(IntStream.range(0, origins.size())
                 .boxed()
                 .flatMap(left -> IntStream.range(left + 1, origins.size())
                         .mapToObj(right -> new OriginDestination(origins.get(left), origins.get(right))))
-                .toList();
+                .toList());
     }
 
     public DispersionPolicy resolveDispersionPolicy(final List<Route> pairRoutes) {

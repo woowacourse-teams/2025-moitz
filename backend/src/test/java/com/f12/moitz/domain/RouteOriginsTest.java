@@ -19,13 +19,13 @@ class RouteOriginsTest {
         final Place seolleung = new Place("선릉역", new Point(127.048, 37.504));
         final RouteOrigins routeOrigins = new RouteOrigins(List.of(gangnam, yeoksam));
 
-        final List<OriginDestination> originDestinations = routeOrigins.createOriginDestinationsTo(List.of(seolleung));
+        final OriginDestinations originDestinations = routeOrigins.createOriginDestinationsTo(List.of(seolleung));
 
-        assertThat(originDestinations).hasSize(2);
-        assertThat(originDestinations)
+        assertThat(originDestinations.size()).isEqualTo(2);
+        assertThat(originDestinations.getValues())
                 .extracting(OriginDestination::getOrigin)
                 .containsExactly(gangnam, yeoksam);
-        assertThat(originDestinations)
+        assertThat(originDestinations.getValues())
                 .extracting(OriginDestination::getDestination)
                 .containsExactly(seolleung, seolleung);
     }
@@ -38,13 +38,13 @@ class RouteOriginsTest {
         final Place seolleung = new Place("선릉역", new Point(127.048, 37.504));
         final RouteOrigins routeOrigins = new RouteOrigins(List.of(gangnam, yeoksam, seolleung));
 
-        final List<OriginDestination> originDestinations = routeOrigins.createOriginDestinationsBetweenOrigins();
+        final OriginDestinations originDestinations = routeOrigins.createOriginDestinationsBetweenOrigins();
 
-        assertThat(originDestinations).hasSize(3);
-        assertThat(originDestinations)
+        assertThat(originDestinations.size()).isEqualTo(3);
+        assertThat(originDestinations.getValues())
                 .extracting(OriginDestination::getOrigin)
                 .containsExactly(gangnam, gangnam, yeoksam);
-        assertThat(originDestinations)
+        assertThat(originDestinations.getValues())
                 .extracting(OriginDestination::getDestination)
                 .containsExactly(yeoksam, seolleung, seolleung);
     }

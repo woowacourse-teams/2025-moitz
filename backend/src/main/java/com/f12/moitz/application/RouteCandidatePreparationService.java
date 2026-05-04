@@ -2,7 +2,7 @@ package com.f12.moitz.application;
 
 import com.f12.moitz.application.port.RouteFinder;
 import com.f12.moitz.domain.DispersionPolicy;
-import com.f12.moitz.domain.OriginDestination;
+import com.f12.moitz.domain.OriginDestinations;
 import com.f12.moitz.domain.Place;
 import com.f12.moitz.domain.Route;
 import com.f12.moitz.domain.RouteCandidate;
@@ -11,9 +11,6 @@ import com.f12.moitz.domain.Routes;
 import com.f12.moitz.domain.subway.SubwayStation;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -39,7 +36,7 @@ public class RouteCandidatePreparationService {
             final DispersionPolicy dispersionPolicy
     ) {
         final List<Place> candidatePlaces = getCandidatePlaces(originStations, routeOrigins, dispersionPolicy);
-        final List<OriginDestination> originDestinations = routeOrigins.createOriginDestinationsTo(candidatePlaces);
+        final OriginDestinations originDestinations = routeOrigins.createOriginDestinationsTo(candidatePlaces);
         final Map<Place, Routes> candidateRoutes = findRoutesByDestination(originDestinations);
         final List<RouteCandidate> routeCandidates = toRouteCandidates(candidatePlaces, candidateRoutes);
         return new RouteCandidatePreparationResult(candidatePlaces, candidateRoutes, routeCandidates);
@@ -66,29 +63,9 @@ public class RouteCandidatePreparationService {
         return candidatePlaces;
     }
 
-    private Map<Place, Routes> findRoutesByDestination(final List<OriginDestination> originDestinations) {
-        final List<Route> routes = routeFinder.findRoutes(originDestinations);
-        return collectByDestination(originDestinations, routes);
-    }
-
-    private Map<Place, Routes> collectByDestination(
-            final List<OriginDestination> originDestinations,
-            final List<Route> routes
-    ) {
-        return IntStream.range(0, originDestinations.size())
-                .boxed()
-                .collect(Collectors.groupingBy(
-                        index -> originDestinations.get(index).getDestination(),
-                        Collectors.mapping(
-                                routes::get,
-                                Collectors.toList()
-                        )
-                ))
-                .entrySet().stream()
-                .collect(Collectors.toMap(
-                        Entry::getKey,
-                        entry -> new Routes(entry.getValue())
-                ));
+    private Map<Place, Routes> findRoutesByDestination(final OriginDestinations originDestinations) {
+        final List<Route> routes = routeFinder.findRoutes(originDestinations.getValues());
+        return originDestinations.groupRoutesByDestination(routes);
     }
 
     private List<RouteCandidate> toRouteCandidates(

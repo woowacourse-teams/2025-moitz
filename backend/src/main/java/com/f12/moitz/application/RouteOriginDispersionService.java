@@ -2,7 +2,7 @@ package com.f12.moitz.application;
 
 import com.f12.moitz.application.port.RouteFinder;
 import com.f12.moitz.domain.DispersionPolicy;
-import com.f12.moitz.domain.OriginDestination;
+import com.f12.moitz.domain.OriginDestinations;
 import com.f12.moitz.domain.Route;
 import com.f12.moitz.domain.RouteOrigins;
 import java.util.List;
@@ -25,8 +25,8 @@ public class RouteOriginDispersionService {
     public DispersionPolicy resolve(final RouteOrigins routeOrigins) {
         validate(routeOrigins);
 
-        final List<OriginDestination> originDestinations = routeOrigins.createOriginDestinationsBetweenOrigins();
-        final List<Route> pairRoutes = routeFinder.findRoutes(originDestinations);
+        final OriginDestinations originDestinations = routeOrigins.createOriginDestinationsBetweenOrigins();
+        final List<Route> pairRoutes = routeFinder.findRoutes(originDestinations.getValues());
         final DispersionPolicy dispersionPolicy = routeOrigins.resolveDispersionPolicy(pairRoutes);
 
         log.debug(
