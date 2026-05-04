@@ -1,7 +1,7 @@
 package com.f12.moitz.infrastructure.persistence;
 
 import com.f12.moitz.domain.Point;
-import com.f12.moitz.domain.repository.SubwayStationRepository;
+import com.f12.moitz.domain.subway.repository.SubwayStationRepository;
 import com.f12.moitz.domain.subway.SubwayStation;
 import com.f12.moitz.infrastructure.persistence.repository.SubwayStationMongoRepository;
 import java.util.List;

@@ -29,7 +29,7 @@ import com.f12.moitz.domain.recommendation.RecommendedPlace;
 import com.f12.moitz.domain.recommendation.Result;
 import com.f12.moitz.domain.route.Route;
 import com.f12.moitz.domain.route.TravelMethod;
-import com.f12.moitz.domain.repository.RecommendResultRepository;
+import com.f12.moitz.domain.recommendation.repository.RecommendResultRepository;
 import com.f12.moitz.domain.subway.SubwayLine;
 import com.f12.moitz.domain.subway.SubwayStation;
 import java.util.List;

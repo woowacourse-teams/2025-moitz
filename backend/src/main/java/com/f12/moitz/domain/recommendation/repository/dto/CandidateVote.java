@@ -1,4 +1,4 @@
-package com.f12.moitz.domain.repository.dto;
+package com.f12.moitz.domain.recommendation.repository.dto;
 
 import lombok.Getter;
 

@@ -1,6 +1,6 @@
 package com.f12.moitz.application;
 
-import com.f12.moitz.domain.repository.SubwayEdgeRepository;
+import com.f12.moitz.domain.subway.repository.SubwayEdgeRepository;
 import com.f12.moitz.domain.subway.SubwayEdges;
 import java.util.HashSet;
 import lombok.RequiredArgsConstructor;

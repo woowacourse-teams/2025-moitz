@@ -1,4 +1,4 @@
-package com.f12.moitz.domain.repository;
+package com.f12.moitz.domain.subway.repository;
 
 import com.f12.moitz.domain.Point;
 import com.f12.moitz.domain.subway.SubwayStation;

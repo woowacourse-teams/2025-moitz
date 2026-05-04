@@ -1,6 +1,6 @@
 package com.f12.moitz.infrastructure.persistence.dto;
 
-import com.f12.moitz.domain.repository.dto.CandidateVote;
+import com.f12.moitz.domain.recommendation.repository.dto.CandidateVote;
 import lombok.Getter;
 import org.springframework.data.mongodb.core.mapping.Field;
 

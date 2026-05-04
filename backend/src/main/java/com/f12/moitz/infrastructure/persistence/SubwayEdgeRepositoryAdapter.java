@@ -1,6 +1,6 @@
 package com.f12.moitz.infrastructure.persistence;
 
-import com.f12.moitz.domain.repository.SubwayEdgeRepository;
+import com.f12.moitz.domain.subway.repository.SubwayEdgeRepository;
 import com.f12.moitz.domain.subway.SubwayEdge;
 import com.f12.moitz.infrastructure.persistence.repository.SubwayEdgeMongoRepository;
 import java.util.List;

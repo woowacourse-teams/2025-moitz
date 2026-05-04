@@ -4,7 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.f12.moitz.domain.Point;
-import com.f12.moitz.domain.repository.SubwayStationRepository;
+import com.f12.moitz.domain.subway.repository.SubwayStationRepository;
 import com.f12.moitz.domain.subway.SubwayStation;
 import java.util.List;
 import java.util.Optional;

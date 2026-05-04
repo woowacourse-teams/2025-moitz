@@ -2,7 +2,7 @@ package com.f12.moitz.application;
 
 import com.f12.moitz.domain.recommendation.candidate.CandidatePlaceSearchArea;
 import com.f12.moitz.domain.Place;
-import com.f12.moitz.domain.repository.SubwayStationRepository;
+import com.f12.moitz.domain.subway.repository.SubwayStationRepository;
 import com.f12.moitz.domain.subway.SubwayStation;
 import com.f12.moitz.domain.subway.SubwayStationName;
 import java.util.List;

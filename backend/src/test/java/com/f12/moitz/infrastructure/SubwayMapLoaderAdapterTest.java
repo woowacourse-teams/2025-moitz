@@ -1,7 +1,7 @@
 package com.f12.moitz.infrastructure;
 
 import com.f12.moitz.application.SubwayStationService;
-import com.f12.moitz.domain.repository.SubwayStationRepository;
+import com.f12.moitz.domain.subway.repository.SubwayStationRepository;
 import com.f12.moitz.infrastructure.adapter.SubwayMapLoaderAdapter;
 import com.f12.moitz.infrastructure.client.open.OpenApiClient;
 import com.fasterxml.jackson.databind.ObjectMapper;
