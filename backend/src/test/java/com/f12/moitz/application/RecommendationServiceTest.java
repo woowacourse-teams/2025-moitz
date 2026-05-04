@@ -14,11 +14,6 @@ import com.f12.moitz.application.port.place.PlaceRecommender;
 import com.f12.moitz.application.subway.SubwayRouteService;
 import com.f12.moitz.application.recommendation.RecommendationPlaceSearchService;
 import com.f12.moitz.application.recommendation.RecommendationService;
-import com.f12.moitz.application.recommendation.RecommendedCandidateReasonService;
-import com.f12.moitz.application.recommendation.RecommendedCandidateRouteService;
-import com.f12.moitz.application.recommendation.RouteCandidatePreparationService;
-import com.f12.moitz.application.recommendation.RouteOriginDispersionService;
-import com.f12.moitz.application.recommendation.RouteOriginPreparationService;
 import com.f12.moitz.application.subway.SubwayStationService;
 import com.f12.moitz.application.utils.RecommendationResponseMapper;
 import com.f12.moitz.common.error.exception.BadRequestException;
@@ -73,12 +68,9 @@ class RecommendationServiceTest {
     void setUp() {
         recommendationResponseMapper = new RecommendationResponseMapper();
         recommendationService = new RecommendationService(
-                new RouteOriginPreparationService(subwayStationService),
-                new RecommendedCandidateReasonService(),
-                new RouteOriginDispersionService(subwayRouteService),
-                new RouteCandidatePreparationService(subwayStationService, subwayRouteService),
+                subwayStationService,
+                subwayRouteService,
                 new RecommendationPlaceSearchService(placeRecommender),
-                new RecommendedCandidateRouteService(subwayRouteService),
                 recommendationResponseMapper,
                 recommendResultRepository
         );

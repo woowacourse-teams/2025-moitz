@@ -7,6 +7,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 public class RecommendedCandidates {
 
@@ -63,6 +65,16 @@ public class RecommendedCandidates {
                 getTags(place)
         ));
         return Collections.unmodifiableMap(tagsByPlaceName);
+    }
+
+    public Map<Place, RecommendationReason> createReasons() {
+        return recommendedCandidatePlaces.stream()
+                .collect(Collectors.toMap(
+                        Function.identity(),
+                        place -> RecommendationReason.fromSelectionTags(place.getName(), getTags(place)),
+                        (left, right) -> left,
+                        LinkedHashMap::new
+                ));
     }
 
     public int size() {

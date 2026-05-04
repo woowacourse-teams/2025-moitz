@@ -3,21 +3,27 @@ package com.f12.moitz.application.recommendation;
 import com.f12.moitz.application.dto.recommendation.RecommendationCreateResponse;
 import com.f12.moitz.application.dto.recommendation.RecommendationRequest;
 import com.f12.moitz.application.dto.recommendation.RecommendationResultResponse;
+import com.f12.moitz.application.subway.SubwayRouteService;
+import com.f12.moitz.application.subway.SubwayStationService;
 import com.f12.moitz.application.utils.RecommendationResponseMapper;
 import com.f12.moitz.common.error.exception.BadRequestException;
 import com.f12.moitz.common.error.exception.GeneralErrorCode;
 import com.f12.moitz.common.error.exception.NotFoundException;
-import com.f12.moitz.domain.recommendation.candidate.CandidateSelection;
-import com.f12.moitz.domain.recommendation.candidate.CandidateSelectionPolicy;
-import com.f12.moitz.domain.recommendation.candidate.DispersionPolicy;
-import com.f12.moitz.domain.recommendation.RecommendedCandidates;
 import com.f12.moitz.domain.place.Place;
 import com.f12.moitz.domain.recommendation.RecommendCondition;
 import com.f12.moitz.domain.recommendation.Recommendation;
 import com.f12.moitz.domain.recommendation.RecommendationReason;
 import com.f12.moitz.domain.recommendation.RecommendedCandidateTravels;
+import com.f12.moitz.domain.recommendation.RecommendedCandidates;
 import com.f12.moitz.domain.recommendation.Result;
 import com.f12.moitz.domain.recommendation.RecommendedPlaces;
+import com.f12.moitz.domain.recommendation.candidate.CandidateSelection;
+import com.f12.moitz.domain.recommendation.candidate.CandidateSelectionPolicy;
+import com.f12.moitz.domain.recommendation.candidate.DispersionPolicy;
+import com.f12.moitz.domain.recommendation.candidate.RouteCandidate;
+import com.f12.moitz.domain.route.CandidateRoute;
+import com.f12.moitz.domain.route.OriginDestinations;
+import com.f12.moitz.domain.route.Route;
 import com.f12.moitz.domain.route.RouteOrigins;
 import com.f12.moitz.domain.route.Routes;
 import com.f12.moitz.domain.recommendation.repository.RecommendResultRepository;
@@ -26,7 +32,6 @@ import java.util.List;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StopWatch;
 
@@ -37,33 +42,24 @@ public class RecommendationService {
     private static final int PLACE_SEARCH_POOL_LIMIT = 50;
     private static final int RECOMMENDED_CANDIDATE_TARGET_COUNT = 5;
 
-    private final RouteOriginPreparationService routeOriginPreparationService;
-    private final RecommendedCandidateReasonService recommendedCandidateReasonService;
-    private final RouteOriginDispersionService routeOriginDispersionService;
-    private final RouteCandidatePreparationService routeCandidatePreparationService;
+    private final SubwayStationService subwayStationService;
+    private final SubwayRouteService subwayRouteService;
     private final RecommendationPlaceSearchService recommendationPlaceSearchService;
-    private final RecommendedCandidateRouteService recommendedCandidateRouteService;
     private final RecommendationResponseMapper recommendationResponseMapper;
     private final RecommendResultRepository recommendResultRepository;
     private final CandidateSelectionPolicy candidateSelectionPolicy = new CandidateSelectionPolicy();
     private final RecommendationFlowLogger recommendationFlowLogger = new RecommendationFlowLogger();
 
     public RecommendationService(
-            @Autowired final RouteOriginPreparationService routeOriginPreparationService,
-            @Autowired final RecommendedCandidateReasonService recommendedCandidateReasonService,
-            @Autowired final RouteOriginDispersionService routeOriginDispersionService,
-            @Autowired final RouteCandidatePreparationService routeCandidatePreparationService,
-            @Autowired final RecommendationPlaceSearchService recommendationPlaceSearchService,
-            @Autowired final RecommendedCandidateRouteService recommendedCandidateRouteService,
-            @Autowired final RecommendationResponseMapper recommendationResponseMapper,
-            @Autowired final RecommendResultRepository recommendResultRepository
+            final SubwayStationService subwayStationService,
+            final SubwayRouteService subwayRouteService,
+            final RecommendationPlaceSearchService recommendationPlaceSearchService,
+            final RecommendationResponseMapper recommendationResponseMapper,
+            final RecommendResultRepository recommendResultRepository
     ) {
-        this.routeOriginPreparationService = routeOriginPreparationService;
-        this.recommendedCandidateReasonService = recommendedCandidateReasonService;
-        this.routeOriginDispersionService = routeOriginDispersionService;
-        this.routeCandidatePreparationService = routeCandidatePreparationService;
+        this.subwayStationService = subwayStationService;
+        this.subwayRouteService = subwayRouteService;
         this.recommendationPlaceSearchService = recommendationPlaceSearchService;
-        this.recommendedCandidateRouteService = recommendedCandidateRouteService;
         this.recommendationResponseMapper = recommendationResponseMapper;
         this.recommendResultRepository = recommendResultRepository;
     }
@@ -133,11 +129,40 @@ public class RecommendationService {
     }
 
     private RouteOriginPreparationResult prepareRouteOrigins(final RecommendationRequest request) {
-        return routeOriginPreparationService.prepare(request.startingPlaceNames());
+        final List<SubwayStation> originStations = getOriginStations(request.startingPlaceNames());
+        return new RouteOriginPreparationResult(
+                originStations,
+                createRouteOrigins(originStations)
+        );
+    }
+
+    private List<SubwayStation> getOriginStations(final List<String> names) {
+        return names.stream()
+                .map(name -> subwayStationService.findByName(name)
+                        .orElseThrow(() -> new BadRequestException(GeneralErrorCode.INPUT_INVALID_START_LOCATION)))
+                .toList();
+    }
+
+    private RouteOrigins createRouteOrigins(final List<SubwayStation> originStations) {
+        try {
+            return new RouteOrigins(originStations);
+        } catch (IllegalArgumentException e) {
+            throw new BadRequestException(GeneralErrorCode.INPUT_INVALID_START_LOCATION, getPlaceNames(originStations));
+        }
     }
 
     private DispersionPolicy resolveDispersionPolicy(final RouteOrigins routeOrigins) {
-        return routeOriginDispersionService.resolve(routeOrigins);
+        final OriginDestinations originDestinations = routeOrigins.createOriginDestinationsBetweenOrigins();
+        final List<Route> pairRoutes = subwayRouteService.findRoutes(originDestinations.getValues());
+        final DispersionPolicy dispersionPolicy = routeOrigins.resolveDispersionPolicy(pairRoutes);
+
+        log.debug(
+                "출발지 분산도 판정 - 출발역={}, pairRoutes={}개, policy={}",
+                routeOrigins.getNames(),
+                pairRoutes.size(),
+                dispersionPolicy
+        );
+        return dispersionPolicy;
     }
 
     private RouteCandidatePreparationResult prepareRouteCandidates(
@@ -145,7 +170,47 @@ public class RecommendationService {
             final RouteOrigins routeOrigins,
             final DispersionPolicy dispersionPolicy
     ) {
-        return routeCandidatePreparationService.prepare(originStations, routeOrigins, dispersionPolicy);
+        final List<Place> candidatePlaces = getCandidatePlaces(originStations, routeOrigins, dispersionPolicy);
+        final OriginDestinations originDestinations = routeOrigins.createOriginDestinationsTo(candidatePlaces);
+        final Map<Place, Routes> candidateRoutes = findRoutesByDestination(originDestinations);
+        final List<RouteCandidate> routeCandidates = createRouteCandidates(candidatePlaces, candidateRoutes);
+        return new RouteCandidatePreparationResult(candidatePlaces, candidateRoutes, routeCandidates);
+    }
+
+    private List<Place> getCandidatePlaces(
+            final List<SubwayStation> originStations,
+            final RouteOrigins routeOrigins,
+            final DispersionPolicy dispersionPolicy
+    ) {
+        final int radiusKilometers = dispersionPolicy.candidateSearchRadiusKilometers();
+        final List<SubwayStation> nearbyStations = subwayStationService.generateCandidatePlace(
+                originStations,
+                radiusKilometers
+        );
+        final List<Place> candidatePlaces = routeOrigins.excludeOriginsFrom(nearbyStations);
+
+        log.debug(
+                "후보역 1차 필터 완료 - policy={}, radius={}km, 후보 {}개",
+                dispersionPolicy,
+                radiusKilometers,
+                candidatePlaces.size()
+        );
+        return candidatePlaces;
+    }
+
+    private Map<Place, Routes> findRoutesByDestination(final OriginDestinations originDestinations) {
+        final List<Route> routes = subwayRouteService.findRoutes(originDestinations.getValues());
+        return originDestinations.groupRoutesByDestination(routes);
+    }
+
+    private List<RouteCandidate> createRouteCandidates(
+            final List<Place> candidatePlaces,
+            final Map<Place, Routes> candidateRoutes
+    ) {
+        return candidatePlaces.stream()
+                .filter(candidateRoutes::containsKey)
+                .map(place -> new RouteCandidate(place, candidateRoutes.get(place)))
+                .toList();
     }
 
     private CandidateSelection selectCandidates(
@@ -177,13 +242,19 @@ public class RecommendationService {
             final RouteOrigins routeOrigins,
             final RecommendedCandidates recommendedCandidates
     ) {
-        return recommendedCandidateRouteService.prepare(routeOrigins, recommendedCandidates);
+        final OriginDestinations originDestinations = routeOrigins.createOriginDestinationsTo(
+                recommendedCandidates.getPlaces()
+        );
+        final List<CandidateRoute> candidateRoutes = subwayRouteService.findCandidateRoutes(
+                originDestinations.getValues()
+        );
+        return new RecommendedCandidateTravels(originDestinations.groupCandidateRoutesByDestination(candidateRoutes));
     }
 
     private Map<Place, RecommendationReason> generateRecommendationReasons(
             final RecommendedCandidates recommendedCandidates
     ) {
-        return recommendedCandidateReasonService.generate(recommendedCandidates);
+        return recommendedCandidates.createReasons();
     }
 
     private Recommendation createRecommendation(
@@ -212,6 +283,12 @@ public class RecommendationService {
                         recommendation
                 )
         ).toHexString().toUpperCase();
+    }
+
+    private List<String> getPlaceNames(final List<? extends Place> places) {
+        return places.stream()
+                .map(Place::getName)
+                .toList();
     }
 
     private void validateRecommendationCandidates(final RecommendedCandidates recommendedCandidates) {

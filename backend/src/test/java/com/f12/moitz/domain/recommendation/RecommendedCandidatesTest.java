@@ -133,6 +133,50 @@ class RecommendedCandidatesTest {
     }
 
     @Test
+    @DisplayName("추천 후보 이름과 태그로 추천 이유를 생성한다")
+    void createReasons() {
+        final Place seolleung = place("선릉역");
+        final Place samsung = place("삼성역");
+        final RecommendedCandidates recommendedCandidates = new RecommendedCandidates(
+                List.of(seolleung, samsung),
+                Map.of(
+                        seolleung, List.of(CandidateSelectionTag.FAIRNESS),
+                        samsung, List.of(CandidateSelectionTag.EFFICIENCY)
+                )
+        );
+
+        final Map<Place, RecommendationReason> result = recommendedCandidates.createReasons();
+
+        assertThat(result)
+                .containsEntry(seolleung, new RecommendationReason(
+                        "#공평",
+                        "선릉역은 모든 참여자의 이동 시간이 최대한 비슷한 기준을 반영해 추천된 만남 장소입니다."
+                ))
+                .containsEntry(samsung, new RecommendationReason(
+                        "#평균최소",
+                        "삼성역은 전체 참여자의 평균 이동 시간이 짧은 기준을 반영해 추천된 만남 장소입니다."
+                ));
+    }
+
+    @Test
+    @DisplayName("추천 태그가 없으면 종합 추천 이유를 생성한다")
+    void createReasons_UsesGeneralReasonWhenTagsAreMissing() {
+        final Place cityHall = place("시청역");
+        final RecommendedCandidates recommendedCandidates = new RecommendedCandidates(
+                List.of(cityHall),
+                Map.of()
+        );
+
+        final Map<Place, RecommendationReason> result = recommendedCandidates.createReasons();
+
+        assertThat(result)
+                .containsEntry(cityHall, new RecommendationReason(
+                        "#종합추천",
+                        "시청역은 이동 시간, 환승, 균형을 종합한 기준을 반영해 추천된 만남 장소입니다."
+                ));
+    }
+
+    @Test
     @DisplayName("추천 후보가 아닌 장소의 태그는 조회할 수 없다")
     void getTags_ThrowsExceptionWhenPlaceIsNotRecommendedCandidate() {
         final Place seolleung = place("선릉역");
