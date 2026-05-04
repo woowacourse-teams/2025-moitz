@@ -1,9 +1,9 @@
 package com.f12.moitz.application.subway;
 
 import com.f12.moitz.application.port.PlaceFinder;
-import com.f12.moitz.application.port.SubwayMapLoader;
-import com.f12.moitz.application.port.dto.RawPathInfo;
-import com.f12.moitz.application.port.dto.RawRouteInfo;
+import com.f12.moitz.application.port.subway.SubwayMapLoader;
+import com.f12.moitz.application.port.subway.dto.RawPathInfo;
+import com.f12.moitz.application.port.subway.dto.RawRouteInfo;
 import com.f12.moitz.domain.subway.Edge;
 import com.f12.moitz.domain.subway.SubwayEdges;
 import com.f12.moitz.domain.subway.SubwayLine;

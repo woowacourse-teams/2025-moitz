@@ -1,4 +1,4 @@
-package com.f12.moitz.application.port.dto;
+package com.f12.moitz.application.port.subway.dto;
 
 public record RawPathInfo(
         RawStationInfo departureStation,

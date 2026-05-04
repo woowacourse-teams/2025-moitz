@@ -1,9 +1,9 @@
 package com.f12.moitz.infrastructure.adapter;
 
-import com.f12.moitz.application.port.SubwayMapLoader;
-import com.f12.moitz.application.port.dto.RawPathInfo;
-import com.f12.moitz.application.port.dto.RawRouteInfo;
-import com.f12.moitz.application.port.dto.RawStationInfo;
+import com.f12.moitz.application.port.subway.SubwayMapLoader;
+import com.f12.moitz.application.port.subway.dto.RawPathInfo;
+import com.f12.moitz.application.port.subway.dto.RawRouteInfo;
+import com.f12.moitz.application.port.subway.dto.RawStationInfo;
 import com.f12.moitz.infrastructure.client.open.OpenApiClient;
 import com.f12.moitz.infrastructure.client.open.dto.PathResponse;
 import com.f12.moitz.infrastructure.client.open.dto.SubwayRouteResponse;
