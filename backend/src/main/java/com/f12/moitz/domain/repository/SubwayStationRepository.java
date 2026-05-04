@@ -1,16 +1,20 @@
 package com.f12.moitz.domain.repository;
 
-import com.f12.moitz.infrastructure.persistence.SubwayStationEntity;
+import com.f12.moitz.domain.Point;
+import com.f12.moitz.domain.subway.SubwayStation;
 import java.util.List;
 import java.util.Optional;
-import org.springframework.data.geo.Distance;
-import org.springframework.data.geo.Point;
-import org.springframework.data.mongodb.repository.MongoRepository;
 
-public interface SubwayStationRepository extends MongoRepository<SubwayStationEntity, String> {
+public interface SubwayStationRepository {
 
-    Optional<SubwayStationEntity> findByName(String name);
+    List<SubwayStation> findAll();
 
-    List<SubwayStationEntity> findByPointNear(Point center, Distance distance);
+    Optional<SubwayStation> findByName(String name);
+
+    List<SubwayStation> findByPointNear(Point center, int radiusKilometers);
+
+    long count();
+
+    void saveAll(List<SubwayStation> subwayStations);
 
 }

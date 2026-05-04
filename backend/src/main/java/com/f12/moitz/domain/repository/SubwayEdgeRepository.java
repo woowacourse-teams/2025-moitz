@@ -1,8 +1,15 @@
 package com.f12.moitz.domain.repository;
 
 import com.f12.moitz.domain.subway.SubwayEdge;
-import org.springframework.data.mongodb.repository.MongoRepository;
+import java.util.List;
+import java.util.Set;
 
-public interface SubwayEdgeRepository extends MongoRepository<SubwayEdge, String> {
+public interface SubwayEdgeRepository {
+
+    void saveAll(Set<SubwayEdge> subwayEdges);
+
+    long count();
+
+    List<SubwayEdge> findAll();
 
 }
