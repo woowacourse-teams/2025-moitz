@@ -1,4 +1,4 @@
-package com.f12.moitz.infrastructure.adapter;
+package com.f12.moitz.infrastructure.adapter.place;
 
 import com.f12.moitz.application.port.PlaceRecommender;
 import com.f12.moitz.common.error.exception.ExternalApiErrorCode;

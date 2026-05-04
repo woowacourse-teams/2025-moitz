@@ -1,4 +1,4 @@
-package com.f12.moitz.infrastructure.adapter;
+package com.f12.moitz.infrastructure.adapter.subway;
 
 import com.f12.moitz.application.port.subway.SubwayMapLoader;
 import com.f12.moitz.application.port.subway.dto.RawPathInfo;

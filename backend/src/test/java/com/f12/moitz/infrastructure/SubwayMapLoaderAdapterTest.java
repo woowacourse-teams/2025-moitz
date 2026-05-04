@@ -2,7 +2,7 @@ package com.f12.moitz.infrastructure;
 
 import com.f12.moitz.application.subway.SubwayStationService;
 import com.f12.moitz.domain.subway.repository.SubwayStationRepository;
-import com.f12.moitz.infrastructure.adapter.SubwayMapLoaderAdapter;
+import com.f12.moitz.infrastructure.adapter.subway.SubwayMapLoaderAdapter;
 import com.f12.moitz.infrastructure.client.open.OpenApiClient;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Disabled;
