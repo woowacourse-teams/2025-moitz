@@ -12,10 +12,12 @@ import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.geo.Distance;
 import org.springframework.data.mongodb.core.geo.GeoJsonPoint;
 
 @ExtendWith(MockitoExtension.class)
@@ -60,6 +62,35 @@ class SubwayStationServiceTest {
 
         // Then
         assertThat(station).contains(expectedStation.toSubwayStation());
+    }
+
+    @DisplayName("출발역 중심점과 반경으로 후보역을 검색한다")
+    @Test
+    void generateCandidatePlace() {
+        // Given
+        final SubwayStation gangnam = new SubwayStation("강남역", new Point(127.0, 37.0));
+        final SubwayStation yeoksam = new SubwayStation("역삼역", new Point(129.0, 39.0));
+        final SubwayStationEntity seolleung = new SubwayStationEntity("선릉역", new GeoJsonPoint(128.0, 38.0));
+        Mockito.when(subwayStationRepository.findByPointNear(Mockito.any(), Mockito.any()))
+                .thenReturn(List.of(seolleung));
+
+        // When
+        final List<SubwayStation> candidatePlaces = subwayStationService.generateCandidatePlace(
+                List.of(gangnam, yeoksam),
+                10
+        );
+
+        // Then
+        assertThat(candidatePlaces).containsExactly(seolleung.toSubwayStation());
+
+        final ArgumentCaptor<org.springframework.data.geo.Point> pointCaptor = ArgumentCaptor.forClass(
+                org.springframework.data.geo.Point.class
+        );
+        final ArgumentCaptor<Distance> distanceCaptor = ArgumentCaptor.forClass(Distance.class);
+        Mockito.verify(subwayStationRepository).findByPointNear(pointCaptor.capture(), distanceCaptor.capture());
+        assertThat(pointCaptor.getValue().getX()).isEqualTo(128.0);
+        assertThat(pointCaptor.getValue().getY()).isEqualTo(38.0);
+        assertThat(distanceCaptor.getValue().getValue()).isEqualTo(10.0);
     }
 
     @DisplayName("후보역 생성 시 출발역 목록은 비어있거나 null일 수 없다")

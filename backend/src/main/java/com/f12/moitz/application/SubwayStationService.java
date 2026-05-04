@@ -1,6 +1,8 @@
 package com.f12.moitz.application;
 
+import com.f12.moitz.domain.CandidatePlaceSearchArea;
 import com.f12.moitz.domain.Place;
+import com.f12.moitz.domain.Point;
 import com.f12.moitz.domain.repository.SubwayStationRepository;
 import com.f12.moitz.domain.subway.SubwayStation;
 import com.f12.moitz.domain.subway.SubwayStationName;
@@ -9,10 +11,6 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
-import org.locationtech.jts.geom.Coordinate;
-import org.locationtech.jts.geom.GeometryFactory;
-import org.locationtech.jts.geom.MultiPoint;
-import org.locationtech.jts.geom.Point;
 import org.springframework.data.geo.Distance;
 import org.springframework.data.geo.Metrics;
 import org.springframework.stereotype.Service;
@@ -24,7 +22,6 @@ public class SubwayStationService {
     private static final int DISTANCE_VALUE = 10;
 
     private final SubwayStationRepository subwayStationRepository;
-    private final GeometryFactory geometryFactory;
 
     public List<SubwayStation> getAll() {
         return subwayStationRepository.findAll().stream()
@@ -77,47 +74,22 @@ public class SubwayStationService {
             final List<SubwayStation> startingStations,
             final int distanceValue
     ) {
-        validateCandidatePlaceSearch(startingStations, distanceValue);
+        final CandidatePlaceSearchArea searchArea = new CandidatePlaceSearchArea(startingStations, distanceValue);
 
-        final List<SubwayStationEntity> stationEntities = startingStations.stream()
-                .map(SubwayStationEntity::fromSubwayStation)
-                .toList();
-
-        final Coordinate[] coordinateArr = getCoordinates(stationEntities);
-
-        final org.springframework.data.geo.Point center = getCenterPoint(coordinateArr);
-        final Distance distance = new Distance(distanceValue, Metrics.KILOMETERS);
-
-        return subwayStationRepository.findByPointNear(center, distance).stream()
+        return subwayStationRepository.findByPointNear(
+                        toGeoPoint(searchArea.getCenter()),
+                        toDistance(searchArea)
+                ).stream()
                 .map(SubwayStationEntity::toSubwayStation)
                 .toList();
     }
 
-    private void validateCandidatePlaceSearch(
-            final List<SubwayStation> startingStations,
-            final int distanceValue
-    ) {
-        if (startingStations == null || startingStations.isEmpty()) {
-            throw new IllegalArgumentException("출발 지하철역 목록은 비어있거나 null일 수 없습니다.");
-        }
-        if (distanceValue <= 0) {
-            throw new IllegalArgumentException("후보역 검색 반경은 0보다 커야 합니다.");
-        }
+    private org.springframework.data.geo.Point toGeoPoint(final Point point) {
+        return new org.springframework.data.geo.Point(point.getX(), point.getY());
     }
 
-    private Coordinate[] getCoordinates(final List<SubwayStationEntity> stationEntities) {
-        return stationEntities.stream()
-                .map(place -> {
-                    final List<Double> coordinates = place.getPoint().getCoordinates();
-                    return new Coordinate(coordinates.get(0), coordinates.get(1));
-                })
-                .toArray(Coordinate[]::new);
-    }
-
-    private org.springframework.data.geo.Point getCenterPoint(final Coordinate[] coordinateArr) {
-        final MultiPoint multiPoint = geometryFactory.createMultiPointFromCoords(coordinateArr);
-        final Point centroid = multiPoint.getCentroid();
-        return new org.springframework.data.geo.Point(centroid.getX(), centroid.getY());
+    private Distance toDistance(final CandidatePlaceSearchArea searchArea) {
+        return new Distance(searchArea.getRadiusKilometers(), Metrics.KILOMETERS);
     }
 
 }
