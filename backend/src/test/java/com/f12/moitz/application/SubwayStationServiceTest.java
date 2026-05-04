@@ -3,6 +3,7 @@ package com.f12.moitz.application;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import com.f12.moitz.application.subway.SubwayStationService;
 import com.f12.moitz.domain.Point;
 import com.f12.moitz.domain.subway.repository.SubwayStationRepository;
 import com.f12.moitz.domain.subway.SubwayStation;

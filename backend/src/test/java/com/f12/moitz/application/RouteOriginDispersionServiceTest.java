@@ -6,6 +6,7 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 
 import com.f12.moitz.application.port.RouteFinder;
+import com.f12.moitz.application.recommendation.RouteOriginDispersionService;
 import com.f12.moitz.domain.recommendation.candidate.DispersionPolicy;
 import com.f12.moitz.domain.route.OriginDestination;
 import com.f12.moitz.domain.route.Path;

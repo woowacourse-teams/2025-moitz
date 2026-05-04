@@ -1,7 +1,7 @@
 package com.f12.moitz.ui;
 
-import com.f12.moitz.application.RecommendationService;
-import com.f12.moitz.application.VoteService;
+import com.f12.moitz.application.recommendation.RecommendationService;
+import com.f12.moitz.application.vote.VoteService;
 import com.f12.moitz.application.dto.RecommendationCreateResponse;
 import com.f12.moitz.application.dto.RecommendationRequest;
 import com.f12.moitz.application.dto.RecommendationResultResponse;

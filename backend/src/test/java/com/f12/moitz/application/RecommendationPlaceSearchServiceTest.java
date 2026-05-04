@@ -6,6 +6,8 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 
 import com.f12.moitz.application.port.PlaceRecommender;
+import com.f12.moitz.application.recommendation.RecommendationPlaceSearchResult;
+import com.f12.moitz.application.recommendation.RecommendationPlaceSearchService;
 import com.f12.moitz.domain.recommendation.candidate.CandidateSelection;
 import com.f12.moitz.domain.recommendation.candidate.CandidateSelectionTag;
 import com.f12.moitz.domain.recommendation.RecommendedPlaces;

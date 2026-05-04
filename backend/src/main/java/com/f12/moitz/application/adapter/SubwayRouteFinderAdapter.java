@@ -1,6 +1,6 @@
 package com.f12.moitz.application.adapter;
 
-import com.f12.moitz.application.SubwayStationService;
+import com.f12.moitz.application.subway.SubwayStationService;
 import com.f12.moitz.application.port.RouteFinder;
 import com.f12.moitz.domain.route.CandidateRoute;
 import com.f12.moitz.domain.route.OriginDestination;

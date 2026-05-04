@@ -1,4 +1,4 @@
-package com.f12.moitz.application;
+package com.f12.moitz.application.vote;
 
 import com.f12.moitz.application.dto.VotesResponse;
 import com.f12.moitz.common.error.exception.BadRequestException;

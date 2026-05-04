@@ -1,4 +1,4 @@
-package com.f12.moitz.application;
+package com.f12.moitz.application.recommendation;
 
 import com.f12.moitz.domain.recommendation.RecommendedPlaces;
 import com.f12.moitz.domain.recommendation.RecommendedCandidates;

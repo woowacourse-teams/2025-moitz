@@ -4,6 +4,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.BDDMockito.given;
 
+import com.f12.moitz.application.recommendation.RouteOriginPreparationResult;
+import com.f12.moitz.application.recommendation.RouteOriginPreparationService;
+import com.f12.moitz.application.subway.SubwayStationService;
 import com.f12.moitz.common.error.exception.BadRequestException;
 import com.f12.moitz.common.error.exception.GeneralErrorCode;
 import com.f12.moitz.domain.Point;

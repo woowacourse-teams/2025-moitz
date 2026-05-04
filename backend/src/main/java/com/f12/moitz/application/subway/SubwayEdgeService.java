@@ -1,4 +1,4 @@
-package com.f12.moitz.application;
+package com.f12.moitz.application.subway;
 
 import com.f12.moitz.domain.subway.repository.SubwayEdgeRepository;
 import com.f12.moitz.domain.subway.SubwayEdges;

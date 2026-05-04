@@ -1,6 +1,7 @@
-package com.f12.moitz.application;
+package com.f12.moitz.application.recommendation;
 
 import com.f12.moitz.application.port.RouteFinder;
+import com.f12.moitz.application.subway.SubwayStationService;
 import com.f12.moitz.domain.recommendation.candidate.DispersionPolicy;
 import com.f12.moitz.domain.route.OriginDestinations;
 import com.f12.moitz.domain.Place;

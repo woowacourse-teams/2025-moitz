@@ -1,6 +1,6 @@
 package com.f12.moitz.infrastructure;
 
-import com.f12.moitz.application.SetupService;
+import com.f12.moitz.application.subway.SetupService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;

@@ -1,5 +1,6 @@
-package com.f12.moitz.application;
+package com.f12.moitz.application.recommendation;
 
+import com.f12.moitz.application.subway.SubwayStationService;
 import com.f12.moitz.common.error.exception.BadRequestException;
 import com.f12.moitz.common.error.exception.GeneralErrorCode;
 import com.f12.moitz.domain.Place;
