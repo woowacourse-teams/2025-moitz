@@ -3,7 +3,7 @@ package com.f12.moitz.infrastructure.client.gemini;
 import static com.f12.moitz.infrastructure.PromptGenerator.ADDITIONAL_WITH_CANDIDATE_PROMPT;
 import static com.f12.moitz.infrastructure.PromptGenerator.RECOMMENDATION_COUNT;
 
-import com.f12.moitz.application.dto.RecommendedLocationsResponse;
+import com.f12.moitz.application.dto.recommendation.RecommendedLocationsResponse;
 import com.f12.moitz.common.error.exception.ExternalApiErrorCode;
 import com.f12.moitz.common.error.exception.ExternalApiException;
 import com.f12.moitz.common.error.exception.RetryableApiException;

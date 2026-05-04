@@ -1,0 +1,28 @@
+package com.f12.moitz.infrastructure.adapter.place;
+
+import com.f12.moitz.application.port.place.PlaceFinder;
+import com.f12.moitz.domain.place.Place;
+import com.f12.moitz.infrastructure.client.kakao.KakaoMapClient;
+import java.util.List;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Component;
+
+@Component
+@RequiredArgsConstructor
+public class PlaceFinderAdapter implements PlaceFinder {
+
+    private final KakaoMapClient kakaoMapClient;
+
+    @Override
+    public Place findPlaceByName(final String placeName) {
+        return new Place(placeName, kakaoMapClient.searchPointBy(placeName));
+    }
+
+    @Override
+    public List<Place> findPlacesByNames(final List<String> placeNames) {
+        return placeNames.stream()
+                .map(this::findPlaceByName)
+                .toList();
+    }
+
+}

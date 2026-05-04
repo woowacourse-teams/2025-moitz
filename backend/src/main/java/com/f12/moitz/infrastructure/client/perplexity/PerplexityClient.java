@@ -1,6 +1,6 @@
 package com.f12.moitz.infrastructure.client.perplexity;
 
-import com.f12.moitz.application.dto.RecommendedLocationsResponse;
+import com.f12.moitz.application.dto.recommendation.RecommendedLocationsResponse;
 import com.f12.moitz.common.error.exception.ExternalApiErrorCode;
 import com.f12.moitz.common.error.exception.ExternalApiException;
 import com.f12.moitz.common.error.exception.RetryableApiException;

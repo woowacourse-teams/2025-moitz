@@ -5,36 +5,37 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyList;
-import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
-import com.f12.moitz.application.dto.RecommendationRequest;
-import com.f12.moitz.application.port.LocationReasonGenerator;
-import com.f12.moitz.application.port.PlaceRecommender;
-import com.f12.moitz.application.port.dto.ReasonAndDescription;
-import com.f12.moitz.application.port.RouteFinder;
-import com.f12.moitz.application.utils.RecommendationMapper;
+import com.f12.moitz.application.dto.recommendation.RecommendationRequest;
+import com.f12.moitz.application.port.place.PlaceRecommender;
+import com.f12.moitz.application.subway.SubwayRouteService;
+import com.f12.moitz.application.recommendation.RecommendationPlaceSearchService;
+import com.f12.moitz.application.recommendation.RecommendationService;
+import com.f12.moitz.application.subway.SubwayStationService;
+import com.f12.moitz.application.recommendation.utils.RecommendationResponseMapper;
 import com.f12.moitz.common.error.exception.BadRequestException;
 import com.f12.moitz.common.error.exception.GeneralErrorCode;
-import com.f12.moitz.domain.CategorizedRecommendedPlaces;
-import com.f12.moitz.domain.Course;
-import com.f12.moitz.domain.Path;
-import com.f12.moitz.domain.Place;
-import com.f12.moitz.domain.Point;
-import com.f12.moitz.domain.RecommendCondition;
-import com.f12.moitz.domain.RecommendedPlace;
-import com.f12.moitz.domain.Result;
-import com.f12.moitz.domain.Route;
-import com.f12.moitz.domain.TravelMethod;
-import com.f12.moitz.domain.repository.RecommendResultRepository;
+import com.f12.moitz.domain.route.CandidateRoute;
+import com.f12.moitz.domain.recommendation.RecommendedPlaces;
+import com.f12.moitz.domain.route.Course;
+import com.f12.moitz.domain.route.Path;
+import com.f12.moitz.domain.place.Place;
+import com.f12.moitz.domain.place.Point;
+import com.f12.moitz.domain.recommendation.RecommendCondition;
+import com.f12.moitz.domain.recommendation.RecommendedPlace;
+import com.f12.moitz.domain.recommendation.Result;
+import com.f12.moitz.domain.route.Route;
+import com.f12.moitz.domain.route.TravelMethod;
+import com.f12.moitz.domain.recommendation.repository.RecommendResultRepository;
 import com.f12.moitz.domain.subway.SubwayLine;
 import com.f12.moitz.domain.subway.SubwayStation;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -50,31 +51,27 @@ class RecommendationServiceTest {
     private RecommendationService recommendationService;
 
     @Mock
-    private LocationReasonGenerator locationReasonGenerator;
-
-    @Mock
     private PlaceRecommender placeRecommender;
 
     @Mock
     private SubwayStationService subwayStationService;
 
     @Mock
-    private RouteFinder routeFinder;
+    private SubwayRouteService subwayRouteService;
 
     @Mock
     private RecommendResultRepository recommendResultRepository;
 
-    private RecommendationMapper recommendationMapper;
+    private RecommendationResponseMapper recommendationResponseMapper;
 
     @BeforeEach
     void setUp() {
-        recommendationMapper = new RecommendationMapper();
+        recommendationResponseMapper = new RecommendationResponseMapper();
         recommendationService = new RecommendationService(
                 subwayStationService,
-                placeRecommender,
-                locationReasonGenerator,
-                routeFinder,
-                recommendationMapper,
+                subwayRouteService,
+                new RecommendationPlaceSearchService(placeRecommender),
+                recommendationResponseMapper,
                 recommendResultRepository
         );
     }
@@ -91,11 +88,11 @@ class RecommendationServiceTest {
 
         final SubwayStation seolleung = new SubwayStation("선릉역", new Point(127.048, 37.504));
         final SubwayStation samsung = new SubwayStation("삼성역", new Point(127.063, 37.508));
-        given(subwayStationService.generateCandidatePlace(anyList(), anyInt()))
+        given(subwayStationService.findByPointNear(any(), anyInt()))
                 .willReturn(List.of(gangnam, yeoksam, seolleung, samsung));
 
-        Map<Place, CategorizedRecommendedPlaces> mockRecommendedPlaces = Map.of(
-                seolleung, new CategorizedRecommendedPlaces(
+        Map<Place, RecommendedPlaces> mockRecommendedPlaces = Map.of(
+                seolleung, new RecommendedPlaces(
                         Map.of(
                                 RecommendCondition.CAFE, List.of(
                                         new RecommendedPlace(
@@ -109,7 +106,7 @@ class RecommendationServiceTest {
                                 )
                         )
                 ),
-                samsung, new CategorizedRecommendedPlaces(
+                samsung, new RecommendedPlaces(
                         Map.of(
                                 RecommendCondition.CAFE, List.of(
                                         new RecommendedPlace(
@@ -136,19 +133,15 @@ class RecommendationServiceTest {
                 new Route(List.of(new Path(gangnam, samsung, TravelMethod.SUBWAY, 14 * 60, SubwayLine.fromTitle("2호선")))),
                 new Route(List.of(new Path(yeoksam, samsung, TravelMethod.SUBWAY, 10 * 60, SubwayLine.fromTitle("2호선"))))
         );
-        given(routeFinder.findRoutes(anyList())).willReturn(pairwiseRoutes, mockRoutes);
+        given(subwayRouteService.findRoutes(anyList())).willReturn(pairwiseRoutes, mockRoutes);
 
-        List<Course> mockCourses = List.of(
-                new Course(List.of(gangnam.getPoint(), seolleung.getPoint())),
-                new Course(List.of(yeoksam.getPoint(), seolleung.getPoint())),
-                new Course(List.of(gangnam.getPoint(), samsung.getPoint())),
-                new Course(List.of(yeoksam.getPoint(), samsung.getPoint()))
+        List<CandidateRoute> mockCandidateRoutes = List.of(
+                new CandidateRoute(mockRoutes.get(0), new Course(List.of(gangnam.getPoint(), seolleung.getPoint()))),
+                new CandidateRoute(mockRoutes.get(1), new Course(List.of(yeoksam.getPoint(), seolleung.getPoint()))),
+                new CandidateRoute(mockRoutes.get(2), new Course(List.of(gangnam.getPoint(), samsung.getPoint()))),
+                new CandidateRoute(mockRoutes.get(3), new Course(List.of(yeoksam.getPoint(), samsung.getPoint())))
         );
-        given(routeFinder.findCourses(anyList())).willReturn(mockCourses);
-        given(locationReasonGenerator.generateReasons(anyList(), anyMap())).willReturn(Map.of(
-                "선릉역", new ReasonAndDescription("설명1", "이유1"),
-                "삼성역", new ReasonAndDescription("설명2", "이유2")
-        ));
+        given(subwayRouteService.findCandidateRoutes(anyList())).willReturn(mockCandidateRoutes);
 
         given(recommendResultRepository.saveAndReturnId(any(Result.class))).willReturn(new ObjectId());
 
@@ -163,15 +156,15 @@ class RecommendationServiceTest {
 
         Result savedResult = resultCaptor.getValue();
         assertThat(savedResult.getRecommendedLocationsCount()).isEqualTo(2);
-        assertThat(savedResult.getRecommendedLocations().getCandidates().stream()
-                .map(recommendedLocation -> recommendedLocation.getDestination().getName())
-                .collect(Collectors.toList()))
+        assertThat(IntStream.range(0, savedResult.getRecommendedLocationsCount())
+                .mapToObj(index -> savedResult.getRecommendedLocations().get(index).getDestination().getName())
+                .toList())
                 .containsExactly("삼성역", "선릉역");
-        assertThat(savedResult.getRecommendedLocations().getCandidates().stream()
-                .map(recommendedLocation -> recommendedLocation.getTags().stream()
+        assertThat(IntStream.range(0, savedResult.getRecommendedLocationsCount())
+                .mapToObj(index -> savedResult.getRecommendedLocations().get(index).getTags().stream()
                         .map(Enum::name)
                         .toList())
-                .collect(Collectors.toList()))
+                .toList())
                 .containsExactly(
                         List.of("FAIRNESS", "EFFICIENCY", "TRANSFER"),
                         List.of("MAX_BURDEN_RELIEF", "EFFICIENCY", "TRANSFER")
@@ -179,7 +172,7 @@ class RecommendationServiceTest {
     }
 
     @Test
-    @DisplayName("장소 조건을 만족하는 최종 후보가 없으면 제어된 예외를 반환한다")
+    @DisplayName("장소 조건을 만족하는 추천 후보가 없으면 제어된 예외를 반환한다")
     void recommendLocation_ThrowsBadRequestWhenNoRecommendationMatches() {
         final RecommendationRequest request = new RecommendationRequest(List.of("강남역", "역삼역"), List.of("CAFE"));
         final SubwayStation gangnam = new SubwayStation("강남역", new Point(127.027, 37.497));
@@ -188,17 +181,17 @@ class RecommendationServiceTest {
 
         given(subwayStationService.findByName("강남역")).willReturn(Optional.of(gangnam));
         given(subwayStationService.findByName("역삼역")).willReturn(Optional.of(yeoksam));
-        given(subwayStationService.generateCandidatePlace(anyList(), anyInt()))
+        given(subwayStationService.findByPointNear(any(), anyInt()))
                 .willReturn(List.of(gangnam, yeoksam, seolleung));
 
-        given(routeFinder.findRoutes(anyList())).willReturn(
+        given(subwayRouteService.findRoutes(anyList())).willReturn(
                 List.of(new Route(List.of(new Path(gangnam, yeoksam, TravelMethod.SUBWAY, 2 * 60, SubwayLine.fromTitle("2호선"))))),
                 List.of(
                 new Route(List.of(new Path(gangnam, seolleung, TravelMethod.SUBWAY, 10 * 60, SubwayLine.fromTitle("2호선")))),
                 new Route(List.of(new Path(yeoksam, seolleung, TravelMethod.SUBWAY, 5 * 60, SubwayLine.fromTitle("2호선"))))
         ));
         given(placeRecommender.recommendPlaces(anyList(), anyList())).willReturn(Map.of(
-                seolleung, new CategorizedRecommendedPlaces(Map.of())
+                seolleung, new RecommendedPlaces(Map.of())
         ));
 
         assertThatThrownBy(() -> recommendationService.recommendLocation(request))
@@ -220,7 +213,7 @@ class RecommendationServiceTest {
                 .isInstanceOfSatisfying(BadRequestException.class,
                         exception -> assertThat(exception.getErrorCode())
                                 .isEqualTo(GeneralErrorCode.INPUT_INVALID_START_LOCATION));
-        verify(routeFinder, times(0)).findRoutes(anyList());
+        verify(subwayRouteService, times(0)).findRoutes(anyList());
     }
 
 }

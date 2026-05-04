@@ -1,6 +1,6 @@
 package com.f12.moitz.ui;
 
-import com.f12.moitz.application.SubwayStationService;
+import com.f12.moitz.application.subway.SubwayStationService;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
