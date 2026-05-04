@@ -48,6 +48,21 @@ public class RecommendedCandidates {
         return recommendedCandidatePlaces;
     }
 
+    public List<String> getPlaceNames() {
+        return recommendedCandidatePlaces.stream()
+                .map(Place::getName)
+                .toList();
+    }
+
+    public Map<String, List<CandidateSelectionTag>> getTagsByPlaceName() {
+        final Map<String, List<CandidateSelectionTag>> tagsByPlaceName = new LinkedHashMap<>();
+        recommendedCandidatePlaces.forEach(place -> tagsByPlaceName.put(
+                place.getName(),
+                getTags(place)
+        ));
+        return Collections.unmodifiableMap(tagsByPlaceName);
+    }
+
     public int size() {
         return recommendedCandidatePlaces.size();
     }

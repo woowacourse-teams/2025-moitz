@@ -60,6 +60,45 @@ class RecommendedCandidatesTest {
     }
 
     @Test
+    @DisplayName("추천 후보 이름 목록과 이름별 태그를 조회한다")
+    void getPlaceNamesAndTagsByPlaceName() {
+        final Place seolleung = place("선릉역");
+        final Place samsung = place("삼성역");
+        final RecommendedCandidates recommendedCandidates = new RecommendedCandidates(
+                List.of(seolleung, samsung),
+                Map.of(
+                        seolleung, List.of(CandidateSelectionTag.FAIRNESS),
+                        samsung, List.of(CandidateSelectionTag.EFFICIENCY, CandidateSelectionTag.GENERAL)
+                )
+        );
+
+        assertSoftly(softAssertions -> {
+            softAssertions.assertThat(recommendedCandidates.getPlaceNames())
+                    .containsExactly("선릉역", "삼성역");
+            softAssertions.assertThat(recommendedCandidates.getTagsByPlaceName())
+                    .containsEntry("선릉역", List.of(CandidateSelectionTag.FAIRNESS))
+                    .containsEntry("삼성역", List.of(CandidateSelectionTag.EFFICIENCY))
+                    .hasSize(2);
+        });
+    }
+
+    @Test
+    @DisplayName("추천 후보 이름별 태그는 외부에서 변경할 수 없다")
+    void getTagsByPlaceName_ReturnsUnmodifiableMap() {
+        final Place seolleung = place("선릉역");
+        final RecommendedCandidates recommendedCandidates = new RecommendedCandidates(
+                List.of(seolleung),
+                Map.of(seolleung, List.of(CandidateSelectionTag.FAIRNESS))
+        );
+
+        assertThatThrownBy(() -> recommendedCandidates.getTagsByPlaceName().put(
+                "삼성역",
+                List.of(CandidateSelectionTag.EFFICIENCY)
+        ))
+                .isInstanceOf(UnsupportedOperationException.class);
+    }
+
+    @Test
     @DisplayName("추천 후보 목록과 태그 맵은 null일 수 없다")
     void constructor_ThrowsExceptionWhenArgumentsAreInvalid() {
         final Place seolleung = place("선릉역");
