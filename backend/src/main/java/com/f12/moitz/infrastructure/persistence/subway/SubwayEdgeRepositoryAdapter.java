@@ -1,8 +1,8 @@
-package com.f12.moitz.infrastructure.persistence;
+package com.f12.moitz.infrastructure.persistence.subway;
 
 import com.f12.moitz.domain.subway.SubwayEdge;
 import com.f12.moitz.domain.subway.repository.SubwayEdgeRepository;
-import com.f12.moitz.infrastructure.persistence.repository.SubwayEdgeMongoRepository;
+import com.f12.moitz.infrastructure.persistence.subway.repository.SubwayEdgeMongoRepository;
 import java.util.List;
 import java.util.Set;
 import org.springframework.stereotype.Repository;

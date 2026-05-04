@@ -1,4 +1,4 @@
-package com.f12.moitz.infrastructure.persistence;
+package com.f12.moitz.infrastructure.persistence.recommendation;
 
 import com.f12.moitz.domain.Place;
 import com.f12.moitz.domain.recommendation.RecommendCondition;

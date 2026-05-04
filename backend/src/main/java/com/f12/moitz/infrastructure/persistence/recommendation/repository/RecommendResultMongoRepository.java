@@ -1,7 +1,7 @@
-package com.f12.moitz.infrastructure.persistence.repository;
+package com.f12.moitz.infrastructure.persistence.recommendation.repository;
 
-import com.f12.moitz.infrastructure.persistence.dto.CandidateVoteProjection;
-import com.f12.moitz.infrastructure.persistence.ResultEntity;
+import com.f12.moitz.infrastructure.persistence.recommendation.ResultEntity;
+import com.f12.moitz.infrastructure.persistence.recommendation.projection.CandidateVoteProjection;
 import java.util.List;
 import java.util.Optional;
 import org.bson.types.ObjectId;

@@ -1,4 +1,4 @@
-package com.f12.moitz.infrastructure.persistence;
+package com.f12.moitz.infrastructure.persistence.subway;
 
 import com.f12.moitz.domain.subway.Edge;
 import com.f12.moitz.domain.subway.SubwayEdge;

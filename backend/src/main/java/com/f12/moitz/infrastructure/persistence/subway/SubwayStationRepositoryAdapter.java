@@ -1,9 +1,9 @@
-package com.f12.moitz.infrastructure.persistence;
+package com.f12.moitz.infrastructure.persistence.subway;
 
 import com.f12.moitz.domain.Point;
-import com.f12.moitz.domain.subway.repository.SubwayStationRepository;
 import com.f12.moitz.domain.subway.SubwayStation;
-import com.f12.moitz.infrastructure.persistence.repository.SubwayStationMongoRepository;
+import com.f12.moitz.domain.subway.repository.SubwayStationRepository;
+import com.f12.moitz.infrastructure.persistence.subway.repository.SubwayStationMongoRepository;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.data.geo.Distance;

@@ -1,10 +1,10 @@
-package com.f12.moitz.infrastructure.persistence;
+package com.f12.moitz.infrastructure.persistence.recommendation;
 
 import com.f12.moitz.domain.recommendation.Result;
 import com.f12.moitz.domain.recommendation.repository.RecommendResultRepository;
 import com.f12.moitz.domain.recommendation.vote.CandidateVote;
-import com.f12.moitz.infrastructure.persistence.dto.CandidateVoteProjection;
-import com.f12.moitz.infrastructure.persistence.repository.RecommendResultMongoRepository;
+import com.f12.moitz.infrastructure.persistence.recommendation.projection.CandidateVoteProjection;
+import com.f12.moitz.infrastructure.persistence.recommendation.repository.RecommendResultMongoRepository;
 import java.util.List;
 import java.util.Optional;
 import org.bson.types.ObjectId;

@@ -1,4 +1,4 @@
-package com.f12.moitz.infrastructure.persistence.dto;
+package com.f12.moitz.infrastructure.persistence.recommendation.projection;
 
 import com.f12.moitz.domain.recommendation.vote.CandidateVote;
 import lombok.Getter;
