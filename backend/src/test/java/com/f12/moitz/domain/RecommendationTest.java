@@ -25,6 +25,51 @@ class RecommendationTest {
     }
 
     @Test
+    @DisplayName("추천 생성에 필요한 정보를 조합해 추천 결과를 생성한다")
+    void create() {
+        final Place startPlace = new Place("잠실역", new Point(127.0, 37.0));
+        final Place recommendedPlace = new Place("선릉역", new Point(127.1, 37.1));
+        final RecommendedPlaces recommendedPlaces = createRecommendedPlaces(RecommendCondition.CAFE);
+
+        final Recommendation recommendation = Recommendation.create(
+                Map.of(recommendedPlace, new RecommendationReason("#공평", "이동 시간이 고른 후보입니다.")),
+                Map.of(recommendedPlace, recommendedPlaces),
+                createRecommendedCandidateTravels(startPlace, recommendedPlace),
+                createRecommendedCandidates(
+                        List.of(recommendedPlace),
+                        Map.of(recommendedPlace, List.of(CandidateSelectionTag.FAIRNESS))
+                )
+        );
+
+        assertThat(recommendation.size()).isEqualTo(1);
+        assertThat(recommendation.get(0).getDestination()).isEqualTo(recommendedPlace);
+        assertThat(recommendation.get(0).getTags()).containsExactly(CandidateSelectionTag.FAIRNESS);
+        assertThat(recommendation.get(0).getDescription()).isEqualTo("#공평");
+        assertThat(recommendation.get(0).getReason()).isEqualTo("이동 시간이 고른 후보입니다.");
+        assertThat(recommendation.get(0).getVotes()).isZero();
+    }
+
+    @Test
+    @DisplayName("추천 이유가 누락되면 추천 결과를 생성할 수 없다")
+    void create_ThrowsExceptionWhenRecommendationReasonIsMissing() {
+        final Place startPlace = new Place("잠실역", new Point(127.0, 37.0));
+        final Place recommendedPlace = new Place("선릉역", new Point(127.1, 37.1));
+        final Place otherPlace = new Place("삼성역", new Point(127.2, 37.2));
+
+        assertSoftly(softAssertions -> softAssertions.assertThatThrownBy(() -> Recommendation.create(
+                Map.of(otherPlace, new RecommendationReason("#공평", "이동 시간이 고른 후보입니다.")),
+                Map.of(recommendedPlace, createRecommendedPlaces(RecommendCondition.CAFE)),
+                createRecommendedCandidateTravels(startPlace, recommendedPlace),
+                createRecommendedCandidates(
+                        List.of(recommendedPlace),
+                        Map.of(recommendedPlace, List.of(CandidateSelectionTag.FAIRNESS))
+                )
+        ))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("추천 이유가 누락되었습니다. 추천 지역: 선릉역"));
+    }
+
+    @Test
     @DisplayName("예외가 발생하지 않고 추천이 생성된다")
     void doesNotThrow() {
         // Given
@@ -139,6 +184,37 @@ class RecommendationTest {
         Map<RecommendCondition, List<RecommendedPlace>> recommendedPlacesByCondition = Map.of(RecommendCondition.CAFE, List.of(recommendedPlace));
         final RecommendedPlaces recommendedPlaces = new RecommendedPlaces(recommendedPlacesByCondition);
         return new Candidate(endPlace, routes, courses, recommendedPlaces, tag, "123", "123", 0);
+    }
+
+    private RecommendedCandidateTravels createRecommendedCandidateTravels(
+            final Place startPlace,
+            final Place recommendedPlace
+    ) {
+        return new RecommendedCandidateTravels(
+                Map.of(recommendedPlace, createRoutes(startPlace, recommendedPlace, 10 * 60)),
+                Map.of(recommendedPlace, createCourses(startPlace, recommendedPlace))
+        );
+    }
+
+    private RecommendedCandidates createRecommendedCandidates(
+            final List<Place> recommendedPlaces,
+            final Map<Place, List<CandidateSelectionTag>> tagsByPlace
+    ) {
+        return new RecommendedCandidates(recommendedPlaces, tagsByPlace);
+    }
+
+    private Routes createRoutes(final Place startPlace, final Place endPlace, final int travelTime) {
+        return new Routes(List.of(new Route(List.of(new Path(
+                startPlace,
+                endPlace,
+                TravelMethod.SUBWAY,
+                travelTime,
+                SubwayLine.fromTitle("2호선")
+        )))));
+    }
+
+    private Courses createCourses(final Place startPlace, final Place endPlace) {
+        return new Courses(List.of(new Course(List.of(startPlace.getPoint(), endPlace.getPoint()))));
     }
 
     private RecommendedPlaces createRecommendedPlaces(final RecommendCondition recommendCondition) {

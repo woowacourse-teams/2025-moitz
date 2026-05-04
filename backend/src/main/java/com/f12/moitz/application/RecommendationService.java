@@ -43,7 +43,6 @@ public class RecommendationService {
     private final RouteCandidatePreparationService routeCandidatePreparationService;
     private final RecommendationPlaceSearchService recommendationPlaceSearchService;
     private final RecommendedCandidateRouteService recommendedCandidateRouteService;
-    private final RecommendationCreationService recommendationCreationService;
     private final RecommendationResponseMapper recommendationResponseMapper;
     private final RecommendResultRepository recommendResultRepository;
     private final CandidateSelectionPolicy candidateSelectionPolicy = new CandidateSelectionPolicy();
@@ -56,7 +55,6 @@ public class RecommendationService {
             @Autowired final RouteCandidatePreparationService routeCandidatePreparationService,
             @Autowired final RecommendationPlaceSearchService recommendationPlaceSearchService,
             @Autowired final RecommendedCandidateRouteService recommendedCandidateRouteService,
-            @Autowired final RecommendationCreationService recommendationCreationService,
             @Autowired final RecommendationResponseMapper recommendationResponseMapper,
             @Autowired final RecommendResultRepository recommendResultRepository
     ) {
@@ -66,7 +64,6 @@ public class RecommendationService {
         this.routeCandidatePreparationService = routeCandidatePreparationService;
         this.recommendationPlaceSearchService = recommendationPlaceSearchService;
         this.recommendedCandidateRouteService = recommendedCandidateRouteService;
-        this.recommendationCreationService = recommendationCreationService;
         this.recommendationResponseMapper = recommendationResponseMapper;
         this.recommendResultRepository = recommendResultRepository;
     }
@@ -195,7 +192,7 @@ public class RecommendationService {
             final RecommendedCandidateTravels recommendedCandidateTravels,
             final RecommendedCandidates recommendedCandidates
     ) {
-        return recommendationCreationService.create(
+        return Recommendation.create(
                 reasonsByPlace,
                 recommendedPlaces,
                 recommendedCandidateTravels,
