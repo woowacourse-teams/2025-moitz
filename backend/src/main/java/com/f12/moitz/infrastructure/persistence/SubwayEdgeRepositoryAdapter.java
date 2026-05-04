@@ -1,7 +1,7 @@
 package com.f12.moitz.infrastructure.persistence;
 
-import com.f12.moitz.domain.subway.repository.SubwayEdgeRepository;
 import com.f12.moitz.domain.subway.SubwayEdge;
+import com.f12.moitz.domain.subway.repository.SubwayEdgeRepository;
 import com.f12.moitz.infrastructure.persistence.repository.SubwayEdgeMongoRepository;
 import java.util.List;
 import java.util.Set;
@@ -18,7 +18,9 @@ public class SubwayEdgeRepositoryAdapter implements SubwayEdgeRepository {
 
     @Override
     public void saveAll(final Set<SubwayEdge> subwayEdges) {
-        subwayEdgeMongoRepository.saveAll(subwayEdges);
+        subwayEdgeMongoRepository.saveAll(subwayEdges.stream()
+                .map(SubwayEdgeDocument::fromSubwayEdge)
+                .toList());
     }
 
     @Override
@@ -28,7 +30,9 @@ public class SubwayEdgeRepositoryAdapter implements SubwayEdgeRepository {
 
     @Override
     public List<SubwayEdge> findAll() {
-        return subwayEdgeMongoRepository.findAll();
+        return subwayEdgeMongoRepository.findAll().stream()
+                .map(SubwayEdgeDocument::toSubwayEdge)
+                .toList();
     }
 
 }
