@@ -1,7 +1,6 @@
 package com.f12.moitz.application;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.f12.moitz.application.subway.SubwayStationService;
 import com.f12.moitz.domain.place.Point;
@@ -62,55 +61,26 @@ class SubwayStationServiceTest {
         assertThat(station).contains(expectedStation);
     }
 
-    @DisplayName("출발역 중심점과 반경으로 후보역을 검색한다")
+    @DisplayName("중심점과 반경으로 근처 지하철역을 검색한다")
     @Test
-    void generateCandidatePlace() {
+    void findByPointNear() {
         // Given
-        final SubwayStation gangnam = new SubwayStation("강남역", new Point(127.0, 37.0));
-        final SubwayStation yeoksam = new SubwayStation("역삼역", new Point(129.0, 39.0));
+        final Point center = new Point(128.0, 38.0);
         final SubwayStation seolleung = new SubwayStation("선릉역", new Point(128.0, 38.0));
-        Mockito.when(subwayStationRepository.findByPointNear(Mockito.any(), Mockito.anyInt()))
+        Mockito.when(subwayStationRepository.findByPointNear(center, 10))
                 .thenReturn(List.of(seolleung));
 
         // When
-        final List<SubwayStation> candidatePlaces = subwayStationService.generateCandidatePlace(
-                List.of(gangnam, yeoksam),
-                10
-        );
+        final List<SubwayStation> stations = subwayStationService.findByPointNear(center, 10);
 
         // Then
-        assertThat(candidatePlaces).containsExactly(seolleung);
+        assertThat(stations).containsExactly(seolleung);
 
         final ArgumentCaptor<Point> pointCaptor = ArgumentCaptor.forClass(Point.class);
         final ArgumentCaptor<Integer> distanceCaptor = ArgumentCaptor.forClass(Integer.class);
         Mockito.verify(subwayStationRepository).findByPointNear(pointCaptor.capture(), distanceCaptor.capture());
-        assertThat(pointCaptor.getValue().getX()).isEqualTo(128.0);
-        assertThat(pointCaptor.getValue().getY()).isEqualTo(38.0);
+        assertThat(pointCaptor.getValue()).isEqualTo(center);
         assertThat(distanceCaptor.getValue()).isEqualTo(10);
-    }
-
-    @DisplayName("후보역 생성 시 출발역 목록은 비어있거나 null일 수 없다")
-    @Test
-    void generateCandidatePlace_ValidateStartingStations() {
-        assertThatThrownBy(() -> subwayStationService.generateCandidatePlace(null, 10))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("출발 지하철역 목록은 비어있거나 null일 수 없습니다.");
-        assertThatThrownBy(() -> subwayStationService.generateCandidatePlace(List.of(), 10))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("출발 지하철역 목록은 비어있거나 null일 수 없습니다.");
-    }
-
-    @DisplayName("후보역 생성 시 검색 반경은 0보다 커야 한다")
-    @Test
-    void generateCandidatePlace_ValidateDistanceValue() {
-        final SubwayStation station = new SubwayStation("강남역", new Point(127.0, 37.0));
-
-        assertThatThrownBy(() -> subwayStationService.generateCandidatePlace(List.of(station), 0))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("후보역 검색 반경은 0보다 커야 합니다.");
-        assertThatThrownBy(() -> subwayStationService.generateCandidatePlace(List.of(station), -1))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("후보역 검색 반경은 0보다 커야 합니다.");
     }
 
 }

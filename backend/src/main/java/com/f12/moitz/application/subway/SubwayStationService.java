@@ -1,7 +1,7 @@
 package com.f12.moitz.application.subway;
 
-import com.f12.moitz.domain.recommendation.candidate.CandidatePlaceSearchArea;
 import com.f12.moitz.domain.place.Place;
+import com.f12.moitz.domain.place.Point;
 import com.f12.moitz.domain.subway.repository.SubwayStationRepository;
 import com.f12.moitz.domain.subway.SubwayStation;
 import com.f12.moitz.domain.subway.SubwayStationName;
@@ -14,8 +14,6 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class SubwayStationService {
-
-    private static final int DISTANCE_VALUE = 10;
 
     private final SubwayStationRepository subwayStationRepository;
 
@@ -54,17 +52,8 @@ public class SubwayStationService {
         subwayStationRepository.saveAll(subwayStations);
     }
 
-    public List<SubwayStation> generateCandidatePlace(final List<SubwayStation> startingStations) {
-        return generateCandidatePlace(startingStations, DISTANCE_VALUE);
-    }
-
-    public List<SubwayStation> generateCandidatePlace(
-            final List<SubwayStation> startingStations,
-            final int distanceValue
-    ) {
-        final CandidatePlaceSearchArea searchArea = new CandidatePlaceSearchArea(startingStations, distanceValue);
-
-        return subwayStationRepository.findByPointNear(searchArea.getCenter(), searchArea.getRadiusKilometers());
+    public List<SubwayStation> findByPointNear(final Point center, final int radiusKilometers) {
+        return subwayStationRepository.findByPointNear(center, radiusKilometers);
     }
 
 }

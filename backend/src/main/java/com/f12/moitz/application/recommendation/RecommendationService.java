@@ -18,6 +18,7 @@ import com.f12.moitz.domain.recommendation.RecommendedCandidateTravels;
 import com.f12.moitz.domain.recommendation.RecommendedCandidates;
 import com.f12.moitz.domain.recommendation.Result;
 import com.f12.moitz.domain.recommendation.RecommendedPlaces;
+import com.f12.moitz.domain.recommendation.candidate.CandidatePlaceSearchArea;
 import com.f12.moitz.domain.recommendation.candidate.CandidateSelection;
 import com.f12.moitz.domain.recommendation.candidate.CandidateSelectionPolicy;
 import com.f12.moitz.domain.recommendation.candidate.DispersionPolicy;
@@ -183,17 +184,20 @@ public class RecommendationService {
             final RouteOrigins routeOrigins,
             final DispersionPolicy dispersionPolicy
     ) {
-        final int radiusKilometers = dispersionPolicy.candidateSearchRadiusKilometers();
-        final List<SubwayStation> nearbyStations = subwayStationService.generateCandidatePlace(
+        final CandidatePlaceSearchArea searchArea = new CandidatePlaceSearchArea(
                 originStations,
-                radiusKilometers
+                dispersionPolicy.candidateSearchRadiusKilometers()
+        );
+        final List<SubwayStation> nearbyStations = subwayStationService.findByPointNear(
+                searchArea.getCenter(),
+                searchArea.getRadiusKilometers()
         );
         final List<Place> candidatePlaces = routeOrigins.excludeOriginsFrom(nearbyStations);
 
         log.debug(
                 "후보역 1차 필터 완료 - policy={}, radius={}km, 후보 {}개",
                 dispersionPolicy,
-                radiusKilometers,
+                searchArea.getRadiusKilometers(),
                 candidatePlaces.size()
         );
         return candidatePlaces;

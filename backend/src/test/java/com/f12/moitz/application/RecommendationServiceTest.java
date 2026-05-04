@@ -88,7 +88,7 @@ class RecommendationServiceTest {
 
         final SubwayStation seolleung = new SubwayStation("선릉역", new Point(127.048, 37.504));
         final SubwayStation samsung = new SubwayStation("삼성역", new Point(127.063, 37.508));
-        given(subwayStationService.generateCandidatePlace(anyList(), anyInt()))
+        given(subwayStationService.findByPointNear(any(), anyInt()))
                 .willReturn(List.of(gangnam, yeoksam, seolleung, samsung));
 
         Map<Place, RecommendedPlaces> mockRecommendedPlaces = Map.of(
@@ -181,7 +181,7 @@ class RecommendationServiceTest {
 
         given(subwayStationService.findByName("강남역")).willReturn(Optional.of(gangnam));
         given(subwayStationService.findByName("역삼역")).willReturn(Optional.of(yeoksam));
-        given(subwayStationService.generateCandidatePlace(anyList(), anyInt()))
+        given(subwayStationService.findByPointNear(any(), anyInt()))
                 .willReturn(List.of(gangnam, yeoksam, seolleung));
 
         given(subwayRouteService.findRoutes(anyList())).willReturn(
