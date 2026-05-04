@@ -5,15 +5,12 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyList;
-import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 import com.f12.moitz.application.dto.RecommendationRequest;
-import com.f12.moitz.application.port.LocationReasonGenerator;
 import com.f12.moitz.application.port.PlaceRecommender;
-import com.f12.moitz.application.port.dto.ReasonAndDescription;
 import com.f12.moitz.application.subway.SubwayRouteService;
 import com.f12.moitz.application.recommendation.RecommendationPlaceSearchService;
 import com.f12.moitz.application.recommendation.RecommendationService;
@@ -59,9 +56,6 @@ class RecommendationServiceTest {
     private RecommendationService recommendationService;
 
     @Mock
-    private LocationReasonGenerator locationReasonGenerator;
-
-    @Mock
     private PlaceRecommender placeRecommender;
 
     @Mock
@@ -80,7 +74,7 @@ class RecommendationServiceTest {
         recommendationResponseMapper = new RecommendationResponseMapper();
         recommendationService = new RecommendationService(
                 new RouteOriginPreparationService(subwayStationService),
-                new RecommendedCandidateReasonService(locationReasonGenerator),
+                new RecommendedCandidateReasonService(),
                 new RouteOriginDispersionService(subwayRouteService),
                 new RouteCandidatePreparationService(subwayStationService, subwayRouteService),
                 new RecommendationPlaceSearchService(placeRecommender),
@@ -156,10 +150,6 @@ class RecommendationServiceTest {
                 new CandidateRoute(mockRoutes.get(3), new Course(List.of(yeoksam.getPoint(), samsung.getPoint())))
         );
         given(subwayRouteService.findCandidateRoutes(anyList())).willReturn(mockCandidateRoutes);
-        given(locationReasonGenerator.generateReasons(anyList(), anyMap())).willReturn(Map.of(
-                "선릉역", new ReasonAndDescription("설명1", "이유1"),
-                "삼성역", new ReasonAndDescription("설명2", "이유2")
-        ));
 
         given(recommendResultRepository.saveAndReturnId(any(Result.class))).willReturn(new ObjectId());
 
