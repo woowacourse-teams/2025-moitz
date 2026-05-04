@@ -44,8 +44,13 @@ class SubwayRouteSearchState {
         return times.getOrDefault(currentStation, UNREACHABLE_TIME) + edge.getTimeInSeconds();
     }
 
-    List<PreviousStation> getPreviousStations(final SubwayStation station) {
-        return previousStations.get(station);
+    boolean canContinueOn(final SubwayStation station, final SubwayLine line) {
+        return previousStations.get(station).stream()
+                .anyMatch(previousStation -> previousStation.isSameLine(line));
+    }
+
+    SubwayLine getFirstPreviousLine(final SubwayStation station) {
+        return previousStations.get(station).getFirst().line();
     }
 
     void recordIfShorter(

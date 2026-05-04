@@ -1,8 +1,6 @@
 package com.f12.moitz.domain.subway;
 
 import com.f12.moitz.common.error.exception.SubwayRouteException;
-import com.f12.moitz.domain.subway.SubwayRouteSearchResult.PreviousStation;
-import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
@@ -78,12 +76,8 @@ public class SubwayRouteCalculator {
                 int newTime = searchState.calculateTimeTo(currentStation, edge);
 
                 if (!start.equals(currentStation)) {
-                    final List<PreviousStation> previousStations = searchState.getPreviousStations(currentStation);
-                    boolean isContinuous = previousStations.stream()
-                            .anyMatch(info -> info.isSameLine(currentLine));
-
                     // 환승 시간 추가: 현재 역에 도달할 수 있는 호선들 중 간선의 호선이 포함되어 있지 않은 경우
-                    if (!isContinuous) {
+                    if (!searchState.canContinueOn(currentStation, currentLine)) {
                         Optional<Edge> transferEdge = currentEdges.stream()
                                 .filter(currentEdge -> currentEdge.hasSameValue(currentStation, currentLine))
                                 .findFirst();
@@ -96,7 +90,7 @@ public class SubwayRouteCalculator {
                                     """,
                                     currentStation.getName(),
                                     neighbor.getName(),
-                                    previousStations.getFirst().line().getTitle(),
+                                    searchState.getFirstPreviousLine(currentStation).getTitle(),
                                     currentLine.getTitle(),
                                     start,
                                     end
