@@ -19,24 +19,24 @@ import org.junit.jupiter.api.Test;
 class RouteCandidatePreparationResultTest {
 
     @Test
-    @DisplayName("후보 장소와 후보별 경로로 경로 후보 목록을 생성한다")
+    @DisplayName("경로 후보 준비 결과를 보관한다")
     void getRouteCandidates() {
         final Place gangnam = place("강남역");
         final Place seolleung = place("선릉역");
         final Place samsung = place("삼성역");
         final Routes seolleungRoutes = new Routes(List.of(route(gangnam, seolleung, 10)));
+        final RouteCandidate routeCandidate = new RouteCandidate(seolleung, seolleungRoutes);
 
         final RouteCandidatePreparationResult result = new RouteCandidatePreparationResult(
                 List.of(seolleung, samsung),
-                Map.of(seolleung, seolleungRoutes)
+                Map.of(seolleung, seolleungRoutes),
+                List.of(routeCandidate)
         );
 
         assertThat(result.getCandidatePlaces()).containsExactly(seolleung, samsung);
         assertThat(result.getCandidatePlaceCount()).isEqualTo(2);
         assertThat(result.getRoutedPlaceCount()).isEqualTo(1);
-        assertThat(result.getRouteCandidates())
-                .extracting(RouteCandidate::getPlace)
-                .containsExactly(seolleung);
+        assertThat(result.getRouteCandidates()).containsExactly(routeCandidate);
         assertThat(result.getRouteCandidates().getFirst().getRoutes()).isEqualTo(seolleungRoutes);
     }
 

@@ -3,6 +3,7 @@ package com.f12.moitz.application.recommendation;
 import com.f12.moitz.application.subway.SubwayStationService;
 import com.f12.moitz.application.subway.SubwayRouteService;
 import com.f12.moitz.domain.recommendation.candidate.DispersionPolicy;
+import com.f12.moitz.domain.recommendation.candidate.RouteCandidate;
 import com.f12.moitz.domain.route.OriginDestinations;
 import com.f12.moitz.domain.place.Place;
 import com.f12.moitz.domain.route.Route;
@@ -37,7 +38,8 @@ public class RouteCandidatePreparationService {
         final List<Place> candidatePlaces = getCandidatePlaces(originStations, routeOrigins, dispersionPolicy);
         final OriginDestinations originDestinations = routeOrigins.createOriginDestinationsTo(candidatePlaces);
         final Map<Place, Routes> candidateRoutes = findRoutesByDestination(originDestinations);
-        return new RouteCandidatePreparationResult(candidatePlaces, candidateRoutes);
+        final List<RouteCandidate> routeCandidates = createRouteCandidates(candidatePlaces, candidateRoutes);
+        return new RouteCandidatePreparationResult(candidatePlaces, candidateRoutes, routeCandidates);
     }
 
     private List<Place> getCandidatePlaces(
@@ -64,6 +66,16 @@ public class RouteCandidatePreparationService {
     private Map<Place, Routes> findRoutesByDestination(final OriginDestinations originDestinations) {
         final List<Route> routes = subwayRouteService.findRoutes(originDestinations.getValues());
         return originDestinations.groupRoutesByDestination(routes);
+    }
+
+    private List<RouteCandidate> createRouteCandidates(
+            final List<Place> candidatePlaces,
+            final Map<Place, Routes> candidateRoutes
+    ) {
+        return candidatePlaces.stream()
+                .filter(candidateRoutes::containsKey)
+                .map(place -> new RouteCandidate(place, candidateRoutes.get(place)))
+                .toList();
     }
 
 }
