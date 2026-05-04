@@ -3,10 +3,10 @@ package com.f12.moitz.application.subway.setup;
 import com.f12.moitz.application.port.place.PlaceFinder;
 import com.f12.moitz.application.port.subway.SubwayMapLoader;
 import com.f12.moitz.application.port.subway.dto.RawRouteInfo;
-import com.f12.moitz.application.subway.SubwayEdgeService;
 import com.f12.moitz.application.subway.SubwayStationService;
 import com.f12.moitz.domain.subway.SubwayEdges;
 import com.f12.moitz.domain.subway.SubwayStation;
+import com.f12.moitz.domain.subway.repository.SubwayEdgeRepository;
 import java.util.List;
 import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
@@ -19,7 +19,7 @@ import org.springframework.stereotype.Service;
 public class SetupService {
 
     private final SubwayStationService subwayStationService;
-    private final SubwayEdgeService subwayEdgeService;
+    private final SubwayEdgeRepository subwayEdgeRepository;
     private final SubwayMapLoader subwayMapLoader;
     private final PlaceFinder placeFinder;
     private final SubwayEdgesBuilder subwayEdgesBuilder;
@@ -29,7 +29,7 @@ public class SetupService {
         log.info("SubwayEdges 초기화 시작");
 
         // 지하철 노선도 데이터 존재하는지 확인
-        if (subwayStationService.getCount() > 0 && subwayEdgeService.getCount() > 0) {
+        if (subwayStationService.getCount() > 0 && subwayEdgeRepository.count() > 0) {
             log.info("DB에 데이터가 있습니다. 저장된 데이터를 사용합니다. 서비스 시작.");
             return;
         }
@@ -61,7 +61,7 @@ public class SetupService {
         subwayMapSupplement.apply(subwayEdges);
 
         // 엣지 데이터 저장
-        subwayEdgeService.saveAll(subwayEdges);
+        subwayEdgeRepository.saveAll(subwayEdges.getSubwayEdges());
         log.info("SubwayEdges 초기화 완료. 서비스 시작.");
     }
 
