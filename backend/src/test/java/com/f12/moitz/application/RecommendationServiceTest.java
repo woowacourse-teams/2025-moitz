@@ -15,7 +15,7 @@ import com.f12.moitz.application.subway.SubwayRouteService;
 import com.f12.moitz.application.recommendation.RecommendationPlaceSearchService;
 import com.f12.moitz.application.recommendation.RecommendationService;
 import com.f12.moitz.application.subway.SubwayStationService;
-import com.f12.moitz.application.utils.RecommendationResponseMapper;
+import com.f12.moitz.application.recommendation.utils.RecommendationResponseMapper;
 import com.f12.moitz.common.error.exception.BadRequestException;
 import com.f12.moitz.common.error.exception.GeneralErrorCode;
 import com.f12.moitz.domain.route.CandidateRoute;

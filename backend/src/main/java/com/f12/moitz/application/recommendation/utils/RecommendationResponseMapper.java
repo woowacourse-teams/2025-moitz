@@ -1,4 +1,4 @@
-package com.f12.moitz.application.utils;
+package com.f12.moitz.application.recommendation.utils;
 
 import com.f12.moitz.application.dto.recommendation.LocationResponse;
 import com.f12.moitz.application.dto.recommendation.PathResponse;

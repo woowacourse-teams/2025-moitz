@@ -1,5 +1,7 @@
-package com.f12.moitz.application.recommendation;
+package com.f12.moitz.application.recommendation.utils;
 
+import com.f12.moitz.application.recommendation.RecommendationPlaceSearchResult;
+import com.f12.moitz.application.recommendation.RouteCandidatePreparationResult;
 import com.f12.moitz.domain.recommendation.candidate.CandidateSelection;
 import com.f12.moitz.domain.recommendation.candidate.CandidateSelectionTag;
 import com.f12.moitz.domain.place.Place;
