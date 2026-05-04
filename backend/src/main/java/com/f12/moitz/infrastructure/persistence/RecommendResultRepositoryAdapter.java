@@ -21,12 +21,13 @@ public class RecommendResultRepositoryAdapter implements RecommendResultReposito
 
     @Override
     public ObjectId saveAndReturnId(final Result result) {
-        return recommendResultMongoRepository.save(result).getId();
+        return recommendResultMongoRepository.save(ResultEntity.fromDomain(result)).getId();
     }
 
     @Override
     public Optional<Result> findById(final ObjectId id) {
-        return recommendResultMongoRepository.findById(id);
+        return recommendResultMongoRepository.findById(id)
+                .map(ResultEntity::toDomain);
     }
 
     @Override

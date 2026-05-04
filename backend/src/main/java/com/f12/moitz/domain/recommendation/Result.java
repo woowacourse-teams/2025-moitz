@@ -4,37 +4,26 @@ import com.f12.moitz.domain.Place;
 import java.time.Instant;
 import java.util.List;
 import java.util.Objects;
-import lombok.NoArgsConstructor;
 import org.bson.types.ObjectId;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
 
-@Document(collection = "result")
-@NoArgsConstructor(access = lombok.AccessLevel.PROTECTED)
 public class Result {
 
-    @Id
-    private ObjectId id;
+    private final ObjectId id;
 
-    private List<RecommendCondition> recommendConditions;
+    private final List<RecommendCondition> recommendConditions;
 
-    @CreatedDate
-    private Instant createdAt;
+    private final Instant createdAt;
 
-    private List<? extends Place> startingPlaces;
+    private final List<? extends Place> startingPlaces;
 
-    private Recommendation recommendedLocations;
+    private final Recommendation recommendedLocations;
 
     public Result(
             final List<RecommendCondition> recommendConditions,
             final List<? extends Place> startingPlaces,
             final Recommendation recommendedLocations
     ) {
-        validate(recommendConditions, startingPlaces, recommendedLocations);
-        this.recommendConditions = List.copyOf(recommendConditions);
-        this.startingPlaces = List.copyOf(startingPlaces);
-        this.recommendedLocations = recommendedLocations;
+        this(null, recommendConditions, startingPlaces, recommendedLocations, null);
     }
 
     public Result(
@@ -43,11 +32,22 @@ public class Result {
             final List<? extends Place> startingPlaces,
             final Recommendation recommendedLocations
     ) {
+        this(id, recommendConditions, startingPlaces, recommendedLocations, null);
+    }
+
+    public Result(
+            final ObjectId id,
+            final List<RecommendCondition> recommendConditions,
+            final List<? extends Place> startingPlaces,
+            final Recommendation recommendedLocations,
+            final Instant createdAt
+    ) {
         validate(recommendConditions, startingPlaces, recommendedLocations);
         this.id = id;
         this.recommendConditions = List.copyOf(recommendConditions);
         this.startingPlaces = List.copyOf(startingPlaces);
         this.recommendedLocations = recommendedLocations;
+        this.createdAt = createdAt;
     }
 
     private void validate(

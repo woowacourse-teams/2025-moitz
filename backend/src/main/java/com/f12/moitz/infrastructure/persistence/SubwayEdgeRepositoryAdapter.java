@@ -19,7 +19,7 @@ public class SubwayEdgeRepositoryAdapter implements SubwayEdgeRepository {
     @Override
     public void saveAll(final Set<SubwayEdge> subwayEdges) {
         subwayEdgeMongoRepository.saveAll(subwayEdges.stream()
-                .map(SubwayEdgeDocument::fromSubwayEdge)
+                .map(SubwayEdgeEntity::fromDomain)
                 .toList());
     }
 
@@ -31,7 +31,7 @@ public class SubwayEdgeRepositoryAdapter implements SubwayEdgeRepository {
     @Override
     public List<SubwayEdge> findAll() {
         return subwayEdgeMongoRepository.findAll().stream()
-                .map(SubwayEdgeDocument::toSubwayEdge)
+                .map(SubwayEdgeEntity::toDomain)
                 .toList();
     }
 

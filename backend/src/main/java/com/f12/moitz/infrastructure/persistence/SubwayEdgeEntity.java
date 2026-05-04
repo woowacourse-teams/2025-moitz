@@ -12,19 +12,19 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @RequiredArgsConstructor
 @Getter
 @Document(collection = "subway-edge")
-public class SubwayEdgeDocument {
+public class SubwayEdgeEntity {
 
     private final SubwayStation subwayStation;
     private final Set<Edge> edges;
 
-    public SubwayEdge toSubwayEdge() {
+    public SubwayEdge toDomain() {
         final SubwayEdge subwayEdge = new SubwayEdge(subwayStation);
         edges.forEach(subwayEdge::addEdge);
         return subwayEdge;
     }
 
-    public static SubwayEdgeDocument fromSubwayEdge(final SubwayEdge subwayEdge) {
-        return new SubwayEdgeDocument(
+    public static SubwayEdgeEntity fromDomain(final SubwayEdge subwayEdge) {
+        return new SubwayEdgeEntity(
                 subwayEdge.getSubwayStation(),
                 new HashSet<>(subwayEdge.getEdges())
         );

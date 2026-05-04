@@ -1,7 +1,7 @@
 package com.f12.moitz.infrastructure.persistence.repository;
 
-import com.f12.moitz.domain.recommendation.Result;
 import com.f12.moitz.infrastructure.persistence.dto.CandidateVoteProjection;
+import com.f12.moitz.infrastructure.persistence.ResultEntity;
 import java.util.List;
 import java.util.Optional;
 import org.bson.types.ObjectId;
@@ -10,7 +10,7 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
 import org.springframework.data.mongodb.repository.Update;
 
-public interface RecommendResultMongoRepository extends MongoRepository<Result, ObjectId> {
+public interface RecommendResultMongoRepository extends MongoRepository<ResultEntity, ObjectId> {
 
     @Aggregation(pipeline = {
             "{ $match: { _id: ?0 } }",
