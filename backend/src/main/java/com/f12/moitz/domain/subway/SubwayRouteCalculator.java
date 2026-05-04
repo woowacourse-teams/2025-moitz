@@ -2,21 +2,13 @@ package com.f12.moitz.domain.subway;
 
 import com.f12.moitz.common.error.exception.SubwayRouteException;
 import com.f12.moitz.domain.subway.SubwayRouteSearchResult.PreviousStation;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
-import java.util.PriorityQueue;
 import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class SubwayRouteCalculator {
-
-    private static final int UNREACHABLE_TIME = Integer.MAX_VALUE;
 
     private final SubwayEdges edges;
     private final StationSequenceReconstructor stationSequenceReconstructor;
@@ -58,23 +50,15 @@ public class SubwayRouteCalculator {
             final SubwayStation start,
             final SubwayStation end
     ) {
-        final Map<SubwayStation, Integer> times = new HashMap<>();
-        final Map<SubwayStation, List<PreviousStation>> prev = new HashMap<>();
-        final PriorityQueue<Node> pq = new PriorityQueue<>(Comparator.comparingInt(n -> n.time));
-        final Set<SubwayStation> visited = new HashSet<>();
+        final SubwayRouteSearchState searchState = new SubwayRouteSearchState(start);
 
-        times.put(start, 0);
-        pq.add(new Node(start, 0));
-
-        while (!pq.isEmpty()) {
-            final Node current = pq.poll();
-            // 현재 역 정보 가져오기
-            final SubwayStation currentStation = current.station;
+        while (searchState.hasNext()) {
+            final SubwayStation currentStation = searchState.pollStation();
 
             if (!edges.containsStation(currentStation)) {
                 continue;
             }
-            if (!visited.add(currentStation)) {
+            if (!searchState.visit(currentStation)) {
                 continue;
             }
             if (end.equals(currentStation)) {
@@ -86,15 +70,15 @@ public class SubwayRouteCalculator {
             for (Edge edge : currentEdges) {
                 final SubwayStation neighbor = edge.getDestination();
 
-                if (visited.contains(neighbor)) {
+                if (searchState.isVisited(neighbor)) {
                     continue;
                 }
 
                 final SubwayLine currentLine = edge.getSubwayLine();
-                int newTime = times.getOrDefault(currentStation, UNREACHABLE_TIME) + edge.getTimeInSeconds();
+                int newTime = searchState.calculateTimeTo(currentStation, edge);
 
                 if (!start.equals(currentStation)) {
-                    final List<PreviousStation> previousStations = prev.get(currentStation);
+                    final List<PreviousStation> previousStations = searchState.getPreviousStations(currentStation);
                     boolean isContinuous = previousStations.stream()
                             .anyMatch(info -> info.isSameLine(currentLine));
 
@@ -124,23 +108,10 @@ public class SubwayRouteCalculator {
                     }
                 }
 
-                int neighborTime = times.getOrDefault(neighbor, UNREACHABLE_TIME);
-
-                if (newTime < neighborTime) {
-                    times.put(neighbor, newTime);
-                    prev.put(neighbor, new ArrayList<>(List.of(new PreviousStation(currentStation, currentLine))));
-                    pq.add(new Node(neighbor, newTime));
-                } else if (newTime == neighborTime) {
-                    final List<PreviousStation> previousStations = prev.get(neighbor);
-                    previousStations.add(new PreviousStation(currentStation, currentLine));
-                }
+                searchState.recordIfShorter(currentStation, neighbor, currentLine, newTime);
             }
         }
-        return new SubwayRouteSearchResult(prev);
-    }
-
-    private record Node(SubwayStation station, int time) {
-
+        return searchState.toResult();
     }
 
 }
