@@ -14,7 +14,7 @@ import com.f12.moitz.application.dto.RecommendationRequest;
 import com.f12.moitz.application.port.LocationReasonGenerator;
 import com.f12.moitz.application.port.PlaceRecommender;
 import com.f12.moitz.application.port.dto.ReasonAndDescription;
-import com.f12.moitz.application.port.RouteFinder;
+import com.f12.moitz.application.subway.SubwayRouteService;
 import com.f12.moitz.application.recommendation.RecommendationPlaceSearchService;
 import com.f12.moitz.application.recommendation.RecommendationService;
 import com.f12.moitz.application.recommendation.RecommendedCandidateReasonService;
@@ -68,7 +68,7 @@ class RecommendationServiceTest {
     private SubwayStationService subwayStationService;
 
     @Mock
-    private RouteFinder routeFinder;
+    private SubwayRouteService subwayRouteService;
 
     @Mock
     private RecommendResultRepository recommendResultRepository;
@@ -81,10 +81,10 @@ class RecommendationServiceTest {
         recommendationService = new RecommendationService(
                 new RouteOriginPreparationService(subwayStationService),
                 new RecommendedCandidateReasonService(locationReasonGenerator),
-                new RouteOriginDispersionService(routeFinder),
-                new RouteCandidatePreparationService(subwayStationService, routeFinder),
+                new RouteOriginDispersionService(subwayRouteService),
+                new RouteCandidatePreparationService(subwayStationService, subwayRouteService),
                 new RecommendationPlaceSearchService(placeRecommender),
-                new RecommendedCandidateRouteService(routeFinder),
+                new RecommendedCandidateRouteService(subwayRouteService),
                 recommendationResponseMapper,
                 recommendResultRepository
         );
@@ -147,7 +147,7 @@ class RecommendationServiceTest {
                 new Route(List.of(new Path(gangnam, samsung, TravelMethod.SUBWAY, 14 * 60, SubwayLine.fromTitle("2호선")))),
                 new Route(List.of(new Path(yeoksam, samsung, TravelMethod.SUBWAY, 10 * 60, SubwayLine.fromTitle("2호선"))))
         );
-        given(routeFinder.findRoutes(anyList())).willReturn(pairwiseRoutes, mockRoutes);
+        given(subwayRouteService.findRoutes(anyList())).willReturn(pairwiseRoutes, mockRoutes);
 
         List<CandidateRoute> mockCandidateRoutes = List.of(
                 new CandidateRoute(mockRoutes.get(0), new Course(List.of(gangnam.getPoint(), seolleung.getPoint()))),
@@ -155,7 +155,7 @@ class RecommendationServiceTest {
                 new CandidateRoute(mockRoutes.get(2), new Course(List.of(gangnam.getPoint(), samsung.getPoint()))),
                 new CandidateRoute(mockRoutes.get(3), new Course(List.of(yeoksam.getPoint(), samsung.getPoint())))
         );
-        given(routeFinder.findCandidateRoutes(anyList())).willReturn(mockCandidateRoutes);
+        given(subwayRouteService.findCandidateRoutes(anyList())).willReturn(mockCandidateRoutes);
         given(locationReasonGenerator.generateReasons(anyList(), anyMap())).willReturn(Map.of(
                 "선릉역", new ReasonAndDescription("설명1", "이유1"),
                 "삼성역", new ReasonAndDescription("설명2", "이유2")
@@ -202,7 +202,7 @@ class RecommendationServiceTest {
         given(subwayStationService.generateCandidatePlace(anyList(), anyInt()))
                 .willReturn(List.of(gangnam, yeoksam, seolleung));
 
-        given(routeFinder.findRoutes(anyList())).willReturn(
+        given(subwayRouteService.findRoutes(anyList())).willReturn(
                 List.of(new Route(List.of(new Path(gangnam, yeoksam, TravelMethod.SUBWAY, 2 * 60, SubwayLine.fromTitle("2호선"))))),
                 List.of(
                 new Route(List.of(new Path(gangnam, seolleung, TravelMethod.SUBWAY, 10 * 60, SubwayLine.fromTitle("2호선")))),
@@ -231,7 +231,7 @@ class RecommendationServiceTest {
                 .isInstanceOfSatisfying(BadRequestException.class,
                         exception -> assertThat(exception.getErrorCode())
                                 .isEqualTo(GeneralErrorCode.INPUT_INVALID_START_LOCATION));
-        verify(routeFinder, times(0)).findRoutes(anyList());
+        verify(subwayRouteService, times(0)).findRoutes(anyList());
     }
 
 }

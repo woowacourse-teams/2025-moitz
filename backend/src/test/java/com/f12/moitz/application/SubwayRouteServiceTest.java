@@ -2,7 +2,7 @@ package com.f12.moitz.application;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.f12.moitz.application.adapter.SubwayRouteFinderAdapter;
+import com.f12.moitz.application.subway.SubwayRouteService;
 import com.f12.moitz.domain.Place;
 import com.f12.moitz.domain.Point;
 import com.f12.moitz.domain.route.Route;
@@ -18,10 +18,10 @@ import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 
 @Disabled
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
-class SubwayRouteFinderAdapterTest {
+class SubwayRouteServiceTest {
 
     @Autowired
-    private SubwayRouteFinderAdapter routeFinder;
+    private SubwayRouteService subwayRouteService;
 
     @DisplayName("노선도 만들고 최단경로 찾는다.")
     @Test
@@ -45,7 +45,7 @@ class SubwayRouteFinderAdapterTest {
                 .toList();
 
         // When
-        List<Route> routes = routeFinder.findRoutes(originDestinations);
+        List<Route> routes = subwayRouteService.findRoutes(originDestinations);
 
         // Then
         assertThat(routes).hasSize(15);

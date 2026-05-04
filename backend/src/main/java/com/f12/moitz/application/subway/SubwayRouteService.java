@@ -1,7 +1,5 @@
-package com.f12.moitz.application.adapter;
+package com.f12.moitz.application.subway;
 
-import com.f12.moitz.application.subway.SubwayStationService;
-import com.f12.moitz.application.port.RouteFinder;
 import com.f12.moitz.domain.route.CandidateRoute;
 import com.f12.moitz.domain.route.OriginDestination;
 import com.f12.moitz.domain.route.Route;
@@ -10,16 +8,16 @@ import com.f12.moitz.domain.subway.SubwayRouteCalculator;
 import com.f12.moitz.domain.subway.SubwayStation;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 @Slf4j
-@Component
-public class SubwayRouteFinderAdapter implements RouteFinder {
+@Service
+public class SubwayRouteService {
 
     private final SubwayStationService subwayStationService;
     private final SubwayRouteCalculator subwayRouteCalculator;
 
-    public SubwayRouteFinderAdapter(
+    public SubwayRouteService(
             final SubwayStationService subwayStationService,
             final SubwayRouteCalculator subwayRouteCalculator
     ) {
@@ -27,14 +25,12 @@ public class SubwayRouteFinderAdapter implements RouteFinder {
         this.subwayRouteCalculator = subwayRouteCalculator;
     }
 
-    @Override
     public List<Route> findRoutes(final List<OriginDestination> originDestinations) {
         return findStationSequences(originDestinations).stream()
                 .map(StationSequence::toRoute)
                 .toList();
     }
 
-    @Override
     public List<CandidateRoute> findCandidateRoutes(final List<OriginDestination> originDestinations) {
         return findStationSequences(originDestinations).stream()
                 .map(StationSequence::toCandidateRoute)

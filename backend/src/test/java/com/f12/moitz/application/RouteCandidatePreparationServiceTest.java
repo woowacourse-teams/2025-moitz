@@ -5,7 +5,7 @@ import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 
-import com.f12.moitz.application.port.RouteFinder;
+import com.f12.moitz.application.subway.SubwayRouteService;
 import com.f12.moitz.application.recommendation.RouteCandidatePreparationResult;
 import com.f12.moitz.application.recommendation.RouteCandidatePreparationService;
 import com.f12.moitz.application.subway.SubwayStationService;
@@ -35,14 +35,14 @@ class RouteCandidatePreparationServiceTest {
     private SubwayStationService subwayStationService;
 
     @Mock
-    private RouteFinder routeFinder;
+    private SubwayRouteService subwayRouteService;
 
     @Test
     @DisplayName("출발지를 제외한 후보 지역과 후보별 경로를 조립한다")
     void assemble() {
         final RouteCandidatePreparationService service = new RouteCandidatePreparationService(
                 subwayStationService,
-                routeFinder
+                subwayRouteService
         );
         final SubwayStation gangnam = new SubwayStation("강남역", new Point(127.027, 37.497));
         final SubwayStation yeoksam = new SubwayStation("역삼역", new Point(127.036, 37.501));
@@ -52,7 +52,7 @@ class RouteCandidatePreparationServiceTest {
         final RouteOrigins routeOrigins = new RouteOrigins(originStations);
         given(subwayStationService.generateCandidatePlace(originStations, 10))
                 .willReturn(List.of(gangnam, yeoksam, seolleung, samsung));
-        given(routeFinder.findRoutes(anyList())).willReturn(List.of(
+        given(subwayRouteService.findRoutes(anyList())).willReturn(List.of(
                 createRoute(gangnam, seolleung, 10),
                 createRoute(yeoksam, seolleung, 5),
                 createRoute(gangnam, samsung, 14),
@@ -76,7 +76,7 @@ class RouteCandidatePreparationServiceTest {
                 .allSatisfy(candidate -> assertThat(candidate.getRoutes().getRoutes()).hasSize(2));
 
         final ArgumentCaptor<List<OriginDestination>> captor = ArgumentCaptor.forClass(List.class);
-        verify(routeFinder).findRoutes(captor.capture());
+        verify(subwayRouteService).findRoutes(captor.capture());
         assertThat(captor.getValue()).hasSize(4);
         assertThat(captor.getValue())
                 .extracting(OriginDestination::getDestination)

@@ -1,7 +1,7 @@
 package com.f12.moitz.application.recommendation;
 
-import com.f12.moitz.application.port.RouteFinder;
 import com.f12.moitz.application.subway.SubwayStationService;
+import com.f12.moitz.application.subway.SubwayRouteService;
 import com.f12.moitz.domain.recommendation.candidate.DispersionPolicy;
 import com.f12.moitz.domain.route.OriginDestinations;
 import com.f12.moitz.domain.Place;
@@ -12,7 +12,6 @@ import com.f12.moitz.domain.subway.SubwayStation;
 import java.util.List;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 @Slf4j
@@ -20,14 +19,14 @@ import org.springframework.stereotype.Service;
 public class RouteCandidatePreparationService {
 
     private final SubwayStationService subwayStationService;
-    private final RouteFinder routeFinder;
+    private final SubwayRouteService subwayRouteService;
 
     public RouteCandidatePreparationService(
             final SubwayStationService subwayStationService,
-            @Qualifier("subwayRouteFinderAdapter") final RouteFinder routeFinder
+            final SubwayRouteService subwayRouteService
     ) {
         this.subwayStationService = subwayStationService;
-        this.routeFinder = routeFinder;
+        this.subwayRouteService = subwayRouteService;
     }
 
     public RouteCandidatePreparationResult prepare(
@@ -63,7 +62,7 @@ public class RouteCandidatePreparationService {
     }
 
     private Map<Place, Routes> findRoutesByDestination(final OriginDestinations originDestinations) {
-        final List<Route> routes = routeFinder.findRoutes(originDestinations.getValues());
+        final List<Route> routes = subwayRouteService.findRoutes(originDestinations.getValues());
         return originDestinations.groupRoutesByDestination(routes);
     }
 

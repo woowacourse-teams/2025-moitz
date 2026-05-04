@@ -6,7 +6,7 @@ import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 
-import com.f12.moitz.application.port.RouteFinder;
+import com.f12.moitz.application.subway.SubwayRouteService;
 import com.f12.moitz.application.recommendation.RecommendedCandidateRouteService;
 import com.f12.moitz.domain.route.CandidateRoute;
 import com.f12.moitz.domain.recommendation.candidate.CandidateSelectionTag;
@@ -35,12 +35,12 @@ import org.mockito.junit.jupiter.MockitoExtension;
 class RecommendedCandidateRouteServiceTest {
 
     @Mock
-    private RouteFinder routeFinder;
+    private SubwayRouteService subwayRouteService;
 
     @Test
     @DisplayName("선택된 추천 후보의 경로와 코스를 장소별로 조립한다")
     void assemble() {
-        final RecommendedCandidateRouteService service = new RecommendedCandidateRouteService(routeFinder);
+        final RecommendedCandidateRouteService service = new RecommendedCandidateRouteService(subwayRouteService);
         final Place gangnam = new Place("강남역", new Point(127.027, 37.497));
         final Place yeoksam = new Place("역삼역", new Point(127.036, 37.501));
         final Place seolleung = new Place("선릉역", new Point(127.048, 37.504));
@@ -48,7 +48,7 @@ class RecommendedCandidateRouteServiceTest {
         final RouteOrigins routeOrigins = new RouteOrigins(List.of(gangnam, yeoksam));
         final Routes seolleungRoutes = createRoutes(List.of(gangnam, yeoksam), seolleung);
         final Routes samsungRoutes = createRoutes(List.of(gangnam, yeoksam), samsung);
-        given(routeFinder.findCandidateRoutes(anyList())).willReturn(List.of(
+        given(subwayRouteService.findCandidateRoutes(anyList())).willReturn(List.of(
                 new CandidateRoute(seolleungRoutes.get(0), new Course(List.of(gangnam.getPoint(), seolleung.getPoint()))),
                 new CandidateRoute(seolleungRoutes.get(1), new Course(List.of(yeoksam.getPoint(), seolleung.getPoint()))),
                 new CandidateRoute(samsungRoutes.get(0), new Course(List.of(gangnam.getPoint(), samsung.getPoint()))),
@@ -80,7 +80,7 @@ class RecommendedCandidateRouteServiceTest {
                 .hasSize(2);
 
         final ArgumentCaptor<List<OriginDestination>> captor = ArgumentCaptor.forClass(List.class);
-        verify(routeFinder).findCandidateRoutes(captor.capture());
+        verify(subwayRouteService).findCandidateRoutes(captor.capture());
         assertThat(captor.getValue()).hasSize(4);
         assertThat(captor.getValue())
                 .extracting(OriginDestination::getDestination)
@@ -90,13 +90,13 @@ class RecommendedCandidateRouteServiceTest {
     @Test
     @DisplayName("후보 경로 조회 결과 개수가 요청 개수와 다르면 추천 후보 이동 정보를 조립할 수 없다")
     void prepare_ThrowsExceptionWhenCandidateRouteCountDoesNotMatchOriginDestinations() {
-        final RecommendedCandidateRouteService service = new RecommendedCandidateRouteService(routeFinder);
+        final RecommendedCandidateRouteService service = new RecommendedCandidateRouteService(subwayRouteService);
         final Place gangnam = new Place("강남역", new Point(127.027, 37.497));
         final Place yeoksam = new Place("역삼역", new Point(127.036, 37.501));
         final Place seolleung = new Place("선릉역", new Point(127.048, 37.504));
         final RouteOrigins routeOrigins = new RouteOrigins(List.of(gangnam, yeoksam));
         final Routes seolleungRoutes = createRoutes(List.of(gangnam, yeoksam), seolleung);
-        given(routeFinder.findCandidateRoutes(anyList())).willReturn(List.of(
+        given(subwayRouteService.findCandidateRoutes(anyList())).willReturn(List.of(
                 new CandidateRoute(seolleungRoutes.get(0), new Course(List.of(gangnam.getPoint(), seolleung.getPoint())))
         ));
 
@@ -114,11 +114,11 @@ class RecommendedCandidateRouteServiceTest {
     @Test
     @DisplayName("후보 경로 조회 결과가 null이면 추천 후보 이동 정보를 조립할 수 없다")
     void prepare_ThrowsExceptionWhenCandidateRoutesAreNull() {
-        final RecommendedCandidateRouteService service = new RecommendedCandidateRouteService(routeFinder);
+        final RecommendedCandidateRouteService service = new RecommendedCandidateRouteService(subwayRouteService);
         final Place gangnam = new Place("강남역", new Point(127.027, 37.497));
         final Place seolleung = new Place("선릉역", new Point(127.048, 37.504));
         final RouteOrigins routeOrigins = new RouteOrigins(List.of(gangnam));
-        given(routeFinder.findCandidateRoutes(anyList())).willReturn(null);
+        given(subwayRouteService.findCandidateRoutes(anyList())).willReturn(null);
 
         assertThatThrownBy(() -> service.prepare(
                 routeOrigins,

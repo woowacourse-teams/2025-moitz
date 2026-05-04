@@ -1,6 +1,6 @@
 package com.f12.moitz.application.recommendation;
 
-import com.f12.moitz.application.port.RouteFinder;
+import com.f12.moitz.application.subway.SubwayRouteService;
 import com.f12.moitz.domain.route.CandidateRoute;
 import com.f12.moitz.domain.route.OriginDestinations;
 import com.f12.moitz.domain.Place;
@@ -9,18 +9,15 @@ import com.f12.moitz.domain.recommendation.RecommendedCandidates;
 import com.f12.moitz.domain.route.RouteOrigins;
 import java.util.List;
 import java.util.Map;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 @Service
 public class RecommendedCandidateRouteService {
 
-    private final RouteFinder routeFinder;
+    private final SubwayRouteService subwayRouteService;
 
-    public RecommendedCandidateRouteService(
-            @Qualifier("subwayRouteFinderAdapter") final RouteFinder routeFinder
-    ) {
-        this.routeFinder = routeFinder;
+    public RecommendedCandidateRouteService(final SubwayRouteService subwayRouteService) {
+        this.subwayRouteService = subwayRouteService;
     }
 
     public RecommendedCandidateTravels prepare(
@@ -35,7 +32,9 @@ public class RecommendedCandidateRouteService {
     private Map<Place, List<CandidateRoute>> findCandidateRoutesByDestination(
             final OriginDestinations originDestinations
     ) {
-        final List<CandidateRoute> candidateRoutes = routeFinder.findCandidateRoutes(originDestinations.getValues());
+        final List<CandidateRoute> candidateRoutes = subwayRouteService.findCandidateRoutes(
+                originDestinations.getValues()
+        );
         return originDestinations.groupCandidateRoutesByDestination(candidateRoutes);
     }
 

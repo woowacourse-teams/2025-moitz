@@ -1,32 +1,29 @@
 package com.f12.moitz.application.recommendation;
 
-import com.f12.moitz.application.port.RouteFinder;
+import com.f12.moitz.application.subway.SubwayRouteService;
 import com.f12.moitz.domain.recommendation.candidate.DispersionPolicy;
 import com.f12.moitz.domain.route.OriginDestinations;
 import com.f12.moitz.domain.route.Route;
 import com.f12.moitz.domain.route.RouteOrigins;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 @Slf4j
 @Service
 public class RouteOriginDispersionService {
 
-    private final RouteFinder routeFinder;
+    private final SubwayRouteService subwayRouteService;
 
-    public RouteOriginDispersionService(
-            @Qualifier("subwayRouteFinderAdapter") final RouteFinder routeFinder
-    ) {
-        this.routeFinder = routeFinder;
+    public RouteOriginDispersionService(final SubwayRouteService subwayRouteService) {
+        this.subwayRouteService = subwayRouteService;
     }
 
     public DispersionPolicy resolve(final RouteOrigins routeOrigins) {
         validate(routeOrigins);
 
         final OriginDestinations originDestinations = routeOrigins.createOriginDestinationsBetweenOrigins();
-        final List<Route> pairRoutes = routeFinder.findRoutes(originDestinations.getValues());
+        final List<Route> pairRoutes = subwayRouteService.findRoutes(originDestinations.getValues());
         final DispersionPolicy dispersionPolicy = routeOrigins.resolveDispersionPolicy(pairRoutes);
 
         log.debug(
