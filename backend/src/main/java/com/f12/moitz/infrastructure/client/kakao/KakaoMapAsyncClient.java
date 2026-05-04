@@ -2,7 +2,7 @@ package com.f12.moitz.infrastructure.client.kakao;
 
 import com.f12.moitz.common.error.exception.ExternalApiErrorCode;
 import com.f12.moitz.common.error.exception.ExternalApiException;
-import com.f12.moitz.domain.Point;
+import com.f12.moitz.domain.place.Point;
 import com.f12.moitz.infrastructure.client.kakao.dto.DocumentResponse;
 import com.f12.moitz.infrastructure.client.kakao.dto.KakaoApiResponse;
 import com.f12.moitz.infrastructure.client.kakao.dto.KakaoImageApiResponse;

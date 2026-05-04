@@ -2,7 +2,7 @@ package com.f12.moitz.domain.subway;
 
 import com.f12.moitz.application.subway.SubwayStationService;
 import com.f12.moitz.domain.route.Path;
-import com.f12.moitz.domain.Point;
+import com.f12.moitz.domain.place.Point;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.assertj.core.api.SoftAssertions;

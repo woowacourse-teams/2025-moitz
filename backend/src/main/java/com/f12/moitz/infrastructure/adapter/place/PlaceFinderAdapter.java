@@ -1,7 +1,7 @@
 package com.f12.moitz.infrastructure.adapter.place;
 
-import com.f12.moitz.application.port.PlaceFinder;
-import com.f12.moitz.domain.Place;
+import com.f12.moitz.application.port.place.PlaceFinder;
+import com.f12.moitz.domain.place.Place;
 import com.f12.moitz.infrastructure.client.kakao.KakaoMapClient;
 import java.util.List;
 import lombok.RequiredArgsConstructor;

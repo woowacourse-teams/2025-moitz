@@ -1,6 +1,6 @@
 package com.f12.moitz.infrastructure.persistence.subway;
 
-import com.f12.moitz.domain.Point;
+import com.f12.moitz.domain.place.Point;
 import com.f12.moitz.domain.subway.SubwayStation;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

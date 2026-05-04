@@ -1,6 +1,6 @@
 package com.f12.moitz.domain.subway.repository;
 
-import com.f12.moitz.domain.Point;
+import com.f12.moitz.domain.place.Point;
 import com.f12.moitz.domain.subway.SubwayStation;
 import java.util.List;
 import java.util.Optional;

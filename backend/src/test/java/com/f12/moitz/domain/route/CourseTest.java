@@ -4,7 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.SoftAssertions.assertSoftly;
 
-import com.f12.moitz.domain.Point;
+import com.f12.moitz.domain.place.Point;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;

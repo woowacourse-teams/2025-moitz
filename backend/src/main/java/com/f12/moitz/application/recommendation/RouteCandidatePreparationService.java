@@ -4,7 +4,7 @@ import com.f12.moitz.application.subway.SubwayStationService;
 import com.f12.moitz.application.subway.SubwayRouteService;
 import com.f12.moitz.domain.recommendation.candidate.DispersionPolicy;
 import com.f12.moitz.domain.route.OriginDestinations;
-import com.f12.moitz.domain.Place;
+import com.f12.moitz.domain.place.Place;
 import com.f12.moitz.domain.route.Route;
 import com.f12.moitz.domain.route.RouteOrigins;
 import com.f12.moitz.domain.route.Routes;

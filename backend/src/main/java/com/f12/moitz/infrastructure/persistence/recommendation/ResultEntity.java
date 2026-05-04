@@ -1,6 +1,6 @@
 package com.f12.moitz.infrastructure.persistence.recommendation;
 
-import com.f12.moitz.domain.Place;
+import com.f12.moitz.domain.place.Place;
 import com.f12.moitz.domain.recommendation.RecommendCondition;
 import com.f12.moitz.domain.recommendation.Recommendation;
 import com.f12.moitz.domain.recommendation.Result;

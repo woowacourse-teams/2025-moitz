@@ -1,6 +1,6 @@
 package com.f12.moitz.infrastructure.utils;
 
-import com.f12.moitz.domain.Point;
+import com.f12.moitz.domain.place.Point;
 import com.f12.moitz.domain.recommendation.RecommendedPlace;
 import com.f12.moitz.infrastructure.client.kakao.dto.DocumentResponse;
 import java.util.Arrays;

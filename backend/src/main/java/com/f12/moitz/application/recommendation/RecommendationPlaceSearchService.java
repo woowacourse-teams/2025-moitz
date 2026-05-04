@@ -1,11 +1,11 @@
 package com.f12.moitz.application.recommendation;
 
-import com.f12.moitz.application.port.PlaceRecommender;
+import com.f12.moitz.application.port.place.PlaceRecommender;
 import com.f12.moitz.domain.recommendation.candidate.CandidateSelection;
 import com.f12.moitz.domain.recommendation.RecommendedPlaces;
 import com.f12.moitz.domain.recommendation.RecommendedCandidates;
 import com.f12.moitz.domain.recommendation.candidate.CandidatePlaceSearchPolicy;
-import com.f12.moitz.domain.Place;
+import com.f12.moitz.domain.place.Place;
 import com.f12.moitz.domain.recommendation.RecommendCondition;
 import com.f12.moitz.domain.route.Routes;
 import java.util.ArrayList;

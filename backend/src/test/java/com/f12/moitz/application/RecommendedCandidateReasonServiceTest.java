@@ -4,8 +4,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.f12.moitz.application.recommendation.RecommendedCandidateReasonService;
 import com.f12.moitz.domain.recommendation.candidate.CandidateSelectionTag;
-import com.f12.moitz.domain.Place;
-import com.f12.moitz.domain.Point;
+import com.f12.moitz.domain.place.Place;
+import com.f12.moitz.domain.place.Point;
 import com.f12.moitz.domain.recommendation.RecommendedCandidates;
 import com.f12.moitz.domain.recommendation.RecommendationReason;
 import java.util.List;

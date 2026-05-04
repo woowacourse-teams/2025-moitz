@@ -1,6 +1,6 @@
 package com.f12.moitz.domain.route;
 
-import com.f12.moitz.domain.Place;
+import com.f12.moitz.domain.place.Place;
 import java.util.List;
 import lombok.Getter;
 

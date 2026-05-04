@@ -1,7 +1,7 @@
 package com.f12.moitz.domain.recommendation;
 
 import com.f12.moitz.domain.recommendation.candidate.CandidateSelectionTag;
-import com.f12.moitz.domain.Place;
+import com.f12.moitz.domain.place.Place;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;

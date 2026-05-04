@@ -3,8 +3,8 @@ package com.f12.moitz.domain.recommendation.candidate;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import com.f12.moitz.domain.Place;
-import com.f12.moitz.domain.Point;
+import com.f12.moitz.domain.place.Place;
+import com.f12.moitz.domain.place.Point;
 import com.f12.moitz.domain.route.Path;
 import com.f12.moitz.domain.route.Route;
 import com.f12.moitz.domain.route.Routes;

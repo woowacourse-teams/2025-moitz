@@ -2,7 +2,7 @@ package com.f12.moitz.domain.recommendation;
 
 import static org.assertj.core.api.SoftAssertions.assertSoftly;
 
-import com.f12.moitz.domain.Point;
+import com.f12.moitz.domain.place.Point;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;

@@ -3,7 +3,7 @@ package com.f12.moitz.application.recommendation;
 import com.f12.moitz.application.subway.SubwayRouteService;
 import com.f12.moitz.domain.route.CandidateRoute;
 import com.f12.moitz.domain.route.OriginDestinations;
-import com.f12.moitz.domain.Place;
+import com.f12.moitz.domain.place.Place;
 import com.f12.moitz.domain.recommendation.RecommendedCandidateTravels;
 import com.f12.moitz.domain.recommendation.RecommendedCandidates;
 import com.f12.moitz.domain.route.RouteOrigins;

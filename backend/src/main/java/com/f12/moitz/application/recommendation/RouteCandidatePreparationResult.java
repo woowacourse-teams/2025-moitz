@@ -1,6 +1,6 @@
 package com.f12.moitz.application.recommendation;
 
-import com.f12.moitz.domain.Place;
+import com.f12.moitz.domain.place.Place;
 import com.f12.moitz.domain.recommendation.candidate.RouteCandidate;
 import com.f12.moitz.domain.route.Routes;
 import java.util.List;

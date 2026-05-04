@@ -9,7 +9,7 @@ import com.f12.moitz.application.recommendation.RouteOriginPreparationService;
 import com.f12.moitz.application.subway.SubwayStationService;
 import com.f12.moitz.common.error.exception.BadRequestException;
 import com.f12.moitz.common.error.exception.GeneralErrorCode;
-import com.f12.moitz.domain.Point;
+import com.f12.moitz.domain.place.Point;
 import com.f12.moitz.domain.subway.SubwayStation;
 import java.util.List;
 import java.util.Optional;

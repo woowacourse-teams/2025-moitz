@@ -7,7 +7,7 @@ import static org.mockito.BDDMockito.given;
 
 import com.f12.moitz.common.error.exception.ExternalApiErrorCode;
 import com.f12.moitz.common.error.exception.ExternalApiException;
-import com.f12.moitz.domain.Point;
+import com.f12.moitz.domain.place.Point;
 import com.f12.moitz.infrastructure.client.odsay.dto.OdsayErrorResponse;
 import com.f12.moitz.infrastructure.client.odsay.dto.ResultResponse;
 import com.f12.moitz.infrastructure.client.odsay.dto.SubwayRouteSearchResponse;

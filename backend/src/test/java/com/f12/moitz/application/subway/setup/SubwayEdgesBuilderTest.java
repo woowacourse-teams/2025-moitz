@@ -5,7 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import com.f12.moitz.application.port.subway.dto.RawPathInfo;
 import com.f12.moitz.application.port.subway.dto.RawRouteInfo;
 import com.f12.moitz.application.port.subway.dto.RawStationInfo;
-import com.f12.moitz.domain.Point;
+import com.f12.moitz.domain.place.Point;
 import com.f12.moitz.domain.subway.Edge;
 import com.f12.moitz.domain.subway.SubwayEdges;
 import com.f12.moitz.domain.subway.SubwayLine;

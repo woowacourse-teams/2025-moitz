@@ -1,6 +1,6 @@
 package com.f12.moitz.domain.recommendation.candidate;
 
-import com.f12.moitz.domain.Place;
+import com.f12.moitz.domain.place.Place;
 import com.f12.moitz.domain.route.Routes;
 import lombok.Getter;
 

@@ -1,10 +1,10 @@
 package com.f12.moitz.infrastructure.adapter.place;
 
-import com.f12.moitz.application.port.PlaceRecommender;
+import com.f12.moitz.application.port.place.PlaceRecommender;
 import com.f12.moitz.common.error.exception.ExternalApiErrorCode;
 import com.f12.moitz.common.error.exception.ExternalApiException;
 import com.f12.moitz.domain.recommendation.RecommendedPlaces;
-import com.f12.moitz.domain.Place;
+import com.f12.moitz.domain.place.Place;
 import com.f12.moitz.domain.recommendation.RecommendCondition;
 import com.f12.moitz.domain.recommendation.RecommendedPlace;
 import com.f12.moitz.infrastructure.client.kakao.KakaoMapAsyncClient;

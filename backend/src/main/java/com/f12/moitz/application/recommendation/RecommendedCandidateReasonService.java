@@ -1,6 +1,6 @@
 package com.f12.moitz.application.recommendation;
 
-import com.f12.moitz.domain.Place;
+import com.f12.moitz.domain.place.Place;
 import com.f12.moitz.domain.recommendation.RecommendedCandidates;
 import com.f12.moitz.domain.recommendation.RecommendationReason;
 import java.util.LinkedHashMap;
