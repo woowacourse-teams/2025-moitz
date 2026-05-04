@@ -1,6 +1,6 @@
 package com.f12.moitz.application.vote;
 
-import com.f12.moitz.application.dto.VotesResponse;
+import com.f12.moitz.application.dto.vote.VotesResponse;
 import com.f12.moitz.common.error.exception.BadRequestException;
 import com.f12.moitz.common.error.exception.GeneralErrorCode;
 import com.f12.moitz.common.error.exception.NotFoundException;

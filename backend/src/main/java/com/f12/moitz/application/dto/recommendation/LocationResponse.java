@@ -1,4 +1,4 @@
-package com.f12.moitz.application.dto;
+package com.f12.moitz.application.dto.recommendation;
 
 import com.f12.moitz.domain.recommendation.RecommendCondition;
 import io.swagger.v3.oas.annotations.media.Schema;

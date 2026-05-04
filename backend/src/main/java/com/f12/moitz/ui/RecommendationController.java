@@ -2,11 +2,11 @@ package com.f12.moitz.ui;
 
 import com.f12.moitz.application.recommendation.RecommendationService;
 import com.f12.moitz.application.vote.VoteService;
-import com.f12.moitz.application.dto.RecommendationCreateResponse;
-import com.f12.moitz.application.dto.RecommendationRequest;
-import com.f12.moitz.application.dto.RecommendationResultResponse;
-import com.f12.moitz.application.dto.VoteRequest;
-import com.f12.moitz.application.dto.VotesResponse;
+import com.f12.moitz.application.dto.recommendation.RecommendationCreateResponse;
+import com.f12.moitz.application.dto.recommendation.RecommendationRequest;
+import com.f12.moitz.application.dto.recommendation.RecommendationResultResponse;
+import com.f12.moitz.application.dto.vote.VoteRequest;
+import com.f12.moitz.application.dto.vote.VotesResponse;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

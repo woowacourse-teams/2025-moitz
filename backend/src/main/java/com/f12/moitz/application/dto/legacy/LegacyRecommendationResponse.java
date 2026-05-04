@@ -1,5 +1,6 @@
-package com.f12.moitz.application.dto;
+package com.f12.moitz.application.dto.legacy;
 
+import com.f12.moitz.application.dto.recommendation.PlaceRecommendResponse;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
 

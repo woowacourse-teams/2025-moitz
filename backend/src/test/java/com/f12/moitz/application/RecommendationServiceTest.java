@@ -9,7 +9,7 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
-import com.f12.moitz.application.dto.RecommendationRequest;
+import com.f12.moitz.application.dto.recommendation.RecommendationRequest;
 import com.f12.moitz.application.port.place.PlaceRecommender;
 import com.f12.moitz.application.subway.SubwayRouteService;
 import com.f12.moitz.application.recommendation.RecommendationPlaceSearchService;

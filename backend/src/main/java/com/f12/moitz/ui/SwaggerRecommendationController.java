@@ -1,8 +1,8 @@
 package com.f12.moitz.ui;
 
-import com.f12.moitz.application.dto.RecommendationCreateResponse;
-import com.f12.moitz.application.dto.RecommendationRequest;
-import com.f12.moitz.application.dto.RecommendationResultResponse;
+import com.f12.moitz.application.dto.recommendation.RecommendationCreateResponse;
+import com.f12.moitz.application.dto.recommendation.RecommendationRequest;
+import com.f12.moitz.application.dto.recommendation.RecommendationResultResponse;
 import com.f12.moitz.common.error.ErrorResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;

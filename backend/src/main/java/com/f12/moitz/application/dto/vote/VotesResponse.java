@@ -1,4 +1,4 @@
-package com.f12.moitz.application.dto;
+package com.f12.moitz.application.dto.vote;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 

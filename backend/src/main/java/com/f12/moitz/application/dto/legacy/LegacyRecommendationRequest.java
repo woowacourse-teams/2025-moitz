@@ -1,4 +1,4 @@
-package com.f12.moitz.application.dto;
+package com.f12.moitz.application.dto.legacy;
 
 import com.f12.moitz.common.error.exception.BadRequestException;
 import com.f12.moitz.common.error.exception.GeneralErrorCode;

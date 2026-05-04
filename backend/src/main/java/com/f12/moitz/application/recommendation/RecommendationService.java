@@ -1,8 +1,8 @@
 package com.f12.moitz.application.recommendation;
 
-import com.f12.moitz.application.dto.RecommendationCreateResponse;
-import com.f12.moitz.application.dto.RecommendationRequest;
-import com.f12.moitz.application.dto.RecommendationResultResponse;
+import com.f12.moitz.application.dto.recommendation.RecommendationCreateResponse;
+import com.f12.moitz.application.dto.recommendation.RecommendationRequest;
+import com.f12.moitz.application.dto.recommendation.RecommendationResultResponse;
 import com.f12.moitz.application.utils.RecommendationResponseMapper;
 import com.f12.moitz.common.error.exception.BadRequestException;
 import com.f12.moitz.common.error.exception.GeneralErrorCode;

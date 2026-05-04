@@ -5,7 +5,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 
-import com.f12.moitz.application.dto.VotesResponse;
+import com.f12.moitz.application.dto.vote.VotesResponse;
 import com.f12.moitz.application.vote.VoteService;
 import com.f12.moitz.common.error.exception.BadRequestException;
 import com.f12.moitz.common.error.exception.GeneralErrorCode;

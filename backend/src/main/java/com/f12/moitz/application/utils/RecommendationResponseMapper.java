@@ -1,12 +1,12 @@
 package com.f12.moitz.application.utils;
 
-import com.f12.moitz.application.dto.LocationResponse;
-import com.f12.moitz.application.dto.PathResponse;
-import com.f12.moitz.application.dto.PlaceRecommendResponse;
-import com.f12.moitz.application.dto.PointResponse;
-import com.f12.moitz.application.dto.RecommendationResultResponse;
-import com.f12.moitz.application.dto.RouteResponse;
-import com.f12.moitz.application.dto.StartingPlaceResponse;
+import com.f12.moitz.application.dto.recommendation.LocationResponse;
+import com.f12.moitz.application.dto.recommendation.PathResponse;
+import com.f12.moitz.application.dto.recommendation.PlaceRecommendResponse;
+import com.f12.moitz.application.dto.recommendation.PointResponse;
+import com.f12.moitz.application.dto.recommendation.RecommendationResultResponse;
+import com.f12.moitz.application.dto.recommendation.RouteResponse;
+import com.f12.moitz.application.dto.recommendation.StartingPlaceResponse;
 import com.f12.moitz.domain.recommendation.Candidate;
 import com.f12.moitz.domain.route.CandidateRoute;
 import com.f12.moitz.domain.recommendation.candidate.CandidateSelectionTag;
