@@ -1,4 +1,4 @@
-package com.f12.moitz.domain;
+package com.f12.moitz.domain.recommendation;
 
 import java.util.Collections;
 import java.util.LinkedHashMap;

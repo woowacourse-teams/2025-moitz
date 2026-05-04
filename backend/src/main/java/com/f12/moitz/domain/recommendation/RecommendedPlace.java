@@ -1,5 +1,7 @@
-package com.f12.moitz.domain;
+package com.f12.moitz.domain.recommendation;
 
+import com.f12.moitz.domain.Place;
+import com.f12.moitz.domain.Point;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

@@ -13,7 +13,7 @@ import com.f12.moitz.application.dto.RecommendationCreateResponse;
 import com.f12.moitz.application.dto.RecommendationRequest;
 import com.f12.moitz.application.dto.RouteResponse;
 import com.f12.moitz.application.dto.StartingPlaceResponse;
-import com.f12.moitz.domain.RecommendCondition;
+import com.f12.moitz.domain.recommendation.RecommendCondition;
 import java.util.List;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;

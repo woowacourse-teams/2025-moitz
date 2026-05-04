@@ -1,5 +1,6 @@
-package com.f12.moitz.domain;
+package com.f12.moitz.domain.recommendation;
 
+import com.f12.moitz.domain.Place;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;

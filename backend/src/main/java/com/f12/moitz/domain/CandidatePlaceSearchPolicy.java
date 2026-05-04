@@ -1,5 +1,6 @@
 package com.f12.moitz.domain;
 
+import com.f12.moitz.domain.recommendation.RecommendedCandidates;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedHashMap;

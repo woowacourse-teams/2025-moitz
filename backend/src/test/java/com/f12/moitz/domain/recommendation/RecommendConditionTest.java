@@ -1,4 +1,4 @@
-package com.f12.moitz.domain;
+package com.f12.moitz.domain.recommendation;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;

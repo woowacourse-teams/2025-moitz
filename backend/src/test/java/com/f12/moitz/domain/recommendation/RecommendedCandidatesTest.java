@@ -1,9 +1,12 @@
-package com.f12.moitz.domain;
+package com.f12.moitz.domain.recommendation;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.SoftAssertions.assertSoftly;
 
+import com.f12.moitz.domain.CandidateSelectionTag;
+import com.f12.moitz.domain.Place;
+import com.f12.moitz.domain.Point;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;

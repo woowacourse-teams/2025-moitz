@@ -1,7 +1,7 @@
 package com.f12.moitz.infrastructure;
 
 import com.f12.moitz.domain.Place;
-import com.f12.moitz.domain.RecommendCondition;
+import com.f12.moitz.domain.recommendation.RecommendCondition;
 import com.f12.moitz.infrastructure.client.kakao.dto.KakaoApiResponse;
 import com.f12.moitz.infrastructure.client.kakao.dto.KakaoApiResponses;
 import java.util.List;

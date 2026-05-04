@@ -1,5 +1,6 @@
-package com.f12.moitz.domain;
+package com.f12.moitz.domain.recommendation;
 
+import com.f12.moitz.domain.Place;
 import com.f12.moitz.domain.route.CandidateRoute;
 import com.f12.moitz.domain.route.Courses;
 import com.f12.moitz.domain.route.Routes;

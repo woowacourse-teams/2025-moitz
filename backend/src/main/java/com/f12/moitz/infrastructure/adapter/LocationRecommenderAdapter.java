@@ -4,7 +4,7 @@ import com.f12.moitz.application.dto.RecommendedLocationsResponse;
 import com.f12.moitz.application.port.LocationRecommender;
 import com.f12.moitz.common.error.exception.ExternalApiException;
 import com.f12.moitz.common.error.exception.RetryableApiException;
-import com.f12.moitz.domain.RecommendCondition;
+import com.f12.moitz.domain.recommendation.RecommendCondition;
 import com.f12.moitz.infrastructure.client.gemini.GoogleGeminiClient;
 import com.f12.moitz.infrastructure.client.perplexity.PerplexityClient;
 import io.github.resilience4j.circuitbreaker.CallNotPermittedException;

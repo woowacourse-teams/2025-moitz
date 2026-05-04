@@ -1,4 +1,4 @@
-package com.f12.moitz.domain;
+package com.f12.moitz.domain.recommendation;
 
 import com.f12.moitz.common.error.exception.BadRequestException;
 import com.f12.moitz.common.error.exception.GeneralErrorCode;

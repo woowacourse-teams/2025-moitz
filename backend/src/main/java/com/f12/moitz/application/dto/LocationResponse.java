@@ -1,6 +1,6 @@
 package com.f12.moitz.application.dto;
 
-import com.f12.moitz.domain.RecommendCondition;
+import com.f12.moitz.domain.recommendation.RecommendCondition;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
 import java.util.Map;

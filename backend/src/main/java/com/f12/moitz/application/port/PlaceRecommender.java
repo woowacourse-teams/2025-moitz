@@ -1,8 +1,8 @@
 package com.f12.moitz.application.port;
 
-import com.f12.moitz.domain.RecommendedPlaces;
+import com.f12.moitz.domain.recommendation.RecommendedPlaces;
 import com.f12.moitz.domain.Place;
-import com.f12.moitz.domain.RecommendCondition;
+import com.f12.moitz.domain.recommendation.RecommendCondition;
 import java.util.List;
 import java.util.Map;
 

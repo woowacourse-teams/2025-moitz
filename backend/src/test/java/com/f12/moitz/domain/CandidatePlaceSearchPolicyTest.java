@@ -2,6 +2,7 @@ package com.f12.moitz.domain;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.f12.moitz.domain.recommendation.RecommendedCandidates;
 import com.f12.moitz.domain.route.Path;
 import com.f12.moitz.domain.route.Route;
 import com.f12.moitz.domain.route.Routes;
