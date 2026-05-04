@@ -28,19 +28,38 @@ public class SetupService {
     public void setup() {
         log.info("SubwayEdges 초기화 시작");
 
-        // 지하철 노선도 데이터 존재하는지 확인
-        if (subwayStationService.getCount() > 0 && subwayEdgeRepository.count() > 0) {
+        if (hasExistingSubwayMap()) {
             log.info("DB에 데이터가 있습니다. 저장된 데이터를 사용합니다. 서비스 시작.");
             return;
         }
 
         // TODO: 비교해서 필요한 것만 저장하도록 해야 할듯?
 
-        // 지하철 데이터 로딩
-        final List<RawRouteInfo> rawRoutes = subwayMapLoader.loadRawRoutes();
+        final List<RawRouteInfo> rawRoutes = loadRawRoutes();
+        final List<SubwayStation> subwayStations = createSubwayStations(rawRoutes);
 
-        // 기존 역 데이터를 삭제하고 지하철 데이터로부터 새로운 역 데이터 저장 (?)
-        final List<String> stationNames = rawRoutes.stream()
+        saveSubwayMap(rawRoutes, subwayStations);
+        log.info("SubwayEdges 초기화 완료. 서비스 시작.");
+    }
+
+    private boolean hasExistingSubwayMap() {
+        return subwayStationService.getCount() > 0 && subwayEdgeRepository.count() > 0;
+    }
+
+    private List<RawRouteInfo> loadRawRoutes() {
+        return subwayMapLoader.loadRawRoutes();
+    }
+
+    private List<SubwayStation> createSubwayStations(final List<RawRouteInfo> rawRoutes) {
+        final List<String> stationNames = extractStationNames(rawRoutes);
+        return placeFinder.findPlacesByNames(stationNames)
+                .stream()
+                .map(place -> new SubwayStation(place.getName(), place.getPoint()))
+                .toList();
+    }
+
+    private List<String> extractStationNames(final List<RawRouteInfo> rawRoutes) {
+        return rawRoutes.stream()
                 .flatMap(route -> route.paths().stream())
                 .flatMap(path -> Stream.of(
                         path.departureStation().stationName(),
@@ -48,21 +67,16 @@ public class SetupService {
                 ))
                 .distinct()
                 .toList();
+    }
 
-        final List<SubwayStation> subwayStations = placeFinder.findPlacesByNames(stationNames)
-                .stream()
-                .map(place -> new SubwayStation(place.getName(), place.getPoint()))
-                .toList();
-
+    private void saveSubwayMap(
+            final List<RawRouteInfo> rawRoutes,
+            final List<SubwayStation> subwayStations
+    ) {
         subwayStationService.saveAll(subwayStations);
-
-        // 역과 엣지 조립
         final SubwayEdges subwayEdges = subwayEdgesBuilder.build(subwayStations, rawRoutes);
         subwayMapSupplement.apply(subwayEdges);
-
-        // 엣지 데이터 저장
         subwayEdgeRepository.saveAll(subwayEdges.getSubwayEdges());
-        log.info("SubwayEdges 초기화 완료. 서비스 시작.");
     }
 
 }
