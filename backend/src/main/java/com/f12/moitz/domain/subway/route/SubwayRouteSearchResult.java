@@ -1,7 +1,9 @@
-package com.f12.moitz.domain.subway;
+package com.f12.moitz.domain.subway.route;
 
 import com.f12.moitz.common.error.exception.ExternalApiErrorCode;
 import com.f12.moitz.common.error.exception.SubwayRouteException;
+import com.f12.moitz.domain.subway.SubwayLine;
+import com.f12.moitz.domain.subway.SubwayStation;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;

@@ -2,7 +2,7 @@ package com.f12.moitz.common.config;
 
 import com.f12.moitz.application.subway.SubwayEdgeService;
 import com.f12.moitz.domain.subway.SubwayEdges;
-import com.f12.moitz.domain.subway.SubwayRouteCalculator;
+import com.f12.moitz.domain.subway.route.SubwayRouteCalculator;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 

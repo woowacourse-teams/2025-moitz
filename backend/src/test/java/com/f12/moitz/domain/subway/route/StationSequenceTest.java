@@ -1,9 +1,11 @@
-package com.f12.moitz.domain.subway;
+package com.f12.moitz.domain.subway.route;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.f12.moitz.domain.route.CandidateRoute;
 import com.f12.moitz.domain.place.Point;
+import com.f12.moitz.domain.route.CandidateRoute;
+import com.f12.moitz.domain.subway.Edge;
+import com.f12.moitz.domain.subway.SubwayStation;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

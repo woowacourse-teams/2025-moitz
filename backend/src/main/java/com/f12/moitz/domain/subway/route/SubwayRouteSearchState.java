@@ -1,6 +1,9 @@
-package com.f12.moitz.domain.subway;
+package com.f12.moitz.domain.subway.route;
 
-import com.f12.moitz.domain.subway.SubwayRouteSearchResult.PreviousStation;
+import com.f12.moitz.domain.subway.Edge;
+import com.f12.moitz.domain.subway.SubwayLine;
+import com.f12.moitz.domain.subway.SubwayStation;
+import com.f12.moitz.domain.subway.route.SubwayRouteSearchResult.PreviousStation;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;

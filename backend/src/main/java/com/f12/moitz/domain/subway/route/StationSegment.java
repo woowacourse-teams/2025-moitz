@@ -1,5 +1,8 @@
-package com.f12.moitz.domain.subway;
+package com.f12.moitz.domain.subway.route;
 
+import com.f12.moitz.domain.subway.Edge;
+import com.f12.moitz.domain.subway.SubwayLine;
+import com.f12.moitz.domain.subway.SubwayStation;
 import lombok.Getter;
 import org.springframework.lang.Nullable;
 
