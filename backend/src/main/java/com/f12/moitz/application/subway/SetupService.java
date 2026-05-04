@@ -2,21 +2,12 @@ package com.f12.moitz.application.subway;
 
 import com.f12.moitz.application.port.PlaceFinder;
 import com.f12.moitz.application.port.subway.SubwayMapLoader;
-import com.f12.moitz.application.port.subway.dto.RawPathInfo;
 import com.f12.moitz.application.port.subway.dto.RawRouteInfo;
 import com.f12.moitz.domain.subway.Edge;
 import com.f12.moitz.domain.subway.SubwayEdges;
 import com.f12.moitz.domain.subway.SubwayLine;
 import com.f12.moitz.domain.subway.SubwayStation;
-import java.time.DateTimeException;
-import java.time.Duration;
-import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.NoSuchElementException;
 import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -27,12 +18,11 @@ import org.springframework.stereotype.Service;
 @Slf4j
 public class SetupService {
 
-    private static final DateTimeFormatter TIME_FORMATTER = DateTimeFormatter.ofPattern("HH:mm:ss");
-
     private final SubwayStationService subwayStationService;
     private final SubwayEdgeService subwayEdgeService;
     private final SubwayMapLoader subwayMapLoader;
     private final PlaceFinder placeFinder;
+    private final SubwayEdgesBuilder subwayEdgesBuilder;
 
     public void setup() {
         log.info("SubwayEdges 초기화 시작");
@@ -66,85 +56,12 @@ public class SetupService {
         subwayStationService.saveAll(subwayStations);
 
         // 역과 엣지 조립
-        final SubwayEdges subwayEdges = assembleSubwayStations(subwayStations, rawRoutes);
+        final SubwayEdges subwayEdges = subwayEdgesBuilder.build(subwayStations, rawRoutes);
+        addMissingData(subwayEdges);
 
         // 엣지 데이터 저장
         subwayEdgeService.saveAll(subwayEdges);
         log.info("SubwayEdges 초기화 완료. 서비스 시작.");
-    }
-
-    private SubwayEdges assembleSubwayStations(final List<SubwayStation> stations, final List<RawRouteInfo> rawRoutes) {
-        final Map<SubwayStation, List<Edge>> stationMap = new HashMap<>();
-        for (RawRouteInfo rawRoute : rawRoutes) {
-            final List<RawPathInfo> paths = rawRoute.paths();
-            for (int i = 0; i < paths.size(); i++) {
-                final RawPathInfo currentPath = paths.get(i);
-                final String fromName = currentPath.departureStation().stationName();
-                final String toName = currentPath.arrivalStation().stationName();
-                final String fromLine = currentPath.departureStation().lineName();
-                final String toLine = currentPath.arrivalStation().lineName();
-
-                final SubwayStation fromStation = getStationByName(stations, fromName);
-                final SubwayStation toStation = getStationByName(stations, toName);
-
-                final int distance = currentPath.stationSectionDistance();
-                final int travelTimeInSeconds = calculateTravelTime(currentPath, paths, i);
-
-                final List<Edge> fromEdges = stationMap.computeIfAbsent(fromStation, k -> new ArrayList<>());
-                final List<Edge> toEdges = stationMap.computeIfAbsent(toStation, k -> new ArrayList<>());
-
-                fromEdges.add(new Edge(toStation, travelTimeInSeconds, distance, fromLine));
-                if (currentPath.isTransfer()) {
-                    fromEdges.add(new Edge(toStation, travelTimeInSeconds, distance, toLine));
-                } else {
-                    toEdges.add(new Edge(fromStation, travelTimeInSeconds, distance, fromLine));
-                }
-            }
-        }
-        final SubwayEdges subwayEdges = SubwayEdges.of(stationMap);
-        addMissingData(subwayEdges);
-        return subwayEdges;
-    }
-
-    private SubwayStation getStationByName(final List<SubwayStation> stations, final String fromName) {
-        return stations.stream()
-                .filter(station -> station.getName().equals(fromName))
-                .findFirst()
-                .orElseThrow(() -> new NoSuchElementException("이름이 일치하는 SubwayStation이 존재하지 않습니다: " + fromName));
-    }
-
-    private int calculateTravelTime(
-            final RawPathInfo currentPath,
-            final List<RawPathInfo> allPaths,
-            final int currentIndex
-    ) {
-        if (currentPath.isTransfer()) {
-            return currentPath.waitingSeconds() + currentPath.requiredSeconds();
-        }
-
-        if (currentIndex < allPaths.size() - 1) {
-            final RawPathInfo nextPath = allPaths.get(currentIndex + 1);
-            final String currentDepartureTime = currentPath.trainDepartureTime();
-            final String nextDepartureTime = nextPath.trainDepartureTime();
-
-            if (currentDepartureTime != null && nextDepartureTime != null) {
-                return calculateTimeDifference(currentDepartureTime, nextDepartureTime);
-            }
-        }
-        return currentPath.requiredSeconds();
-    }
-
-    private int calculateTimeDifference(final String currentDepartureTime, final String nextDepartureTime) {
-        try {
-            final LocalTime current = LocalTime.parse(currentDepartureTime, TIME_FORMATTER);
-            LocalTime next = LocalTime.parse(nextDepartureTime, TIME_FORMATTER);
-            if (next.isBefore(current)) {
-                next = next.plusHours(24);
-            }
-            return (int) Duration.between(current, next).getSeconds();
-        } catch (DateTimeException | ArithmeticException e) {
-            throw new IllegalStateException("경로의 출발 시간을 파싱할 수 없습니다.");
-        }
     }
 
     private void addMissingData(final SubwayEdges subwayEdges) {
