@@ -6,7 +6,7 @@ import com.f12.moitz.domain.Place;
 import com.f12.moitz.domain.RecommendCondition;
 import com.f12.moitz.domain.RecommendedCandidates;
 import com.f12.moitz.domain.RouteCandidate;
-import com.f12.moitz.domain.Routes;
+import com.f12.moitz.domain.route.Routes;
 import com.f12.moitz.domain.subway.SubwayStation;
 import java.util.List;
 import java.util.Map;

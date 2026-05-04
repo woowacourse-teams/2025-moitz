@@ -2,7 +2,7 @@ package com.f12.moitz.application;
 
 import com.f12.moitz.domain.Place;
 import com.f12.moitz.domain.RouteCandidate;
-import com.f12.moitz.domain.Routes;
+import com.f12.moitz.domain.route.Routes;
 import java.util.List;
 import java.util.Map;
 

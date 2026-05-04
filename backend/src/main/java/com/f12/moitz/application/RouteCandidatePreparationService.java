@@ -2,11 +2,11 @@ package com.f12.moitz.application;
 
 import com.f12.moitz.application.port.RouteFinder;
 import com.f12.moitz.domain.DispersionPolicy;
-import com.f12.moitz.domain.OriginDestinations;
+import com.f12.moitz.domain.route.OriginDestinations;
 import com.f12.moitz.domain.Place;
-import com.f12.moitz.domain.Route;
-import com.f12.moitz.domain.RouteOrigins;
-import com.f12.moitz.domain.Routes;
+import com.f12.moitz.domain.route.Route;
+import com.f12.moitz.domain.route.RouteOrigins;
+import com.f12.moitz.domain.route.Routes;
 import com.f12.moitz.domain.subway.SubwayStation;
 import java.util.List;
 import java.util.Map;

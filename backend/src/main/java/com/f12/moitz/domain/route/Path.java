@@ -1,5 +1,6 @@
-package com.f12.moitz.domain;
+package com.f12.moitz.domain.route;
 
+import com.f12.moitz.domain.Place;
 import com.f12.moitz.domain.subway.SubwayLine;
 import java.time.Duration;
 import lombok.AccessLevel;

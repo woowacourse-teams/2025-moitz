@@ -1,4 +1,4 @@
-package com.f12.moitz.domain;
+package com.f12.moitz.domain.route;
 
 public enum TravelMethod {
 

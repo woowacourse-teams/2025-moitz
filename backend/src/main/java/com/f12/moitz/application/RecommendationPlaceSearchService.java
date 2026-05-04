@@ -7,7 +7,7 @@ import com.f12.moitz.domain.RecommendedCandidates;
 import com.f12.moitz.domain.CandidatePlaceSearchPolicy;
 import com.f12.moitz.domain.Place;
 import com.f12.moitz.domain.RecommendCondition;
-import com.f12.moitz.domain.Routes;
+import com.f12.moitz.domain.route.Routes;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;

@@ -1,12 +1,12 @@
 package com.f12.moitz.application;
 
 import com.f12.moitz.application.port.RouteFinder;
-import com.f12.moitz.domain.CandidateRoute;
-import com.f12.moitz.domain.OriginDestinations;
+import com.f12.moitz.domain.route.CandidateRoute;
+import com.f12.moitz.domain.route.OriginDestinations;
 import com.f12.moitz.domain.Place;
 import com.f12.moitz.domain.RecommendedCandidateTravels;
 import com.f12.moitz.domain.RecommendedCandidates;
-import com.f12.moitz.domain.RouteOrigins;
+import com.f12.moitz.domain.route.RouteOrigins;
 import java.util.List;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Qualifier;

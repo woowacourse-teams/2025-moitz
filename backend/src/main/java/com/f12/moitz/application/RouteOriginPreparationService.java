@@ -3,7 +3,7 @@ package com.f12.moitz.application;
 import com.f12.moitz.common.error.exception.BadRequestException;
 import com.f12.moitz.common.error.exception.GeneralErrorCode;
 import com.f12.moitz.domain.Place;
-import com.f12.moitz.domain.RouteOrigins;
+import com.f12.moitz.domain.route.RouteOrigins;
 import com.f12.moitz.domain.subway.SubwayStation;
 import java.util.List;
 import org.springframework.stereotype.Service;

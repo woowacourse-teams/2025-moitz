@@ -1,6 +1,6 @@
 package com.f12.moitz.application;
 
-import com.f12.moitz.domain.RouteOrigins;
+import com.f12.moitz.domain.route.RouteOrigins;
 import com.f12.moitz.domain.subway.SubwayStation;
 import java.util.List;
 

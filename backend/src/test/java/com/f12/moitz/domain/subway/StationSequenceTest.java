@@ -2,7 +2,7 @@ package com.f12.moitz.domain.subway;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.f12.moitz.domain.CandidateRoute;
+import com.f12.moitz.domain.route.CandidateRoute;
 import com.f12.moitz.domain.Point;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;

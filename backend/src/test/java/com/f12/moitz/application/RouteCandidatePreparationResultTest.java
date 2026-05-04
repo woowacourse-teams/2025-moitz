@@ -2,13 +2,13 @@ package com.f12.moitz.application;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.f12.moitz.domain.Path;
+import com.f12.moitz.domain.route.Path;
 import com.f12.moitz.domain.Place;
 import com.f12.moitz.domain.Point;
-import com.f12.moitz.domain.Route;
+import com.f12.moitz.domain.route.Route;
 import com.f12.moitz.domain.RouteCandidate;
-import com.f12.moitz.domain.Routes;
-import com.f12.moitz.domain.TravelMethod;
+import com.f12.moitz.domain.route.Routes;
+import com.f12.moitz.domain.route.TravelMethod;
 import com.f12.moitz.domain.subway.SubwayLine;
 import java.util.List;
 import java.util.Map;

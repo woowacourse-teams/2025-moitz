@@ -1,7 +1,7 @@
 package com.f12.moitz.domain.subway;
 
 import com.f12.moitz.application.SubwayStationService;
-import com.f12.moitz.domain.Path;
+import com.f12.moitz.domain.route.Path;
 import com.f12.moitz.domain.Point;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;

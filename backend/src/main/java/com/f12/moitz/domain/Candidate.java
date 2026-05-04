@@ -1,5 +1,8 @@
 package com.f12.moitz.domain;
 
+import com.f12.moitz.domain.route.CandidateRoute;
+import com.f12.moitz.domain.route.Courses;
+import com.f12.moitz.domain.route.Routes;
 import java.util.List;
 import java.util.stream.IntStream;
 import lombok.AccessLevel;

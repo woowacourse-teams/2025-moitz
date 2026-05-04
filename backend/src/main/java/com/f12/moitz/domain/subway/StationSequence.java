@@ -1,10 +1,10 @@
 package com.f12.moitz.domain.subway;
 
-import com.f12.moitz.domain.CandidateRoute;
-import com.f12.moitz.domain.Course;
-import com.f12.moitz.domain.Path;
+import com.f12.moitz.domain.route.CandidateRoute;
+import com.f12.moitz.domain.route.Course;
+import com.f12.moitz.domain.route.Path;
 import com.f12.moitz.domain.Point;
-import com.f12.moitz.domain.Route;
+import com.f12.moitz.domain.route.Route;
 import java.util.ArrayList;
 import java.util.List;
 

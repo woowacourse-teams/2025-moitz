@@ -1,8 +1,11 @@
-package com.f12.moitz.domain;
+package com.f12.moitz.domain.route;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import com.f12.moitz.domain.DispersionPolicy;
+import com.f12.moitz.domain.Place;
+import com.f12.moitz.domain.Point;
 import com.f12.moitz.domain.subway.SubwayLine;
 import java.util.Arrays;
 import java.util.List;

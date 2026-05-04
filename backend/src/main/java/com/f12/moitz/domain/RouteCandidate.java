@@ -1,5 +1,6 @@
 package com.f12.moitz.domain;
 
+import com.f12.moitz.domain.route.Routes;
 import lombok.Getter;
 
 @Getter

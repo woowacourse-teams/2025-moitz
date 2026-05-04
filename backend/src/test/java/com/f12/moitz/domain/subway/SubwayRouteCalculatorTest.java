@@ -1,7 +1,7 @@
 package com.f12.moitz.domain.subway;
 
 import com.f12.moitz.domain.Point;
-import com.f12.moitz.domain.Path;
+import com.f12.moitz.domain.route.Path;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;

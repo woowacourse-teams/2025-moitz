@@ -4,6 +4,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatNoException;
 import static org.assertj.core.api.SoftAssertions.assertSoftly;
 
+import com.f12.moitz.domain.route.Course;
+import com.f12.moitz.domain.route.Courses;
+import com.f12.moitz.domain.route.Path;
+import com.f12.moitz.domain.route.Route;
+import com.f12.moitz.domain.route.Routes;
+import com.f12.moitz.domain.route.TravelMethod;
 import com.f12.moitz.domain.subway.SubwayLine;
 import java.util.ArrayList;
 import java.util.Arrays;
