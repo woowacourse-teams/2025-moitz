@@ -14,12 +14,21 @@ public class RouteCandidatePreparationResult {
 
     public RouteCandidatePreparationResult(
             final List<Place> candidatePlaces,
-            final Map<Place, Routes> candidateRoutes,
-            final List<RouteCandidate> routeCandidates
+            final Map<Place, Routes> candidateRoutes
     ) {
         this.candidatePlaces = List.copyOf(candidatePlaces);
         this.candidateRoutes = Map.copyOf(candidateRoutes);
-        this.routeCandidates = List.copyOf(routeCandidates);
+        this.routeCandidates = createRouteCandidates(this.candidatePlaces, this.candidateRoutes);
+    }
+
+    private List<RouteCandidate> createRouteCandidates(
+            final List<Place> candidatePlaces,
+            final Map<Place, Routes> candidateRoutes
+    ) {
+        return candidatePlaces.stream()
+                .filter(candidateRoutes::containsKey)
+                .map(place -> new RouteCandidate(place, candidateRoutes.get(place)))
+                .toList();
     }
 
     public List<Place> getCandidatePlaces() {
