@@ -8,6 +8,7 @@ import com.f12.moitz.domain.recommendation.candidate.CandidateSelectionTag;
 import com.f12.moitz.domain.place.Place;
 import com.f12.moitz.domain.place.Point;
 import java.util.Arrays;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.DisplayName;
@@ -16,8 +17,8 @@ import org.junit.jupiter.api.Test;
 class RecommendedCandidatesTest {
 
     @Test
-    @DisplayName("추천 후보 장소 기준으로 태그를 정규화한다")
-    void constructor_NormalizesTagsByRecommendedCandidatePlaces() {
+    @DisplayName("추천 후보 장소 기준으로 단일 태그를 정규화한다")
+    void constructor_NormalizesTagByRecommendedCandidatePlaces() {
         final Place seolleung = place("선릉역");
         final Place samsung = place("삼성역");
         final Place gangnam = place("강남역");
@@ -25,78 +26,77 @@ class RecommendedCandidatesTest {
         final RecommendedCandidates recommendedCandidates = new RecommendedCandidates(
                 List.of(seolleung, samsung),
                 Map.of(
-                        seolleung, List.of(CandidateSelectionTag.FAIRNESS, CandidateSelectionTag.GENERAL),
-                        gangnam, List.of(CandidateSelectionTag.TRANSFER)
+                        seolleung, CandidateSelectionTag.FAIRNESS,
+                        gangnam, CandidateSelectionTag.TRANSFER
                 )
         );
 
         assertSoftly(softAssertions -> {
             softAssertions.assertThat(recommendedCandidates.getPlaces())
                     .containsExactly(seolleung, samsung);
-            softAssertions.assertThat(recommendedCandidates.getTags(seolleung))
-                    .containsExactly(CandidateSelectionTag.FAIRNESS);
-            softAssertions.assertThat(recommendedCandidates.getTags(samsung))
-                    .containsExactly(CandidateSelectionTag.GENERAL);
+            softAssertions.assertThat(recommendedCandidates.getTag(seolleung))
+                    .isEqualTo(CandidateSelectionTag.FAIRNESS);
+            softAssertions.assertThat(recommendedCandidates.getTag(samsung))
+                    .isEqualTo(CandidateSelectionTag.GENERAL);
             softAssertions.assertThat(recommendedCandidates.size()).isEqualTo(2);
             softAssertions.assertThat(recommendedCandidates.isEmpty()).isFalse();
         });
     }
 
     @Test
-    @DisplayName("추천 후보 태그가 비어있거나 null만 있으면 종합 추천 태그로 보정한다")
-    void constructor_UsesGeneralWhenTagsAreEmptyOrOnlyNull() {
+    @DisplayName("추천 후보 태그가 없거나 null이면 적당한 추천 태그로 보정한다")
+    void constructor_UsesGeneralWhenTagsAreMissingOrNull() {
         final Place seolleung = place("선릉역");
         final Place samsung = place("삼성역");
+        final Map<Place, CandidateSelectionTag> tagsByPlace = new LinkedHashMap<>();
+        tagsByPlace.put(samsung, null);
 
         final RecommendedCandidates recommendedCandidates = new RecommendedCandidates(
                 List.of(seolleung, samsung),
-                Map.of(
-                        seolleung, List.of(),
-                        samsung, Arrays.asList(null, null)
-                )
+                tagsByPlace
         );
 
-        assertThat(recommendedCandidates.getTags(seolleung))
-                .containsExactly(CandidateSelectionTag.GENERAL);
-        assertThat(recommendedCandidates.getTags(samsung))
-                .containsExactly(CandidateSelectionTag.GENERAL);
+        assertThat(recommendedCandidates.getTag(seolleung))
+                .isEqualTo(CandidateSelectionTag.GENERAL);
+        assertThat(recommendedCandidates.getTag(samsung))
+                .isEqualTo(CandidateSelectionTag.GENERAL);
     }
 
     @Test
-    @DisplayName("추천 후보 이름 목록과 이름별 태그를 조회한다")
+    @DisplayName("추천 후보 이름 목록과 이름별 단일 태그를 조회한다")
     void getPlaceNamesAndTagsByPlaceName() {
         final Place seolleung = place("선릉역");
         final Place samsung = place("삼성역");
         final RecommendedCandidates recommendedCandidates = new RecommendedCandidates(
                 List.of(seolleung, samsung),
                 Map.of(
-                        seolleung, List.of(CandidateSelectionTag.FAIRNESS),
-                        samsung, List.of(CandidateSelectionTag.EFFICIENCY, CandidateSelectionTag.GENERAL)
+                        seolleung, CandidateSelectionTag.FAIRNESS,
+                        samsung, CandidateSelectionTag.EFFICIENCY
                 )
         );
 
         assertSoftly(softAssertions -> {
             softAssertions.assertThat(recommendedCandidates.getPlaceNames())
                     .containsExactly("선릉역", "삼성역");
-            softAssertions.assertThat(recommendedCandidates.getTagsByPlaceName())
-                    .containsEntry("선릉역", List.of(CandidateSelectionTag.FAIRNESS))
-                    .containsEntry("삼성역", List.of(CandidateSelectionTag.EFFICIENCY))
+            softAssertions.assertThat(recommendedCandidates.getTagByPlaceName())
+                    .containsEntry("선릉역", CandidateSelectionTag.FAIRNESS)
+                    .containsEntry("삼성역", CandidateSelectionTag.EFFICIENCY)
                     .hasSize(2);
         });
     }
 
     @Test
     @DisplayName("추천 후보 이름별 태그는 외부에서 변경할 수 없다")
-    void getTagsByPlaceName_ReturnsUnmodifiableMap() {
+    void getTagByPlaceName_ReturnsUnmodifiableMap() {
         final Place seolleung = place("선릉역");
         final RecommendedCandidates recommendedCandidates = new RecommendedCandidates(
                 List.of(seolleung),
-                Map.of(seolleung, List.of(CandidateSelectionTag.FAIRNESS))
+                Map.of(seolleung, CandidateSelectionTag.FAIRNESS)
         );
 
-        assertThatThrownBy(() -> recommendedCandidates.getTagsByPlaceName().put(
+        assertThatThrownBy(() -> recommendedCandidates.getTagByPlaceName().put(
                 "삼성역",
-                List.of(CandidateSelectionTag.EFFICIENCY)
+                CandidateSelectionTag.EFFICIENCY
         ))
                 .isInstanceOf(UnsupportedOperationException.class);
     }
@@ -125,7 +125,7 @@ class RecommendedCandidatesTest {
         final Place seolleung = place("선릉역");
         final RecommendedCandidates recommendedCandidates = new RecommendedCandidates(
                 List.of(seolleung),
-                Map.of(seolleung, List.of(CandidateSelectionTag.FAIRNESS))
+                Map.of(seolleung, CandidateSelectionTag.FAIRNESS)
         );
 
         assertThatThrownBy(() -> recommendedCandidates.getPlaces().add(place("삼성역")))
@@ -140,8 +140,8 @@ class RecommendedCandidatesTest {
         final RecommendedCandidates recommendedCandidates = new RecommendedCandidates(
                 List.of(seolleung, samsung),
                 Map.of(
-                        seolleung, List.of(CandidateSelectionTag.FAIRNESS),
-                        samsung, List.of(CandidateSelectionTag.EFFICIENCY)
+                        seolleung, CandidateSelectionTag.FAIRNESS,
+                        samsung, CandidateSelectionTag.EFFICIENCY
                 )
         );
 
@@ -149,17 +149,17 @@ class RecommendedCandidatesTest {
 
         assertThat(result)
                 .containsEntry(seolleung, new RecommendationReason(
-                        "#공평",
-                        "선릉역은 모든 참여자의 이동 시간이 최대한 비슷한 기준을 반영해 추천된 만남 장소입니다."
+                        "#가장공평",
+                        "선릉역은 모든 참여자의 이동 시간이 가장 공평한 기준을 반영해 추천된 만남 장소입니다."
                 ))
                 .containsEntry(samsung, new RecommendationReason(
-                        "#평균최소",
+                        "#최소평균",
                         "삼성역은 전체 참여자의 평균 이동 시간이 짧은 기준을 반영해 추천된 만남 장소입니다."
                 ));
     }
 
     @Test
-    @DisplayName("추천 태그가 없으면 종합 추천 이유를 생성한다")
+    @DisplayName("추천 태그가 없으면 적당한 추천 이유를 생성한다")
     void createReasons_UsesGeneralReasonWhenTagsAreMissing() {
         final Place cityHall = place("시청역");
         final RecommendedCandidates recommendedCandidates = new RecommendedCandidates(
@@ -171,26 +171,26 @@ class RecommendedCandidatesTest {
 
         assertThat(result)
                 .containsEntry(cityHall, new RecommendationReason(
-                        "#종합추천",
-                        "시청역은 이동 시간, 환승, 균형을 종합한 기준을 반영해 추천된 만남 장소입니다."
+                        "#적당한",
+                        "시청역은 이동 시간, 환승, 균형이 적당한 기준을 반영해 추천된 만남 장소입니다."
                 ));
     }
 
     @Test
     @DisplayName("추천 후보가 아닌 장소의 태그는 조회할 수 없다")
-    void getTags_ThrowsExceptionWhenPlaceIsNotRecommendedCandidate() {
+    void getTag_ThrowsExceptionWhenPlaceIsNotRecommendedCandidate() {
         final Place seolleung = place("선릉역");
         final Place samsung = place("삼성역");
         final RecommendedCandidates recommendedCandidates = new RecommendedCandidates(
                 List.of(seolleung),
-                Map.of(seolleung, List.of(CandidateSelectionTag.FAIRNESS))
+                Map.of(seolleung, CandidateSelectionTag.FAIRNESS)
         );
 
         assertSoftly(softAssertions -> {
-            softAssertions.assertThatThrownBy(() -> recommendedCandidates.getTags(null))
+            softAssertions.assertThatThrownBy(() -> recommendedCandidates.getTag(null))
                     .isInstanceOf(IllegalArgumentException.class)
                     .hasMessage("추천 후보 장소는 null일 수 없습니다.");
-            softAssertions.assertThatThrownBy(() -> recommendedCandidates.getTags(samsung))
+            softAssertions.assertThatThrownBy(() -> recommendedCandidates.getTag(samsung))
                     .isInstanceOf(IllegalArgumentException.class)
                     .hasMessage("추천 후보 태그가 누락되었습니다. 추천 지역: 삼성역");
         });

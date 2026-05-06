@@ -1,6 +1,10 @@
 package com.f12.moitz.application.dto.recommendation;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.f12.moitz.common.error.exception.BadRequestException;
+import com.f12.moitz.common.error.exception.GeneralErrorCode;
 import com.f12.moitz.domain.recommendation.RecommendCondition;
+import com.f12.moitz.domain.recommendation.candidate.CandidateSelectionTag;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
 import java.util.Map;
@@ -21,12 +25,18 @@ public record LocationResponse(
         int avgMinutes,
         @Schema(description = "최적의 추천 여부", example = "true", requiredMode = Schema.RequiredMode.REQUIRED)
         boolean isBest,
-        @Schema(description = "추천 태그 코드 목록", example = "[\"FAIRNESS\", \"EFFICIENCY\"]", requiredMode = Schema.RequiredMode.REQUIRED)
+        @Schema(description = "추천 태그 코드 목록", example = "[\"FAIRNESS\"]", requiredMode = Schema.RequiredMode.REQUIRED)
         List<String> tags,
-        @Schema(description = "추천 이유 해시태그", example = "#최소환승 #평균최소", requiredMode = Schema.RequiredMode.REQUIRED)
+        @JsonProperty("tag_info")
+        @Schema(description = "추천 태그 설명", example = "환승 부담이 적은 기준", requiredMode = Schema.RequiredMode.REQUIRED)
+        String tagInfo,
+        @Schema(description = "추천 이유 해시태그", example = "#최소환승", requiredMode = Schema.RequiredMode.REQUIRED)
         String description,
-        @Schema(description = "지역 추천 이유 문장", example = "서울역은 환승 부담이 적은 기준, 전체 참여자의 평균 이동 시간이 짧은 기준을 반영해 추천된 만남 장소입니다.", requiredMode = Schema.RequiredMode.REQUIRED)
+        @Schema(description = "지역 추천 이유 문장", example = "서울역은 환승 부담이 적은 기준을 반영해 추천된 만남 장소입니다.", requiredMode = Schema.RequiredMode.REQUIRED)
         String reason,
+        @JsonProperty("location_info")
+        @Schema(description = "지역 추천 정보", example = "서울역은 환승 부담이 적은 기준을 반영해 추천된 만남 장소입니다.", requiredMode = Schema.RequiredMode.REQUIRED)
+        String locationInfo,
         @Schema(
                 description = "카테고리별 추천 장소 목록",
                 example = """
@@ -85,6 +95,10 @@ public record LocationResponse(
         List<RouteResponse> routes
 ) {
 
+    public LocationResponse {
+        tags = validateTags(tags);
+    }
+
     public LocationResponse(
             final Long id,
             final int index,
@@ -108,7 +122,41 @@ public record LocationResponse(
                 avgMinutes,
                 isBest,
                 List.of(validateTag(tag)),
+                resolveTagInfo(tag),
                 description,
+                reason,
+                reason,
+                places,
+                routes
+        );
+    }
+
+    public LocationResponse(
+            final Long id,
+            final int index,
+            final double y,
+            final double x,
+            final String name,
+            final int avgMinutes,
+            final boolean isBest,
+            final List<String> tags,
+            final String description,
+            final String reason,
+            final Map<RecommendCondition, List<PlaceRecommendResponse>> places,
+            final List<RouteResponse> routes
+    ) {
+        this(
+                id,
+                index,
+                y,
+                x,
+                name,
+                avgMinutes,
+                isBest,
+                validateTags(tags),
+                resolveTagInfo(tags),
+                description,
+                reason,
                 reason,
                 places,
                 routes
@@ -117,9 +165,34 @@ public record LocationResponse(
 
     private static String validateTag(final String tag) {
         if (tag == null || tag.isBlank()) {
-            throw new IllegalArgumentException("추천 태그는 비어 있을 수 없습니다.");
+            throw new BadRequestException(GeneralErrorCode.INPUT_INVALID_RECOMMENDATION_TAG, tag);
         }
         return tag;
+    }
+
+    private static List<String> validateTags(final List<String> tags) {
+        if (tags == null || tags.isEmpty()) {
+            throw new BadRequestException(GeneralErrorCode.INPUT_INVALID_RECOMMENDATION_TAG, tags);
+        }
+        if (tags.size() != 1) {
+            throw new BadRequestException(GeneralErrorCode.INPUT_INVALID_RECOMMENDATION_TAG, tags);
+        }
+        return tags.stream()
+                .map(LocationResponse::validateTag)
+                .toList();
+    }
+
+    private static String resolveTagInfo(final List<String> tags) {
+        return resolveTagInfo(validateTags(tags).getFirst());
+    }
+
+    private static String resolveTagInfo(final String tag) {
+        final String validatedTag = validateTag(tag);
+        try {
+            return CandidateSelectionTag.valueOf(validatedTag).getDescription();
+        } catch (IllegalArgumentException e) {
+            throw new BadRequestException(GeneralErrorCode.INPUT_INVALID_RECOMMENDATION_TAG, e, validatedTag);
+        }
     }
 
 }

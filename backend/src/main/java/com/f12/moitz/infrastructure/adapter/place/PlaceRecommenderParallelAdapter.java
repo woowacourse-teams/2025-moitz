@@ -1,6 +1,7 @@
 package com.f12.moitz.infrastructure.adapter.place;
 
 import com.f12.moitz.application.port.place.PlaceRecommender;
+import com.f12.moitz.application.port.place.PlaceRecommendationCriteria;
 import com.f12.moitz.common.error.exception.ExternalApiErrorCode;
 import com.f12.moitz.common.error.exception.ExternalApiException;
 import com.f12.moitz.domain.recommendation.RecommendedPlaces;
@@ -9,8 +10,10 @@ import com.f12.moitz.domain.recommendation.RecommendCondition;
 import com.f12.moitz.domain.recommendation.RecommendedPlace;
 import com.f12.moitz.infrastructure.client.kakao.KakaoMapAsyncClient;
 import com.f12.moitz.infrastructure.client.kakao.dto.KakaoApiResponse;
+import com.f12.moitz.infrastructure.client.kakao.dto.DocumentResponse;
 import com.f12.moitz.infrastructure.client.kakao.dto.SearchPlacesLimitQuantityRequest;
 import com.f12.moitz.infrastructure.utils.KakaoPlaceMapper;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -27,59 +30,96 @@ import reactor.core.publisher.Mono;
 @RequiredArgsConstructor
 public class PlaceRecommenderParallelAdapter implements PlaceRecommender {
 
-    private static final int PLACE_RECOMMENDATION_COUNT = 5;
-
     private final KakaoMapAsyncClient kakaoMapAsyncClient;
     private final KakaoPlaceMapper kakaoPlaceMapper;
 
     @Override
     public Map<Place, RecommendedPlaces> recommendPlaces(
             final List<Place> targetPlaces,
-            final List<RecommendCondition> requirements
+            final PlaceRecommendationCriteria criteria
     ) {
-        return recommendPlacesAsync(targetPlaces, requirements)
+        return recommendPlacesAsync(targetPlaces, criteria)
                 .block();
     }
 
     private Mono<Map<Place, RecommendedPlaces>> recommendPlacesAsync(
             final List<Place> targetPlaces,
-            final List<RecommendCondition> requirements
+            final PlaceRecommendationCriteria criteria
     ) {
-        return searchPlacesWithRequirementAsync(targetPlaces, requirements)
-                .map(this::buildRecommendedPlaces);
+        return searchPlacesWithRequirementAsync(targetPlaces, criteria)
+                .map(searchResults -> buildRecommendedPlaces(searchResults, criteria.limitPerCondition()));
     }
 
     private Map<Place, RecommendedPlaces> buildRecommendedPlaces(
-            final Map<Place, Map<RecommendCondition, List<KakaoApiResponse>>> searchResults
+            final Map<Place, Map<RecommendCondition, List<KakaoApiResponse>>> searchResults,
+            final int limitPerCondition
     ) {
         return searchResults.entrySet().stream()
                 .collect(Collectors.toMap(
                         Entry::getKey,
                         entry -> new RecommendedPlaces(
-                                buildCategoryMap(entry.getValue())
+                                buildCategoryMap(entry.getValue(), limitPerCondition)
                         )
                 ));
     }
 
     private Map<RecommendCondition, List<RecommendedPlace>> buildCategoryMap(
-            final Map<RecommendCondition, List<KakaoApiResponse>> categoryResponses
+            final Map<RecommendCondition, List<KakaoApiResponse>> categoryResponses,
+            final int limitPerCondition
     ) {
         return categoryResponses.entrySet().stream()
                 .collect(Collectors.toMap(
                         Entry::getKey,
-                        entry -> entry.getValue().stream()
-                                .flatMap(resp -> resp.documents().stream())
+                        entry -> interleaveDocuments(entry.getValue(), limitPerCondition).stream()
                                 .map(kakaoPlaceMapper::toRecommendedPlace)
                                 .toList()
                 ));
     }
 
+    private List<DocumentResponse> interleaveDocuments(
+            final List<KakaoApiResponse> responses,
+            final int limitPerCondition
+    ) {
+        // interleaveDocuments는 documentsByKeyword를 index 기준 라운드로빈으로 순회하며, limitPerCondition 도달 또는 hasNextDocument=false까지 짧은 리스트를 건너뛰고 긴 리스트로 채운다.
+        final List<List<DocumentResponse>> documentsByKeyword = responses.stream()
+                .map(this::getDocuments)
+                .toList();
+        final List<DocumentResponse> interleavedDocuments = new ArrayList<>();
+
+        for (int index = 0; interleavedDocuments.size() < limitPerCondition; index++) {
+            boolean hasNextDocument = false;
+
+            for (List<DocumentResponse> documents : documentsByKeyword) {
+                if (index < documents.size()) {
+                    interleavedDocuments.add(documents.get(index));
+                    hasNextDocument = true;
+                }
+                if (interleavedDocuments.size() == limitPerCondition) {
+                    return interleavedDocuments;
+                }
+            }
+
+            if (!hasNextDocument) {
+                return interleavedDocuments;
+            }
+        }
+
+        return interleavedDocuments;
+    }
+
+    private List<DocumentResponse> getDocuments(final KakaoApiResponse response) {
+        if (response.documents() == null) {
+            return List.of();
+        }
+        return response.documents();
+    }
+
     private Mono<Map<Place, Map<RecommendCondition, List<KakaoApiResponse>>>> searchPlacesWithRequirementAsync(
             final List<Place> targetPlaces,
-            final List<RecommendCondition> requirements
+            final PlaceRecommendationCriteria criteria
     ) {
         return Flux.fromIterable(targetPlaces)
-                .flatMap(place -> searchRequirementsForPlaceAsync(place, requirements)
+                .flatMap(place -> searchRequirementsForPlaceAsync(place, criteria)
                         .map(requirementMap -> Map.entry(place, requirementMap))
                 )
                 .collectMap(Map.Entry::getKey, Map.Entry::getValue);
@@ -87,26 +127,27 @@ public class PlaceRecommenderParallelAdapter implements PlaceRecommender {
 
     private Mono<Map<RecommendCondition, List<KakaoApiResponse>>> searchRequirementsForPlaceAsync(
             final Place place,
-            final List<RecommendCondition> requirements
+            final PlaceRecommendationCriteria criteria
     ) {
-        return Flux.fromIterable(requirements)
-                .flatMap(condition -> searchKeywordsForConditionAsync(condition, place))
+        return Flux.fromIterable(criteria.conditions())
+                .flatMap(condition -> searchKeywordsForConditionAsync(condition, place, criteria.limitPerCondition()))
                 .collectMap(Map.Entry::getKey, Map.Entry::getValue, HashMap::new);
     }
 
     private Mono<Map.Entry<RecommendCondition, List<KakaoApiResponse>>> searchKeywordsForConditionAsync(
             final RecommendCondition condition,
-            final Place place
+            final Place place,
+            final int limitPerCondition
     ) {
         return Flux.fromIterable(condition.getKeywords())
-                .flatMap(keyword -> kakaoMapAsyncClient.searchPlacesByAsync(
+                .flatMapSequential(keyword -> kakaoMapAsyncClient.searchPlacesByAsync(
                         new SearchPlacesLimitQuantityRequest(
                                 keyword,
                                 place.getName(),
                                 place.getPoint().getX(),
                                 place.getPoint().getY(),
                                 800,
-                                PLACE_RECOMMENDATION_COUNT
+                                limitPerCondition
                         )
                 )
                 .retry(2)

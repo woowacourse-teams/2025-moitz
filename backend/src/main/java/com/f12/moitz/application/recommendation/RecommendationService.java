@@ -43,6 +43,7 @@ public class RecommendationService {
 
     private static final int PLACE_SEARCH_POOL_LIMIT = 50;
     private static final int RECOMMENDED_CANDIDATE_TARGET_COUNT = 5;
+    private static final int RECOMMENDED_PLACE_LIMIT_PER_CONDITION = 6;
 
     private final SubwayStationService subwayStationService;
     private final SubwayRouteService subwayRouteService;
@@ -239,6 +240,7 @@ public class RecommendationService {
                 recommendConditions,
                 candidateRoutes,
                 PLACE_SEARCH_POOL_LIMIT,
+                RECOMMENDED_PLACE_LIMIT_PER_CONDITION,
                 RECOMMENDED_CANDIDATE_TARGET_COUNT
         );
     }
@@ -298,7 +300,7 @@ public class RecommendationService {
 
     private void validateRecommendationCandidates(final RecommendedCandidates recommendedCandidates) {
         if (recommendedCandidates.isEmpty()) {
-            throw new BadRequestException(GeneralErrorCode.RECOMMENDATION_NOT_FOUND);
+            throw new BadRequestException(GeneralErrorCode.RECOMMENDATION_RESULT_EMPTY);
         }
     }
 

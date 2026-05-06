@@ -1,6 +1,7 @@
 package com.f12.moitz.application.recommendation;
 
 import com.f12.moitz.application.port.place.PlaceRecommender;
+import com.f12.moitz.application.port.place.PlaceRecommendationCriteria;
 import com.f12.moitz.domain.recommendation.candidate.CandidateSelection;
 import com.f12.moitz.domain.recommendation.RecommendedPlaces;
 import com.f12.moitz.domain.recommendation.RecommendedCandidates;
@@ -33,8 +34,13 @@ public class RecommendationPlaceSearchService {
             final List<RecommendCondition> recommendConditions,
             final Map<Place, Routes> candidateRoutes,
             final int searchLimit,
+            final int recommendedPlaceLimitPerCondition,
             final int targetCount
     ) {
+        final PlaceRecommendationCriteria criteria = new PlaceRecommendationCriteria(
+                recommendConditions,
+                recommendedPlaceLimitPerCondition
+        );
         final Map<Place, RecommendedPlaces> accumulatedRecommendedPlaces = new LinkedHashMap<>();
         final List<Place> searchedPlaces = new ArrayList<>();
         RecommendedCandidates recommendedCandidates = selectRecommendedCandidates(
@@ -72,7 +78,7 @@ public class RecommendationPlaceSearchService {
                     summarizePlacesWithScore(batch, candidateRoutes)
             );
 
-            accumulatedRecommendedPlaces.putAll(placeRecommender.recommendPlaces(batch, recommendConditions));
+            accumulatedRecommendedPlaces.putAll(placeRecommender.recommendPlaces(batch, criteria));
             searchedPlaces.addAll(batch);
 
             recommendedCandidates = selectRecommendedCandidates(

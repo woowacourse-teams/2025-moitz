@@ -141,8 +141,8 @@ class CandidateTest {
     }
 
     @Test
-    @DisplayName("후보는 여러 추천 태그를 가질 수 있다")
-    void createWithMultipleTags() {
+    @DisplayName("후보에 여러 추천 태그가 들어오면 우선순위가 가장 높은 단일 태그만 가진다")
+    void createWithMultipleTags_NormalizesToSingleTag() {
         final Place startPlace = new Place("잠실역", new Point(127.0, 37.0));
         final Place endPlace = new Place("강남역", new Point(127.2, 37.2));
         final Route route = new Route(List.of(new Path(
@@ -172,7 +172,7 @@ class CandidateTest {
         );
 
         assertThat(candidate.getTags())
-                .containsExactly(CandidateSelectionTag.FAIRNESS, CandidateSelectionTag.EFFICIENCY);
+                .containsExactly(CandidateSelectionTag.FAIRNESS);
         assertThat(candidate.getTag()).isEqualTo(CandidateSelectionTag.FAIRNESS);
     }
 
@@ -211,7 +211,7 @@ class CandidateTest {
     }
 
     @Test
-    @DisplayName("저장 문서에 태그 정보가 없거나 비어있으면 종합 추천 태그로 보정한다")
+    @DisplayName("저장 문서에 태그 정보가 없거나 비어있으면 적당한 태그로 보정한다")
     void getTags_UsesGeneralWhenTagsAndLegacyTagAreMissing() throws Exception {
         final var constructor = Candidate.class.getDeclaredConstructor();
         constructor.setAccessible(true);
@@ -238,7 +238,7 @@ class CandidateTest {
     }
 
     @Test
-    @DisplayName("종합 추천 태그는 다른 태그가 없는 경우에만 조회한다")
+    @DisplayName("적당한 태그는 다른 태그가 없는 경우에만 조회한다")
     void getTags_RemovesGeneralWhenOtherTagsExist() throws Exception {
         final var constructor = Candidate.class.getDeclaredConstructor();
         constructor.setAccessible(true);

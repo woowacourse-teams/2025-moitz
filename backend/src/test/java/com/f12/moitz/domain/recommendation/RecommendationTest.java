@@ -46,7 +46,7 @@ class RecommendationTest {
                 createRecommendedCandidateTravels(startPlace, recommendedPlace),
                 createRecommendedCandidates(
                         List.of(recommendedPlace),
-                        Map.of(recommendedPlace, List.of(CandidateSelectionTag.FAIRNESS))
+                        Map.of(recommendedPlace, CandidateSelectionTag.FAIRNESS)
                 )
         );
 
@@ -71,7 +71,7 @@ class RecommendationTest {
                 createRecommendedCandidateTravels(startPlace, recommendedPlace),
                 createRecommendedCandidates(
                         List.of(recommendedPlace),
-                        Map.of(recommendedPlace, List.of(CandidateSelectionTag.FAIRNESS))
+                        Map.of(recommendedPlace, CandidateSelectionTag.FAIRNESS)
                 )
         ))
                 .isInstanceOf(IllegalArgumentException.class)
@@ -131,7 +131,7 @@ class RecommendationTest {
     }
 
     @Test
-    @DisplayName("후보지들을 태그 순서 우선으로 정렬한다")
+    @DisplayName("후보지들을 공평성 점수 우선으로 정렬한다")
     void sortCandidates() {
         // Given
         final Candidate generalCandidate = createCandidate(1200, 600, CandidateSelectionTag.GENERAL);
@@ -143,9 +143,22 @@ class RecommendationTest {
         final Recommendation recommendation = new Recommendation(candidates);
 
         // Then
-        assertThat(recommendation.get(0)).isEqualTo(fairnessCandidate);
+        assertThat(recommendation.get(0)).isEqualTo(generalCandidate);
         assertThat(recommendation.get(1)).isEqualTo(transferCandidate);
-        assertThat(recommendation.get(2)).isEqualTo(generalCandidate);
+        assertThat(recommendation.get(2)).isEqualTo(fairnessCandidate);
+    }
+
+    @Test
+    @DisplayName("공평성 점수가 같으면 태그 순서로 정렬한다")
+    void sortCandidates_UsesTagPriorityWhenFairnessScoreIsSame() {
+        final Candidate generalCandidate = createCandidate(1200, 600, CandidateSelectionTag.GENERAL);
+        final Candidate fairnessCandidate = createCandidate(1200, 600, CandidateSelectionTag.FAIRNESS);
+        final List<Candidate> candidates = List.of(generalCandidate, fairnessCandidate);
+
+        final Recommendation recommendation = new Recommendation(candidates);
+
+        assertThat(recommendation.get(0)).isEqualTo(fairnessCandidate);
+        assertThat(recommendation.get(1)).isEqualTo(generalCandidate);
     }
 
     @Test
@@ -207,7 +220,7 @@ class RecommendationTest {
 
     private RecommendedCandidates createRecommendedCandidates(
             final List<Place> recommendedPlaces,
-            final Map<Place, List<CandidateSelectionTag>> tagsByPlace
+            final Map<Place, CandidateSelectionTag> tagsByPlace
     ) {
         return new RecommendedCandidates(recommendedPlaces, tagsByPlace);
     }

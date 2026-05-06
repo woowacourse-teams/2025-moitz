@@ -13,11 +13,11 @@ import java.util.stream.Collectors;
 public class RecommendedCandidates {
 
     private final List<Place> recommendedCandidatePlaces;
-    private final Map<Place, List<CandidateSelectionTag>> tagsByPlace;
+    private final Map<Place, CandidateSelectionTag> tagsByPlace;
 
     public RecommendedCandidates(
             final List<Place> recommendedCandidatePlaces,
-            final Map<Place, List<CandidateSelectionTag>> tagsByPlace
+            final Map<Place, CandidateSelectionTag> tagsByPlace
     ) {
         validate(recommendedCandidatePlaces, tagsByPlace);
         this.recommendedCandidatePlaces = List.copyOf(recommendedCandidatePlaces);
@@ -26,7 +26,7 @@ public class RecommendedCandidates {
 
     private void validate(
             final List<Place> recommendedCandidatePlaces,
-            final Map<Place, List<CandidateSelectionTag>> tagsByPlace
+            final Map<Place, CandidateSelectionTag> tagsByPlace
     ) {
         if (recommendedCandidatePlaces == null) {
             throw new IllegalArgumentException("추천 후보 목록은 null일 수 없습니다.");
@@ -40,10 +40,6 @@ public class RecommendedCandidates {
     }
 
     public CandidateSelectionTag getTag(final Place place) {
-        return getTags(place).get(0);
-    }
-
-    public List<CandidateSelectionTag> getTags(final Place place) {
         validateRecommendedCandidatePlace(place);
         return tagsByPlace.get(place);
     }
@@ -58,20 +54,20 @@ public class RecommendedCandidates {
                 .toList();
     }
 
-    public Map<String, List<CandidateSelectionTag>> getTagsByPlaceName() {
-        final Map<String, List<CandidateSelectionTag>> tagsByPlaceName = new LinkedHashMap<>();
-        recommendedCandidatePlaces.forEach(place -> tagsByPlaceName.put(
+    public Map<String, CandidateSelectionTag> getTagByPlaceName() {
+        final Map<String, CandidateSelectionTag> tagByPlaceName = new LinkedHashMap<>();
+        recommendedCandidatePlaces.forEach(place -> tagByPlaceName.put(
                 place.getName(),
-                getTags(place)
+                getTag(place)
         ));
-        return Collections.unmodifiableMap(tagsByPlaceName);
+        return Collections.unmodifiableMap(tagByPlaceName);
     }
 
     public Map<Place, RecommendationReason> createReasons() {
         return recommendedCandidatePlaces.stream()
                 .collect(Collectors.toMap(
                         Function.identity(),
-                        place -> RecommendationReason.fromSelectionTags(place.getName(), getTags(place)),
+                        place -> RecommendationReason.fromSelectionTags(place.getName(), List.of(getTag(place))),
                         (left, right) -> left,
                         LinkedHashMap::new
                 ));
@@ -94,16 +90,23 @@ public class RecommendedCandidates {
         }
     }
 
-    private Map<Place, List<CandidateSelectionTag>> normalizeTagsByPlace(
+    private Map<Place, CandidateSelectionTag> normalizeTagsByPlace(
             final List<Place> recommendedCandidatePlaces,
-            final Map<Place, List<CandidateSelectionTag>> tagsByPlace
+            final Map<Place, CandidateSelectionTag> tagsByPlace
     ) {
-        final Map<Place, List<CandidateSelectionTag>> normalizedTagsByPlace = new LinkedHashMap<>();
+        final Map<Place, CandidateSelectionTag> normalizedTagsByPlace = new LinkedHashMap<>();
         recommendedCandidatePlaces.forEach(place -> normalizedTagsByPlace.put(
                 place,
-                CandidateSelectionTag.normalize(tagsByPlace.get(place))
+                normalizeTag(tagsByPlace.get(place))
         ));
         return Collections.unmodifiableMap(normalizedTagsByPlace);
+    }
+
+    private CandidateSelectionTag normalizeTag(final CandidateSelectionTag tag) {
+        if (tag == null) {
+            return CandidateSelectionTag.normalize(null).getFirst();
+        }
+        return CandidateSelectionTag.normalize(List.of(tag)).getFirst();
     }
 
 }

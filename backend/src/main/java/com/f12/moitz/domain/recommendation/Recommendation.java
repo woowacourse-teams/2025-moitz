@@ -25,7 +25,7 @@ public class Recommendation {
                         getRecommendationReason(place, reasonsByPlace),
                         recommendedPlaces.get(place),
                         recommendedCandidateTravels.getCandidateRoutes(place),
-                        recommendedCandidates.getTags(place)
+                        List.of(recommendedCandidates.getTag(place))
                 ))
                 .toList();
         return new Recommendation(candidates);
@@ -58,8 +58,8 @@ public class Recommendation {
 
     private List<Candidate> sort(final List<Candidate> candidates) {
         return candidates.stream()
-                .sorted(Comparator.comparingInt((Candidate candidate) -> candidate.getTag().getPriority())
-                        .thenComparing(Candidate::calculateFairnessScore))
+                .sorted(Comparator.comparing(Candidate::calculateFairnessScore)
+                        .thenComparingInt(candidate -> candidate.getTag().getPriority()))
                 .toList();
     }
 
