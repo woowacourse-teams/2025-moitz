@@ -8,6 +8,7 @@ import com.f12.moitz.application.dto.recommendation.RecommendationResultResponse
 import com.f12.moitz.application.dto.recommendation.RouteResponse;
 import com.f12.moitz.application.dto.recommendation.StartingPlaceResponse;
 import com.f12.moitz.domain.recommendation.Candidate;
+import com.f12.moitz.domain.recommendation.RecommendationReason;
 import com.f12.moitz.domain.route.CandidateRoute;
 import com.f12.moitz.domain.recommendation.candidate.CandidateSelectionTag;
 import com.f12.moitz.domain.recommendation.RecommendedPlaces;
@@ -75,6 +76,11 @@ public class RecommendationResponseMapper {
                 candidate.getRecommendedPlaces()
         );
         final List<RouteResponse> routes = toRouteResponses(candidate);
+        final List<CandidateSelectionTag> tags = candidate.getTags();
+        final RecommendationReason recommendationReason = RecommendationReason.fromSelectionTags(
+                targetPlace.getName(),
+                tags
+        );
 
         return new LocationResponse(
                 (long) index + 1,
@@ -85,11 +91,11 @@ public class RecommendationResponseMapper {
                 totalTime,
                 // 추천 방식 변경으로 기존 평균 이동시간 기준 best 표시는 임시 비활성화한다.
                 BEST_RECOMMENDATION_DISABLED,
-                candidate.getTags().stream()
+                tags.stream()
                         .map(CandidateSelectionTag::name)
                         .toList(),
-                candidate.getDescription(),
-                candidate.getReason(),
+                recommendationReason.description(),
+                recommendationReason.reason(),
                 recommendedPlaces,
                 routes
         );
