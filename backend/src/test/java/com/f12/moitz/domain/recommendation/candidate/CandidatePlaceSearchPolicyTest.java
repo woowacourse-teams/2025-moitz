@@ -92,11 +92,13 @@ class CandidatePlaceSearchPolicyTest {
     void select_AssignsGeneralTagToSingleFallbackCandidateOnly() {
         final RouteCandidate first = routeCandidate("일반후보1역");
         final RouteCandidate second = routeCandidate("일반후보2역");
+        final int expectedCandidates = 2;
+        final int requestedFallbackCount = 5;
         final CandidateSelection candidateSelection = new CandidateSelection(
                 List.of(first, second),
                 DispersionPolicy.TIER_4,
                 DispersionPolicy.TIER_4,
-                2,
+                expectedCandidates,
                 false,
                 Map.of()
         );
@@ -105,7 +107,7 @@ class CandidatePlaceSearchPolicyTest {
                 candidateSelection,
                 candidateSelection.getSearchCandidatePlaces(),
                 ignored -> true,
-                5
+                requestedFallbackCount
         );
 
         assertThat(recommendedCandidates.getPlaces())
