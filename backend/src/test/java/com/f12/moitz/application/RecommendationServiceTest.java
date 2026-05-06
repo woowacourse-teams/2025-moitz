@@ -166,8 +166,8 @@ class RecommendationServiceTest {
                         .toList())
                 .toList())
                 .containsExactly(
-                        List.of("FAIRNESS", "EFFICIENCY", "TRANSFER"),
-                        List.of("MAX_BURDEN_RELIEF", "EFFICIENCY", "TRANSFER")
+                        List.of("FAIRNESS"),
+                        List.of("MAX_BURDEN_RELIEF")
                 );
     }
 

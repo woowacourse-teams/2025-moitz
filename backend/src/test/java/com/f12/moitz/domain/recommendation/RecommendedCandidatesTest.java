@@ -16,7 +16,7 @@ import org.junit.jupiter.api.Test;
 class RecommendedCandidatesTest {
 
     @Test
-    @DisplayName("추천 후보 장소 기준으로 태그를 정규화한다")
+    @DisplayName("추천 후보 장소 기준으로 단일 태그를 정규화한다")
     void constructor_NormalizesTagsByRecommendedCandidatePlaces() {
         final Place seolleung = place("선릉역");
         final Place samsung = place("삼성역");
@@ -43,7 +43,7 @@ class RecommendedCandidatesTest {
     }
 
     @Test
-    @DisplayName("추천 후보 태그가 비어있거나 null만 있으면 종합 추천 태그로 보정한다")
+    @DisplayName("추천 후보 태그가 비어있거나 null만 있으면 적당한 추천 태그로 보정한다")
     void constructor_UsesGeneralWhenTagsAreEmptyOrOnlyNull() {
         final Place seolleung = place("선릉역");
         final Place samsung = place("삼성역");
@@ -63,7 +63,7 @@ class RecommendedCandidatesTest {
     }
 
     @Test
-    @DisplayName("추천 후보 이름 목록과 이름별 태그를 조회한다")
+    @DisplayName("추천 후보 이름 목록과 이름별 단일 태그를 조회한다")
     void getPlaceNamesAndTagsByPlaceName() {
         final Place seolleung = place("선릉역");
         final Place samsung = place("삼성역");
@@ -149,17 +149,17 @@ class RecommendedCandidatesTest {
 
         assertThat(result)
                 .containsEntry(seolleung, new RecommendationReason(
-                        "#공평",
-                        "선릉역은 모든 참여자의 이동 시간이 최대한 비슷한 기준을 반영해 추천된 만남 장소입니다."
+                        "#가장공평",
+                        "선릉역은 모든 참여자의 이동 시간이 가장 공평한 기준을 반영해 추천된 만남 장소입니다."
                 ))
                 .containsEntry(samsung, new RecommendationReason(
-                        "#평균최소",
+                        "#최소평균",
                         "삼성역은 전체 참여자의 평균 이동 시간이 짧은 기준을 반영해 추천된 만남 장소입니다."
                 ));
     }
 
     @Test
-    @DisplayName("추천 태그가 없으면 종합 추천 이유를 생성한다")
+    @DisplayName("추천 태그가 없으면 적당한 추천 이유를 생성한다")
     void createReasons_UsesGeneralReasonWhenTagsAreMissing() {
         final Place cityHall = place("시청역");
         final RecommendedCandidates recommendedCandidates = new RecommendedCandidates(
@@ -171,8 +171,8 @@ class RecommendedCandidatesTest {
 
         assertThat(result)
                 .containsEntry(cityHall, new RecommendationReason(
-                        "#종합추천",
-                        "시청역은 이동 시간, 환승, 균형을 종합한 기준을 반영해 추천된 만남 장소입니다."
+                        "#적당한",
+                        "시청역은 이동 시간, 환승, 균형이 적당한 기준을 반영해 추천된 만남 장소입니다."
                 ));
     }
 

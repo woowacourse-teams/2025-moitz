@@ -21,8 +21,8 @@ class CandidatePlaceSearchPolicyTest {
     private final CandidatePlaceSearchPolicy candidatePlaceSearchPolicy = new CandidatePlaceSearchPolicy();
 
     @Test
-    @DisplayName("추천 후보는 장소 기준으로 중복 제거하고 선택된 후보가 속한 태그를 모두 부여한다")
-    void select_AssignsAllMatchedTagsWithoutDuplicatingPlaces() {
+    @DisplayName("추천 후보는 태그별로 하나의 장소를 선택하고 이미 선택된 장소는 다음 태그에서 건너뛴다")
+    void select_AssignsSinglePlacePerTagWithoutDuplicatingPlaces() {
         final RouteCandidate shared = routeCandidate("공통후보역");
         final RouteCandidate maxBurden = routeCandidate("최장후보역");
         final RouteCandidate efficiency = routeCandidate("평균후보역");
@@ -48,7 +48,7 @@ class CandidatePlaceSearchPolicyTest {
                 .extracting(Place::getName)
                 .containsExactly("공통후보역", "최장후보역", "평균후보역", "환승후보역", "일반후보역");
         assertThat(recommendedCandidates.getTags(shared.getPlace()))
-                .containsExactly(CandidateSelectionTag.FAIRNESS, CandidateSelectionTag.EFFICIENCY);
+                .containsExactly(CandidateSelectionTag.FAIRNESS);
         assertThat(recommendedCandidates.getTags(maxBurden.getPlace()))
                 .containsExactly(CandidateSelectionTag.MAX_BURDEN_RELIEF);
         assertThat(recommendedCandidates.getTags(efficiency.getPlace()))
@@ -88,6 +88,33 @@ class CandidatePlaceSearchPolicyTest {
     }
 
     @Test
+    @DisplayName("태그 후보가 없어서 일반 태그로 보충할 때도 일반 태그는 하나의 장소에만 부여한다")
+    void select_AssignsGeneralTagToSingleFallbackCandidateOnly() {
+        final RouteCandidate first = routeCandidate("일반후보1역");
+        final RouteCandidate second = routeCandidate("일반후보2역");
+        final CandidateSelection candidateSelection = new CandidateSelection(
+                List.of(first, second),
+                DispersionPolicy.TIER_4,
+                DispersionPolicy.TIER_4,
+                2,
+                false,
+                Map.of()
+        );
+
+        final RecommendedCandidates recommendedCandidates = candidatePlaceSearchPolicy.select(
+                candidateSelection,
+                candidateSelection.getSearchCandidatePlaces(),
+                ignored -> true,
+                5
+        );
+
+        assertThat(recommendedCandidates.getPlaces())
+                .containsExactly(first.getPlace());
+        assertThat(recommendedCandidates.getTags(first.getPlace()))
+                .containsExactly(CandidateSelectionTag.GENERAL);
+    }
+
+    @Test
     @DisplayName("태그 후보가 조건을 만족하지 못하면 같은 태그의 다음 후보를 선택한다")
     void select_UsesNextCandidateWhenFirstTaggedCandidateDoesNotSatisfyCondition() {
         final RouteCandidate failedFairness = routeCandidate("실패후보역");
@@ -118,8 +145,8 @@ class CandidatePlaceSearchPolicyTest {
     }
 
     @Test
-    @DisplayName("최소 환승 태그는 최종 후보 중 환승 점수가 가장 낮은 후보에만 부여한다")
-    void select_AssignsTransferTagOnlyToBestTransferBurdensAmongFinalPlaces() {
+    @DisplayName("이미 선택된 후보는 최소 환승 태그에 다시 매핑하지 않고 다음 후보를 선택한다")
+    void select_SelectsNextTransferCandidateWhenBestTransferPlaceAlreadyHasAnotherTag() {
         final RouteCandidate wangsimni = routeCandidateWithTransfers("왕십리역", List.of(0, 0, 2, 2));
         final RouteCandidate oksu = routeCandidateWithTransfers("옥수역", List.of(0, 1, 0, 1));
         final RouteCandidate yaksu = routeCandidateWithTransfers("약수역", List.of(1, 1, 0, 1));
@@ -147,18 +174,18 @@ class CandidatePlaceSearchPolicyTest {
         );
 
         assertThat(recommendedCandidates.getTags(wangsimni.getPlace()))
-                .containsExactly(CandidateSelectionTag.FAIRNESS, CandidateSelectionTag.EFFICIENCY);
+                .containsExactly(CandidateSelectionTag.FAIRNESS);
         assertThat(recommendedCandidates.getTags(oksu.getPlace()))
-                .containsExactly(CandidateSelectionTag.MAX_BURDEN_RELIEF, CandidateSelectionTag.TRANSFER);
+                .containsExactly(CandidateSelectionTag.MAX_BURDEN_RELIEF);
         assertThat(recommendedCandidates.getTags(yaksu.getPlace()))
                 .containsExactly(CandidateSelectionTag.EFFICIENCY);
         assertThat(recommendedCandidates.getTags(chungmuro.getPlace()))
-                .containsExactly(CandidateSelectionTag.GENERAL);
+                .containsExactly(CandidateSelectionTag.TRANSFER);
     }
 
     @Test
-    @DisplayName("최종 후보 중 같은 최소 환승 점수인 후보에는 최소 환승 태그를 함께 부여한다")
-    void select_AddsTransferTagToAllBestTransferBurdenPlaces() {
+    @DisplayName("최소 환승 점수가 같은 후보가 있어도 최소 환승 태그는 단일 후보에만 부여한다")
+    void select_AssignsTransferTagToSingleCandidateOnly() {
         final RouteCandidate fairness = routeCandidateWithTransfers("공평후보역", List.of(0, 1));
         final RouteCandidate general = routeCandidateWithTransfers("일반후보역", List.of(0, 1));
         final RouteCandidate highTransfer = routeCandidateWithTransfers("환승많은역", List.of(1, 1));
@@ -185,7 +212,7 @@ class CandidatePlaceSearchPolicyTest {
         );
 
         assertThat(recommendedCandidates.getTags(fairness.getPlace()))
-                .containsExactly(CandidateSelectionTag.FAIRNESS, CandidateSelectionTag.TRANSFER);
+                .containsExactly(CandidateSelectionTag.FAIRNESS);
         assertThat(recommendedCandidates.getTags(general.getPlace()))
                 .containsExactly(CandidateSelectionTag.TRANSFER);
         assertThat(recommendedCandidates.getTags(highTransfer.getPlace()))
@@ -193,8 +220,8 @@ class CandidatePlaceSearchPolicyTest {
     }
 
     @Test
-    @DisplayName("최소 환승 후보가 기존 태그 수집에서 누락되어도 최종 태그 정규화에서 최소 환승 태그를 부여한다")
-    void select_AddsTransferTagWhenBestTransferPlaceWasNotCollectedAsTransferTag() {
+    @DisplayName("최소 환승 태그는 사후 보정으로 다른 태그 후보에 추가하지 않는다")
+    void select_DoesNotAddTransferTagByPostNormalization() {
         final RouteCandidate bestTransfer = routeCandidateWithTransfers("최소환승역", List.of(0, 1));
         final RouteCandidate taggedTransfer = routeCandidateWithTransfers("태그수집환승역", List.of(1, 1));
         final Map<CandidateSelectionTag, List<RouteCandidate>> tagSelections = new LinkedHashMap<>();
@@ -220,9 +247,9 @@ class CandidatePlaceSearchPolicyTest {
         );
 
         assertThat(recommendedCandidates.getTags(bestTransfer.getPlace()))
-                .containsExactly(CandidateSelectionTag.FAIRNESS, CandidateSelectionTag.TRANSFER);
+                .containsExactly(CandidateSelectionTag.FAIRNESS);
         assertThat(recommendedCandidates.getTags(taggedTransfer.getPlace()))
-                .containsExactly(CandidateSelectionTag.GENERAL);
+                .containsExactly(CandidateSelectionTag.TRANSFER);
     }
 
     @Test
@@ -322,8 +349,8 @@ class CandidatePlaceSearchPolicyTest {
     }
 
     @Test
-    @DisplayName("비어있는 태그의 미검색 후보가 더 이상 없으면 일반 후보로 추천 개수를 보충한다")
-    void selectNextSearchPlaces_FillsWithGeneralCandidatesWhenMissingTagCandidatesAreExhausted() {
+    @DisplayName("비어있는 태그의 미검색 후보가 더 이상 없고 일반 태그가 이미 선택되면 추가 조회하지 않는다")
+    void selectNextSearchPlaces_DoesNotFillWithGeneralCandidatesWhenGeneralTagAlreadySelected() {
         final RouteCandidate fairness = routeCandidate("공평후보역");
         final RouteCandidate efficiency = routeCandidate("평균후보역");
         final RouteCandidate general = routeCandidate("일반후보역");
@@ -352,8 +379,7 @@ class CandidatePlaceSearchPolicyTest {
         );
 
         assertThat(nextSearchPlaces)
-                .extracting(Place::getName)
-                .containsExactly("보충후보1역", "보충후보2역");
+                .isEmpty();
     }
 
     private Map<CandidateSelectionTag, List<RouteCandidate>> createTagSelections(
