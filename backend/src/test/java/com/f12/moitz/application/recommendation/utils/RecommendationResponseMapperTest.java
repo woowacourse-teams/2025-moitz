@@ -61,6 +61,63 @@ class RecommendationResponseMapperTest {
         assertThat(location.locationInfo()).isEqualTo(location.reason());
     }
 
+    @Test
+    @DisplayName("저장된 태그가 모두 일반 태그이면 일반 태그 기준으로 응답한다")
+    void toResponse_WhenAllTagsAreGeneral_ReturnsGeneralNormalized() {
+        final RecommendationResultResponse response = mapper.toResponse(createResult(
+                createCandidate(List.of(CandidateSelectionTag.GENERAL))
+        ));
+
+        assertGeneralLocation(response.locations().getFirst());
+    }
+
+    @Test
+    @DisplayName("저장된 태그가 비어있거나 null이면 일반 태그 기준으로 응답한다")
+    void toResponse_WhenSelectionTagsEmptyOrNull_HandleGracefully() {
+        final RecommendationResultResponse emptyTagsResponse = mapper.toResponse(createResult(
+                createCandidate(List.of())
+        ));
+        final RecommendationResultResponse nullTagsResponse = mapper.toResponse(createResult(
+                createCandidate(null)
+        ));
+
+        assertGeneralLocation(emptyTagsResponse.locations().getFirst());
+        assertGeneralLocation(nullTagsResponse.locations().getFirst());
+    }
+
+    private Result createResult(final Candidate candidate) {
+        final Place startPlace = new Place("강남역", new Point(127.027, 37.497));
+        return new Result(
+                List.of(RecommendCondition.CAFE),
+                List.of(startPlace),
+                new Recommendation(List.of(candidate))
+        );
+    }
+
+    private Candidate createCandidate(final List<CandidateSelectionTag> tags) {
+        final Place startPlace = new Place("강남역", new Point(127.027, 37.497));
+        final Place candidatePlace = new Place("선릉역", new Point(127.048, 37.504));
+        return new Candidate(
+                candidatePlace,
+                new Routes(List.of(createRoute(startPlace, candidatePlace))),
+                new Courses(List.of(new Course(List.of(startPlace.getPoint(), candidatePlace.getPoint())))),
+                createRecommendedPlaces(),
+                tags,
+                "#저장된태그",
+                "저장된 추천 이유입니다.",
+                0
+        );
+    }
+
+    private void assertGeneralLocation(final LocationResponse location) {
+        assertThat(location.tags()).containsExactly(CandidateSelectionTag.GENERAL.name());
+        assertThat(location.tagInfo()).isEqualTo(CandidateSelectionTag.GENERAL.getDescription());
+        assertThat(location.description()).isEqualTo(CandidateSelectionTag.GENERAL.getHashtag());
+        assertThat(location.reason())
+                .isEqualTo("선릉역은 이동 시간, 환승, 균형이 적당한 기준을 반영해 추천된 만남 장소입니다.");
+        assertThat(location.locationInfo()).isEqualTo(location.reason());
+    }
+
     private Route createRoute(final Place startPlace, final Place candidatePlace) {
         return new Route(List.of(new Path(
                 startPlace,
