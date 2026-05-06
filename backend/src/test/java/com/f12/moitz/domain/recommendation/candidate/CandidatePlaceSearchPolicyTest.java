@@ -47,16 +47,16 @@ class CandidatePlaceSearchPolicyTest {
         assertThat(recommendedCandidates.getPlaces())
                 .extracting(Place::getName)
                 .containsExactly("공통후보역", "최장후보역", "평균후보역", "환승후보역", "일반후보역");
-        assertThat(recommendedCandidates.getTags(shared.getPlace()))
-                .containsExactly(CandidateSelectionTag.FAIRNESS);
-        assertThat(recommendedCandidates.getTags(maxBurden.getPlace()))
-                .containsExactly(CandidateSelectionTag.MAX_BURDEN_RELIEF);
-        assertThat(recommendedCandidates.getTags(efficiency.getPlace()))
-                .containsExactly(CandidateSelectionTag.EFFICIENCY);
-        assertThat(recommendedCandidates.getTags(transfer.getPlace()))
-                .containsExactly(CandidateSelectionTag.TRANSFER);
-        assertThat(recommendedCandidates.getTags(general.getPlace()))
-                .containsExactly(CandidateSelectionTag.GENERAL);
+        assertThat(recommendedCandidates.getTag(shared.getPlace()))
+                .isEqualTo(CandidateSelectionTag.FAIRNESS);
+        assertThat(recommendedCandidates.getTag(maxBurden.getPlace()))
+                .isEqualTo(CandidateSelectionTag.MAX_BURDEN_RELIEF);
+        assertThat(recommendedCandidates.getTag(efficiency.getPlace()))
+                .isEqualTo(CandidateSelectionTag.EFFICIENCY);
+        assertThat(recommendedCandidates.getTag(transfer.getPlace()))
+                .isEqualTo(CandidateSelectionTag.TRANSFER);
+        assertThat(recommendedCandidates.getTag(general.getPlace()))
+                .isEqualTo(CandidateSelectionTag.GENERAL);
     }
 
     @Test
@@ -110,8 +110,8 @@ class CandidatePlaceSearchPolicyTest {
 
         assertThat(recommendedCandidates.getPlaces())
                 .containsExactly(first.getPlace());
-        assertThat(recommendedCandidates.getTags(first.getPlace()))
-                .containsExactly(CandidateSelectionTag.GENERAL);
+        assertThat(recommendedCandidates.getTag(first.getPlace()))
+                .isEqualTo(CandidateSelectionTag.GENERAL);
     }
 
     @Test
@@ -140,8 +140,6 @@ class CandidatePlaceSearchPolicyTest {
                 .containsExactly("대체후보역");
         assertThat(recommendedCandidates.getTag(nextFairness.getPlace()))
                 .isEqualTo(CandidateSelectionTag.FAIRNESS);
-        assertThat(recommendedCandidates.getTags(nextFairness.getPlace()))
-                .containsExactly(CandidateSelectionTag.FAIRNESS);
     }
 
     @Test
@@ -173,14 +171,14 @@ class CandidatePlaceSearchPolicyTest {
                 4
         );
 
-        assertThat(recommendedCandidates.getTags(wangsimni.getPlace()))
-                .containsExactly(CandidateSelectionTag.FAIRNESS);
-        assertThat(recommendedCandidates.getTags(oksu.getPlace()))
-                .containsExactly(CandidateSelectionTag.MAX_BURDEN_RELIEF);
-        assertThat(recommendedCandidates.getTags(yaksu.getPlace()))
-                .containsExactly(CandidateSelectionTag.EFFICIENCY);
-        assertThat(recommendedCandidates.getTags(chungmuro.getPlace()))
-                .containsExactly(CandidateSelectionTag.TRANSFER);
+        assertThat(recommendedCandidates.getTag(wangsimni.getPlace()))
+                .isEqualTo(CandidateSelectionTag.FAIRNESS);
+        assertThat(recommendedCandidates.getTag(oksu.getPlace()))
+                .isEqualTo(CandidateSelectionTag.MAX_BURDEN_RELIEF);
+        assertThat(recommendedCandidates.getTag(yaksu.getPlace()))
+                .isEqualTo(CandidateSelectionTag.EFFICIENCY);
+        assertThat(recommendedCandidates.getTag(chungmuro.getPlace()))
+                .isEqualTo(CandidateSelectionTag.TRANSFER);
     }
 
     @Test
@@ -211,12 +209,12 @@ class CandidatePlaceSearchPolicyTest {
                 3
         );
 
-        assertThat(recommendedCandidates.getTags(fairness.getPlace()))
-                .containsExactly(CandidateSelectionTag.FAIRNESS);
-        assertThat(recommendedCandidates.getTags(general.getPlace()))
-                .containsExactly(CandidateSelectionTag.TRANSFER);
-        assertThat(recommendedCandidates.getTags(highTransfer.getPlace()))
-                .containsExactly(CandidateSelectionTag.MAX_BURDEN_RELIEF);
+        assertThat(recommendedCandidates.getTag(fairness.getPlace()))
+                .isEqualTo(CandidateSelectionTag.FAIRNESS);
+        assertThat(recommendedCandidates.getTag(general.getPlace()))
+                .isEqualTo(CandidateSelectionTag.TRANSFER);
+        assertThat(recommendedCandidates.getTag(highTransfer.getPlace()))
+                .isEqualTo(CandidateSelectionTag.MAX_BURDEN_RELIEF);
     }
 
     @Test
@@ -246,10 +244,10 @@ class CandidatePlaceSearchPolicyTest {
                 2
         );
 
-        assertThat(recommendedCandidates.getTags(bestTransfer.getPlace()))
-                .containsExactly(CandidateSelectionTag.FAIRNESS);
-        assertThat(recommendedCandidates.getTags(taggedTransfer.getPlace()))
-                .containsExactly(CandidateSelectionTag.TRANSFER);
+        assertThat(recommendedCandidates.getTag(bestTransfer.getPlace()))
+                .isEqualTo(CandidateSelectionTag.FAIRNESS);
+        assertThat(recommendedCandidates.getTag(taggedTransfer.getPlace()))
+                .isEqualTo(CandidateSelectionTag.TRANSFER);
     }
 
     @Test
@@ -279,10 +277,10 @@ class CandidatePlaceSearchPolicyTest {
                 2
         );
 
-        assertThat(recommendedCandidates.getTags(general.getPlace()))
-                .containsExactly(CandidateSelectionTag.GENERAL);
-        assertThat(recommendedCandidates.getTags(transfer.getPlace()))
-                .containsExactly(CandidateSelectionTag.TRANSFER);
+        assertThat(recommendedCandidates.getTag(general.getPlace()))
+                .isEqualTo(CandidateSelectionTag.GENERAL);
+        assertThat(recommendedCandidates.getTag(transfer.getPlace()))
+                .isEqualTo(CandidateSelectionTag.TRANSFER);
     }
 
     @Test
@@ -428,8 +426,8 @@ class CandidatePlaceSearchPolicyTest {
                 4
         );
 
-        assertThat(recommendedCandidates.getTags(fallbackGeneral.getPlace()))
-                .containsExactly(CandidateSelectionTag.GENERAL);
+        assertThat(recommendedCandidates.getTag(fallbackGeneral.getPlace()))
+                .isEqualTo(CandidateSelectionTag.GENERAL);
         assertThat(nextSearchPlaces)
                 .isEmpty();
     }

@@ -109,7 +109,7 @@ public class CandidatePlaceSearchPolicy {
 
         final List<Place> recommendedCandidatePlaces = taggedPlaceSelection.recommendedCandidatePlaces();
         final Set<Place> recommendedCandidatePlaceSet = toPlaceSet(recommendedCandidatePlaces);
-        final Map<Place, List<CandidateSelectionTag>> tagsByPlace = taggedPlaceSelection.tagsByPlace();
+        final Map<Place, CandidateSelectionTag> tagsByPlace = taggedPlaceSelection.tagsByPlace();
 
         for (Place place : searchedPlaces) {
             if (recommendedCandidatePlaceSet.contains(place) || !placeCondition.test(place)) {
@@ -117,7 +117,7 @@ public class CandidatePlaceSearchPolicy {
             }
             recommendedCandidatePlaces.add(place);
             selectedByTag.put(CandidateSelectionTag.GENERAL, place);
-            tagsByPlace.put(place, List.of(CandidateSelectionTag.GENERAL));
+            tagsByPlace.put(place, CandidateSelectionTag.GENERAL);
             return;
         }
     }
@@ -134,7 +134,7 @@ public class CandidatePlaceSearchPolicy {
         final Set<Place> searchedPlaceSet = toPlaceSet(searchedPlaces);
         final Set<Place> selectedPlaceSet = new HashSet<>();
         final Map<CandidateSelectionTag, Place> selectedByTag = new LinkedHashMap<>();
-        final Map<Place, List<CandidateSelectionTag>> tagsByPlace = new LinkedHashMap<>();
+        final Map<Place, CandidateSelectionTag> tagsByPlace = new LinkedHashMap<>();
 
         for (CandidateSelectionTag tag : CandidateSelectionTag.orderedValues()) {
             final List<RouteCandidate> tagCandidates = candidateSelection.getCandidatesByTag(tag);
@@ -148,7 +148,7 @@ public class CandidatePlaceSearchPolicy {
                 }
                 selectedByTag.put(tag, place);
                 selectedPlaceSet.add(place);
-                tagsByPlace.put(place, List.of(tag));
+                tagsByPlace.put(place, tag);
                 break;
             }
         }
@@ -167,7 +167,7 @@ public class CandidatePlaceSearchPolicy {
     private record TaggedPlaceSelection(
             List<Place> recommendedCandidatePlaces,
             Map<CandidateSelectionTag, Place> selectedByTag,
-            Map<Place, List<CandidateSelectionTag>> tagsByPlace
+            Map<Place, CandidateSelectionTag> tagsByPlace
     ) {
 
     }

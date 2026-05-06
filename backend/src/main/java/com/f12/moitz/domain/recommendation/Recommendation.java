@@ -25,7 +25,7 @@ public class Recommendation {
                         getRecommendationReason(place, reasonsByPlace),
                         recommendedPlaces.get(place),
                         recommendedCandidateTravels.getCandidateRoutes(place),
-                        recommendedCandidates.getTags(place)
+                        List.of(recommendedCandidates.getTag(place))
                 ))
                 .toList();
         return new Recommendation(candidates);

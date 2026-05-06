@@ -46,7 +46,7 @@ class RecommendationTest {
                 createRecommendedCandidateTravels(startPlace, recommendedPlace),
                 createRecommendedCandidates(
                         List.of(recommendedPlace),
-                        Map.of(recommendedPlace, List.of(CandidateSelectionTag.FAIRNESS))
+                        Map.of(recommendedPlace, CandidateSelectionTag.FAIRNESS)
                 )
         );
 
@@ -71,7 +71,7 @@ class RecommendationTest {
                 createRecommendedCandidateTravels(startPlace, recommendedPlace),
                 createRecommendedCandidates(
                         List.of(recommendedPlace),
-                        Map.of(recommendedPlace, List.of(CandidateSelectionTag.FAIRNESS))
+                        Map.of(recommendedPlace, CandidateSelectionTag.FAIRNESS)
                 )
         ))
                 .isInstanceOf(IllegalArgumentException.class)
@@ -220,7 +220,7 @@ class RecommendationTest {
 
     private RecommendedCandidates createRecommendedCandidates(
             final List<Place> recommendedPlaces,
-            final Map<Place, List<CandidateSelectionTag>> tagsByPlace
+            final Map<Place, CandidateSelectionTag> tagsByPlace
     ) {
         return new RecommendedCandidates(recommendedPlaces, tagsByPlace);
     }
