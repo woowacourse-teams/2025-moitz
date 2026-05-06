@@ -1,6 +1,8 @@
 package com.f12.moitz.application.dto.recommendation;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.f12.moitz.common.error.exception.BadRequestException;
+import com.f12.moitz.common.error.exception.GeneralErrorCode;
 import com.f12.moitz.domain.recommendation.RecommendCondition;
 import com.f12.moitz.domain.recommendation.candidate.CandidateSelectionTag;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -185,7 +187,12 @@ public record LocationResponse(
     }
 
     private static String resolveTagInfo(final String tag) {
-        return CandidateSelectionTag.valueOf(validateTag(tag)).getDescription();
+        final String validatedTag = validateTag(tag);
+        try {
+            return CandidateSelectionTag.valueOf(validatedTag).getDescription();
+        } catch (IllegalArgumentException e) {
+            throw new BadRequestException(GeneralErrorCode.INPUT_INVALID_RECOMMENDATION_TAG, e, validatedTag);
+        }
     }
 
 }
