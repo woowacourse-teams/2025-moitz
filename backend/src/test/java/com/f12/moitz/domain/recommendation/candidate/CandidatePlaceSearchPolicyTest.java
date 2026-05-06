@@ -286,6 +286,22 @@ class CandidatePlaceSearchPolicyTest {
     }
 
     @Test
+    @DisplayName("일반 태그 후보가 조건을 만족하지 못하면 보충 후보를 일반 태그로 선택한다")
+    void select_AssignsGeneralTagToFallbackCandidateWhenGeneralCandidateFails() {
+        final FallbackGeneralSelectionFixture fixture = createFallbackGeneralSelectionFixture();
+
+        final RecommendedCandidates recommendedCandidates = candidatePlaceSearchPolicy.select(
+                fixture.candidateSelection(),
+                fixture.searchedPlaces(),
+                place -> !place.equals(fixture.failedGeneralPlace()),
+                5
+        );
+
+        assertThat(recommendedCandidates.getTag(fixture.fallbackGeneralPlace()))
+                .isEqualTo(CandidateSelectionTag.GENERAL);
+    }
+
+    @Test
     @DisplayName("다음 장소 검색 대상은 비어있는 태그 후보를 우선하고 이 후보가 남아있다면 일반 후보로 채우지 않는다")
     void selectNextSearchPlaces_PrioritizesMissingTagsWithoutGeneralFillWhenTagCandidatesRemain() {
         final RouteCandidate fairness = routeCandidate("공평후보역");
@@ -385,6 +401,20 @@ class CandidatePlaceSearchPolicyTest {
     @Test
     @DisplayName("일반 태그가 보충 후보로 선택된 상태라면 추가 일반 후보를 조회하지 않는다")
     void selectNextSearchPlaces_DoesNotFillWithGeneralCandidatesWhenFallbackGeneralSelected() {
+        final FallbackGeneralSelectionFixture fixture = createFallbackGeneralSelectionFixture();
+
+        final List<Place> nextSearchPlaces = candidatePlaceSearchPolicy.selectNextSearchPlaces(
+                fixture.candidateSelection(),
+                fixture.searchedPlaces(),
+                place -> !place.equals(fixture.failedGeneralPlace()),
+                4
+        );
+
+        assertThat(nextSearchPlaces)
+                .isEmpty();
+    }
+
+    private FallbackGeneralSelectionFixture createFallbackGeneralSelectionFixture() {
         final RouteCandidate fairness = routeCandidate("공평후보역");
         final RouteCandidate maxBurden = routeCandidate("최장후보역");
         final RouteCandidate efficiency = routeCandidate("평균후보역");
@@ -406,32 +436,28 @@ class CandidatePlaceSearchPolicyTest {
                 false,
                 tagSelections
         );
-        final List<Place> searchedPlaces = List.of(
-                fairness.getPlace(),
-                maxBurden.getPlace(),
-                efficiency.getPlace(),
-                transfer.getPlace(),
+        return new FallbackGeneralSelectionFixture(
+                candidateSelection,
+                List.of(
+                        fairness.getPlace(),
+                        maxBurden.getPlace(),
+                        efficiency.getPlace(),
+                        transfer.getPlace(),
+                        failedGeneral.getPlace(),
+                        fallbackGeneral.getPlace()
+                ),
                 failedGeneral.getPlace(),
                 fallbackGeneral.getPlace()
         );
+    }
 
-        final RecommendedCandidates recommendedCandidates = candidatePlaceSearchPolicy.select(
-                candidateSelection,
-                searchedPlaces,
-                place -> !place.equals(failedGeneral.getPlace()),
-                5
-        );
-        final List<Place> nextSearchPlaces = candidatePlaceSearchPolicy.selectNextSearchPlaces(
-                candidateSelection,
-                searchedPlaces,
-                place -> !place.equals(failedGeneral.getPlace()),
-                4
-        );
+    private record FallbackGeneralSelectionFixture(
+            CandidateSelection candidateSelection,
+            List<Place> searchedPlaces,
+            Place failedGeneralPlace,
+            Place fallbackGeneralPlace
+    ) {
 
-        assertThat(recommendedCandidates.getTag(fallbackGeneral.getPlace()))
-                .isEqualTo(CandidateSelectionTag.GENERAL);
-        assertThat(nextSearchPlaces)
-                .isEmpty();
     }
 
     private Map<CandidateSelectionTag, List<RouteCandidate>> createTagSelections(

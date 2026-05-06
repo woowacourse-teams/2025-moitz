@@ -36,8 +36,39 @@ class PlaceRecommenderParallelAdapterTest {
     private KakaoMapAsyncClient kakaoMapAsyncClient;
 
     @Test
-    @DisplayName("카카오맵 장소 추천 검색 요청 개수를 6개로 제한한다")
-    void recommendPlaces_WithSixPlaceRecommendationCount() {
+    @DisplayName("카카오맵 키워드별 검색 요청 개수를 조건별 제한 개수로 전달한다")
+    void recommendPlaces_PassesLimitPerConditionToEachKeywordRequest() {
+        final Place place = new Place("강남역", new Point(127.027, 37.497));
+        final PlaceRecommenderParallelAdapter adapter = new PlaceRecommenderParallelAdapter(
+                kakaoMapAsyncClient,
+                new KakaoPlaceMapper()
+        );
+        given(kakaoMapAsyncClient.searchPlacesByAsync(any(SearchPlacesLimitQuantityRequest.class)))
+                .willAnswer(invocation -> {
+                    final SearchPlacesLimitQuantityRequest request = invocation.getArgument(0);
+                    final int count = "PC방".equals(request.query()) ? 2 : 6;
+                    return Mono.just(new KakaoApiResponse(
+                            createDocuments(request.query(), count),
+                            new MetaResponse(true, 0, 0, null)
+                    ));
+                });
+
+        adapter.recommendPlaces(
+                List.of(place),
+                new PlaceRecommendationCriteria(List.of(RecommendCondition.PC_ROOM_KARAOKE), 6)
+        );
+
+        final ArgumentCaptor<SearchPlacesLimitQuantityRequest> captor =
+                ArgumentCaptor.forClass(SearchPlacesLimitQuantityRequest.class);
+        verify(kakaoMapAsyncClient, times(2)).searchPlacesByAsync(captor.capture());
+        assertThat(captor.getAllValues())
+                .extracting(SearchPlacesLimitQuantityRequest::size)
+                .containsOnly(6);
+    }
+
+    @Test
+    @DisplayName("PC방·노래방 결과를 라운드로빈으로 인터리브하여 최대 6개를 반환한다")
+    void recommendPlaces_InterleavesMultiKeywordResultsRoundRobin() {
         final Place place = new Place("강남역", new Point(127.027, 37.497));
         final PlaceRecommenderParallelAdapter adapter = new PlaceRecommenderParallelAdapter(
                 kakaoMapAsyncClient,
@@ -58,12 +89,6 @@ class PlaceRecommenderParallelAdapterTest {
                 new PlaceRecommendationCriteria(List.of(RecommendCondition.PC_ROOM_KARAOKE), 6)
         );
 
-        final ArgumentCaptor<SearchPlacesLimitQuantityRequest> captor =
-                ArgumentCaptor.forClass(SearchPlacesLimitQuantityRequest.class);
-        verify(kakaoMapAsyncClient, times(2)).searchPlacesByAsync(captor.capture());
-        assertThat(captor.getAllValues())
-                .extracting(SearchPlacesLimitQuantityRequest::size)
-                .containsOnly(6);
         assertThat(recommendedPlaces.get(place).getPlaces(RecommendCondition.PC_ROOM_KARAOKE))
                 .hasSize(6)
                 .extracting(RecommendedPlace::getName)
@@ -80,8 +105,8 @@ class PlaceRecommenderParallelAdapterTest {
     private List<DocumentResponse> createDocuments(final String keyword, final int count) {
         return IntStream.range(0, count)
                 .mapToObj(index -> new DocumentResponse(
-                        "FD6",
-                        "음식점 > 카페",
+                        "CT1",
+                        "문화,예술 > 오락시설 > " + keyword,
                         "100",
                         keyword + " 장소 " + index,
                         "https://place.map.kakao.com/" + keyword + "-" + index,
