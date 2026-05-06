@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.f12.moitz.common.error.exception.BadRequestException;
 import com.f12.moitz.common.error.exception.GeneralErrorCode;
+import com.f12.moitz.domain.recommendation.candidate.CandidateSelectionTag;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
@@ -34,7 +35,7 @@ class LocationResponseTest {
 
         final JsonNode json = objectMapper.readTree(objectMapper.writeValueAsString(response));
 
-        assertThat(json.get("tag_info").asText()).isEqualTo("환승 부담이 적은 기준");
+        assertThat(json.get("tag_info").asText()).isEqualTo(CandidateSelectionTag.TRANSFER.getDescription());
         assertThat(json.get("location_info").asText()).isEqualTo(response.reason());
         assertThat(json.has("tagInfo")).isFalse();
         assertThat(json.has("locationInfo")).isFalse();
@@ -59,7 +60,7 @@ class LocationResponseTest {
 
         final JsonNode json = objectMapper.readTree(objectMapper.writeValueAsString(response));
 
-        assertThat(json.get("tag_info").asText()).isEqualTo("전체 참여자의 평균 이동 시간이 짧은 기준");
+        assertThat(json.get("tag_info").asText()).isEqualTo(CandidateSelectionTag.EFFICIENCY.getDescription());
         assertThat(json.get("location_info").asText()).isEqualTo(response.reason());
     }
 
