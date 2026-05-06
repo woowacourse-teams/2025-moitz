@@ -10,6 +10,7 @@ import com.f12.moitz.application.port.place.PlaceRecommendationCriteria;
 import com.f12.moitz.domain.place.Place;
 import com.f12.moitz.domain.place.Point;
 import com.f12.moitz.domain.recommendation.RecommendCondition;
+import com.f12.moitz.domain.recommendation.RecommendedPlace;
 import com.f12.moitz.domain.recommendation.RecommendedPlaces;
 import com.f12.moitz.infrastructure.client.kakao.KakaoMapAsyncClient;
 import com.f12.moitz.infrastructure.client.kakao.dto.KakaoApiResponse;
@@ -43,10 +44,14 @@ class PlaceRecommenderParallelAdapterTest {
                 new KakaoPlaceMapper()
         );
         given(kakaoMapAsyncClient.searchPlacesByAsync(any(SearchPlacesLimitQuantityRequest.class)))
-                .willReturn(Mono.just(new KakaoApiResponse(
-                        createDocuments(),
-                        new MetaResponse(true, 0, 0, null)
-                )));
+                .willAnswer(invocation -> {
+                    final SearchPlacesLimitQuantityRequest request = invocation.getArgument(0);
+                    final int count = "PC방".equals(request.query()) ? 2 : 6;
+                    return Mono.just(new KakaoApiResponse(
+                            createDocuments(request.query(), count),
+                            new MetaResponse(true, 0, 0, null)
+                    ));
+                });
 
         final Map<Place, RecommendedPlaces> recommendedPlaces = adapter.recommendPlaces(
                 List.of(place),
@@ -59,17 +64,27 @@ class PlaceRecommenderParallelAdapterTest {
         assertThat(captor.getAllValues())
                 .extracting(SearchPlacesLimitQuantityRequest::size)
                 .containsOnly(6);
-        assertThat(recommendedPlaces.get(place).getPlaces(RecommendCondition.PC_ROOM_KARAOKE)).hasSize(6);
+        assertThat(recommendedPlaces.get(place).getPlaces(RecommendCondition.PC_ROOM_KARAOKE))
+                .hasSize(6)
+                .extracting(RecommendedPlace::getName)
+                .containsExactly(
+                        "PC방 장소 0",
+                        "노래방 장소 0",
+                        "PC방 장소 1",
+                        "노래방 장소 1",
+                        "노래방 장소 2",
+                        "노래방 장소 3"
+                );
     }
 
-    private List<DocumentResponse> createDocuments() {
-        return IntStream.range(0, 6)
+    private List<DocumentResponse> createDocuments(final String keyword, final int count) {
+        return IntStream.range(0, count)
                 .mapToObj(index -> new DocumentResponse(
                         "FD6",
                         "음식점 > 카페",
                         "100",
-                        "추천 장소 " + index,
-                        "https://place.map.kakao.com/" + index,
+                        keyword + " 장소 " + index,
+                        "https://place.map.kakao.com/" + keyword + "-" + index,
                         "127.027",
                         "37.497",
                         "https://example.com/image-" + index + ".jpg"

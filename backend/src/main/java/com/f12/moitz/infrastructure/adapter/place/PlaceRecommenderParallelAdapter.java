@@ -10,8 +10,10 @@ import com.f12.moitz.domain.recommendation.RecommendCondition;
 import com.f12.moitz.domain.recommendation.RecommendedPlace;
 import com.f12.moitz.infrastructure.client.kakao.KakaoMapAsyncClient;
 import com.f12.moitz.infrastructure.client.kakao.dto.KakaoApiResponse;
+import com.f12.moitz.infrastructure.client.kakao.dto.DocumentResponse;
 import com.f12.moitz.infrastructure.client.kakao.dto.SearchPlacesLimitQuantityRequest;
 import com.f12.moitz.infrastructure.utils.KakaoPlaceMapper;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -68,12 +70,47 @@ public class PlaceRecommenderParallelAdapter implements PlaceRecommender {
         return categoryResponses.entrySet().stream()
                 .collect(Collectors.toMap(
                         Entry::getKey,
-                        entry -> entry.getValue().stream()
-                                .flatMap(resp -> resp.documents().stream())
-                                .limit(limitPerCondition)
+                        entry -> interleaveDocuments(entry.getValue(), limitPerCondition).stream()
                                 .map(kakaoPlaceMapper::toRecommendedPlace)
                                 .toList()
                 ));
+    }
+
+    private List<DocumentResponse> interleaveDocuments(
+            final List<KakaoApiResponse> responses,
+            final int limitPerCondition
+    ) {
+        final List<List<DocumentResponse>> documentsByKeyword = responses.stream()
+                .map(this::getDocuments)
+                .toList();
+        final List<DocumentResponse> interleavedDocuments = new ArrayList<>();
+
+        for (int index = 0; interleavedDocuments.size() < limitPerCondition; index++) {
+            boolean hasNextDocument = false;
+
+            for (List<DocumentResponse> documents : documentsByKeyword) {
+                if (index < documents.size()) {
+                    interleavedDocuments.add(documents.get(index));
+                    hasNextDocument = true;
+                }
+                if (interleavedDocuments.size() == limitPerCondition) {
+                    return interleavedDocuments;
+                }
+            }
+
+            if (!hasNextDocument) {
+                return interleavedDocuments;
+            }
+        }
+
+        return interleavedDocuments;
+    }
+
+    private List<DocumentResponse> getDocuments(final KakaoApiResponse response) {
+        if (response.documents() == null) {
+            return List.of();
+        }
+        return response.documents();
     }
 
     private Mono<Map<Place, Map<RecommendCondition, List<KakaoApiResponse>>>> searchPlacesWithRequirementAsync(
@@ -102,7 +139,7 @@ public class PlaceRecommenderParallelAdapter implements PlaceRecommender {
             final int limitPerCondition
     ) {
         return Flux.fromIterable(condition.getKeywords())
-                .flatMap(keyword -> kakaoMapAsyncClient.searchPlacesByAsync(
+                .flatMapSequential(keyword -> kakaoMapAsyncClient.searchPlacesByAsync(
                         new SearchPlacesLimitQuantityRequest(
                                 keyword,
                                 place.getName(),
