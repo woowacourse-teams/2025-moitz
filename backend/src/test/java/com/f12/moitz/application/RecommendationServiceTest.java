@@ -204,7 +204,7 @@ class RecommendationServiceTest {
         assertThatThrownBy(() -> recommendationService.recommendLocation(request))
                 .isInstanceOfSatisfying(BadRequestException.class,
                         exception -> assertThat(exception.getErrorCode())
-                                .isEqualTo(GeneralErrorCode.RECOMMENDATION_NOT_FOUND));
+                                .isEqualTo(GeneralErrorCode.RECOMMENDATION_RESULT_EMPTY));
     }
 
     @Test

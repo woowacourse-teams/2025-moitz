@@ -300,7 +300,7 @@ public class RecommendationService {
 
     private void validateRecommendationCandidates(final RecommendedCandidates recommendedCandidates) {
         if (recommendedCandidates.isEmpty()) {
-            throw new BadRequestException(GeneralErrorCode.RECOMMENDATION_NOT_FOUND);
+            throw new BadRequestException(GeneralErrorCode.RECOMMENDATION_RESULT_EMPTY);
         }
     }
 
