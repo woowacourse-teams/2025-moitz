@@ -41,6 +41,29 @@ class LocationResponseTest {
     }
 
     @Test
+    void serialize_WithTagInfoAndLocationInfo_ListInput() throws Exception {
+        final LocationResponse response = new LocationResponse(
+                1L,
+                1,
+                37.0,
+                127.0,
+                "서울역",
+                20,
+                false,
+                List.of("EFFICIENCY"),
+                "#최소평균",
+                "서울역은 전체 참여자의 평균 이동 시간이 짧은 기준을 반영해 추천된 만남 장소입니다.",
+                Map.of(),
+                List.of()
+        );
+
+        final JsonNode json = objectMapper.readTree(objectMapper.writeValueAsString(response));
+
+        assertThat(json.get("tag_info").asText()).isEqualTo("전체 참여자의 평균 이동 시간이 짧은 기준");
+        assertThat(json.get("location_info").asText()).isEqualTo(response.reason());
+    }
+
+    @Test
     void create_ThrowsExceptionWhenTagsHaveMultipleValues() {
         assertThatThrownBy(() -> new LocationResponse(
                 1L,
@@ -79,6 +102,29 @@ class LocationResponseTest {
                 .isInstanceOfSatisfying(BadRequestException.class, exception -> {
                     assertThat(exception.getErrorCode()).isEqualTo(GeneralErrorCode.INPUT_INVALID_RECOMMENDATION_TAG);
                     assertThat(exception).hasMessageContaining("UNKNOWN");
+                    assertThat(exception).hasCauseInstanceOf(IllegalArgumentException.class);
+                });
+    }
+
+    @Test
+    void serialize_WithTagInfoAndLocationInfo_InvalidTagThrows() {
+        assertThatThrownBy(() -> new LocationResponse(
+                1L,
+                1,
+                37.0,
+                127.0,
+                "서울역",
+                20,
+                false,
+                List.of("INVALID_TAG"),
+                "#알수없음",
+                "서울역 추천 이유입니다.",
+                Map.of(),
+                List.of()
+        ))
+                .isInstanceOfSatisfying(BadRequestException.class, exception -> {
+                    assertThat(exception.getErrorCode()).isEqualTo(GeneralErrorCode.INPUT_INVALID_RECOMMENDATION_TAG);
+                    assertThat(exception).hasMessageContaining("INVALID_TAG");
                     assertThat(exception).hasCauseInstanceOf(IllegalArgumentException.class);
                 });
     }
