@@ -61,7 +61,7 @@ public class CandidatePlaceSearchPolicy {
                     .ifPresent(place -> nextSearchPlaces.putIfAbsent(place, place));
         }
 
-        if (!nextSearchPlaces.isEmpty() || selectedByTag.containsKey(CandidateSelectionTag.GENERAL)) {
+        if (!nextSearchPlaces.isEmpty() || hasGeneralSelection(selectedByTag)) {
             return nextSearchPlaces.values().stream()
                     .limit(limit)
                     .toList();
@@ -93,31 +93,37 @@ public class CandidatePlaceSearchPolicy {
                 searchedPlaces,
                 placeCondition
         );
-        final List<Place> recommendedCandidatePlaces = new ArrayList<>(taggedPlaceSelection.recommendedCandidatePlaces());
-        final Map<CandidateSelectionTag, Place> selectedByTag = new LinkedHashMap<>(
-                taggedPlaceSelection.selectedByTag()
-        );
-        final Map<Place, List<CandidateSelectionTag>> tagsByPlace = new LinkedHashMap<>(
-                taggedPlaceSelection.tagsByPlace()
-        );
-        final Set<Place> recommendedCandidatePlaceSet = toPlaceSet(recommendedCandidatePlaces);
+        appendGeneralFallback(taggedPlaceSelection, searchedPlaces, placeCondition);
+        return taggedPlaceSelection;
+    }
 
-        if (selectedByTag.containsKey(CandidateSelectionTag.GENERAL)) {
-            return new TaggedPlaceSelection(recommendedCandidatePlaces, selectedByTag, tagsByPlace);
+    private void appendGeneralFallback(
+            final TaggedPlaceSelection taggedPlaceSelection,
+            final List<Place> searchedPlaces,
+            final Predicate<Place> placeCondition
+    ) {
+        final Map<CandidateSelectionTag, Place> selectedByTag = taggedPlaceSelection.selectedByTag();
+        if (hasGeneralSelection(selectedByTag)) {
+            return;
         }
+
+        final List<Place> recommendedCandidatePlaces = taggedPlaceSelection.recommendedCandidatePlaces();
+        final Set<Place> recommendedCandidatePlaceSet = toPlaceSet(recommendedCandidatePlaces);
+        final Map<Place, List<CandidateSelectionTag>> tagsByPlace = taggedPlaceSelection.tagsByPlace();
 
         for (Place place : searchedPlaces) {
             if (recommendedCandidatePlaceSet.contains(place) || !placeCondition.test(place)) {
                 continue;
             }
             recommendedCandidatePlaces.add(place);
-            recommendedCandidatePlaceSet.add(place);
             selectedByTag.put(CandidateSelectionTag.GENERAL, place);
             tagsByPlace.put(place, List.of(CandidateSelectionTag.GENERAL));
-            break;
+            return;
         }
+    }
 
-        return new TaggedPlaceSelection(recommendedCandidatePlaces, selectedByTag, tagsByPlace);
+    private boolean hasGeneralSelection(final Map<CandidateSelectionTag, Place> selectedByTag) {
+        return selectedByTag.containsKey(CandidateSelectionTag.GENERAL);
     }
 
     private TaggedPlaceSelection selectTaggedPlaces(
