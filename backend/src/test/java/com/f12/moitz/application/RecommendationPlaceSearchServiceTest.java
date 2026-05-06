@@ -1,10 +1,12 @@
 package com.f12.moitz.application;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 
+import com.f12.moitz.application.port.place.PlaceRecommendationCriteria;
 import com.f12.moitz.application.port.place.PlaceRecommender;
 import com.f12.moitz.application.recommendation.RecommendationPlaceSearchResult;
 import com.f12.moitz.application.recommendation.RecommendationPlaceSearchService;
@@ -65,13 +67,15 @@ class RecommendationPlaceSearchServiceTest {
                 seolleung, createRecommendedPlaces("선릉 카페"),
                 samsung, createRecommendedPlaces("삼성 카페")
         );
-        given(placeRecommender.recommendPlaces(anyList(), anyList())).willReturn(recommendedPlaces);
+        given(placeRecommender.recommendPlaces(anyList(), any(PlaceRecommendationCriteria.class)))
+                .willReturn(recommendedPlaces);
 
         final RecommendationPlaceSearchResult result = service.search(
                 candidateSelection,
                 List.of(RecommendCondition.CAFE),
                 candidateRoutes,
                 5,
+                6,
                 2
         );
 
@@ -81,9 +85,13 @@ class RecommendationPlaceSearchServiceTest {
         assertThat(result.getRecommendedPlaceCount()).isEqualTo(2);
         assertThat(result.getRecommendedCandidates().getPlaces()).containsExactly(seolleung, samsung);
 
-        final ArgumentCaptor<List<Place>> captor = ArgumentCaptor.forClass(List.class);
-        verify(placeRecommender).recommendPlaces(captor.capture(), anyList());
-        assertThat(captor.getValue()).containsExactly(seolleung, samsung);
+        final ArgumentCaptor<List<Place>> placesCaptor = ArgumentCaptor.forClass(List.class);
+        final ArgumentCaptor<PlaceRecommendationCriteria> criteriaCaptor =
+                ArgumentCaptor.forClass(PlaceRecommendationCriteria.class);
+        verify(placeRecommender).recommendPlaces(placesCaptor.capture(), criteriaCaptor.capture());
+        assertThat(placesCaptor.getValue()).containsExactly(seolleung, samsung);
+        assertThat(criteriaCaptor.getValue().conditions()).containsExactly(RecommendCondition.CAFE);
+        assertThat(criteriaCaptor.getValue().limitPerCondition()).isEqualTo(6);
     }
 
     @Test
@@ -110,7 +118,7 @@ class RecommendationPlaceSearchServiceTest {
                 seolleung, seolleungCandidate.getRoutes(),
                 samsung, samsungCandidate.getRoutes()
         );
-        given(placeRecommender.recommendPlaces(anyList(), anyList())).willReturn(Map.of(
+        given(placeRecommender.recommendPlaces(anyList(), any(PlaceRecommendationCriteria.class))).willReturn(Map.of(
                 seolleung, createRecommendedPlaces("선릉 카페"),
                 samsung, new RecommendedPlaces(Map.of())
         ));
@@ -120,6 +128,7 @@ class RecommendationPlaceSearchServiceTest {
                 List.of(RecommendCondition.CAFE),
                 candidateRoutes,
                 2,
+                6,
                 2
         );
 

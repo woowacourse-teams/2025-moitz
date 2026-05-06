@@ -10,6 +10,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 import com.f12.moitz.application.dto.recommendation.RecommendationRequest;
+import com.f12.moitz.application.port.place.PlaceRecommendationCriteria;
 import com.f12.moitz.application.port.place.PlaceRecommender;
 import com.f12.moitz.application.subway.SubwayRouteService;
 import com.f12.moitz.application.recommendation.RecommendationPlaceSearchService;
@@ -121,7 +122,7 @@ class RecommendationServiceTest {
                         )
                 )
         );
-        given(placeRecommender.recommendPlaces(anyList(), anyList()))
+        given(placeRecommender.recommendPlaces(anyList(), any(PlaceRecommendationCriteria.class)))
                 .willReturn(mockRecommendedPlaces);
 
         List<Route> pairwiseRoutes = List.of(
@@ -169,6 +170,12 @@ class RecommendationServiceTest {
                         List.of("FAIRNESS"),
                         List.of("MAX_BURDEN_RELIEF")
                 );
+
+        ArgumentCaptor<PlaceRecommendationCriteria> criteriaCaptor =
+                ArgumentCaptor.forClass(PlaceRecommendationCriteria.class);
+        verify(placeRecommender).recommendPlaces(anyList(), criteriaCaptor.capture());
+        assertThat(criteriaCaptor.getValue().conditions()).containsExactly(RecommendCondition.CAFE);
+        assertThat(criteriaCaptor.getValue().limitPerCondition()).isEqualTo(6);
     }
 
     @Test
@@ -190,7 +197,7 @@ class RecommendationServiceTest {
                 new Route(List.of(new Path(gangnam, seolleung, TravelMethod.SUBWAY, 10 * 60, SubwayLine.fromTitle("2호선")))),
                 new Route(List.of(new Path(yeoksam, seolleung, TravelMethod.SUBWAY, 5 * 60, SubwayLine.fromTitle("2호선"))))
         ));
-        given(placeRecommender.recommendPlaces(anyList(), anyList())).willReturn(Map.of(
+        given(placeRecommender.recommendPlaces(anyList(), any(PlaceRecommendationCriteria.class))).willReturn(Map.of(
                 seolleung, new RecommendedPlaces(Map.of())
         ));
 
