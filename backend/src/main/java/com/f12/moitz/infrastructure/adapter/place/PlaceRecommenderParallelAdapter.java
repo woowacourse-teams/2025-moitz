@@ -80,6 +80,7 @@ public class PlaceRecommenderParallelAdapter implements PlaceRecommender {
             final List<KakaoApiResponse> responses,
             final int limitPerCondition
     ) {
+        // interleaveDocuments는 documentsByKeyword를 index 기준 라운드로빈으로 순회하며, limitPerCondition 도달 또는 hasNextDocument=false까지 짧은 리스트를 건너뛰고 긴 리스트로 채운다.
         final List<List<DocumentResponse>> documentsByKeyword = responses.stream()
                 .map(this::getDocuments)
                 .toList();
