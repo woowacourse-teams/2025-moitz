@@ -382,6 +382,58 @@ class CandidatePlaceSearchPolicyTest {
                 .isEmpty();
     }
 
+    @Test
+    @DisplayName("일반 태그가 보충 후보로 선택된 상태라면 추가 일반 후보를 조회하지 않는다")
+    void selectNextSearchPlaces_DoesNotFillWithGeneralCandidatesWhenFallbackGeneralSelected() {
+        final RouteCandidate fairness = routeCandidate("공평후보역");
+        final RouteCandidate maxBurden = routeCandidate("최장후보역");
+        final RouteCandidate efficiency = routeCandidate("평균후보역");
+        final RouteCandidate transfer = routeCandidate("환승후보역");
+        final RouteCandidate failedGeneral = routeCandidate("실패일반후보역");
+        final RouteCandidate fallbackGeneral = routeCandidate("보충일반후보역");
+        final RouteCandidate nextFiller = routeCandidate("다음보충후보역");
+        final Map<CandidateSelectionTag, List<RouteCandidate>> tagSelections = new LinkedHashMap<>();
+        tagSelections.put(CandidateSelectionTag.FAIRNESS, List.of(fairness));
+        tagSelections.put(CandidateSelectionTag.MAX_BURDEN_RELIEF, List.of(maxBurden));
+        tagSelections.put(CandidateSelectionTag.EFFICIENCY, List.of(efficiency));
+        tagSelections.put(CandidateSelectionTag.TRANSFER, List.of(transfer));
+        tagSelections.put(CandidateSelectionTag.GENERAL, List.of(failedGeneral));
+        final CandidateSelection candidateSelection = new CandidateSelection(
+                List.of(fairness, maxBurden, efficiency, transfer, failedGeneral, fallbackGeneral, nextFiller),
+                DispersionPolicy.TIER_4,
+                DispersionPolicy.TIER_4,
+                7,
+                false,
+                tagSelections
+        );
+        final List<Place> searchedPlaces = List.of(
+                fairness.getPlace(),
+                maxBurden.getPlace(),
+                efficiency.getPlace(),
+                transfer.getPlace(),
+                failedGeneral.getPlace(),
+                fallbackGeneral.getPlace()
+        );
+
+        final RecommendedCandidates recommendedCandidates = candidatePlaceSearchPolicy.select(
+                candidateSelection,
+                searchedPlaces,
+                place -> !place.equals(failedGeneral.getPlace()),
+                5
+        );
+        final List<Place> nextSearchPlaces = candidatePlaceSearchPolicy.selectNextSearchPlaces(
+                candidateSelection,
+                searchedPlaces,
+                place -> !place.equals(failedGeneral.getPlace()),
+                4
+        );
+
+        assertThat(recommendedCandidates.getTags(fallbackGeneral.getPlace()))
+                .containsExactly(CandidateSelectionTag.GENERAL);
+        assertThat(nextSearchPlaces)
+                .isEmpty();
+    }
+
     private Map<CandidateSelectionTag, List<RouteCandidate>> createTagSelections(
             final RouteCandidate shared,
             final RouteCandidate maxBurden,
