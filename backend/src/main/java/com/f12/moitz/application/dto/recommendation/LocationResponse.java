@@ -93,6 +93,10 @@ public record LocationResponse(
         List<RouteResponse> routes
 ) {
 
+    public LocationResponse {
+        tags = validateTags(tags);
+    }
+
     public LocationResponse(
             final Long id,
             final int index,
@@ -167,6 +171,9 @@ public record LocationResponse(
     private static List<String> validateTags(final List<String> tags) {
         if (tags == null || tags.isEmpty()) {
             throw new IllegalArgumentException("추천 태그는 비어 있을 수 없습니다.");
+        }
+        if (tags.size() != 1) {
+            throw new IllegalArgumentException("추천 태그는 하나만 가질 수 있습니다.");
         }
         return tags.stream()
                 .map(LocationResponse::validateTag)

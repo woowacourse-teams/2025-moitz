@@ -1,6 +1,7 @@
 package com.f12.moitz.application.dto.recommendation;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -35,6 +36,26 @@ class LocationResponseTest {
         assertThat(json.get("location_info").asText()).isEqualTo(response.reason());
         assertThat(json.has("tagInfo")).isFalse();
         assertThat(json.has("locationInfo")).isFalse();
+    }
+
+    @Test
+    void create_ThrowsExceptionWhenTagsHaveMultipleValues() {
+        assertThatThrownBy(() -> new LocationResponse(
+                1L,
+                1,
+                37.0,
+                127.0,
+                "서울역",
+                20,
+                false,
+                List.of("TRANSFER", "EFFICIENCY"),
+                "#최소환승",
+                "서울역은 환승 부담이 적은 기준을 반영해 추천된 만남 장소입니다.",
+                Map.of(),
+                List.of()
+        ))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("추천 태그는 하나만 가질 수 있습니다.");
     }
 
 }
