@@ -1,6 +1,8 @@
 package com.f12.moitz.application.dto.recommendation;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.f12.moitz.domain.recommendation.RecommendCondition;
+import com.f12.moitz.domain.recommendation.candidate.CandidateSelectionTag;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
 import java.util.Map;
@@ -23,10 +25,16 @@ public record LocationResponse(
         boolean isBest,
         @Schema(description = "추천 태그 코드 목록", example = "[\"FAIRNESS\"]", requiredMode = Schema.RequiredMode.REQUIRED)
         List<String> tags,
+        @JsonProperty("tag_info")
+        @Schema(description = "추천 태그 설명", example = "환승 부담이 적은 기준", requiredMode = Schema.RequiredMode.REQUIRED)
+        String tagInfo,
         @Schema(description = "추천 이유 해시태그", example = "#최소환승", requiredMode = Schema.RequiredMode.REQUIRED)
         String description,
         @Schema(description = "지역 추천 이유 문장", example = "서울역은 환승 부담이 적은 기준을 반영해 추천된 만남 장소입니다.", requiredMode = Schema.RequiredMode.REQUIRED)
         String reason,
+        @JsonProperty("location_info")
+        @Schema(description = "지역 추천 정보", example = "서울역은 환승 부담이 적은 기준을 반영해 추천된 만남 장소입니다.", requiredMode = Schema.RequiredMode.REQUIRED)
+        String locationInfo,
         @Schema(
                 description = "카테고리별 추천 장소 목록",
                 example = """
@@ -108,7 +116,41 @@ public record LocationResponse(
                 avgMinutes,
                 isBest,
                 List.of(validateTag(tag)),
+                resolveTagInfo(tag),
                 description,
+                reason,
+                reason,
+                places,
+                routes
+        );
+    }
+
+    public LocationResponse(
+            final Long id,
+            final int index,
+            final double y,
+            final double x,
+            final String name,
+            final int avgMinutes,
+            final boolean isBest,
+            final List<String> tags,
+            final String description,
+            final String reason,
+            final Map<RecommendCondition, List<PlaceRecommendResponse>> places,
+            final List<RouteResponse> routes
+    ) {
+        this(
+                id,
+                index,
+                y,
+                x,
+                name,
+                avgMinutes,
+                isBest,
+                validateTags(tags),
+                resolveTagInfo(tags),
+                description,
+                reason,
                 reason,
                 places,
                 routes
@@ -120,6 +162,23 @@ public record LocationResponse(
             throw new IllegalArgumentException("추천 태그는 비어 있을 수 없습니다.");
         }
         return tag;
+    }
+
+    private static List<String> validateTags(final List<String> tags) {
+        if (tags == null || tags.isEmpty()) {
+            throw new IllegalArgumentException("추천 태그는 비어 있을 수 없습니다.");
+        }
+        return tags.stream()
+                .map(LocationResponse::validateTag)
+                .toList();
+    }
+
+    private static String resolveTagInfo(final List<String> tags) {
+        return resolveTagInfo(validateTags(tags).getFirst());
+    }
+
+    private static String resolveTagInfo(final String tag) {
+        return CandidateSelectionTag.valueOf(validateTag(tag)).getDescription();
     }
 
 }
