@@ -64,7 +64,7 @@ class LocationResponseTest {
     }
 
     @Test
-    void create_ThrowsExceptionWhenTagsHaveMultipleValues() {
+    void create_ThrowsBadRequestExceptionWhenTagsHaveMultipleValues() {
         assertThatThrownBy(() -> new LocationResponse(
                 1L,
                 1,
@@ -79,8 +79,32 @@ class LocationResponseTest {
                 Map.of(),
                 List.of()
         ))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("추천 태그는 하나만 가질 수 있습니다.");
+                .isInstanceOfSatisfying(BadRequestException.class, exception ->
+                        assertThat(exception.getErrorCode())
+                                .isEqualTo(GeneralErrorCode.INPUT_INVALID_RECOMMENDATION_TAG)
+                );
+    }
+
+    @Test
+    void create_ThrowsBadRequestExceptionWhenTagsAreEmpty() {
+        assertThatThrownBy(() -> new LocationResponse(
+                1L,
+                1,
+                37.0,
+                127.0,
+                "서울역",
+                20,
+                false,
+                List.of(),
+                "#최소환승",
+                "서울역은 환승 부담이 적은 기준을 반영해 추천된 만남 장소입니다.",
+                Map.of(),
+                List.of()
+        ))
+                .isInstanceOfSatisfying(BadRequestException.class, exception ->
+                        assertThat(exception.getErrorCode())
+                                .isEqualTo(GeneralErrorCode.INPUT_INVALID_RECOMMENDATION_TAG)
+                );
     }
 
     @Test

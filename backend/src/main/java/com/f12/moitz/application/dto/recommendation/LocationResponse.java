@@ -165,17 +165,17 @@ public record LocationResponse(
 
     private static String validateTag(final String tag) {
         if (tag == null || tag.isBlank()) {
-            throw new IllegalArgumentException("추천 태그는 비어 있을 수 없습니다.");
+            throw new BadRequestException(GeneralErrorCode.INPUT_INVALID_RECOMMENDATION_TAG, tag);
         }
         return tag;
     }
 
     private static List<String> validateTags(final List<String> tags) {
         if (tags == null || tags.isEmpty()) {
-            throw new IllegalArgumentException("추천 태그는 비어 있을 수 없습니다.");
+            throw new BadRequestException(GeneralErrorCode.INPUT_INVALID_RECOMMENDATION_TAG, tags);
         }
         if (tags.size() != 1) {
-            throw new IllegalArgumentException("추천 태그는 하나만 가질 수 있습니다.");
+            throw new BadRequestException(GeneralErrorCode.INPUT_INVALID_RECOMMENDATION_TAG, tags);
         }
         return tags.stream()
                 .map(LocationResponse::validateTag)
