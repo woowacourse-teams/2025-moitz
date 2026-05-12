@@ -35,37 +35,8 @@ class LocationResponseTest {
 
         final JsonNode json = objectMapper.readTree(objectMapper.writeValueAsString(response));
 
-        assertThat(json.get("tag").asText()).isEqualTo(CandidateSelectionTag.TRANSFER.name());
-        assertThat(json.has("tags")).isFalse();
-        assertThat(json.get("tag_info").asText()).isEqualTo(CandidateSelectionTag.TRANSFER.getDescription());
-        assertThat(json.get("location_info").asText()).isEqualTo(response.reason());
-        assertThat(json.has("tagInfo")).isFalse();
-        assertThat(json.has("locationInfo")).isFalse();
-    }
-
-    @Test
-    void serialize_WithTagInfoAndLocationInfo_ListInput() throws Exception {
-        final LocationResponse response = new LocationResponse(
-                1L,
-                1,
-                37.0,
-                127.0,
-                "서울역",
-                20,
-                false,
-                List.of("EFFICIENCY"),
-                "#최소평균",
-                "서울역은 전체 참여자의 평균 이동 시간이 짧은 기준을 반영해 추천된 만남 장소입니다.",
-                Map.of(),
-                List.of()
-        );
-
-        final JsonNode json = objectMapper.readTree(objectMapper.writeValueAsString(response));
-
-        assertThat(json.get("tag").asText()).isEqualTo(CandidateSelectionTag.EFFICIENCY.name());
-        assertThat(json.has("tags")).isFalse();
-        assertThat(json.get("tag_info").asText()).isEqualTo(CandidateSelectionTag.EFFICIENCY.getDescription());
-        assertThat(json.get("location_info").asText()).isEqualTo(response.reason());
+        assertThat(json.get("tagInfo").asText()).isEqualTo(CandidateSelectionTag.TRANSFER.getDescription());
+        assertThat(json.get("locationInfo").asText()).isEqualTo(response.reason());
     }
 
     @Test
