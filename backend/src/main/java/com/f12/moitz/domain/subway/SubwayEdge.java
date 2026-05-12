@@ -3,18 +3,13 @@ package com.f12.moitz.domain.subway;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
-import lombok.AccessLevel;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
-import org.springframework.data.mongodb.core.mapping.Document;
 
 @Getter
-@Document(collection = "subway-edge")
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class SubwayEdge {
 
-    private SubwayStation subwayStation;
-    private Set<Edge> edges;
+    private final SubwayStation subwayStation;
+    private final Set<Edge> edges;
 
     public SubwayEdge(final SubwayStation subwayStation) {
         this.subwayStation = subwayStation;

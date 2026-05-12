@@ -6,7 +6,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import com.f12.moitz.common.error.exception.ExternalApiErrorCode;
 import com.f12.moitz.common.error.exception.ExternalApiException;
 import com.f12.moitz.infrastructure.client.gemini.dto.RecommendedLocationResponse;
-import com.f12.moitz.application.dto.RecommendedLocationsResponse;
+import com.f12.moitz.application.dto.recommendation.RecommendedLocationsResponse;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import okhttp3.mockwebserver.MockResponse;

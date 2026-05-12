@@ -1,0 +1,47 @@
+package com.f12.moitz.application.recommendation;
+
+import com.f12.moitz.domain.place.Place;
+import com.f12.moitz.domain.recommendation.candidate.RouteCandidate;
+import com.f12.moitz.domain.route.Routes;
+import java.util.List;
+import java.util.Map;
+
+public class RouteCandidatePreparationResult {
+
+    private final List<Place> candidatePlaces;
+    private final Map<Place, Routes> candidateRoutes;
+    private final List<RouteCandidate> routeCandidates;
+
+    public RouteCandidatePreparationResult(
+            final List<Place> candidatePlaces,
+            final Map<Place, Routes> candidateRoutes,
+            final List<RouteCandidate> routeCandidates
+    ) {
+        this.candidatePlaces = List.copyOf(candidatePlaces);
+        this.candidateRoutes = Map.copyOf(candidateRoutes);
+        this.routeCandidates = List.copyOf(routeCandidates);
+    }
+
+    public List<Place> getCandidatePlaces() {
+        return candidatePlaces;
+    }
+
+    public int getCandidatePlaceCount() {
+        return candidatePlaces.size();
+    }
+
+    public long getRoutedPlaceCount() {
+        return candidatePlaces.stream()
+                .filter(candidateRoutes::containsKey)
+                .count();
+    }
+
+    public Map<Place, Routes> getCandidateRoutes() {
+        return candidateRoutes;
+    }
+
+    public List<RouteCandidate> getRouteCandidates() {
+        return routeCandidates;
+    }
+
+}

@@ -18,4 +18,9 @@ public class BadRequestException extends RuntimeException {
         this.errorCode = errorCode;
     }
 
+    public BadRequestException(ErrorCode errorCode, Throwable cause, Object... args) {
+        super(errorCode.getMessage() + " " + Arrays.toString(args), cause);
+        this.errorCode = errorCode;
+    }
+
 }
