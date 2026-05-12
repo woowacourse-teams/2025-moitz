@@ -76,10 +76,10 @@ public class RecommendationResponseMapper {
                 candidate.getRecommendedPlaces()
         );
         final List<RouteResponse> routes = toRouteResponses(candidate);
-        final List<CandidateSelectionTag> tags = candidate.getTags();
+        final CandidateSelectionTag tag = candidate.getTag();
         final RecommendationReason recommendationReason = RecommendationReason.fromSelectionTags(
                 targetPlace.getName(),
-                tags
+                List.of(tag)
         );
 
         return new LocationResponse(
@@ -91,9 +91,7 @@ public class RecommendationResponseMapper {
                 totalTime,
                 // 추천 방식 변경으로 기존 평균 이동시간 기준 best 표시는 임시 비활성화한다.
                 BEST_RECOMMENDATION_DISABLED,
-                tags.stream()
-                        .map(CandidateSelectionTag::name)
-                        .toList(),
+                tag.name(),
                 recommendationReason.description(),
                 recommendationReason.reason(),
                 recommendedPlaces,
