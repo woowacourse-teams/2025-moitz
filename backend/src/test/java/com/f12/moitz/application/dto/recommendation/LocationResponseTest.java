@@ -35,10 +35,10 @@ class LocationResponseTest {
 
         final JsonNode json = objectMapper.readTree(objectMapper.writeValueAsString(response));
 
-        assertThat(json.get("tag_info").asText()).isEqualTo(CandidateSelectionTag.TRANSFER.getDescription());
-        assertThat(json.get("location_info").asText()).isEqualTo(response.reason());
-        assertThat(json.has("tagInfo")).isFalse();
-        assertThat(json.has("locationInfo")).isFalse();
+        assertThat(json.get("tag").asText()).isEqualTo(CandidateSelectionTag.TRANSFER.name());
+        assertThat(json.has("tags")).isFalse();
+        assertThat(json.get("tagInfo").asText()).isEqualTo(CandidateSelectionTag.TRANSFER.getDescription());
+        assertThat(json.get("locationInfo").asText()).isEqualTo(response.reason());
     }
 
     @Test
@@ -60,8 +60,10 @@ class LocationResponseTest {
 
         final JsonNode json = objectMapper.readTree(objectMapper.writeValueAsString(response));
 
-        assertThat(json.get("tag_info").asText()).isEqualTo(CandidateSelectionTag.EFFICIENCY.getDescription());
-        assertThat(json.get("location_info").asText()).isEqualTo(response.reason());
+        assertThat(json.get("tag").asText()).isEqualTo(CandidateSelectionTag.EFFICIENCY.name());
+        assertThat(json.has("tags")).isFalse();
+        assertThat(json.get("tagInfo").asText()).isEqualTo(CandidateSelectionTag.EFFICIENCY.getDescription());
+        assertThat(json.get("locationInfo").asText()).isEqualTo(response.reason());
     }
 
     @Test

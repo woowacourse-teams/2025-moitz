@@ -53,7 +53,7 @@ class RecommendationResponseMapperTest {
         final RecommendationResultResponse response = mapper.toResponse(result);
 
         final LocationResponse location = response.locations().getFirst();
-        assertThat(location.tags()).containsExactly(CandidateSelectionTag.FAIRNESS.name());
+        assertThat(location.tag()).isEqualTo(CandidateSelectionTag.FAIRNESS.name());
         assertThat(location.tagInfo()).isEqualTo("모든 참여자의 이동 시간이 가장 공평한 기준");
         assertThat(location.description()).isEqualTo("#가장공평");
         assertThat(location.reason())
@@ -110,7 +110,7 @@ class RecommendationResponseMapperTest {
     }
 
     private void assertGeneralLocation(final LocationResponse location) {
-        assertThat(location.tags()).containsExactly(CandidateSelectionTag.GENERAL.name());
+        assertThat(location.tag()).isEqualTo(CandidateSelectionTag.GENERAL.name());
         assertThat(location.tagInfo()).isEqualTo(CandidateSelectionTag.GENERAL.getDescription());
         assertThat(location.description()).isEqualTo(CandidateSelectionTag.GENERAL.getHashtag());
         assertThat(location.reason())
