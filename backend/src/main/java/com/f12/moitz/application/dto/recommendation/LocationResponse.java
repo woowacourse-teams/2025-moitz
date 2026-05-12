@@ -25,16 +25,14 @@ public record LocationResponse(
         int avgMinutes,
         @Schema(description = "최적의 추천 여부", example = "true", requiredMode = Schema.RequiredMode.REQUIRED)
         boolean isBest,
-        @Schema(description = "추천 태그 코드 목록", example = "[\"FAIRNESS\"]", requiredMode = Schema.RequiredMode.REQUIRED)
-        List<String> tags,
-        @JsonProperty("tag_info")
+        @Schema(description = "추천 태그 코드", example = "FAIRNESS", requiredMode = Schema.RequiredMode.REQUIRED)
+        String tag,
         @Schema(description = "추천 태그 설명", example = "환승 부담이 적은 기준", requiredMode = Schema.RequiredMode.REQUIRED)
         String tagInfo,
         @Schema(description = "추천 이유 해시태그", example = "#최소환승", requiredMode = Schema.RequiredMode.REQUIRED)
         String description,
         @Schema(description = "지역 추천 이유 문장", example = "서울역은 환승 부담이 적은 기준을 반영해 추천된 만남 장소입니다.", requiredMode = Schema.RequiredMode.REQUIRED)
         String reason,
-        @JsonProperty("location_info")
         @Schema(description = "지역 추천 정보", example = "서울역은 환승 부담이 적은 기준을 반영해 추천된 만남 장소입니다.", requiredMode = Schema.RequiredMode.REQUIRED)
         String locationInfo,
         @Schema(
@@ -96,7 +94,7 @@ public record LocationResponse(
 ) {
 
     public LocationResponse {
-        tags = validateTags(tags);
+        tag = validateTag(tag);
     }
 
     public LocationResponse(
@@ -121,7 +119,7 @@ public record LocationResponse(
                 name,
                 avgMinutes,
                 isBest,
-                List.of(validateTag(tag)),
+                validateTag(tag),
                 resolveTagInfo(tag),
                 description,
                 reason,
@@ -153,7 +151,7 @@ public record LocationResponse(
                 name,
                 avgMinutes,
                 isBest,
-                validateTags(tags),
+                validateTags(tags).getFirst(),
                 resolveTagInfo(tags),
                 description,
                 reason,
