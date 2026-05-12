@@ -40,7 +40,7 @@ jobs:
             exit 1
           fi
 
-      - name: 애플리케이션을 빌드하고 빌드 파일을 백업한다
+      - name: 애플리케이션을 빌드한다
         run: |
           echo "=== JAR 빌드 ==="
           ./gradlew --no-build-cache clean build -Dspring.profiles.active=prod
@@ -56,9 +56,9 @@ jobs:
           echo $FILE_PATH
           mv $FILE_PATH "$(date +%Y-%m-%d-%H%M%S)-$FILE_PATH"
 
-          echo "=== S3에 빌드 파일 백업 ==="
-          FILE_PATH=$(ls *SNAPSHOT.jar | head -n 1)
-          aws s3 cp "${FILE_PATH}" "${S3_BUCKET}/${FILE_PATH}" --only-show-errors
+          # echo "=== S3에 빌드 파일 백업 ==="
+          # FILE_PATH=$(ls *SNAPSHOT.jar | head -n 1)
+          # aws s3 cp "${FILE_PATH}" "${S3_BUCKET}/${FILE_PATH}" --only-show-errors
 
       - name: 애플리케이션을 실행한다
         env:
