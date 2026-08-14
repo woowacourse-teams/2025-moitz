@@ -37,10 +37,17 @@ function BottomSheet({
   const startYRef = useRef(0);
   const startPercentRef = useRef(positionPercent);
   const viewportRef = useRef<number>(getViewportHeight());
+  const currentPercentRef = useRef(positionPercent); // 드래그 중 현재 위치 추적
+  const containerRef = useRef<HTMLDivElement>(null); // DOM 직접 조작용
 
   const activePointerIdRef = useRef<number | null>(null);
 
   useSyncViewportHeight(viewportRef);
+
+  // positionPercent가 변경될 때 currentPercentRef도 동기화
+  useEffect(() => {
+    currentPercentRef.current = positionPercent;
+  }, [positionPercent]);
 
   // 애니메이션이 끝나면 다시 OFF
   const handleTransitionEnd: React.TransitionEventHandler<
@@ -58,7 +65,7 @@ function BottomSheet({
     // 이미 드래그 중이면 무시한다 (안전성)
     if (isDraggingRef.current) return;
 
-    //  드래그를 시작한 '그 손가락'을 내 버튼에 묶어두고 캡처함
+    // 드래그를 시작한 '그 손가락'을 내 버튼에 묶어두고 캡처함
     // 매 이벤트마다 정말 그 손가락이 맞는지(ID) 확인해서,
     // 중간에 영역을 벗어나도/다른 손가락이 닿아도 드래그가 안 끊기게 함.
     e.currentTarget.setPointerCapture(e.pointerId);
@@ -72,21 +79,20 @@ function BottomSheet({
     // 화면상의 현재 포인터 Y좌표(px)를 기록한다 (기준점 1)
     startYRef.current = e.clientY;
     // 드래그 시작 당시의 퍼센트 위치를 기록한다. (기준점 2)
-    startPercentRef.current = positionPercent;
+    startPercentRef.current = currentPercentRef.current;
   };
 
   /**
    * onPointerMove
    * - 드래그 '중'에 호출되어 바텀시트 위치(%)를 실시간으로 갱신함
-   *   쉽게 말하자면, 눌렀던 순간의 기준점에서,
-   *   햔재 포인터가 Y축으로 얼마나 움직였는지(px)를 화면 높이로 나눠 퍼센트로 바꾸고,
-   *   그만큼 시트 위치를 업데이트한다.
+   * - React 상태 대신 DOM을 직접 조작하여 성능 최적화
+   *   (매 이벤트마다 setState하면 리렌더링 + emotion 스타일 재계산으로 프레임 드랍 발생)
    */
   const onPointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
     // 내 손가락만 반영
     if (activePointerIdRef.current !== e.pointerId) return;
 
-    // // 드래그 중이 아닐 때 들어오는 move 이벤트는 무시 (안전성)
+    // 드래그 중이 아닐 때 들어오는 move 이벤트는 무시 (안전성)
     if (!isDraggingRef.current) return;
 
     // 1) 드래그 이동량(px). 아래로 끌면 양수, 위로 끌면 음수
@@ -95,7 +101,7 @@ function BottomSheet({
     // 2) 현재 보이는 뷰포트 높이(px). 0일 가능성에 대비해 최소 1로 가드
     const viewportHeightInPx = viewportRef.current || 1;
 
-    // 3) 이동량을 0 ~ 100  퍼센트로 환산
+    // 3) 이동량을 0 ~ 100 퍼센트로 환산
     const dragDistanceInPercent = (dragDistanceInPx / viewportHeightInPx) * 100;
 
     // 4) 새 위치 퍼센트 계산
@@ -104,8 +110,15 @@ function BottomSheet({
     const tentativePositionPercent =
       startPercentRef.current - dragDistanceInPercent;
 
-    // 5) 상태 반영
-    setPositionPercent(clampPositionPercent(tentativePositionPercent));
+    const clampedPercent = clampPositionPercent(tentativePositionPercent);
+
+    // 5) ref에 현재 위치 저장 (React 상태 업데이트 없이)
+    currentPercentRef.current = clampedPercent;
+
+    // 6) DOM 직접 조작으로 즉시 반영
+    if (containerRef.current) {
+      containerRef.current.style.transform = `translate3d(0, ${100 - clampedPercent}%, 0)`;
+    }
   };
 
   /**
@@ -119,7 +132,7 @@ function BottomSheet({
     activePointerIdRef.current = null; // 포인터 ID 해제
 
     const start = startPercentRef.current; // 출발점
-    const current = clampPositionPercent(positionPercent); // 현재 시트 위치(%)
+    const current = currentPercentRef.current; // 현재 시트 위치(%)
 
     // 방향 기반 스냅 결정 (2%를 살짝의 기준으로 사용)
     const target = decideDirectionalSnapTarget(start, current, SNAP_POINTS, 2);
@@ -139,6 +152,7 @@ function BottomSheet({
       }}
       isAnimating={isAnimating}
       onContainerTransitionEnd={handleTransitionEnd}
+      containerRef={containerRef}
     >
       {!selectedLocation && (
         <BottomSheetList
@@ -159,16 +173,6 @@ function BottomSheet({
 }
 
 export default BottomSheet;
-
-/**
- * findNearestSnap
- *  - 가장 가까운 스냅을 참음 -> decideDirectionalSnapTarget 함수 생성하면서 안 쓰게 됨
- */
-// const findNearestSnap = (current: number) =>
-//   SNAP_POINTS.reduce(
-//     (best, p) => (Math.abs(p - current) < Math.abs(best - current) ? p : best),
-//     SNAP_POINTS[0],
-//   );
 
 /**
  * clampPositionPercent
@@ -207,7 +211,7 @@ export function useSyncViewportHeight(viewportRef: { current: number }) {
       visualViewport.addEventListener('resize', update, { passive: true });
     }
 
-    // 5) 언마운트 시 정리 (메모리 누수/중복 리스너 방지)
+    // 4) 언마운트 시 정리 (메모리 누수/중복 리스너 방지)
     return () => {
       window.removeEventListener('resize', update);
       window.removeEventListener('orientationchange', update);

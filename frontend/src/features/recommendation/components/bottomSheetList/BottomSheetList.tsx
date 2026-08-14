@@ -1,3 +1,5 @@
+import React from 'react';
+
 import {
   RecommendedLocation,
   StartingPlace,
@@ -35,4 +37,4 @@ function BottomSheetList({
   );
 }
 
-export default BottomSheetList;
+export default React.memo(BottomSheetList);

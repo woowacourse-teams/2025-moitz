@@ -1,3 +1,5 @@
+import React from 'react';
+
 import { SelectedLocation } from '@features/recommendation/types/SelectedLocation';
 
 import { StartingPlace } from '@entities/location/types/Location';
@@ -38,4 +40,4 @@ function BottomSheetDetail({
   );
 }
 
-export default BottomSheetDetail;
+export default React.memo(BottomSheetDetail);

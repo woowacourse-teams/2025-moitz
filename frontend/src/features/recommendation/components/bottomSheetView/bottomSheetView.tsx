@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useParams } from 'react-router';
 
 import useVoteModal from '@widgets/voting/hooks/useVoteModal';
@@ -14,6 +14,7 @@ interface BottomSheetViewProps {
   handleProps: React.HTMLAttributes<HTMLDivElement>;
   isAnimating: boolean;
   onContainerTransitionEnd: React.TransitionEventHandler<HTMLDivElement>;
+  containerRef: React.RefObject<HTMLDivElement>;
 }
 
 function BottomSheetView({
@@ -22,9 +23,16 @@ function BottomSheetView({
   handleProps,
   isAnimating,
   onContainerTransitionEnd,
+  containerRef,
 }: BottomSheetViewProps) {
   const { id } = useParams<{ id: string }>();
   const { openVoteModal } = useVoteModal();
+
+  useEffect(() => {
+    if (containerRef.current) {
+      containerRef.current.style.transform = `translate3d(0, ${100 - positionPercent}%, 0)`;
+    }
+  }, [positionPercent, containerRef]);
 
   const handleVoteButtonClick = async () => {
     if (id) {
@@ -33,12 +41,12 @@ function BottomSheetView({
   };
 
   return (
-    <div css={[bottomSheetView.base()]}>
+    <div css={[bottomSheetView.base()]} ref={containerRef}>
       <div
         css={[
           flex({ direction: 'column' }),
           shadow.bottom_sheet,
-          bottomSheetView.container(positionPercent),
+          bottomSheetView.container(),
           isAnimating && bottomSheetView.animate(),
         ]}
         // CSS transition이 끝났을 때 호출되는 이벤트 핸들러
