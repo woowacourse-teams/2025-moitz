@@ -18,6 +18,6 @@ public interface RecommendResultRepository {
 
     List<CandidateVote> findAllVotesById(ObjectId id);
 
-    void incrementVotesByIdAndCandidate(ObjectId id, String location);
+    Optional<CandidateVote> incrementVotesByIdAndCandidate(ObjectId id, String location);
 
 }

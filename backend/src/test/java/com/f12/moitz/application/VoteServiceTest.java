@@ -3,7 +3,6 @@ package com.f12.moitz.application;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.verify;
 
 import com.f12.moitz.application.dto.vote.VotesResponse;
 import com.f12.moitz.application.vote.VoteService;
@@ -33,14 +32,13 @@ class VoteServiceTest {
         final VoteService voteService = new VoteService(recommendResultRepository);
         final ObjectId id = new ObjectId();
         given(recommendResultRepository.existsById(id)).willReturn(true);
-        given(recommendResultRepository.findVotesByIdAndCandidate(id, "선릉역"))
+        given(recommendResultRepository.incrementVotesByIdAndCandidate(id, "선릉역"))
                 .willReturn(Optional.of(new CandidateVote("선릉역", 3)));
 
         final VotesResponse response = voteService.addVote(id.toHexString(), "선릉역");
 
         assertThat(response.locationName()).isEqualTo("선릉역");
         assertThat(response.count()).isEqualTo(3);
-        verify(recommendResultRepository).incrementVotesByIdAndCandidate(id, "선릉역");
     }
 
     @Test
@@ -73,6 +71,8 @@ class VoteServiceTest {
         final VoteService voteService = new VoteService(recommendResultRepository);
         final ObjectId id = new ObjectId();
         given(recommendResultRepository.existsById(id)).willReturn(true);
+        given(recommendResultRepository.incrementVotesByIdAndCandidate(id, "없는역"))
+                .willReturn(Optional.empty());
         given(recommendResultRepository.findVotesByIdAndCandidate(id, "없는역"))
                 .willReturn(Optional.empty());
 
@@ -101,6 +101,22 @@ class VoteServiceTest {
         assertThat(responses)
                 .extracting(VotesResponse::count)
                 .containsExactly(3, 1);
+    }
+
+    @Test
+    @DisplayName("후보가 99표이면 투표 수를 늘리지 않고 99를 반환한다")
+    void addVote_ReturnsMaximumVotesWithoutIncrementing() {
+        final VoteService voteService = new VoteService(recommendResultRepository);
+        final ObjectId id = new ObjectId();
+        given(recommendResultRepository.existsById(id)).willReturn(true);
+        given(recommendResultRepository.incrementVotesByIdAndCandidate(id, "선릉역"))
+                .willReturn(Optional.empty());
+        given(recommendResultRepository.findVotesByIdAndCandidate(id, "선릉역"))
+                .willReturn(Optional.of(new CandidateVote("선릉역", 99)));
+
+        final VotesResponse response = voteService.addVote(id.toHexString(), "선릉역");
+
+        assertThat(response.count()).isEqualTo(99);
     }
 
 }

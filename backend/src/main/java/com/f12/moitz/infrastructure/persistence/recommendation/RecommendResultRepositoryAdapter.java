@@ -1,12 +1,14 @@
 package com.f12.moitz.infrastructure.persistence.recommendation;
 
 import com.f12.moitz.domain.recommendation.Result;
+import com.f12.moitz.domain.recommendation.Candidate;
 import com.f12.moitz.domain.recommendation.repository.RecommendResultRepository;
 import com.f12.moitz.domain.recommendation.vote.CandidateVote;
 import com.f12.moitz.infrastructure.persistence.recommendation.projection.CandidateVoteProjection;
 import com.f12.moitz.infrastructure.persistence.recommendation.repository.RecommendResultMongoRepository;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.IntStream;
 import org.bson.types.ObjectId;
 import org.springframework.stereotype.Repository;
 
@@ -49,8 +51,20 @@ public class RecommendResultRepositoryAdapter implements RecommendResultReposito
     }
 
     @Override
-    public void incrementVotesByIdAndCandidate(final ObjectId id, final String location) {
-        recommendResultMongoRepository.incrementVotesByIdAndCandidate(id, location);
+    public Optional<CandidateVote> incrementVotesByIdAndCandidate(final ObjectId id, final String location) {
+        return recommendResultMongoRepository.incrementVotesByIdAndCandidate(id, location)
+                .flatMap(resultEntity -> {
+                    final Result result = resultEntity.toDomain();
+                    return IntStream.range(0, result.getRecommendedLocationsCount())
+                            .mapToObj(index -> result.getRecommendedLocations().get(index))
+                            .filter(candidate -> candidate.getDestination().getName().equals(location))
+                            .findFirst()
+                            .map(this::toCandidateVote);
+                });
+    }
+
+    private CandidateVote toCandidateVote(final Candidate candidate) {
+        return new CandidateVote(candidate.getDestination().getName(), candidate.getVotes());
     }
 
 }
