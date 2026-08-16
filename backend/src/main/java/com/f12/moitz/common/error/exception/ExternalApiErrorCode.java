@@ -10,11 +10,6 @@ public enum ExternalApiErrorCode implements ErrorCode {
     EXCEEDED_GEMINI_API_TOKEN_QUOTA("E0005", "GEMINI API 토큰 사용량이 초과되었습니다.", false),
     GEMINI_API_SERVER_UNRESPONSIVE("E0006", "GEMINI API 서버가 응답하지 않습니다.", false),
 
-    // ODSAY API 예외 E001
-    INVALID_ODSAY_API_RESPONSE("E0011", "ODSAY API 응답이 정상적으로 생성되지 않았습니다.", false),
-    ODSAY_API_SERVER_UNRESPONSIVE("E0012", "ODSAY API 서버가 응답하지 않습니다.", false),
-    ODSAY_API_BLOCKED("E0013", "ODDAY API에서 요청을 차단했습니다. 잠시 후 다시 시도해주세요.", true),
-
     // KAKAO MAP API 예외 E002
     INVALID_KAKAO_MAP_API_RESPONSE("E0021", "KAKAO API 응답 처리 중 문제가 발생했습니다.", false),
     EXCEEDED_KAKAO_MAP_API_TOKEN_QUOTA("E0022", "KAKAO API 토큰 사용량이 초과되었습니다.", false),
