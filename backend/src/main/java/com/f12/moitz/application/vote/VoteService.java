@@ -4,13 +4,13 @@ import com.f12.moitz.application.dto.vote.VotesResponse;
 import com.f12.moitz.common.error.exception.BadRequestException;
 import com.f12.moitz.common.error.exception.GeneralErrorCode;
 import com.f12.moitz.common.error.exception.NotFoundException;
+import com.f12.moitz.domain.recommendation.Result;
 import com.f12.moitz.domain.recommendation.repository.RecommendResultRepository;
 import com.f12.moitz.domain.recommendation.vote.CandidateVote;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @Service
@@ -22,16 +22,12 @@ public class VoteService {
         this.recommendResultRepository = recommendResultRepository;
     }
 
-    @Transactional
     public VotesResponse addVote(final String id, final String candidateName) {
         validateCandidateName(candidateName);
         final ObjectId objectId = parseExistingResultId(id);
-
-        recommendResultRepository.incrementVotesByIdAndCandidate(objectId, candidateName);
-
-        final CandidateVote result = recommendResultRepository.findVotesByIdAndCandidate(objectId, candidateName)
-                .orElseThrow(() -> new NotFoundException(GeneralErrorCode.INPUT_INVALID_CANDIDATE_NAME));
-        return toResponse(result);
+        return recommendResultRepository.incrementVotesByIdAndCandidate(objectId, candidateName)
+                .map(this::toResponse)
+                .orElseGet(() -> findExistingCandidateVote(objectId, candidateName));
     }
 
     public List<VotesResponse> getAllVotes(final String id) {
@@ -53,6 +49,12 @@ public class VoteService {
             throw new NotFoundException(GeneralErrorCode.INPUT_INVALID_RESULT);
         }
         return objectId;
+    }
+
+    private VotesResponse findExistingCandidateVote(final ObjectId id, final String candidateName) {
+        return recommendResultRepository.findVotesByIdAndCandidate(id, candidateName)
+                .map(this::toResponse)
+                .orElseThrow(() -> new NotFoundException(GeneralErrorCode.INPUT_INVALID_CANDIDATE_NAME));
     }
 
     private VotesResponse toResponse(final CandidateVote candidateVote) {

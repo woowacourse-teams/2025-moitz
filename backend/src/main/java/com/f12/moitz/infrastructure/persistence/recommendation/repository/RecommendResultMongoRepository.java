@@ -7,10 +7,9 @@ import java.util.Optional;
 import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.repository.Aggregation;
 import org.springframework.data.mongodb.repository.MongoRepository;
-import org.springframework.data.mongodb.repository.Query;
-import org.springframework.data.mongodb.repository.Update;
 
-public interface RecommendResultMongoRepository extends MongoRepository<ResultEntity, ObjectId> {
+public interface RecommendResultMongoRepository extends MongoRepository<ResultEntity, ObjectId>,
+        RecommendResultMongoRepositoryCustom {
 
     @Aggregation(pipeline = {
             "{ $match: { _id: ?0 } }",
@@ -32,9 +31,5 @@ public interface RecommendResultMongoRepository extends MongoRepository<ResultEn
                     "'_id': 0 } }"
     })
     List<CandidateVoteProjection> findAllVotesById(ObjectId id);
-
-    @Query("{ '_id': ?0, 'recommendedLocations.candidates.destination.name': ?1 }")
-    @Update(update = "{ '$inc': { 'recommendedLocations.candidates.$.votes': 1 } }")
-    void incrementVotesByIdAndCandidate(ObjectId id, String location);
 
 }
