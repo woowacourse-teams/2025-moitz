@@ -14,6 +14,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Candidate {
 
+    public static final int MAX_VOTES = 99;
+
     private static final int INITIAL_VOTES = 0;
 
     private Place destination;
