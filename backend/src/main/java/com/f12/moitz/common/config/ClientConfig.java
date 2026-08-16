@@ -43,14 +43,6 @@ public class ClientConfig {
     }
 
     @Bean
-    public RestClient odsayRestClient() {
-        return restClientBuilder()
-                .baseUrl("https://api.odsay.com/v1/api")
-                .requestFactory(simpleClientHttpRequestFactory())
-                .build();
-    }
-
-    @Bean
     public RestClient openRestClient() {
         return restClientBuilder()
                 .baseUrl("https://apis.data.go.kr/B553766/path")
@@ -77,14 +69,6 @@ public class ClientConfig {
     @Bean
     public Client geminiClient() {
         return geminiClientBuilder().apiKey(geminiApiKey).build();
-    }
-
-    @Bean
-    public WebClient odsayWebClient() {
-        return WebClient.builder()
-                .baseUrl("https://api.odsay.com/v1/api")
-                .clientConnector(new ReactorClientHttpConnector(httpClient(5)))
-                .build();
     }
 
     @Bean

@@ -1,5 +1,7 @@
-package com.f12.moitz.application.dto.recommendation;
+package com.f12.moitz.application.dto.recommendation.mock;
 
+import com.f12.moitz.application.dto.recommendation.LocationResponse;
+import com.f12.moitz.application.dto.recommendation.StartingPlaceResponse;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
 
