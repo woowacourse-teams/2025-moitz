@@ -1,5 +1,6 @@
-package com.f12.moitz.application.dto.legacy;
+package com.f12.moitz.application.dto.legacy.mock;
 
+import com.f12.moitz.application.dto.legacy.LegacyRecommendationResponse;
 import com.f12.moitz.application.dto.recommendation.StartingPlaceResponse;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;

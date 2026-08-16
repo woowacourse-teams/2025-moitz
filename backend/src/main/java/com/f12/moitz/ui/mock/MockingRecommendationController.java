@@ -1,11 +1,11 @@
-package com.f12.moitz.ui;
+package com.f12.moitz.ui.mock;
 
 import com.f12.moitz.application.dto.legacy.LegacyRecommendationRequest;
 import com.f12.moitz.application.dto.legacy.LegacyRecommendationResponse;
 import com.f12.moitz.application.dto.legacy.LegacyRouteResponse;
 import com.f12.moitz.application.dto.recommendation.LocationResponse;
-import com.f12.moitz.application.dto.legacy.MockLegacyRecommendationResponse;
-import com.f12.moitz.application.dto.recommendation.MockRecommendationResponse;
+import com.f12.moitz.application.dto.legacy.mock.MockLegacyRecommendationResponse;
+import com.f12.moitz.application.dto.recommendation.mock.MockRecommendationResponse;
 import com.f12.moitz.application.dto.recommendation.PathResponse;
 import com.f12.moitz.application.dto.recommendation.PlaceRecommendResponse;
 import com.f12.moitz.application.dto.recommendation.PointResponse;

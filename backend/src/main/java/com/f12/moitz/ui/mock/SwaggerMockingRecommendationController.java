@@ -1,6 +1,6 @@
-package com.f12.moitz.ui;
+package com.f12.moitz.ui.mock;
 
-import com.f12.moitz.application.dto.recommendation.MockRecommendationResponse;
+import com.f12.moitz.application.dto.recommendation.mock.MockRecommendationResponse;
 import com.f12.moitz.application.dto.recommendation.RecommendationCreateResponse;
 import com.f12.moitz.application.dto.recommendation.RecommendationRequest;
 import com.f12.moitz.common.error.ErrorResponse;
