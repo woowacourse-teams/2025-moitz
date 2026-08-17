@@ -12,7 +12,7 @@ public class ErrorResponse {
     @Schema(description = "HTTP 상태 코드", example = "400")
     private final int status;
 
-    @Schema(description = "오류 코드", example = "INVALID_REQUEST")
+    @Schema(description = "오류 코드", example = "C0001")
     private final String code;
 
     @Schema(description = "오류 메시지", example = "잘못된 요청입니다.")
@@ -21,7 +21,7 @@ public class ErrorResponse {
     @Schema(description = "요청 메서드", example = "POST")
     private final String method;
 
-    @Schema(description = "요청 경로", example = "/locations")
+    @Schema(description = "요청 경로", example = "/recommendations")
     private final String path;
 
     @Schema(description = "오류 발생 시간", example = "2023-10-01T12:00:00")
