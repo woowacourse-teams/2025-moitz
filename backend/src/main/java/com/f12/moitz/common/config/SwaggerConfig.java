@@ -11,6 +11,7 @@ import io.swagger.v3.oas.models.media.MediaType;
 import io.swagger.v3.oas.models.responses.ApiResponse;
 import io.swagger.v3.oas.models.responses.ApiResponses;
 import io.swagger.v3.oas.models.servers.Server;
+import java.time.LocalDateTime;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import org.springdoc.core.customizers.OpenApiCustomizer;
@@ -43,19 +44,22 @@ public class SwaggerConfig {
             openApi.getPaths().forEach((path, pathItem) -> {
                 pathItem.readOperationsMap().forEach((httpMethod, operation) -> {
                     var responses = operation.getResponses();
-                    if (path.startsWith("/locations")) {
-                        injectExamplesForErrorEnum(responses, 400, GeneralErrorCode.values());
-                        injectExamplesForErrorEnum(responses, 500, ExternalApiErrorCode.values());
-                    } else if (httpMethod.name().equals("POST") && path.startsWith("/recommendations")) {
-                        injectExamplesForErrorEnum(responses, 400, GeneralErrorCode.values());
-                        injectExamplesForErrorEnum(responses, 500, ExternalApiErrorCode.values());
+                    if (path.equalsIgnoreCase("/recommendations")) {
+                        injectExamplesForErrorEnum(path, httpMethod.name(), responses, 400, GeneralErrorCode.values());
+                        injectExamplesForErrorEnum(path, httpMethod.name(), responses, 500, ExternalApiErrorCode.values());
                     }
                 });
             });
         };
     }
 
-    private void injectExamplesForErrorEnum(final ApiResponses responses, final int statusCode, final ErrorCode[] codes) {
+    private void injectExamplesForErrorEnum(
+            final String path,
+            final String method,
+            final ApiResponses responses,
+            final int statusCode,
+            final ErrorCode[] codes
+    ) {
         final String statusKey = String.valueOf(statusCode);
 
         final ApiResponse apiResponse = responses.computeIfAbsent(
@@ -70,7 +74,7 @@ public class SwaggerConfig {
         }
 
         final MediaType mediaType = content.computeIfAbsent(
-                "*/*",
+                "application/json",
                 k -> new MediaType()
         );
 
@@ -83,20 +87,25 @@ public class SwaggerConfig {
         for (ErrorCode code : codes) {
             final Example example = new Example();
             example.setDescription(code.getMessage());
-            example.setValue(buildExampleResponse(statusCode, code));
+            example.setValue(buildExampleResponse(path, method, statusCode, code));
             examples.put(code.getCode(), example);
         }
 
     }
 
-    private Map<String, Object> buildExampleResponse(final int status, final ErrorCode code) {
+    private Map<String, Object> buildExampleResponse(
+            final String path,
+            final String method,
+            final int status,
+            final ErrorCode code
+    ) {
         return Map.of(
                 "status", status,
                 "code", code.getCode(),
                 "message", code.getClientMessage(),
-                "method", "POST",
-                "path", "/example",
-                "timestamp", "2025-08-07T12:00:00"
+                "method", method,
+                "path", path,
+                "timestamp", LocalDateTime.now()
         );
     }
 
